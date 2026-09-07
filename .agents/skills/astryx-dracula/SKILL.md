@@ -15,7 +15,7 @@ Shared Dracula brand for every Astryx site. Dark-only, no light mode. Never inve
 git clone https://github.com/yuzu-octopus/astryx-dracula.git
 ```
 
-Local mirror at `~/Documents/Projects/astryx-styles`. Copy `astryx-dracula.js`, `theme.css`, `tokens.css`, `fonts/`; re-pull to update.
+Local mirror at `~/Documents/Projects/astryx-dracula`. Copy `astryx-dracula.js`, `theme.css`, `tokens.css`, `fonts/`; re-pull to update.
 
 ## New site
 

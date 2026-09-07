@@ -1,8 +1,8 @@
 ## Astryx Styles (brand source of truth)
 
-Skill: `astryx-styles/.agents/skills/astryx-dracula/SKILL.md` — read it before styling anything.
-Import `astryx-styles/tokens.css` for plain CSS vars, or
-`astryx-styles/astryx-dracula.js` (`astryxDraculaTheme`) + `astryx-styles/theme.css`
+Skill: `astryx-dracula/.agents/skills/astryx-dracula/SKILL.md` — read it before styling anything.
+Import `astryx-dracula/tokens.css` for plain CSS vars, or
+`astryx-dracula/astryx-dracula.js` (`astryxDraculaTheme`) + `astryx-dracula/theme.css`
 with `<Theme theme mode="dark">` from `@astryxdesign/core/theme`.
 Never invent hexes: Dracula bg #282A36 fg #F8F8F2 comment #6272A4
 purple #BD93F9 green #50FA7B red #FF5555 yellow #F1FA8C cyan #8BE9FD
