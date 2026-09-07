@@ -39,6 +39,8 @@ function Kpi({ label, value, delta }: { label: string; value: string; delta: num
 export function Dashboard() {
   return (
     <VStack>
+      <Heading level={2}>Dashboard</Heading>
+      <Text>KPIs, charts, and tables on data tokens.</Text>
       <Grid columns={{ minWidth: 220 }} gap={2}>
         <Kpi label="Visitors" value="84.9k" delta={12} />
         <Kpi label="Page views" value="312k" delta={8} />

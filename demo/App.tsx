@@ -1,31 +1,39 @@
 import { useState } from 'react';
-import { Divider, Heading, Tab, TabList, Text, VStack } from '@astryxdesign/core';
+import { Badge, Banner, Button, CodeBlock, Divider, Heading, Link, Text, VStack } from '@astryxdesign/core';
 import { Theme } from '@astryxdesign/core/theme';
 import { astryxStylesTheme } from '../astryx-theme';
-import { Overview } from './Overview';
-import { ComponentGallery } from './Components';
+import { Palette } from './Palette';
+import { Gallery } from './Gallery';
 import { Dashboard } from './Dashboard';
 import { Quickstart } from './Quickstart';
 
+const HERO_CODE = `import { astryxDraculaTheme } from './astryx-dracula';
+import './theme.css';
+
+<Theme theme={astryxDraculaTheme} mode="dark">
+  <App />
+</Theme>;`;
+
 export default function App() {
-  const [tab, setTab] = useState('overview');
+  const [applied, setApplied] = useState(false);
   return (
     <Theme theme={astryxStylesTheme} mode="dark">
-      <VStack>
-        <Heading level={1}>Astryx Dracula</Heading>
-        <Text>Pure Dracula brand kit for every Astryx site. Dark-only, 11 frozen hexes, zero runtime theme cost.</Text>
-        <TabList value={tab} onChange={setTab} layout="fill" hasDivider>
-          <Tab value="overview" label="Overview" />
-          <Tab value="components" label="Components" />
-          <Tab value="dashboard" label="Dashboard" />
-          <Tab value="quickstart" label="Quickstart" />
-        </TabList>
-        {tab === 'overview' && <Overview go={setTab} />}
-        {tab === 'components' && <ComponentGallery />}
-        {tab === 'dashboard' && <Dashboard />}
-        {tab === 'quickstart' && <Quickstart />}
+      <VStack style={{ maxWidth: 1080, marginInline: 'auto', width: '100%' }}>
+        <Text>
+          Astryx Dracula <Badge label="dark-only" variant="purple" /> <Link href="https://github.com/yuzu-octopus/astryx-theme">GitHub</Link> <Link href="./llms.txt">llms.txt</Link>
+        </Text>
+        <Heading level={1}>Dracula, live in every component</Heading>
+        <Text>Pure Dracula brand kit for Astryx sites. 266 tokens, syntax highlighting, chart colors. Prebuilt CSS, zero runtime cost.</Text>
+        <Button label={applied ? 'Theme applied' : 'Apply the theme'} variant="primary" onClick={() => setApplied(!applied)} />
+        <Link href="https://draculatheme.com">Purple means tappable</Link>
+        {applied && <Banner status="success" title="Theme applied — 266 tokens active" />}
+        <CodeBlock code={HERO_CODE} language="tsx" title="wrap-your-app.tsx" hasLineNumbers isWrapped />
+        <Palette />
+        <Dashboard />
+        <Gallery />
+        <Quickstart />
         <Divider />
-        <Text>Copy the kit from ~/Documents/Projects/astryx-styles. Read the skill before styling anything.</Text>
+        <Text>Copy the kit, read the skill, ship dark interfaces. Dracula spec at draculatheme.com.</Text>
       </VStack>
     </Theme>
   );
