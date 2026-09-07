@@ -5,11 +5,12 @@ Three paths, same hexes. Pick one per site.
 ## Get the kit
 
 ```bash
-git clone https://github.com/yuzu-octopus/astryx-dracula.git
+bun add astryx-dracula
 ```
 
-Copy what you need: `astryx-dracula.js` + `theme.css` (prebuilt), `astryx-theme.ts` (source),
-`tokens.css` (plain CSS), `fonts/` into served `public/fonts/`. Re-pull to update; never fork the hexes per-site.
+Or clone `https://github.com/yuzu-octopus/astryx-dracula.git` and copy
+`astryx-dracula.js` + `theme.css` (prebuilt), `tokens.css` (plain CSS), `fonts/` into served
+`public/fonts/`. Update with a version bump; never fork the hexes per-site.
 
 ## Prebuilt (recommended for Astryx apps)
 

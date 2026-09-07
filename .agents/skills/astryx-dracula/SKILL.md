@@ -12,17 +12,18 @@ Shared Dracula brand for every Astryx site. Dark-only, no light mode. Never inve
 ## Get the kit
 
 ```bash
-git clone https://github.com/yuzu-octopus/astryx-dracula.git
+bun add astryx-dracula
 ```
 
-Local mirror at `~/Documents/Projects/astryx-dracula`. Copy `astryx-dracula.js`, `theme.css`, `tokens.css`, `fonts/`; re-pull to update.
+Clone fallback: `git clone https://github.com/yuzu-octopus/astryx-dracula.git`, then copy
+`astryx-dracula.js`, `theme.css`, `tokens.css`, `fonts/`; re-pull to update.
 
 ## New site
 
 ```bash
-bun add react react-dom @stylexjs/stylex @astryxdesign/core lucide-react
+bun add react react-dom @stylexjs/stylex @astryxdesign/core lucide-react astryx-dracula
 bun add -d typescript vite @vitejs/plugin-react @astryxdesign/cli @types/react @types/react-dom
-cp -r <kit>/fonts public/fonts
+cp -r node_modules/astryx-dracula/fonts public/fonts
 ```
 
 Entry file, in this order:
@@ -30,10 +31,10 @@ Entry file, in this order:
 ```tsx
 import '@astryxdesign/core/reset.css';
 import '@astryxdesign/core/astryx.css';
-import '<kit>/tokens.css';
-import '<kit>/theme.css';
+import 'astryx-dracula/tokens.css';
+import 'astryx-dracula/theme.css';
 import { Theme } from '@astryxdesign/core/theme';
-import { astryxDraculaTheme } from '<kit>/astryx-dracula';
+import { astryxDraculaTheme } from 'astryx-dracula';
 
 <Theme theme={astryxDraculaTheme} mode="dark">
   <App />

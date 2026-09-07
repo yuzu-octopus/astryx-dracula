@@ -25,13 +25,13 @@ export function Quickstart() {
           <VStack gap={3}>
             <HStack gap={2} vAlign="center">
               <Badge label="01" variant="purple" />
-              <Heading level={3}>Clone the Kit</Heading>
+              <Heading level={3}>Add the Package</Heading>
             </HStack>
             <Text type="supporting" color="secondary">
-              Clone the Dracula theme repository to get the frozen tokens, assets, and type definitions.
+              Install the frozen tokens, assets, and type definitions from npm.
             </Text>
             <CodeBlock
-              code="git clone https://github.com/yuzu-octopus/astryx-dracula.git"
+              code="bun add astryx-dracula"
               language="bash"
               hasCopyButton
               width="100%"
@@ -49,7 +49,7 @@ export function Quickstart() {
               Install required peer packages and copy JetBrains Mono fonts into your public asset directory.
             </Text>
             <CodeBlock
-              code={`bun add @astryxdesign/core lucide-react @stylexjs/stylex\ncp -r <kit>/fonts public/fonts`}
+              code={`bun add @astryxdesign/core lucide-react @stylexjs/stylex\ncp -r node_modules/astryx-dracula/fonts public/fonts`}
               language="bash"
               hasCopyButton
               width="100%"
@@ -119,7 +119,7 @@ export function Quickstart() {
               Copy this prompt. Replace SITE with your project path.
             </Text>
             <CodeBlock
-              code={`Style SITE with the Astryx Dracula brand.\n1. Read https://yuzu-octopus.github.io/astryx-dracula/llms.txt and the agent skill it links. Do not guess tokens.\n2. Clone https://github.com/yuzu-octopus/astryx-dracula.git. Copy astryx-dracula.js, theme.css, and fonts/ into SITE.\n3. Wrap the app in <Theme theme={astryxDraculaTheme} mode="dark"> with reset.css, astryx.css, tokens.css, theme.css imported in that order.\n4. Component props first, var(--color-*) second, raw hex never. Discover components with bunx astryx component <Name>.\n5. Migrating: inventory every hex and :root override, map each to a brand token, delete the old theme, then verify with a build plus screenshots.`}
+              code={`Style SITE with the Astryx Dracula brand.\n1. Read https://yuzu-octopus.github.io/astryx-dracula/llms.txt and the agent skill it links. Do not guess tokens.\n2. Run bun add astryx-dracula in SITE. Copy node_modules/astryx-dracula/fonts to public/fonts.\n3. Wrap the app in <Theme theme={astryxDraculaTheme} mode="dark"> with reset.css, astryx.css, tokens.css, theme.css imported in that order.\n4. Component props first, var(--color-*) second, raw hex never. Discover components with bunx astryx component <Name>.\n5. Migrating: inventory every hex and :root override, map each to a brand token, delete the old theme, then verify with a build plus screenshots.`}
               language="plaintext"
               hasCopyButton
               width="100%"
