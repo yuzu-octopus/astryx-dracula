@@ -15,7 +15,7 @@ Shared Dracula brand for every Astryx site. Dark-only, no light mode. Never inve
 git clone https://github.com/yuzu-octopus/astryx-theme.git
 ```
 
-Local mirror at `~/Documents/Projects/astryx-styles`. Kit files you copy: `astryx-dracula.js`, `theme.css`, `astryx-theme.ts` (source), `tokens.css` (plain CSS), `fonts/`.
+Local mirror at `~/Documents/Projects/astryx-styles`. Copy `astryx-dracula.js`, `theme.css`, `tokens.css`, `fonts/`; re-pull to update.
 
 ## New site
 
@@ -48,10 +48,6 @@ Stock Vite React config plus the layer-order snippet in `<kit>/vite.config.ts`. 
 2. Map every found color to the Exact list below; anything unmappable is a brand question, not a new hex.
 3. Replace: delete old theme provider and `:root` overrides, point entry imports at the kit files above, swap raw elements for Card/Text/Link/Stack/Grid.
 4. Verify: `bun run build`, screenshot key pages, confirm no raw hex remains (`grep -ri '#[0-9a-f]\{3,6\}' src --include='*.tsx' --include='*.css'` should show only kit references).
-
-## Updating the kit
-
-`git pull` in the clone, re-copy changed files, run `bun run theme:check` in the kit repo if you edited the theme. Never fork the hexes per-site.
 
 ## Exact token names (use these verbatim)
 
