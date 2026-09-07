@@ -12,6 +12,19 @@ function lum(hex: string): number {
   return 0.2126 * f((n >> 16) & 255) + 0.7152 * f((n >> 8) & 255) + 0.0722 * f(n & 255);
 }
 
+// Alpha-composite an accent wash over the card surface, as the browser does
+// for 10% categorical tint backgrounds.
+function mix(fg: string, alpha: number, bg: string): string {
+  const c = (h: string) => parseInt(h.slice(1), 16);
+  const [f, b] = [c(fg), c(bg)];
+  const ch = (i: number) => {
+    const fv = ((i === 0 ? f >> 16 : i === 1 ? (f >> 8) & 255 : f & 255) / 255) * alpha;
+    const bv = (((i === 0 ? b >> 16 : i === 1 ? (b >> 8) & 255 : b & 255) / 255) * (1 - alpha));
+    return Math.round((fv + bv) * 255).toString(16).padStart(2, '0').toUpperCase();
+  };
+  return `#${ch(0)}${ch(1)}${ch(2)}`;
+}
+
 function ratio(a: string, b: string): number {
   const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
   return (x + 0.05) / (y + 0.05);
@@ -25,13 +38,17 @@ const pairs: Array<[string, string, string, number]> = [
   ['text-accent/bg', '#BD93F9', '#282A36', 3.0],
   ['text-paragraph/bg', '#B0B3C4', '#282A36', 4.5],
   ['text-muted/bg', '#8288A6', '#282A36', 3.0],
-  ['on-accent/accent', '#000000', '#BD93F9', 3.0],
-  ['on-success/success', '#000000', '#50FA7B', 3.0],
-  ['on-warning/warning', '#000000', '#F1FA8C', 3.0],
-  ['on-error/error', '#FFFFFF', '#FF5555', 3.0],
-  ['on-info/info', '#000000', '#8BE9FD', 3.0],
-  ['border/bg', '#44475A', '#282A36', 1.3],
+  ['on-accent/accent', '#21222C', '#BD93F9', 3.0],
+  ['on-success/success', '#21222C', '#50FA7B', 3.0],
+  ['on-warning/warning', '#21222C', '#F1FA8C', 3.0],
+  ['on-error/error', '#21222C', '#FF5555', 3.0],
+  ['on-info/info', '#21222C', '#8BE9FD', 3.0],
+  ['separator/bg', '#44475A', '#282A36', 1.3],
   ['border-em/card', '#6272A4', '#343746', 1.5],
+  ['banner-info/text', '#8BE9FD', mix('#8BE9FD', 0.1, '#343746'), 3.0],
+  ['banner-success/text', '#50FA7B', mix('#50FA7B', 0.1, '#343746'), 3.0],
+  ['banner-warning/text', '#F1FA8C', mix('#F1FA8C', 0.1, '#343746'), 3.0],
+  ['banner-error/text', '#FF5555', mix('#FF5555', 0.1, '#343746'), 3.0],
 ];
 
 let failed = false;

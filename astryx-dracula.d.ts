@@ -6,5 +6,6 @@
  * Core: @astryxdesign/core@0.3.0
  */
 
+/// <reference path="./astryx-dracula.variants.d.ts" />
 import type { DefinedTheme } from '@astryxdesign/core/theme';
 export declare const astryxDraculaTheme: DefinedTheme;

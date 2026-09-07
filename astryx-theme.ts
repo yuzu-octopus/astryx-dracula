@@ -77,9 +77,10 @@ const tokens: Record<string, TokenValue> = {
   '--color-background-card': pin('#343746'),
   '--color-background-popover': pin('#424450'),
   '--color-background-muted': pin('#44475A'),
+  '--color-overlay': pin('#191A21CC'),
   '--color-overlay-hover': pin('#353747'),
   '--color-overlay-pressed': pin('#44475A'),
-  '--color-border': pin('#44475A'),
+  '--color-border': pin(DRA.comment),
   '--color-border-emphasized': pin(DRA.comment),
   // Astryx semantics from Dracula accents (text roles AA-verified)
   '--color-accent': pin(DRA.purple),
@@ -96,13 +97,13 @@ const tokens: Record<string, TokenValue> = {
   '--color-icon-secondary': pin('#9AA1BC'),
   '--color-icon-disabled': pin(DRA.comment),
   '--color-icon-accent': pin(DRA.purple),
-  '--color-on-accent': pin('#000000'),
-  '--color-on-success': pin('#000000'),
-  '--color-on-warning': pin('#000000'),
-  '--color-on-error': pin('#FFFFFF'),
-  '--color-on-info': pin('#000000'),
-  '--color-track': pin('#44475A'),
-  '--color-skeleton': pin('#44475A'),
+  '--color-on-accent': pin('#21222C'),
+  '--color-on-success': pin('#21222C'),
+  '--color-on-warning': pin('#21222C'),
+  '--color-on-error': pin('#21222C'),
+  '--color-on-info': pin('#21222C'),
+  '--color-track': pin(DRA.comment),
+  '--color-skeleton': pin(DRA.comment),
   // Spec functional colors for fills, interactive borders, focus
   '--color-functional-red': pin('#DE5735'),
   '--color-functional-orange': pin('#A39514'),
@@ -121,6 +122,49 @@ const tokens: Record<string, TokenValue> = {
   '--color-data-categorical-teal': pin('#A4FFFF'),
   '--color-data-categorical-brown': pin(DRA.orange),
   '--color-data-categorical-indigo': pin('#D6ACFF'),
+  // Categorical tints: 10% accent wash backgrounds, 30% borders, full accents
+  // for text and icons. Stone badge, banner, and field-status scopes resolve
+  // these, so all status surfaces follow Dracula with zero per-scope hacks.
+  '--color-background-blue': pin('#6272A41A'),
+  '--color-border-blue': pin('#6272A44D'),
+  '--color-icon-blue': pin(DRA.comment),
+  '--color-text-blue': pin(DRA.comment),
+  '--color-background-cyan': pin('#8BE9FD1A'),
+  '--color-border-cyan': pin('#8BE9FD4D'),
+  '--color-icon-cyan': pin(DRA.cyan),
+  '--color-text-cyan': pin(DRA.cyan),
+  '--color-background-gray': pin('#9AA1BC1A'),
+  '--color-border-gray': pin('#9AA1BC4D'),
+  '--color-icon-gray': pin('#9AA1BC'),
+  '--color-text-gray': pin('#9AA1BC'),
+  '--color-background-green': pin('#50FA7B1A'),
+  '--color-border-green': pin('#50FA7B4D'),
+  '--color-icon-green': pin(DRA.green),
+  '--color-text-green': pin(DRA.green),
+  '--color-background-orange': pin('#FFB86C1A'),
+  '--color-border-orange': pin('#FFB86C4D'),
+  '--color-icon-orange': pin(DRA.orange),
+  '--color-text-orange': pin(DRA.orange),
+  '--color-background-pink': pin('#FF79C61A'),
+  '--color-border-pink': pin('#FF79C64D'),
+  '--color-icon-pink': pin(DRA.pink),
+  '--color-text-pink': pin(DRA.pink),
+  '--color-background-purple': pin('#BD93F91A'),
+  '--color-border-purple': pin('#BD93F94D'),
+  '--color-icon-purple': pin(DRA.purple),
+  '--color-text-purple': pin(DRA.purple),
+  '--color-background-red': pin('#FF55551A'),
+  '--color-border-red': pin('#FF55554D'),
+  '--color-icon-red': pin(DRA.red),
+  '--color-text-red': pin(DRA.red),
+  '--color-background-teal': pin('#A4FFFF1A'),
+  '--color-border-teal': pin('#A4FFFF4D'),
+  '--color-icon-teal': pin('#A4FFFF'),
+  '--color-text-teal': pin('#A4FFFF'),
+  '--color-background-yellow': pin('#F1FA8C1A'),
+  '--color-border-yellow': pin('#F1FA8C4D'),
+  '--color-icon-yellow': pin(DRA.yellow),
+  '--color-text-yellow': pin(DRA.yellow),
   // Sequential ramps from scripts/generate-chart-ramps.ts: constant hue/sat
   // per Dracula family, lightness 28/44/60/74/88 for dark-bg distinctness
   '--color-data-purple-5': pin('hsl(264.71 89.47% 28%)'),
@@ -171,7 +215,7 @@ const tokens: Record<string, TokenValue> = {
   // Glance compat vars (widget CSS reads these directly)
   '--color-background': pin(DRA.bg),
   '--color-widget-background': pin('#343746'),
-  '--color-widget-content-border': pin('#44475A'),
+  '--color-widget-content-border': pin(DRA.comment),
   '--color-widget-background-highlight': pin('#44475A'),
   '--color-separator': pin('#44475A'),
   '--color-popover-background': pin('#424450'),
@@ -214,8 +258,8 @@ export const astryxStylesTheme: DefinedTheme = defineTheme({
   components: {
     link: {
       base: {
-        color: 'inherit',
-        textDecoration: 'none',
+        color: 'var(--color-text-accent)',
+        textDecoration: 'underline',
         ':hover': { color: 'var(--color-text-highlight)' },
       },
     },
@@ -231,6 +275,89 @@ export const astryxStylesTheme: DefinedTheme = defineTheme({
         borderRadius: 'var(--border-radius)',
         fontWeight: 'var(--font-weight-normal)',
       },
+    },
+    banner: {
+      base: {
+        borderRadius: 'var(--border-radius)',
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        color: 'var(--color-text-primary)',
+      },
+      'status:info': {
+        '--color-accent-muted': 'var(--color-background-cyan)',
+        borderColor: 'var(--color-info)',
+      },
+      'status:success': {
+        '--color-success-muted': 'var(--color-background-green)',
+        borderColor: 'var(--color-success)',
+      },
+      'status:warning': {
+        '--color-warning-muted': 'var(--color-background-yellow)',
+        borderColor: 'var(--color-warning)',
+      },
+      'status:error': {
+        '--color-error-muted': 'var(--color-background-red)',
+        borderColor: 'var(--color-error)',
+      },
+    },
+    'progressbar-fill': {
+      'variant:accent': {
+        backgroundColor: DRA.purple,
+      },
+      'variant:success': {
+        backgroundColor: DRA.green,
+      },
+      'variant:warning': {
+        backgroundColor: DRA.yellow,
+      },
+      'variant:error': {
+        backgroundColor: DRA.red,
+      },
+    },
+    'text-input': {
+      'status:success': { '--color-success': DRA.green },
+      'status:warning': { '--color-warning': DRA.yellow },
+      'status:error': { '--color-error': DRA.red },
+    },
+    textarea: {
+      'status:success': { '--color-success': DRA.green },
+      'status:warning': { '--color-warning': DRA.yellow },
+      'status:error': { '--color-error': DRA.red },
+    },
+    'number-input': {
+      'status:success': { '--color-success': DRA.green },
+      'status:warning': { '--color-warning': DRA.yellow },
+      'status:error': { '--color-error': DRA.red },
+    },
+    'date-input': {
+      'status:success': { '--color-success': DRA.green },
+      'status:warning': { '--color-warning': DRA.yellow },
+      'status:error': { '--color-error': DRA.red },
+    },
+    'time-input': {
+      'status:success': { '--color-success': DRA.green },
+      'status:warning': { '--color-warning': DRA.yellow },
+      'status:error': { '--color-error': DRA.red },
+    },
+    selector: {
+      'status:success': { '--color-success': DRA.green },
+      'status:warning': { '--color-warning': DRA.yellow },
+      'status:error': { '--color-error': DRA.red },
+    },
+    'multi-selector': {
+      'status:success': { '--color-success': DRA.green },
+      'status:warning': { '--color-warning': DRA.yellow },
+      'status:error': { '--color-error': DRA.red },
+    },
+    typeahead: {
+      'status:success': { '--color-success': DRA.green },
+      'status:warning': { '--color-warning': DRA.yellow },
+      'status:error': { '--color-error': DRA.red },
+    },
+    tokenizer: {
+      'status:success': { '--color-success': DRA.green },
+      'status:warning': { '--color-warning': DRA.yellow },
+      'status:error': { '--color-error': DRA.red },
     },
   },
 });
