@@ -1,25 +1,41 @@
-# Deps
+# Deps (bun.lock stays tracked for reproducible installs)
 node_modules/
 .bun/
 
-# Build
+# Build output
 dist/
 build/
+out/
 *.tsbuildinfo
-
-# Vite
 .vite/
 vite.config.*.timestamp-*
 
-# Env / local
+# Env / local overrides
 .env
 .env.*
 !.env.example
+*.local
 
-# OS / editor
+# OS
 .DS_Store
+Thumbs.db
+
+# Editors / IDE
 .idea/
 .vscode/*
+*.swp
+*~
+*.sublime-project
+*.sublime-workspace
 
-# Logs
+# Logs and test output
 *.log
+npm-debug.log*
+.playwright-mcp/
+test-results/
+playwright-report/
+coverage/
+.nyc_output/
+
+# Archives
+*.tgz

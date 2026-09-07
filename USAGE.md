@@ -2,6 +2,15 @@
 
 Three paths, same hexes. Pick one per site.
 
+## Get the kit
+
+```bash
+git clone https://github.com/yuzu-octopus/astryx-theme.git
+```
+
+Copy what you need: `astryx-dracula.js` + `theme.css` (prebuilt), `astryx-theme.ts` (source),
+`tokens.css` (plain CSS), `fonts/` into served `public/fonts/`. Re-pull to update; never fork the hexes per-site.
+
 ## Prebuilt (recommended for Astryx apps)
 
 Zero runtime cost. Built with `bun run theme:build` from `astryx-theme.ts`.
@@ -74,6 +83,13 @@ theme overrides beat component base styles (see `vite.config.ts` in this repo).
 Advanced: custom `astryx theme build` pipelines need the full StyleX
 source-compile setup. See the `/facebook/astryx` `apps/example-vite`
 README. Not required for this kit.
+
+## Troubleshooting
+
+- Unstyled components: entry is missing `reset.css`/`astryx.css` or the import order is wrong.
+- Monospace fallback: `fonts/` not copied to served `public/fonts/`.
+- Wrong colors after a theme edit: rebuild with `bun run theme:build`; `bun run theme:check` confirms staleness.
+- Old `:root` `--color-*` overrides winning: delete them.
 
 ## Rules
 

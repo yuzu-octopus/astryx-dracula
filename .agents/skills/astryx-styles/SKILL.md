@@ -7,7 +7,15 @@ description: Use when styling an Astryx React app with the shared Dracula brand,
 
 ## Overview
 
-Shared Dracula brand for every Astryx site. Dark-only, no light mode. Kit lives at `~/Documents/Projects/astryx-styles`. Never invent a color or a token name.
+Shared Dracula brand for every Astryx site. Dark-only, no light mode. Never invent a color or a token name.
+
+## Get the kit
+
+```bash
+git clone https://github.com/yuzu-octopus/astryx-theme.git
+```
+
+Local mirror at `~/Documents/Projects/astryx-styles`. Kit files you copy: `astryx-dracula.js`, `theme.css`, `astryx-theme.ts` (source), `tokens.css` (plain CSS), `fonts/`.
 
 ## New site
 
@@ -17,44 +25,64 @@ bun add -d typescript vite @vitejs/plugin-react @astryxdesign/cli @types/react @
 cp -r <kit>/fonts public/fonts
 ```
 
-Entry (once): import `@astryxdesign/core/reset.css`, `@astryxdesign/core/astryx.css`, `<kit>/tokens.css`. Wrap app in `<Theme theme={astryxDraculaTheme} mode="dark">` with `<kit>/astryx-dracula.js` + `<kit>/theme.css`. Stock Vite React config plus the layer-order snippet in `<kit>/vite.config.ts`. Discover components with `bunx astryx component <Name>`.
+Entry file, in this order:
+
+```tsx
+import '@astryxdesign/core/reset.css';
+import '@astryxdesign/core/astryx.css';
+import '<kit>/tokens.css';
+import '<kit>/theme.css';
+import { Theme } from '@astryxdesign/core/theme';
+import { astryxDraculaTheme } from '<kit>/astryx-dracula';
+
+<Theme theme={astryxDraculaTheme} mode="dark">
+  <App />
+</Theme>;
+```
+
+Stock Vite React config plus the layer-order snippet in `<kit>/vite.config.ts`. Discover components with `bunx astryx component <Name>` before use.
 
 ## Migrating a codebase
 
 1. Inventory: grep for `#[0-9a-fA-F]{3,6}`, `:root`, `@apply`, Tailwind/StyleX utilities, and existing theme providers.
 2. Map every found color to the Exact list below; anything unmappable is a brand question, not a new hex.
-3. Replace: delete old theme provider and `:root` overrides, point imports at the kit (prebuilt path), swap raw elements for Card/Text/Link/Stack/Grid.
+3. Replace: delete old theme provider and `:root` overrides, point entry imports at the kit files above, swap raw elements for Card/Text/Link/Stack/Grid.
 4. Verify: `bun run build`, screenshot key pages, confirm no raw hex remains (`grep -ri '#[0-9a-f]\{3,6\}' src --include='*.tsx' --include='*.css'` should show only kit references).
+
+## Updating the kit
+
+`git pull` in the clone, re-copy changed files, run `bun run theme:check` in the kit repo if you edited the theme. Never fork the hexes per-site.
 
 ## Exact token names (use these verbatim)
 
 Background `--color-background`, primary `--color-primary`, positive `--color-positive`,
 negative `--color-negative`, muted text `--color-text-subdue`, primary text `--color-text-primary`,
-border `--color-border`,
-accent `--color-accent`, success `--color-success`, error `--color-error`, warning `--color-warning`,
-info `--color-info`, radius `--radius-element`, spacing `--space-gap` / `--space-viewport`,
-radius `--border-radius`. Raw primitives: `--dracula-bg`, `--dracula-fg`,
+border `--color-border`, accent `--color-accent`, success `--color-success`, error `--color-error`,
+warning `--color-warning`, info `--color-info`, radius `--radius-element` / `--border-radius`,
+spacing `--space-gap` / `--space-viewport`. Raw primitives: `--dracula-bg`, `--dracula-fg`,
 `--dracula-comment`, `--dracula-purple`, `--dracula-green`, `--dracula-red`,
 `--dracula-yellow`, `--dracula-cyan`, `--dracula-pink`, `--dracula-orange`,
 `--dracula-current-line`. Glance widget/text vars: `--color-widget-background`,
 `--color-widget-content-border`, `--color-widget-background-highlight`, `--color-separator`,
 `--color-popover-background`, `--color-popover-border`, `--color-progress-border`,
 `--color-progress-value`, `--color-graph-gridlines`, `--color-text-highlight`,
-`--color-text-paragraph`, `--color-text-base`, `--color-text-base-muted`. Nothing else exists.
+`--color-text-paragraph`, `--color-text-base`, `--color-text-base-muted`. Charts:
+`--color-data-categorical-*` and ramp tokens per `BRAND.md`. Nothing else exists.
 For Astryx tokens beyond the kit, `bunx astryx docs tokens`.
 
 ## Semantics
 
-Purple links and titles unvisited, green positive, red negative, yellow tags, cyan info, pink flair, orange warning. Code blocks use the official `dracula` syntax preset bundled in the theme; charts use `--color-data-categorical-*` (nearest Dracula hues, see `BRAND.md`). No `<div>` for layout. Unknown prop? `bunx astryx component <Name>` — do not guess (`label` on Button, `level` on Heading, `columns` on Grid).
+Purple links and titles unvisited, green positive, red negative, yellow tags, cyan info, pink flair, orange warning. Code blocks use the official `dracula` syntax preset bundled in the theme. No `<div>` for layout. Unknown prop? `bunx astryx component <Name>` — do not guess (`label` on Button, `level` on Heading, `columns` on Grid).
 
-## Changing the brand
+## Troubleshooting
 
-Edit `astryx-theme.ts`, run `bun run theme:build`, commit outputs. `bun run theme:check` fails on stale builds; `bun run audit` checks hexes, fonts, and freshness.
+- Unstyled components → entry is missing `reset.css` or `astryx.css`, or import order is wrong.
+- Monospace fallback → `fonts/` not copied to served `public/fonts/`.
+- Wrong colors after theme edit → rebuild: `bun run theme:build`, or `bun run theme:check` to confirm staleness.
+- Old `:root` `--color-*` overrides still winning → delete them; brand lives in the kit theme.
 
 ## Common Mistakes
 
 - Raw hex/px or invented names (`--color-bg`, `--space-lg`) → Exact list or component prop.
 - Raw `<div>`/`<span>`/`<a>` → Card/Text/Link/Stack/Grid.
-- Old `:root` `--color-*` overrides left in place → delete; brand lives in the kit theme.
-- Forgetting `fonts/` copy → monospace fallback.
 - Source-compile StyleX plugin from the example-vite README → unneeded; kit ships prebuilt CSS.
