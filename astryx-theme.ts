@@ -50,6 +50,20 @@ const draculaSyntax = defineSyntaxTheme({
 
 const tokens: Record<string, TokenValue> = {
   // Compat dims (glance widget CSS; no Astryx collision)
+  '--radius-inner': '4px',
+  '--radius-element': '5px',
+  '--radius-container': '5px',
+  '--radius-page': '5px',
+  '--shadow-low': '0 2px 4px #191A210D, 0 4px 8px #191A211A',
+  '--shadow-med': '0 2px 4px #191A210D, 0 4px 12px #191A211A',
+  '--shadow-high': '0 4px 6px #191A211A, 0 12px 24px #191A2126',
+  '--font-size-h1': '17px',
+  '--font-size-h2': '16px',
+  '--font-size-h3': '15px',
+  '--font-size-h4': '14px',
+  '--font-size-base': '13px',
+  '--font-size-h5': '12px',
+  '--font-size-h6': '11px',
   '--space-gap': '23px',
   '--space-viewport': '15px',
   '--widget-content-vertical': '15px',
@@ -191,9 +205,32 @@ export const astryxStylesTheme: DefinedTheme = defineTheme({
   syntax: draculaSyntax,
   tokens,
   typography: {
-    scale: { base: 14, ratio: 1.25 },
+    scale: { base: 13, ratio: 1.2 },
     body: { family: 'JetBrains Mono', fallbacks: 'monospace' },
-    heading: { family: 'JetBrains Mono', fallbacks: 'monospace', weight: 'normal', weights: { 3: 'bold', 4: 'bold' } },
+    heading: { family: 'JetBrains Mono', fallbacks: 'monospace', weight: 'normal' },
     code: { family: 'JetBrains Mono', fallbacks: 'monospace' },
+  },
+  motion: { fast: 175, medium: 410, slow: 975, ratio: 0.75 },
+  components: {
+    link: {
+      base: {
+        color: 'inherit',
+        textDecoration: 'none',
+        ':hover': { color: 'var(--color-text-highlight)' },
+      },
+    },
+    card: {
+      base: {
+        backgroundColor: 'var(--color-widget-background)',
+        border: '1px solid var(--color-widget-content-border)',
+        borderRadius: 'var(--border-radius)',
+      },
+    },
+    button: {
+      base: {
+        borderRadius: 'var(--border-radius)',
+        fontWeight: 'var(--font-weight-normal)',
+      },
+    },
   },
 });
