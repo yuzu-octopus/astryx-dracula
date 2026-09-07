@@ -6,6 +6,7 @@ import { neutralTheme } from '@astryxdesign/theme-neutral/built';
 // and light-dark() resolves identically in either mode.
 // Mapping mirrors glimpse glanceColorVars: Dracula accents onto valid Astryx
 // tokens, plus glance --color-* vars for widget CSS compat.
+// Component overrides ported verbatim from glimpse buildGlimpseTheme.
 
 const DRA = {
   bg: '#282A36',
@@ -68,6 +69,9 @@ const tokens: Record<string, TokenValue> = {
   '--color-skeleton': pin('#313342'),
   // Glance compat vars (widget CSS reads these directly)
   '--color-background': pin(DRA.bg),
+  '--color-widget-background': pin('#2A2C39'),
+  '--color-widget-content-border': pin('#313342'),
+  '--color-text-highlight': pin('#D3D5DE'),
   '--color-primary': pin(DRA.purple),
   '--color-positive': pin(DRA.green),
   '--color-negative': pin(DRA.red),
@@ -94,5 +98,27 @@ export const astryxStylesTheme: DefinedTheme = defineTheme({
     body: { family: 'JetBrains Mono', fallbacks: 'monospace' },
     heading: { family: 'JetBrains Mono', fallbacks: 'monospace', weight: 'normal' },
     code: { family: 'JetBrains Mono', fallbacks: 'monospace' },
+  },
+  components: {
+    link: {
+      base: {
+        color: 'inherit',
+        textDecoration: 'none',
+        ':hover': { color: 'var(--color-text-highlight)' },
+      },
+    },
+    card: {
+      base: {
+        backgroundColor: 'var(--color-widget-background)',
+        border: '1px solid var(--color-widget-content-border)',
+        borderRadius: 'var(--border-radius)',
+      },
+    },
+    button: {
+      base: {
+        borderRadius: 'var(--border-radius)',
+        fontWeight: 'var(--font-weight-normal)',
+      },
+    },
   },
 });

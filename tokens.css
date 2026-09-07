@@ -2,7 +2,24 @@
  * Plain-CSS path: `@import './tokens.css'` then use var(--color-*) / var(--dracula-*) / var(--space-*).
  * This file is the pre-theme paint fallback (same role as glimpse src/index.css :root).
  * Astryx path: `astryx-theme.ts` (defineTheme) is the runtime theme; this file keeps
- * first paint and non-React pages identical. Do not add new hexes here — audit enforces 11. */
+ * first paint and non-React pages identical. Do not add new hexes here — audit enforces 11.
+ * Fonts: copy `fonts/` to your app's served static dir (Vite: `public/fonts/`) so these resolve. */
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/JetBrainsMono-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/JetBrainsMono-SemiBold.woff2') format('woff2');
+}
 
 :root {
   color-scheme: dark;
@@ -36,6 +53,9 @@
   --font-size-h6: 11px;
 
   --color-background: #282A36;
+  --color-widget-background: #2A2C39;
+  --color-widget-content-border: #313342;
+  --color-text-highlight: #D3D5DE;
   --color-primary: #BD93F9;
   --color-positive: #50FA7B;
   --color-negative: #FF5555;

@@ -53,6 +53,27 @@ Dims: gap 23px, viewport 15px, content 15px/17px, widget-gap 23px, tile-row 96px
 - Demo renders 11 swatches with exact hexes; browser smoke test only.
 - No permanent tests. Throwaway audit script is the check; YAGNI applies to test suites here.
 
-## 8. Explicit non-goals
+## 8. Amendment 2026-09-07: proper-theme hardening (post-implementation review)
 
-No preset library port, no light mode, no npm publish, no per-component token overrides, no framework support beyond React Vite + plain CSS.
+Reread of `bunx astryx docs theme/tokens/typography` plus node_modules type truth found gaps in the v1 kit:
+
+- Component overrides missing. Ported link/card/button base verbatim from glimpse `buildGlimpseTheme`
+  (camelCase keys). Added the three glance vars they reference (`--color-widget-background`,
+  `--color-widget-content-border`, `--color-text-highlight`) to theme + CSS. Build now reports
+  199 token overrides, 5 component overrides.
+- Fonts unshipped. Theme referenced JetBrains Mono with no files. Vendored both woff2 from glimpse
+  into `fonts/`; `@font-face` lives in `tokens.css`; consumers copy `fonts/` to `public/fonts/`.
+  Types confirm font loading is always consumer-side (no `url` in `TypographyRole`).
+- No built artifacts. `bun run theme:build` emits `theme.css` + `astryx-dracula.js`; `bun run theme:check`
+  fails on stale outputs. `USAGE.md` documents the prebuilt path first.
+- Config corrected. The plan's example-vite source-compile setup (StyleX plugin, src alias,
+  `optimizeDeps.exclude`) breaks resolution: glimpse uses prebuilt CSS + runtime injection with a
+  stock Vite config, and `@vitejs/plugin-react` 6 requires Vite 8 (plan said 6). Repo follows glimpse.
+- Demo had no `columns` on Grid (single-column stack) and no Button/Link coverage. Fixed and screenshotted.
+- Agent skill added at `.agents/skills/astryx-styles/SKILL.md` (reference, <500 words), tested with two
+  subagent application scenarios: first run invented token names and raw divs, skill hardened with an
+  exact-token table and no-div rule, second run fully compliant.
+
+## 9. Explicit non-goals
+
+No preset library port, no light mode, no npm publish, no framework support beyond React Vite + plain CSS. Component overrides stay at link/card/button base.

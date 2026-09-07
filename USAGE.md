@@ -1,17 +1,28 @@
 # Using Astryx Styles
 
-Two paths, same hexes. Pick one per site.
+Three paths, same hexes. Pick one per site.
 
-## Plain CSS (any stack)
+## Prebuilt (recommended for Astryx apps)
 
-```css
-@import '../tokens.css';
+Zero runtime cost. Built with `bun run theme:build` from `astryx-theme.ts`.
+
+```tsx
+import { astryxDraculaTheme } from './astryx-dracula';
+import './theme.css';
+
+<Theme theme={astryxDraculaTheme} mode="dark">
+  <App />
+</Theme>;
 ```
 
-Then use `var(--color-primary)`, `var(--dracula-purple)`, `var(--space-gap)`.
-`tokens.css` sets real `:root` values with `color-scheme: dark`, so first paint is correct with no runtime.
+After editing `astryx-theme.ts`, rebuild and verify freshness:
 
-## Astryx (Vite + React + Bun)
+```bash
+bun run theme:build
+bun run theme:check   # fails if committed outputs are stale
+```
+
+## Runtime injection (prototyping)
 
 ```tsx
 import { Theme } from '@astryxdesign/core/theme';
@@ -30,20 +41,36 @@ import '@astryxdesign/core/astryx.css';
 import '../tokens.css';
 ```
 
+## Plain CSS (any stack)
+
+```css
+@import '../tokens.css';
+```
+
+Then use `var(--color-primary)`, `var(--dracula-purple)`, `var(--space-gap)`.
+`tokens.css` sets real `:root` values with `color-scheme: dark`, so first paint is correct with no runtime.
+
+## Fonts
+
+Copy `fonts/` to your app's served static dir (Vite: `public/fonts/`).
+`tokens.css` declares the `@font-face` blocks; the theme sets JetBrains Mono
+for body, heading, and code roles. Without the files, text falls back to
+`monospace` — `bun run audit` fails when they are missing here.
+
 ## Consumer Vite config
 
 No special config needed. This kit follows the glimpse path: prebuilt
-`@astryxdesign/core` CSS plus runtime `<Theme>` injection. A stock Vite React
+`@astryxdesign/core` CSS plus `<Theme>` injection. A stock Vite React
 config works. The only recommended extra is the CSS layer-order snippet so
 theme overrides beat component base styles (see `vite.config.ts` in this repo).
 
-Advanced: zero-runtime precompiled themes via `bunx astryx theme build`
-need the full StyleX source-compile setup (`@stylexjs/unplugin`,
-lightningcss targets, `optimizeDeps.exclude`, src alias). See the
-`/facebook/astryx` `apps/example-vite` README. Not required for this kit.
+Advanced: custom `astryx theme build` pipelines need the full StyleX
+source-compile setup. See the `/facebook/astryx` `apps/example-vite`
+README. Not required for this kit.
 
 ## Rules
 
 - Never invent hexes. New color need goes through `tokens.json` + audit, not a one-off.
-- Never override `--color-*` in app `:root`. Brand changes live in `astryx-theme.ts` via `defineTheme`.
+- Never override `--color-*` in app `:root`. Brand changes live in `astryx-theme.ts` via `defineTheme`, then `bun run theme:build`.
 - Tokens for every value: `var(--color-*|--space-*|--radius-*)`. No raw hex or px in components.
+- Component styling: props first, then theme `components` overrides in `astryx-theme.ts`. No per-app CSS wars.

@@ -1,4 +1,5 @@
-// Audit: fails on Dracula hex drift. Run with `bun scripts/audit-dracula.ts`.
+// Audit: fails on Dracula hex drift or missing font files.
+// Run with `bun scripts/audit-dracula.ts`.
 export {};
 const expected: Record<string, string> = {
   bg: '#282A36',
@@ -14,13 +15,28 @@ const expected: Record<string, string> = {
   yellow: '#F1FA8C',
 };
 
-const css = await Bun.file('tokens.css').text();
 let failed = false;
+const css = await Bun.file('tokens.css').text();
 for (const [name, hex] of Object.entries(expected)) {
   if (!css.toLowerCase().includes(hex.toLowerCase())) {
     console.error(`missing ${name} ${hex} in tokens.css`);
     failed = true;
   }
 }
+if (!css.includes('@font-face')) {
+  console.error('missing @font-face block in tokens.css');
+  failed = true;
+}
+for (const f of ['fonts/JetBrainsMono-Regular.woff2', 'fonts/JetBrainsMono-SemiBold.woff2']) {
+  if (!(await Bun.file(f).exists())) {
+    console.error(`missing font file ${f}`);
+    failed = true;
+  }
+}
+const built = await Bun.file('theme.css').text().catch(() => '');
+if (built && !built.includes('astryx-dracula')) {
+  console.error('theme.css stale: rebuild with `bun run theme:build`');
+  failed = true;
+}
 if (failed) process.exit(1);
-console.log('dracula audit PASS: 11/11 hexes present');
+console.log('dracula audit PASS: 11/11 hexes, fonts, build outputs present');

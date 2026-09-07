@@ -1,4 +1,4 @@
-import { Banner, Card, Grid, Heading, Text } from '@astryxdesign/core';
+import { Banner, Button, Card, Grid, Heading, Link, Text } from '@astryxdesign/core';
 import { Theme } from '@astryxdesign/core/theme';
 import { astryxStylesTheme } from '../astryx-theme';
 
@@ -24,6 +24,12 @@ export default function App() {
         <Text>11 frozen hexes. No new colors without an audit change.</Text>
       </Card>
       <Banner status="info" title="Semantic check: purple links, green good, red bad" />
+      <Card>
+        <Link href="#">Purple means tappable</Link>
+        <Text>Theme link, button, and card overrides live.</Text>
+        <Button label="Primary" variant="primary" />
+        <Button label="Secondary" variant="secondary" />
+      </Card>
       <Grid columns={{ minWidth: 220 }} gap={2}>
         {SWATCHES.map((s) => (
           <Card key={s.name} style={{ backgroundColor: s.hex }}>
