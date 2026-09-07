@@ -169,7 +169,7 @@ export function Gallery() {
             <HStack justify="between" vAlign="center" wrap="wrap" gap={2}>
               <Text>
                 Press <Kbd keys="mod+K" /> to command, inspect <Code>tokens.css</Code>, and follow{' '}
-                <Link href="https://github.com/yuzu-octopus/astryx-theme">the skill guidelines</Link>.
+                <Link href="https://github.com/yuzu-octopus/astryx-dracula">the skill guidelines</Link>.
               </Text>
               <Badge label="Zero runtime" variant="green" />
             </HStack>

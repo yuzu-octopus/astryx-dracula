@@ -1,5 +1,5 @@
 ---
-name: astryx-styles
+name: astryx-dracula
 description: Use when styling an Astryx React app with the shared Dracula brand, starting a new brand site, migrating a codebase to the brand theme, or when UI styling looks inconsistent across brand sites
 ---
 
@@ -12,7 +12,7 @@ Shared Dracula brand for every Astryx site. Dark-only, no light mode. Never inve
 ## Get the kit
 
 ```bash
-git clone https://github.com/yuzu-octopus/astryx-theme.git
+git clone https://github.com/yuzu-octopus/astryx-dracula.git
 ```
 
 Local mirror at `~/Documents/Projects/astryx-styles`. Copy `astryx-dracula.js`, `theme.css`, `tokens.css`, `fonts/`; re-pull to update.

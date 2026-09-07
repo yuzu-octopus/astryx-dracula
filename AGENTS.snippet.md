@@ -1,6 +1,6 @@
 ## Astryx Styles (brand source of truth)
 
-Skill: `astryx-styles/.agents/skills/astryx-styles/SKILL.md` — read it before styling anything.
+Skill: `astryx-styles/.agents/skills/astryx-dracula/SKILL.md` — read it before styling anything.
 Import `astryx-styles/tokens.css` for plain CSS vars, or
 `astryx-styles/astryx-dracula.js` (`astryxDraculaTheme`) + `astryx-styles/theme.css`
 with `<Theme theme mode="dark">` from `@astryxdesign/core/theme`.

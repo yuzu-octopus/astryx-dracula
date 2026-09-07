@@ -262,7 +262,7 @@ const INPUT_STATUS = {
   'status:error': { '--color-error': DRA.red },
 };
 
-export const astryxStylesTheme: DefinedTheme = defineTheme({
+export const astryxDraculaTheme: DefinedTheme = defineTheme({
   name: 'astryx-dracula',
   icons: draculaIconRegistry,
   syntax: draculaSyntax,

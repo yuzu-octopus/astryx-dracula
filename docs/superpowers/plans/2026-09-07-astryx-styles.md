@@ -131,7 +131,7 @@ git commit -m "feat: bun astryx vite scaffold"
 
 **Interfaces:**
 - Consumes: glimpse `src/index.css` :root fallbacks, `src/shared/theme/glanceRamp.ts` ramp math, `src/shared/theme/glimpseTheme.ts` DIMS
-- Produces: `tokens.css` plain-CSS import; `astryx-theme.ts` default export `astryxStylesTheme` for `<Theme theme mode>`
+- Produces: `tokens.css` plain-CSS import; `astryx-theme.ts` default export `astryxDraculaTheme` for `<Theme theme mode>`
 
 - [ ] **Step 1: Write tokens.json (single source)**
 
@@ -260,7 +260,7 @@ const tokens: Record<string, TokenValue> = {
   '--radius-container': '5px',
 };
 
-export const astryxStylesTheme: DefinedTheme = defineTheme({
+export const astryxDraculaTheme: DefinedTheme = defineTheme({
   name: 'astryx-dracula',
   extends: neutralTheme,
   tokens,
@@ -349,9 +349,9 @@ Astryx path:
 
 ```tsx
 import { Theme } from '@astryxdesign/core/theme';
-import { astryxStylesTheme } from '../astryx-theme';
+import { astryxDraculaTheme } from '../astryx-theme';
 
-<Theme theme={astryxStylesTheme} mode="dark">
+<Theme theme={astryxDraculaTheme} mode="dark">
   <App />
 </Theme>;
 ```
@@ -362,7 +362,7 @@ import { astryxStylesTheme } from '../astryx-theme';
 ## Astryx Styles (brand source of truth)
 
 Import `astryx-styles/tokens.css` for plain CSS vars, or
-`astryx-styles/astryx-theme.ts` (`astryxStylesTheme`) with
+`astryx-styles/astryx-theme.ts` (`astryxDraculaTheme`) with
 `<Theme theme mode="dark">` from `@astryxdesign/core/theme`.
 Never invent hexes: Dracula bg #282A36 fg #F8F8F2 comment #6272A4
 purple #BD93F9 green #50FA7B red #FF5555 yellow #F1FA8C cyan #8BE9FD

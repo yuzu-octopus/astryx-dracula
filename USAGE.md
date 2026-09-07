@@ -5,7 +5,7 @@ Three paths, same hexes. Pick one per site.
 ## Get the kit
 
 ```bash
-git clone https://github.com/yuzu-octopus/astryx-theme.git
+git clone https://github.com/yuzu-octopus/astryx-dracula.git
 ```
 
 Copy what you need: `astryx-dracula.js` + `theme.css` (prebuilt), `astryx-theme.ts` (source),
@@ -36,9 +36,9 @@ bun run theme:check   # fails if committed outputs are stale
 
 ```tsx
 import { Theme } from '@astryxdesign/core/theme';
-import { astryxStylesTheme } from '../astryx-theme';
+import { astryxDraculaTheme } from '../astryx-theme';
 
-<Theme theme={astryxStylesTheme} mode="dark">
+<Theme theme={astryxDraculaTheme} mode="dark">
   <App />
 </Theme>;
 ```

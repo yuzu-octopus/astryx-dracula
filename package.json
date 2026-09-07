@@ -16,7 +16,7 @@
     "typescript": "^7.0.2",
     "vite": "^8.0.0"
   },
-  "name": "astryx-styles",
+  "name": "astryx-dracula",
   "private": true,
   "scripts": {
     "audit": "bun scripts/check.ts",

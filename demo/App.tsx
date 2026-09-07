@@ -18,7 +18,7 @@ import {
   VStack,
 } from '@astryxdesign/core';
 import { Theme } from '@astryxdesign/core/theme';
-import { astryxStylesTheme } from '../astryx-theme';
+import { astryxDraculaTheme } from '../astryx-theme';
 import { Palette } from './Palette';
 import { Gallery } from './Gallery';
 import { Dashboard } from './Dashboard';
@@ -44,7 +44,7 @@ export default function App() {
   }, []);
 
   return (
-    <Theme theme={astryxStylesTheme} mode="dark">
+    <Theme theme={astryxDraculaTheme} mode="dark">
       <AppShell
         height="auto"
         contentPadding={0}
@@ -71,7 +71,7 @@ export default function App() {
               <HStack gap={2} vAlign="center">
                 {!narrow && (
                   <>
-                    <Link href="https://github.com/yuzu-octopus/astryx-theme" isExternalLink>
+                    <Link href="https://github.com/yuzu-octopus/astryx-dracula" isExternalLink>
                       GitHub
                     </Link>
                     <Link href="./llms.txt">llms.txt</Link>
@@ -215,7 +215,7 @@ export default function App() {
                   </Text>
                 </VStack>
                 <HStack gap={2} vAlign="center">
-                  <Link href="https://github.com/yuzu-octopus/astryx-theme" isExternalLink>
+                  <Link href="https://github.com/yuzu-octopus/astryx-dracula" isExternalLink>
                     GitHub
                   </Link>
                   <Link href="./llms.txt">llms.txt</Link>

@@ -31,7 +31,7 @@ export function Quickstart() {
               Clone the Dracula theme repository to get the frozen tokens, assets, and type definitions.
             </Text>
             <CodeBlock
-              code="git clone https://github.com/yuzu-octopus/astryx-theme.git"
+              code="git clone https://github.com/yuzu-octopus/astryx-dracula.git"
               language="bash"
               hasCopyButton
               width="100%"
@@ -119,7 +119,7 @@ export function Quickstart() {
               Copy this prompt. Replace SITE with your project path.
             </Text>
             <CodeBlock
-              code={`Style SITE with the Astryx Dracula brand.\n1. Read https://yuzu-octopus.github.io/astryx-theme/llms.txt and the agent skill it links. Do not guess tokens.\n2. Clone https://github.com/yuzu-octopus/astryx-theme.git. Copy astryx-dracula.js, theme.css, and fonts/ into SITE.\n3. Wrap the app in <Theme theme={astryxDraculaTheme} mode="dark"> with reset.css, astryx.css, tokens.css, theme.css imported in that order.\n4. Component props first, var(--color-*) second, raw hex never. Discover components with bunx astryx component <Name>.\n5. Migrating: inventory every hex and :root override, map each to a brand token, delete the old theme, then verify with a build plus screenshots.`}
+              code={`Style SITE with the Astryx Dracula brand.\n1. Read https://yuzu-octopus.github.io/astryx-dracula/llms.txt and the agent skill it links. Do not guess tokens.\n2. Clone https://github.com/yuzu-octopus/astryx-dracula.git. Copy astryx-dracula.js, theme.css, and fonts/ into SITE.\n3. Wrap the app in <Theme theme={astryxDraculaTheme} mode="dark"> with reset.css, astryx.css, tokens.css, theme.css imported in that order.\n4. Component props first, var(--color-*) second, raw hex never. Discover components with bunx astryx component <Name>.\n5. Migrating: inventory every hex and :root override, map each to a brand token, delete the old theme, then verify with a build plus screenshots.`}
               language="plaintext"
               hasCopyButton
               width="100%"

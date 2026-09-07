@@ -6,17 +6,17 @@ Use the links below to style a site with this theme or migrate a codebase to it.
 
 ## Start here
 
-- [Agent skill](https://raw.githubusercontent.com/yuzu-octopus/astryx-theme/main/.agents/skills/astryx-styles/SKILL.md): Exact token names, new-site steps, migration steps, common mistakes.
-- [Usage guide](https://raw.githubusercontent.com/yuzu-octopus/astryx-theme/main/USAGE.md): Prebuilt, runtime, and plain-CSS paths plus Vite setup.
-- [Brand reference](https://raw.githubusercontent.com/yuzu-octopus/astryx-theme/main/BRAND.md): Frozen palette, semantic map, charts, code highlighting, deliberate neutrals.
+- [Agent skill](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/.agents/skills/astryx-dracula/SKILL.md): Exact token names, new-site steps, migration steps, common mistakes.
+- [Usage guide](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/USAGE.md): Prebuilt, runtime, and plain-CSS paths plus Vite setup.
+- [Brand reference](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/BRAND.md): Frozen palette, semantic map, charts, code highlighting, deliberate neutrals.
 
 ## Theme source
 
-- [Theme definition](https://raw.githubusercontent.com/yuzu-octopus/astryx-theme/main/astryx-theme.ts): defineTheme source with all token overrides.
-- [Plain CSS tokens](https://raw.githubusercontent.com/yuzu-octopus/astryx-theme/main/tokens.css): :root fallbacks and font declarations.
-- [Token source](https://raw.githubusercontent.com/yuzu-octopus/astryx-theme/main/tokens.json): Single source of primitives and dims.
+- [Theme definition](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/astryx-theme.ts): defineTheme source with all token overrides.
+- [Plain CSS tokens](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/tokens.css): :root fallbacks and font declarations.
+- [Icon registry](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/icons.tsx): Vendored Lucide icons, zero theme dependencies.
 
 ## Optional
 
-- [Live showcase](https://yuzu-octopus.github.io/astryx-theme/): Overview, component gallery, dashboard, and quickstart.
+- [Live showcase](https://yuzu-octopus.github.io/astryx-dracula/): Overview, component gallery, dashboard, and quickstart.
 - [Dracula spec](https://draculatheme.com/contribute): Official palette this theme freezes.

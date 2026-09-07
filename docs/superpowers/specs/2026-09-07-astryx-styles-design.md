@@ -70,7 +70,7 @@ Reread of `bunx astryx docs theme/tokens/typography` plus node_modules type trut
   `optimizeDeps.exclude`) breaks resolution: glimpse uses prebuilt CSS + runtime injection with a
   stock Vite config, and `@vitejs/plugin-react` 6 requires Vite 8 (plan said 6). Repo follows glimpse.
 - Demo had no `columns` on Grid (single-column stack) and no Button/Link coverage. Fixed and screenshotted.
-- Agent skill added at `.agents/skills/astryx-styles/SKILL.md` (reference, <500 words), tested with two
+- Agent skill added at `.agents/skills/astryx-dracula/SKILL.md` (reference, <500 words), tested with two
   subagent application scenarios: first run invented token names and raw divs, skill hardened with an
   exact-token table and no-div rule, second run fully compliant.
 - Full surface audit of `DefineThemeInput` (name, extends, typography, motion, radius, color, tokens,
