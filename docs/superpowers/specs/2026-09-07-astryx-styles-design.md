@@ -73,6 +73,11 @@ Reread of `bunx astryx docs theme/tokens/typography` plus node_modules type trut
 - Agent skill added at `.agents/skills/astryx-styles/SKILL.md` (reference, <500 words), tested with two
   subagent application scenarios: first run invented token names and raw divs, skill hardened with an
   exact-token table and no-div rule, second run fully compliant.
+- Full surface audit of `DefineThemeInput` (name, extends, typography, motion, radius, color, tokens,
+  components, icons, syntax, onDark): added official `syntax: dracula` preset and 10
+  `--color-data-categorical-*` chart tokens in nearest Dracula hues (build: 221 token overrides).
+  Deliberately unset with reasons in `BRAND.md`: motion, radius/color scales, icons, onDark,
+  sequential chart ramps.
 
 ## 9. Explicit non-goals
 
