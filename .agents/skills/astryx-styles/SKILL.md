@@ -62,7 +62,9 @@ spacing `--space-gap` / `--space-viewport`. Raw primitives: `--dracula-bg`, `--d
 `--color-widget-content-border`, `--color-widget-background-highlight`, `--color-separator`,
 `--color-popover-background`, `--color-popover-border`, `--color-progress-border`,
 `--color-progress-value`, `--color-graph-gridlines`, `--color-text-highlight`,
-`--color-text-paragraph`, `--color-text-base`, `--color-text-base-muted`. Charts:
+`--color-text-paragraph`, `--color-text-base`, `--color-text-base-muted`. Status tints:
+`--color-background-<blue|cyan|gray|green|orange|pink|purple|red|teal|yellow>` (10% washes),
+`--color-functional-<red|orange|green|cyan|purple>` (fills and focus). Charts:
 `--color-data-categorical-*` and ramp tokens per `BRAND.md`. Nothing else exists.
 For Astryx tokens beyond the kit, `bunx astryx docs tokens`.
 

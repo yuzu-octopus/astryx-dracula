@@ -77,6 +77,11 @@ Reread of `bunx astryx docs theme/tokens/typography` plus node_modules type trut
   components, icons, syntax, onDark): added official `syntax: dracula` preset and 10
   `--color-data-categorical-*` chart tokens in nearest Dracula hues, plus 9 five-step sequential
   ramps from `scripts/generate-chart-ramps.ts` (constant hue/sat, lightness 28/44/60/74/88).
+- dracula-ui audit round: on-fill text is `#21222C` (spec never uses raw black), links render
+  accent underlined resolving to foreground on hover, banner surfaces route through muted tokens
+  per Stone architecture (no direct fills), categorical bg/border/text tints added for all 10 hues,
+  input status scopes and progress fills pinned to Dracula, borders and tracks raised to visible.
+  Warning stays yellow over orange by brand choice; classic syntax hexes kept over dracula-ui brights.
   Deliberately unset with reasons in `BRAND.md`: motion, radius/color scales, icon glyphs
   (lucide-react, like glimpse), onDark, `--color-data-neutral`. Radii copy glimpse; dark-only stated.
 
