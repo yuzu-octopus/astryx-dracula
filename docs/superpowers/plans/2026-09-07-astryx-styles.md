@@ -15,7 +15,7 @@
 - Pure Dracula hexes only, verified vs https://draculatheme.com/contribute and https://spec.draculatheme.com/: bg #282A36, current-line #44475A, fg #F8F8F2, comment #6272A4, cyan #8BE9FD, green #50FA7B, orange #FFB86C, pink #FF79C6, purple #BD93F9, red #FF5555, yellow #F1FA8C.
 - Package manager `bun` / `bunx` only, never npm/npx/node/pip.
 - Astryx API truth is `node_modules/@astryxdesign/core/dist/**/*.d.ts` (`defineTheme`, `<Theme theme mode>`); never invent ThemeProvider/createTheme.
-- Vite StyleX config follows `/facebook/astryx` example-vite: css-layer order style tag, lightningcss targets chrome 123 / firefox 120 / safari 17.5, `optimizeDeps.exclude` Astryx packages, stylex plugin before react plugin.
+- Vite config follows glimpse (prebuilt CSS + runtime Theme): stock Vite React plus css-layer order style tag. No StyleX plugin, no src alias, no `optimizeDeps.exclude`.
 - Files now, package later. No npm publish in this plan.
 - Dark-only. No light-mode inversion (pure Dracula is dark-only).
 
@@ -56,12 +56,13 @@
   },
   "devDependencies": {
     "@astryxdesign/cli": "^0.3.0",
-    "@stylexjs/unplugin": "^0.19.0",
+    "@types/bun": "^1.4.1",
+    "@types/node": "^26.4.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.1.0",
     "typescript": "^7.0.2",
-    "vite": "^6.0.0"
+    "vite": "^8.0.0"
   },
   "trustedDependencies": [
     "@astryxdesign/core",
@@ -75,22 +76,11 @@
 Run: `bun install`
 Expected: PASS, `bun.lock` created, no npm/npx used.
 
-- [ ] **Step 3: Write vite.config.ts per Astryx example-vite**
+- [ ] **Step 3: Write vite.config.ts (glimpse-style minimal, prebuilt CSS path)**
 
 ```typescript
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import stylex from '@stylexjs/unplugin';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const lightningcssTargets = {
-  chrome: 123 << 16,
-  firefox: 120 << 16,
-  safari: (17 << 16) | (5 << 8),
-};
 
 export default defineConfig({
   plugins: [
@@ -107,31 +97,8 @@ export default defineConfig({
         ];
       },
     },
-    stylex.vite({
-      dev: process.env.NODE_ENV === 'development',
-      runtimeInjection: false,
-      treeshakeCompensation: true,
-      useCSSLayers: true,
-      unstable_moduleResolution: { type: 'commonJS', rootDir: __dirname },
-      lightningcssOptions: { targets: lightningcssTargets },
-    }),
     react(),
   ],
-  resolve: {
-    alias: {
-      '@astryxdesign/core/theme/tokens.stylex': path.resolve(
-        __dirname,
-        'node_modules/@astryxdesign/core/src/theme/tokens.stylex.ts',
-      ),
-      '@astryxdesign/core': path.resolve(
-        __dirname,
-        'node_modules/@astryxdesign/core/src',
-      ),
-    },
-  },
-  optimizeDeps: {
-    exclude: ['@astryxdesign/core', '@astryxdesign/theme-neutral'],
-  },
 });
 ```
 
@@ -245,31 +212,69 @@ git commit -m "feat: bun astryx vite scaffold"
 }
 ```
 
-- [ ] **Step 3: Write astryx-theme.ts (defineTheme, dark tuples pinned)**
+- [ ] **Step 3: Write astryx-theme.ts (valid Astryx tokens, dark tuples pinned)**
+
+Token names MUST be valid `TokenName`s (see `node_modules/@astryxdesign/core/dist/theme/tokens.stylex.d.ts`).
+Glimpse-style: build a `Record<string, TokenValue>` (bypasses excess-property checks for glance compat vars),
+`extends: neutralTheme`, JetBrains Mono typography. Dracula accents map to `--color-accent/success/error/warning/info`,
+surfaces to `--color-background-body/surface/card/popover/muted`, plus glance `--color-*` compat vars.
 
 ```typescript
-import { defineTheme } from '@astryxdesign/core/theme';
+import { defineTheme, type DefinedTheme, type TokenValue } from '@astryxdesign/core/theme';
+import { neutralTheme } from '@astryxdesign/theme-neutral/built';
 
-export const astryxStylesTheme = defineTheme({
+const pin = (hex: string): [string, string] => [hex, hex];
+
+const tokens: Record<string, TokenValue> = {
+  '--space-gap': '23px',
+  '--space-viewport': '15px',
+  '--widget-content-vertical': '15px',
+  '--widget-content-horizontal': '17px',
+  '--widget-gap': '23px',
+  '--tile-row': '96px',
+  '--border-radius': '5px',
+  '--color-background-body': pin('#282A36'),
+  '--color-background-surface': pin('#2A2C39'),
+  '--color-background-card': pin('#2A2C39'),
+  '--color-background-popover': pin('#2D3040'),
+  '--color-background-muted': pin('#313342'),
+  '--color-border': pin('#313342'),
+  '--color-border-emphasized': pin('#424559'),
+  '--color-accent': pin('#BD93F9'),
+  '--color-accent-muted': pin('#8BE9FD'),
+  '--color-success': pin('#50FA7B'),
+  '--color-error': pin('#FF5555'),
+  '--color-warning': pin('#F1FA8C'),
+  '--color-info': pin('#8BE9FD'),
+  '--color-text-accent': pin('#BD93F9'),
+  '--color-icon-accent': pin('#BD93F9'),
+  '--color-background': pin('#282A36'),
+  '--color-primary': pin('#BD93F9'),
+  '--color-text-subdue': pin('#4C5067'),
+  '--radius-element': '5px',
+  '--radius-container': '5px',
+};
+
+export const astryxStylesTheme: DefinedTheme = defineTheme({
   name: 'astryx-dracula',
-  tokens: {
-    '--color-background': ['#282A36', '#282A36'],
-    '--color-primary': ['#BD93F9', '#BD93F9'],
-    '--color-positive': ['#50FA7B', '#50FA7B'],
-    '--color-negative': ['#FF5555', '#FF5555'],
-    '--color-warning': ['#F1FA8C', '#F1FA8C'],
-    '--color-info': ['#8BE9FD', '#8BE9FD'],
-    '--color-tag-orange': ['#FFB86C', '#FFB86C'],
-    '--color-tag-pink': ['#FF79C6', '#FF79C6'],
-    '--border-radius': '5px',
-    '--space-gap': '23px',
+  extends: neutralTheme,
+  tokens,
+  typography: {
+    scale: { base: 13, ratio: 1.2 },
+    body: { family: 'JetBrains Mono', fallbacks: 'monospace' },
+    heading: { family: 'JetBrains Mono', fallbacks: 'monospace', weight: 'normal' },
+    code: { family: 'JetBrains Mono', fallbacks: 'monospace' },
   },
 });
 ```
 
+Also add `@types/bun` + `@types/node` to devDependencies and `"types": ["bun", "node", "vite/client"]` in tsconfig.json
+(vite.config `path`/`url`/`process` globals and `Bun.file`/`process.exit` in scripts need them — matches glimpse).
+
 - [ ] **Step 4: Write scripts/audit-dracula.ts (fails on hex drift)**
 
 ```typescript
+export {};
 const expected: Record<string, string> = {
   bg: '#282A36',
   currentLine: '#44475A',
@@ -317,6 +322,7 @@ git commit -m "feat: pure dracula tokens css and astryx theme"
 - Create: `USAGE.md`
 - Create: `AGENTS.snippet.md`
 - Create: `demo/App.tsx`
+- Create: `demo/main.tsx`
 
 **Interfaces:**
 - Consumes: Task 2 tokens
@@ -360,7 +366,9 @@ pink #FF79C6 orange #FFB86C current-line #44475A.
 
 - [ ] **Step 4: Write demo/App.tsx (swatch grid proving tokens)**
 
-Renders 11 swatches reading `var(--dracula-*)` plus Card/Banner/Text from `@astryxdesign/core` inside `<Theme>`. No test file; visual proof only.
+Renders 11 swatches plus Card/Banner/Heading/Text/Grid from `@astryxdesign/core` inside `<Theme>`.
+`Heading` needs `level={1}`. `demo/main.tsx` imports `@astryxdesign/core/reset.css`,
+`@astryxdesign/core/astryx.css`, `../tokens.css` then mounts `App`. No test file; visual proof only.
 
 - [ ] **Step 5: Verify demo serves**
 
@@ -370,6 +378,6 @@ Expected: PASS.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add BRAND.md USAGE.md AGENTS.snippet.md demo/App.tsx
+git add BRAND.md USAGE.md AGENTS.snippet.md demo/App.tsx demo/main.tsx
 git commit -m "docs: brand kit docs and demo"
 ```

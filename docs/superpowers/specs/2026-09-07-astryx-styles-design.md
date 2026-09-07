@@ -9,7 +9,7 @@ One brand source of truth in `astryx-styles/` so every Astryx site renders ident
 ## 2. Sources of truth
 
 - Glimpse runtime: `glimpse/src/index.css` `:root` fallbacks, `src/shared/theme/glanceRamp.ts` ramp math, `src/shared/theme/glimpseTheme.ts` DIMS + semantic map, `src/shared/theme/presets.ts` (not ported; reference only).
-- Astryx docs (`/facebook/astryx` via Context7): `bunx @astryxdesign/cli init` after `bun add -d @astryxdesign/cli`; `defineTheme({ name, tokens })` with `[light, dark]` tuples compiled to `light-dark()`; `<Theme theme mode>` provider; Vite example-vite StyleX config (css-layer order, lightningcss targets chrome 123 / firefox 120 / safari 17.5, `optimizeDeps.exclude`, stylex before react).
+- Astryx docs (`/facebook/astryx` via Context7): `bunx @astryxdesign/cli init` after `bun add -d @astryxdesign/cli`; `defineTheme({ name, tokens })` with `[light, dark]` tuples compiled to `light-dark()`; `<Theme theme mode>` provider; Vite example-vite StyleX config (reference only). This repo follows the glimpse prebuilt path instead: stock Vite React plus the css-layer order snippet, no StyleX plugin, no src alias.
 - Dracula spec (web): https://draculatheme.com/contribute and https://spec.draculatheme.com/. Canonical hexes: bg #282A36, current-line #44475A, fg #F8F8F2, comment #6272A4, cyan #8BE9FD, green #50FA7B, orange #FFB86C, pink #FF79C6, purple #BD93F9, red #FF5555, yellow #F1FA8C. Glimpse hexes match byte-for-byte (case-insensitive); freeze them.
 
 ## 3. Decisions
@@ -32,7 +32,7 @@ Dims: gap 23px, viewport 15px, content 15px/17px, widget-gap 23px, tile-row 96px
 - `tokens.json`: single source (primitives + dims + semantic).
 - `tokens.css`: plain-CSS `:root` real values, `color-scheme: dark`.
 - `astryx-theme.ts`: `defineTheme({ name: 'astryx-dracula', tokens })`, dark hexes pinned in both tuple slots.
-- `vite.config.ts`: repo build config, verbatim Astryx example-vite StyleX setup (css-layer order, lightningcss targets, optimizeDeps exclude). `USAGE.md` reprints the plugin block as the consumer copy-paste snippet.
+- `vite.config.ts`: glimpse-style minimal config (css-layer order + react only). `USAGE.md` shows the consumer copy: stock Vite React plus the layer-order snippet.
 - `scripts/audit-dracula.ts`: asserts all 11 hexes present in `tokens.css`, exit 1 on drift.
 - `BRAND.md`: palette table + semantic map + dims.
 - `USAGE.md`: plain CSS `@import` path + Astryx `<Theme theme mode="dark">` path.
