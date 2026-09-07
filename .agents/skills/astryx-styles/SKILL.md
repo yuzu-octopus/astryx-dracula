@@ -7,7 +7,7 @@ description: Use when styling an Astryx React app with the shared Dracula brand,
 
 ## Overview
 
-Shared Dracula brand for every Astryx site. Kit lives at `~/Documents/Projects/astryx-styles`. Never invent a color or a token name.
+Shared Dracula brand for every Astryx site. Dark-only, no light mode. Kit lives at `~/Documents/Projects/astryx-styles`. Never invent a color or a token name.
 
 ## New site
 

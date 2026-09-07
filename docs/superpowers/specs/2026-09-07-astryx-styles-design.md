@@ -75,9 +75,10 @@ Reread of `bunx astryx docs theme/tokens/typography` plus node_modules type trut
   exact-token table and no-div rule, second run fully compliant.
 - Full surface audit of `DefineThemeInput` (name, extends, typography, motion, radius, color, tokens,
   components, icons, syntax, onDark): added official `syntax: dracula` preset and 10
-  `--color-data-categorical-*` chart tokens in nearest Dracula hues (build: 221 token overrides).
-  Deliberately unset with reasons in `BRAND.md`: motion, radius/color scales, icons, onDark,
-  sequential chart ramps.
+  `--color-data-categorical-*` chart tokens in nearest Dracula hues, plus 9 five-step sequential
+  ramps from `scripts/generate-chart-ramps.ts` (constant hue/sat, lightness 28/44/60/74/88).
+  Deliberately unset with reasons in `BRAND.md`: motion, radius/color scales, icon glyphs
+  (lucide-react, like glimpse), onDark, `--color-data-neutral`. Radii copy glimpse; dark-only stated.
 
 ## 9. Explicit non-goals
 
