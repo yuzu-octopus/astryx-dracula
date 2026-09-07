@@ -6,6 +6,7 @@ import react from '@vitejs/plugin-react';
 // (The /facebook/astryx example-vite source-compile setup is only for
 // zero-runtime `astryx theme build` consumers; see USAGE.md.)
 export default defineConfig({
+  base: '/astryx-theme/',
   plugins: [
     // Declare CSS layer order so theme overrides beat component base styles.
     {
