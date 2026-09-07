@@ -45,7 +45,7 @@ For Astryx tokens beyond the kit, `bunx astryx docs tokens`.
 
 ## Semantics
 
-Purple links and titles unvisited, green positive, red negative, yellow tags, cyan info, pink flair, orange warning. No `<div>` for layout. Unknown prop? `bunx astryx component <Name>` — do not guess (`label` on Button, `level` on Heading, `columns` on Grid).
+Purple links and titles unvisited, green positive, red negative, yellow tags, cyan info, pink flair, orange warning. Code blocks use the official `dracula` syntax preset bundled in the theme; charts use `--color-data-categorical-*` (nearest Dracula hues, see `BRAND.md`). No `<div>` for layout. Unknown prop? `bunx astryx component <Name>` — do not guess (`label` on Button, `level` on Heading, `columns` on Grid).
 
 ## Changing the brand
 

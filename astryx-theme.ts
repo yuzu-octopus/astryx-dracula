@@ -1,4 +1,5 @@
 import { defineTheme, type DefinedTheme, type TokenValue } from '@astryxdesign/core/theme';
+import { dracula } from '@astryxdesign/core/theme/syntax';
 import { neutralTheme } from '@astryxdesign/theme-neutral/built';
 
 // Astryx Styles — pure Dracula theme for `<Theme theme mode>`.
@@ -70,6 +71,18 @@ const tokens: Record<string, TokenValue> = {
   '--color-on-error': pin('#FFFFFF'),
   '--color-track': pin('#313342'),
   '--color-skeleton': pin('#313342'),
+  // Charts: categorical series in nearest Dracula hues (teal/brown/indigo have
+  // no spectral match, so they reuse cyan/orange/purple)
+  '--color-data-categorical-blue': pin(DRA.comment),
+  '--color-data-categorical-orange': pin(DRA.orange),
+  '--color-data-categorical-purple': pin(DRA.purple),
+  '--color-data-categorical-green': pin(DRA.green),
+  '--color-data-categorical-pink': pin(DRA.pink),
+  '--color-data-categorical-cyan': pin(DRA.cyan),
+  '--color-data-categorical-red': pin(DRA.red),
+  '--color-data-categorical-teal': pin(DRA.cyan),
+  '--color-data-categorical-brown': pin(DRA.orange),
+  '--color-data-categorical-indigo': pin(DRA.purple),
   // Glance compat vars (widget CSS reads these directly)
   '--color-background': pin(DRA.bg),
   '--color-widget-background': pin('#2A2C39'),
@@ -107,6 +120,7 @@ const tokens: Record<string, TokenValue> = {
 export const astryxStylesTheme: DefinedTheme = defineTheme({
   name: 'astryx-dracula',
   extends: neutralTheme,
+  syntax: dracula,
   tokens,
   typography: {
     scale: { base: 13, ratio: 1.2 },
