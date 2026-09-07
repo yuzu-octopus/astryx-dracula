@@ -2,7 +2,7 @@ import { Card, Code, Heading, Text, VStack } from '@astryxdesign/core';
 
 export function Quickstart() {
   return (
-    <VStack>
+    <VStack gap={4}>
       <Heading level={2}>Quickstart</Heading>
       <Text>Four steps, in order.</Text>
       <Card>

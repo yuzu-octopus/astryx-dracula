@@ -17,10 +17,10 @@ const SWATCHES: Array<{ name: string; hex: string; fg: string }> = [
 
 export function Palette() {
   return (
-    <VStack>
+    <VStack gap={4}>
       <Heading level={2}>Palette</Heading>
       <Text>Twelve spec tokens. Every token below resolves to one of these.</Text>
-      <Grid columns={{ minWidth: 220 }} gap={2}>
+      <Grid columns={{ minWidth: 220 }} gap={3}>
         {SWATCHES.map((s) => (
           <Card key={s.name} style={{ backgroundColor: s.hex }}>
             <Text style={{ color: s.fg }}>

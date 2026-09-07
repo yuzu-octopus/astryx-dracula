@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AppShell, Badge, Banner, Button, CodeBlock, Divider, Heading, Link, Text, TopNav } from '@astryxdesign/core';
+import { AppShell, Badge, Banner, Button, Card, CodeBlock, Divider, Heading, Link, Text, TopNav } from '@astryxdesign/core';
 import { Theme } from '@astryxdesign/core/theme';
 import { astryxStylesTheme } from '../astryx-theme';
 import { Palette } from './Palette';
@@ -51,11 +51,13 @@ export default function App() {
         }
       >
         <section id="top">
-          <Heading level={1}>Dracula, live in every component</Heading>
-          <Text>Pure Dracula brand kit for Astryx sites. Full token system, syntax highlighting, chart colors. Prebuilt CSS, zero runtime cost.</Text>
-          <Button label={applied ? 'Theme applied' : 'Apply the theme'} variant="primary" onClick={() => setApplied(!applied)} />
-          <Link href="https://draculatheme.com">Purple means tappable</Link>
-          {applied && <Banner status="success" title="Theme applied" />}
+          <Card padding={6}>
+            <Heading level={1}>Dracula, live in every component</Heading>
+            <Text>Pure Dracula brand kit for Astryx sites. Full token system, syntax highlighting, chart colors. Prebuilt CSS, zero runtime cost.</Text>
+            <Button label={applied ? 'Theme applied' : 'Apply the theme'} variant="primary" onClick={() => setApplied(!applied)} />
+            <Link href="https://draculatheme.com">Purple means tappable</Link>
+            {applied && <Banner status="success" title="Theme applied" />}
+          </Card>
           <CodeBlock code={HERO_CODE} language="tsx" title="wrap-your-app.tsx" hasLineNumbers isWrapped />
         </section>
         <Divider />

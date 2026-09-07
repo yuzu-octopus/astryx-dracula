@@ -2,7 +2,7 @@ import { Badge, Banner, Button, Card, Code, Grid, Heading, Kbd, Link, ProgressBa
 
 export function Gallery() {
   return (
-    <VStack>
+    <VStack gap={4}>
       <Heading level={2}>Components</Heading>
       <Text>Statuses, actions, and tags wearing the ramp.</Text>
       <Banner status="info" title="Info: deploy preview ready" />
@@ -10,7 +10,7 @@ export function Gallery() {
       <Banner status="warning" title="Warning: stale theme.css" />
       <Banner status="error" title="Error: hex drift detected" />
       <Card>
-        <Grid columns={{ minWidth: 160 }} gap={2}>
+        <Grid columns={{ minWidth: 160 }} gap={3}>
           <Button label="Primary" variant="primary" />
           <Button label="Secondary" variant="secondary" />
           <Button label="Ghost" variant="ghost" />

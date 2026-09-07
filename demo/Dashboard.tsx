@@ -26,7 +26,7 @@ const TRAFFIC: TrafficRow[] = [
 function Kpi({ label, value, delta }: { label: string; value: string; delta: number }) {
   const up = delta >= 0;
   return (
-    <Card>
+    <Card padding={5}>
       <Text>{label}</Text>
       <Heading level={3} type="display-2">{value}</Heading>
       <Text style={{ color: up ? 'var(--color-positive)' : 'var(--color-negative)' }}>
@@ -38,10 +38,10 @@ function Kpi({ label, value, delta }: { label: string; value: string; delta: num
 
 export function Dashboard() {
   return (
-    <VStack>
+    <VStack gap={4}>
       <Heading level={2}>Dashboard</Heading>
       <Text>KPIs, charts, and tables on data tokens.</Text>
-      <Grid columns={{ minWidth: 220 }} gap={2}>
+      <Grid columns={{ minWidth: 220 }} gap={3}>
         <Kpi label="Visitors" value="84.9k" delta={12} />
         <Kpi label="Page views" value="312k" delta={8} />
         <Kpi label="Bounce" value="31%" delta={-3} />
