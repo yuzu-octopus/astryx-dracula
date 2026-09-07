@@ -51,6 +51,14 @@ Text on fills is always `#21222C`; spec never uses raw black. Links render accen
 with underline and resolve to foreground on hover. Focus and interactive edges
 use Functional Purple `#815CD6`.
 
+## Interactions
+
+Buttons darken on hover; destructive pairs red fill with dark text. Links render accent
+underlined and resolve to foreground on hover. Focus rings use accent, not Functional
+Purple: 5.9 contrast beats 3.5 on dark backgrounds, verified by keyboard screenshot.
+Inputs take accent and error rings from core; table rows lift on hover. Cards, banners,
+badges, and progress bars are static.
+
 ## Deliberately unset (neutral defaults)
 
 Radii flat and crisp (5px elements, 4px inner). Everything below is a core default unless noted:
