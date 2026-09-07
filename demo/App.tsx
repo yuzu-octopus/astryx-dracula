@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Badge, Banner, Button, CodeBlock, Divider, Heading, Link, Text, VStack } from '@astryxdesign/core';
+import { Badge, Banner, Button, Card, CodeBlock, Divider, Heading, Link, Text, VStack } from '@astryxdesign/core';
 import { Theme } from '@astryxdesign/core/theme';
 import { astryxStylesTheme } from '../astryx-theme';
 import { Palette } from './Palette';
