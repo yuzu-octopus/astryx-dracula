@@ -1,0 +1,25 @@
+# Deps
+node_modules/
+.bun/
+
+# Build
+dist/
+build/
+*.tsbuildinfo
+
+# Vite
+.vite/
+vite.config.*.timestamp-*
+
+# Env / local
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/*
+
+# Logs
+*.log
