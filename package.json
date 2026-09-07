@@ -43,7 +43,7 @@
     "tokens.css"
   ],
   "license": "MIT",
-  "name": "@yuzu-octopus/astryx-dracula",
+  "name": "astryx-dracula",
   "peerDependencies": {
     "@astryxdesign/core": "^0.3.0",
     "react": ">=19.0.0",

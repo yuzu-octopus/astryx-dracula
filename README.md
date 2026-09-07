@@ -1,6 +1,6 @@
 # astryx-dracula
 
-[![NPM version](https://img.shields.io/npm/v/@yuzu-octopus/astryx-dracula.svg)](https://www.npmjs.com/package/@yuzu-octopus/astryx-dracula)
+[![NPM version](https://img.shields.io/npm/v/astryx-dracula.svg)](https://www.npmjs.com/package/astryx-dracula)
 [![Build Status](https://github.com/yuzu-octopus/astryx-dracula/workflows/Deploy%20showcase/badge.svg)](https://github.com/yuzu-octopus/astryx-dracula/actions)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -20,15 +20,15 @@ Live showcase: https://yuzu-octopus.github.io/astryx-dracula/
 ## Installation
 
 ```bash
-bun add @yuzu-octopus/astryx-dracula
+bun add astryx-dracula
 ```
 
 ## Usage
 
 ```tsx
 import { Theme } from '@astryxdesign/core/theme';
-import { astryxDraculaTheme } from '@yuzu-octopus/astryx-dracula';
-import '@yuzu-octopus/astryx-dracula/theme.css';
+import { astryxDraculaTheme } from 'astryx-dracula';
+import 'astryx-dracula/theme.css';
 
 <Theme theme={astryxDraculaTheme} mode="dark">
   <App />
