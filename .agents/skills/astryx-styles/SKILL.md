@@ -36,7 +36,12 @@ info `--color-info`, radius `--radius-element`, spacing `--space-gap` / `--space
 radius `--border-radius`. Raw primitives: `--dracula-bg`, `--dracula-fg`,
 `--dracula-comment`, `--dracula-purple`, `--dracula-green`, `--dracula-red`,
 `--dracula-yellow`, `--dracula-cyan`, `--dracula-pink`, `--dracula-orange`,
-`--dracula-current-line`. Nothing else exists. For Astryx tokens beyond the kit, `bunx astryx docs tokens`.
+`--dracula-current-line`. Glance widget/text vars: `--color-widget-background`,
+`--color-widget-content-border`, `--color-widget-background-highlight`, `--color-separator`,
+`--color-popover-background`, `--color-popover-border`, `--color-progress-border`,
+`--color-progress-value`, `--color-graph-gridlines`, `--color-text-highlight`,
+`--color-text-paragraph`, `--color-text-base`, `--color-text-base-muted`. Nothing else exists.
+For Astryx tokens beyond the kit, `bunx astryx docs tokens`.
 
 ## Semantics
 
