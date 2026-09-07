@@ -16,7 +16,7 @@ export function Quickstart() {
       <VStack gap={1}>
         <Heading level={2}>Quickstart</Heading>
         <Text type="supporting" color="secondary">
-          Four steps to drop pure Dracula into your Astryx application.
+          Five steps to drop pure Dracula into your Astryx application.
         </Text>
       </VStack>
 
@@ -106,6 +106,24 @@ export function Quickstart() {
                 </HStack>
               </VStack>
             </Card>
+          </VStack>
+        </Card>
+
+        <Card padding={4}>
+          <VStack gap={3}>
+            <HStack gap={2} vAlign="center">
+              <Badge label="05" variant="purple" />
+              <Heading level={3}>Delegate To An Agent</Heading>
+            </HStack>
+            <Text type="supporting" color="secondary">
+              Copy this prompt. Replace SITE with your project path.
+            </Text>
+            <CodeBlock
+              code={`Style SITE with the Astryx Dracula brand.\n1. Read https://yuzu-octopus.github.io/astryx-theme/llms.txt and the agent skill it links. Do not guess tokens.\n2. Clone https://github.com/yuzu-octopus/astryx-theme.git. Copy astryx-dracula.js, theme.css, and fonts/ into SITE.\n3. Wrap the app in <Theme theme={astryxDraculaTheme} mode="dark"> with reset.css, astryx.css, tokens.css, theme.css imported in that order.\n4. Component props first, var(--color-*) second, raw hex never. Discover components with bunx astryx component <Name>.\n5. Migrating: inventory every hex and :root override, map each to a brand token, delete the old theme, then verify with a build plus screenshots.`}
+              language="plaintext"
+              hasCopyButton
+              width="100%"
+            />
           </VStack>
         </Card>
       </Grid>
