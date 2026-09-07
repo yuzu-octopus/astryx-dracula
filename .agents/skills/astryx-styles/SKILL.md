@@ -20,7 +20,7 @@ Local mirror at `~/Documents/Projects/astryx-styles`. Copy `astryx-dracula.js`, 
 ## New site
 
 ```bash
-bun add react react-dom @stylexjs/stylex @astryxdesign/core @astryxdesign/theme-neutral
+bun add react react-dom @stylexjs/stylex @astryxdesign/core @astryxdesign/theme-stone
 bun add -d typescript vite @vitejs/plugin-react @astryxdesign/cli @types/react @types/react-dom
 cp -r <kit>/fonts public/fonts
 ```
@@ -54,7 +54,7 @@ Stock Vite React config plus the layer-order snippet in `<kit>/vite.config.ts`. 
 Background `--color-background`, primary `--color-primary`, positive `--color-positive`,
 negative `--color-negative`, muted text `--color-text-subdue`, primary text `--color-text-primary`,
 border `--color-border`, accent `--color-accent`, success `--color-success`, error `--color-error`,
-warning `--color-warning`, info `--color-info`, radius `--radius-element` / `--border-radius`,
+warning `--color-warning`, info `--color-info`, icon `--color-icon-primary` / `--color-icon-secondary` / `--color-icon-disabled` / `--color-icon-accent`, radius `--radius-element` / `--border-radius`,
 spacing `--space-gap` / `--space-viewport`. Raw primitives: `--dracula-bg`, `--dracula-fg`,
 `--dracula-comment`, `--dracula-purple`, `--dracula-green`, `--dracula-red`,
 `--dracula-yellow`, `--dracula-cyan`, `--dracula-pink`, `--dracula-orange`,
@@ -64,7 +64,7 @@ spacing `--space-gap` / `--space-viewport`. Raw primitives: `--dracula-bg`, `--d
 `--color-progress-value`, `--color-graph-gridlines`, `--color-text-highlight`,
 `--color-text-paragraph`, `--color-text-base`, `--color-text-base-muted`. Status tints:
 `--color-background-<blue|cyan|gray|green|orange|pink|purple|red|teal|yellow>` (10% washes),
-`--color-functional-<red|orange|green|cyan|purple>` (fills and focus). Charts:
+`--color-functional-<red|orange|green|cyan|purple>`. Charts:
 `--color-data-categorical-*` and ramp tokens per `BRAND.md`. Nothing else exists.
 For Astryx tokens beyond the kit, `bunx astryx docs tokens`.
 

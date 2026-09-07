@@ -6,9 +6,14 @@
 
 **Architecture:** Extract-then-freeze from glimpse. Single source `tokens.json` generates `tokens.css` and `astryx-theme.ts`. Demo proves tokens render. Docs give agents copy-paste snippets.
 
-**Tech Stack:** Bun 1.4, React 19, `@astryxdesign/core` 0.3.0, `@astryxdesign/theme-neutral` 0.3.0, `@stylexjs/stylex` 0.19.0, Vite 6, TypeScript strict.
+**Tech Stack:** Bun 1.4, React 19, `@astryxdesign/core` 0.3.0, `@astryxdesign/theme-stone` 0.3.0 (replaced theme-neutral after execution), `@stylexjs/stylex` 0.19.0, Vite 8 (required by plugin-react 6), TypeScript strict.
 
 **Spec:** `docs/superpowers/specs/2026-09-07-astryx-styles-design.md` (this repo, written next commit)
+
+> Currency notice: this plan is the executed record and its hex blocks predate the official
+> spec.mdx reading (current-line is #6272A4 shared with comment, selection is #44475A;
+> UI palette and functional colors added later). Current truth lives in `astryx-theme.ts`,
+> `tokens.css`, `BRAND.md`, and the spec amendment. Do not implement from the code blocks below.
 
 ## Global Constraints
 

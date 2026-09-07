@@ -52,15 +52,30 @@
   --widget-gap: 23px;
   --tile-row: 96px;
   --border-radius: 5px;
+  --radius-element: 5px;
   --font-family-mono: 'JetBrains Mono', ui-monospace, monospace;
 
   --color-background: #282A36;
+  --color-accent: #BD93F9;
+  --color-success: #50FA7B;
+  --color-error: #FF5555;
+  --color-warning: #F1FA8C;
+  --color-info: #8BE9FD;
+  --color-text-primary: #F8F8F2;
+  --color-text-secondary: #9AA1BC;
+  --color-text-disabled: #6272A4;
+  --color-text-accent: #BD93F9;
+  --color-border: #6272A4;
   --color-widget-background: #343746;
-  --color-widget-content-border: #44475A;
+  --color-widget-content-border: #6272A4;
   --color-widget-background-highlight: #44475A;
   --color-separator: #44475A;
   --color-popover-background: #424450;
   --color-popover-border: #6272A4;
+  --color-graph-gridlines: #44475A;
+  --color-progress-border: #44475A;
+  --color-progress-value: #6272A4;
+  --color-widget-shadow: #21222C;
   --color-text-highlight: #F8F8F2;
   --color-text-paragraph: #B0B3C4;
   --color-text-base: #9AA1BC;
@@ -71,9 +86,6 @@
   --color-primary: #BD93F9;
   --color-positive: #50FA7B;
   --color-negative: #FF5555;
-  --color-warning: #F1FA8C;
-  --color-info: #8BE9FD;
   --color-tag-orange: #FFB86C;
   --color-tag-pink: #FF79C6;
-  --color-text-subdue: #4C5067;
 }

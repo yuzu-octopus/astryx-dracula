@@ -10,7 +10,7 @@ One brand source of truth in `astryx-styles/` so every Astryx site renders ident
 
 - Glimpse runtime: `glimpse/src/index.css` `:root` fallbacks, `src/shared/theme/glanceRamp.ts` ramp math, `src/shared/theme/glimpseTheme.ts` DIMS + semantic map, `src/shared/theme/presets.ts` (not ported; reference only).
 - Astryx docs (`/facebook/astryx` via Context7): `bunx @astryxdesign/cli init` after `bun add -d @astryxdesign/cli`; `defineTheme({ name, tokens })` with `[light, dark]` tuples compiled to `light-dark()`; `<Theme theme mode>` provider; Vite example-vite StyleX config (reference only). This repo follows the glimpse prebuilt path instead: stock Vite React plus the css-layer order snippet, no StyleX plugin, no src alias.
-- Dracula spec (web): https://draculatheme.com/contribute and https://spec.draculatheme.com/. Canonical hexes: bg #282A36, current-line #44475A, fg #F8F8F2, comment #6272A4, cyan #8BE9FD, green #50FA7B, orange #FFB86C, pink #FF79C6, purple #BD93F9, red #FF5555, yellow #F1FA8C. Glimpse hexes match byte-for-byte (case-insensitive); freeze them.
+- Dracula spec (web): https://draculatheme.com/contribute and https://spec.draculatheme.com/. Canonical hexes: bg #282A36, current-line #6272A4 (shared with comment), selection #44475A, fg #F8F8F2, comment #6272A4, cyan #8BE9FD, green #50FA7B, orange #FFB86C, pink #FF79C6, purple #BD93F9, red #FF5555, yellow #F1FA8C, plus the spec UI palette (light #343746, lighter #424450, dark #21222C) and functional colors (red #DE5735, orange #A39514, green #089108, cyan #0081D6, purple #815CD6). Source file spec.mdx supersedes earlier web summaries.
 
 ## 3. Decisions
 
@@ -57,10 +57,10 @@ Dims: gap 23px, viewport 15px, content 15px/17px, widget-gap 23px, tile-row 96px
 
 Reread of `bunx astryx docs theme/tokens/typography` plus node_modules type truth found gaps in the v1 kit:
 
-- Component overrides missing. Ported link/card/button base verbatim from glimpse `buildGlimpseTheme`
+- Component overrides missing. Ported link/card/button base from glimpse `buildGlimpseTheme`, then customized link to accent-plus-underline for brand visibility (glimpse uses inherit/none)
   (camelCase keys). Added the three glance vars they reference (`--color-widget-background`,
   `--color-widget-content-border`, `--color-text-highlight`) to theme + CSS. Build now reports
-  199 token overrides, 5 component overrides.
+  270+ token overrides, 16 component overrides (`bun run theme:build` reports exact counts; do not hardcode them here).
 - Fonts unshipped. Theme referenced JetBrains Mono with no files. Vendored both woff2 from glimpse
   into `fonts/`; `@font-face` lives in `tokens.css`; consumers copy `fonts/` to `public/fonts/`.
   Types confirm font loading is always consumer-side (no `url` in `TypographyRole`).

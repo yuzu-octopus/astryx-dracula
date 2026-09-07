@@ -16,6 +16,7 @@ Copy what you need: `astryx-dracula.js` + `theme.css` (prebuilt), `astryx-theme.
 Zero runtime cost. Built with `bun run theme:build` from `astryx-theme.ts`.
 
 ```tsx
+import { Theme } from '@astryxdesign/core/theme';
 import { astryxDraculaTheme } from './astryx-dracula';
 import './theme.css';
 

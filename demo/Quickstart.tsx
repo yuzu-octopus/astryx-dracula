@@ -64,10 +64,10 @@ export function Quickstart() {
               <Heading level={3}>Wrap Your Application Root</Heading>
             </HStack>
             <Text type="supporting" color="secondary">
-              Import the prebuilt stylesheet and pass <Code>astryxStylesTheme</Code> to the Theme provider.
+              Import the prebuilt stylesheet and pass <Code>astryxDraculaTheme</Code> to the Theme provider.
             </Text>
             <CodeBlock
-              code={`import { astryxStylesTheme } from './astryx-theme';\nimport './tokens.css';\n\n<Theme theme={astryxStylesTheme} mode="dark">\n  <App />\n</Theme>;`}
+              code={`import { Theme } from '@astryxdesign/core/theme';\nimport { astryxDraculaTheme } from './astryx-dracula';\nimport './theme.css';\n\n<Theme theme={astryxDraculaTheme} mode="dark">\n  <App />\n</Theme>;`}
               language="tsx"
               title="src/main.tsx"
               hasLineNumbers
