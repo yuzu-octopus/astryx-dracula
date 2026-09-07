@@ -63,7 +63,7 @@ Then use `var(--color-primary)`, `var(--dracula-purple)`, `var(--space-gap)`.
 ## Migrating an existing site
 
 1. Inventory: grep for hex colors, `:root` blocks, Tailwind/StyleX utilities, and existing theme providers.
-2. Map every found color to `tokens.json`. Unmappable colors are brand questions, not new hexes.
+2. Map every found color to `BRAND.md`. Unmappable colors are brand questions, not new hexes.
 3. Replace: delete the old theme provider and `:root` overrides, point imports at the kit prebuilt path, swap raw elements for Astryx components.
 4. Verify: build, screenshot key pages, confirm no stray hexes remain in `src/`.
 
@@ -94,7 +94,7 @@ README. Not required for this kit.
 
 ## Rules
 
-- Never invent hexes. New color need goes through `tokens.json` + audit, not a one-off.
+- Never invent hexes. New color need goes through `astryx-theme.ts` + audit, not a one-off.
 - Never override `--color-*` in app `:root`. Brand changes live in `astryx-theme.ts` via `defineTheme`, then `bun run theme:build`.
 - Tokens for every value: `var(--color-*|--space-*|--radius-*)`. No raw hex or px in components.
 - Component styling: props first, then theme `components` overrides in `astryx-theme.ts`. No per-app CSS wars.

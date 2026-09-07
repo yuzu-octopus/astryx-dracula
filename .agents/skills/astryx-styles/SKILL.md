@@ -20,7 +20,7 @@ Local mirror at `~/Documents/Projects/astryx-styles`. Copy `astryx-dracula.js`, 
 ## New site
 
 ```bash
-bun add react react-dom @stylexjs/stylex @astryxdesign/core @astryxdesign/theme-stone
+bun add react react-dom @stylexjs/stylex @astryxdesign/core lucide-react
 bun add -d typescript vite @vitejs/plugin-react @astryxdesign/cli @types/react @types/react-dom
 cp -r <kit>/fonts public/fonts
 ```

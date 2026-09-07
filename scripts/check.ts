@@ -1,6 +1,5 @@
-// Contrast audit for the Dracula theme. Run with `bun scripts/check-contrast.ts`.
-// Floors follow the Dracula spec (WCAG 2.1 AA 4.5 for body text): body 4.5,
-// secondary 4.5, disabled/non-essential 2.5, on-fill 3.0, hairlines 1.3.
+// Kit checks: Dracula palette purity plus WCAG contrast floors.
+// Run with `bun scripts/check.ts`.
 export {};
 
 function lum(hex: string): number {
@@ -12,24 +11,59 @@ function lum(hex: string): number {
   return 0.2126 * f((n >> 16) & 255) + 0.7152 * f((n >> 8) & 255) + 0.0722 * f(n & 255);
 }
 
+function ratio(a: string, b: string): number {
+  const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
+  return (x + 0.05) / (y + 0.05);
+}
+
 // Alpha-composite an accent wash over the card surface, as the browser does
 // for 10% categorical tint backgrounds.
 function mix(fg: string, alpha: number, bg: string): string {
   const c = (h: string) => parseInt(h.slice(1), 16);
   const [f, b] = [c(fg), c(bg)];
   const ch = (i: number) => {
-    const fv = ((i === 0 ? f >> 16 : i === 1 ? (f >> 8) & 255 : f & 255) / 255) * alpha;
+    const fv = (((i === 0 ? f >> 16 : i === 1 ? (f >> 8) & 255 : f & 255) / 255) * alpha);
     const bv = (((i === 0 ? b >> 16 : i === 1 ? (b >> 8) & 255 : b & 255) / 255) * (1 - alpha));
     return Math.round((fv + bv) * 255).toString(16).padStart(2, '0').toUpperCase();
   };
   return `#${ch(0)}${ch(1)}${ch(2)}`;
 }
 
-function ratio(a: string, b: string): number {
-  const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
-  return (x + 0.05) / (y + 0.05);
-}
+let failed = false;
+const fail = (msg: string) => {
+  console.error(msg);
+  failed = true;
+};
 
+// Palette purity: every official hex present in tokens.css, plus fonts and
+// fresh build outputs.
+const expected: Record<string, string> = {
+  bg: '#282A36',
+  currentLine: '#6272A4',
+  selection: '#44475A',
+  fg: '#F8F8F2',
+  comment: '#6272A4',
+  cyan: '#8BE9FD',
+  green: '#50FA7B',
+  orange: '#FFB86C',
+  pink: '#FF79C6',
+  purple: '#BD93F9',
+  red: '#FF5555',
+  yellow: '#F1FA8C',
+};
+
+const css = await Bun.file('tokens.css').text();
+for (const [name, hex] of Object.entries(expected)) {
+  if (!css.toLowerCase().includes(hex.toLowerCase())) fail(`missing ${name} ${hex} in tokens.css`);
+}
+if (!css.includes('@font-face')) fail('missing @font-face block in tokens.css');
+for (const f of ['fonts/JetBrainsMono-Regular.woff2', 'fonts/JetBrainsMono-SemiBold.woff2']) {
+  if (!(await Bun.file(f).exists())) fail(`missing font file ${f}`);
+}
+const built = await Bun.file('theme.css').text().catch(() => '');
+if (built && !built.includes('astryx-dracula')) fail('theme.css stale: rebuild with `bun run theme:build`');
+
+// Contrast floors per the Dracula spec (WCAG 2.1 AA 4.5 for body text).
 const pairs: Array<[string, string, string, number]> = [
   ['text-primary/bg', '#F8F8F2', '#282A36', 4.5],
   ['text-secondary/bg', '#9AA1BC', '#282A36', 4.5],
@@ -50,13 +84,10 @@ const pairs: Array<[string, string, string, number]> = [
   ['banner-warning/text', '#F1FA8C', mix('#F1FA8C', 0.1, '#343746'), 3.0],
   ['banner-error/text', '#FF5555', mix('#FF5555', 0.1, '#343746'), 3.0],
 ];
-
-let failed = false;
 for (const [name, fg, bg, floor] of pairs) {
   const r = ratio(fg, bg);
-  const ok = r >= floor;
-  if (!ok) failed = true;
-  console.log(`${ok ? 'PASS' : 'FAIL'} ${name} ${r.toFixed(2)} (floor ${floor})`);
+  if (r < floor) fail(`FAIL ${name} ${r.toFixed(2)} (floor ${floor})`);
+  else console.log(`PASS ${name} ${r.toFixed(2)}`);
 }
 if (failed) process.exit(1);
-console.log('contrast audit PASS');
+console.log('kit checks PASS');

@@ -1,5 +1,5 @@
 import { defineTheme, defineSyntaxTheme, type DefinedTheme, type TokenValue } from '@astryxdesign/core/theme';
-import { stoneTheme } from '@astryxdesign/theme-stone/built';
+import { draculaIconRegistry } from './icons';
 
 // Astryx Styles — pure Dracula theme for `<Theme theme mode>`.
 // Dark-only: Dracula Classic is a dark spec, so both tuple slots pin the same
@@ -11,7 +11,7 @@ import { stoneTheme } from '@astryxdesign/theme-stone/built';
 // Key spec readings: Current Line #6272A4 doubles as the subtle-border color,
 // Selection #44475A is the quiet surface, UI surfaces come from the spec UI
 // palette, state indicators use Functional colors, text meets WCAG AA
-// (verified by scripts/check-contrast.ts).
+// (verified by scripts/check.ts).
 
 const DRA = {
   bg: '#282A36',
@@ -54,9 +54,6 @@ const tokens: Record<string, TokenValue> = {
   '--radius-element': '5px',
   '--radius-container': '5px',
   '--radius-page': '5px',
-  '--shadow-low': '0 2px 4px #191A210D, 0 4px 8px #191A211A',
-  '--shadow-med': '0 2px 4px #191A210D, 0 4px 12px #191A211A',
-  '--shadow-high': '0 4px 6px #191A211A, 0 12px 24px #191A2126',
   '--font-size-h1': '17px',
   '--font-size-h2': '16px',
   '--font-size-h3': '15px',
@@ -64,6 +61,21 @@ const tokens: Record<string, TokenValue> = {
   '--font-size-base': '13px',
   '--font-size-h5': '12px',
   '--font-size-h6': '11px',
+  '--shadow-low': '0 2px 4px #191A210D, 0 4px 8px #191A211A',
+  '--shadow-med': '0 2px 4px #191A210D, 0 4px 12px #191A211A',
+  '--shadow-high': '0 4px 6px #191A211A, 0 12px 24px #191A2126',
+  '--shadow-inset-hover': 'inset 0px 0px 0px 2px #6272A430',
+  '--shadow-inset-success': 'inset 0px 0px 0px 2px #50FA7B30',
+  '--shadow-inset-warning': 'inset 0px 0px 0px 2px #F1FA8C30',
+  '--shadow-inset-error': 'inset 0px 0px 0px 2px #FF555530',
+  '--color-neutral': pin('#F8F8F21A'),
+  '--color-background-inverted': pin('#F8F8F2'),
+  '--color-background-error-inverted': pin('#FFD5CC'),
+  '--color-accent-muted': 'var(--color-background-purple)',
+  '--color-success-muted': 'var(--color-background-green)',
+  '--color-warning-muted': 'var(--color-background-yellow)',
+  '--color-error-muted': 'var(--color-background-red)',
+  '--color-info-muted': 'var(--color-background-cyan)',
   '--space-gap': '23px',
   '--space-viewport': '15px',
   '--widget-content-vertical': '15px',
@@ -84,7 +96,6 @@ const tokens: Record<string, TokenValue> = {
   '--color-border-emphasized': pin(DRA.comment),
   // Astryx semantics from Dracula accents (text roles AA-verified)
   '--color-accent': pin(DRA.purple),
-  '--color-accent-muted': pin(DRA.cyan),
   '--color-success': pin(DRA.green),
   '--color-error': pin(DRA.red),
   '--color-warning': pin(DRA.yellow),
@@ -165,8 +176,8 @@ const tokens: Record<string, TokenValue> = {
   '--color-border-yellow': pin('#F1FA8C4D'),
   '--color-icon-yellow': pin(DRA.yellow),
   '--color-text-yellow': pin(DRA.yellow),
-  // Sequential ramps from scripts/generate-chart-ramps.ts: constant hue/sat
-  // per Dracula family, lightness 28/44/60/74/88 for dark-bg distinctness
+  // Sequential ramps: constant hue/sat per Dracula family, lightness
+  // 28/44/60/74/88 for dark-bg distinctness
   '--color-data-purple-5': pin('hsl(264.71 89.47% 28%)'),
   '--color-data-purple-4': pin('hsl(264.71 89.47% 44%)'),
   '--color-data-purple-3': pin('hsl(264.71 89.47% 60%)'),
@@ -243,9 +254,17 @@ const tokens: Record<string, TokenValue> = {
   '--color-tag-blue': pin(DRA.purple),
 };
 
+// Input validation tint shared by all 9 input components (stone shapes it per
+// component; one const keeps the nine in lockstep).
+const INPUT_STATUS = {
+  'status:success': { '--color-success': DRA.green },
+  'status:warning': { '--color-warning': DRA.yellow },
+  'status:error': { '--color-error': DRA.red },
+};
+
 export const astryxStylesTheme: DefinedTheme = defineTheme({
   name: 'astryx-dracula',
-  extends: stoneTheme,
+  icons: draculaIconRegistry,
   syntax: draculaSyntax,
   tokens,
   typography: {
@@ -314,50 +333,30 @@ export const astryxStylesTheme: DefinedTheme = defineTheme({
         backgroundColor: DRA.red,
       },
     },
-    'text-input': {
-      'status:success': { '--color-success': DRA.green },
-      'status:warning': { '--color-warning': DRA.yellow },
-      'status:error': { '--color-error': DRA.red },
+    'text-input': INPUT_STATUS,
+    textarea: INPUT_STATUS,
+    'number-input': INPUT_STATUS,
+    'date-input': INPUT_STATUS,
+    'time-input': INPUT_STATUS,
+    selector: INPUT_STATUS,
+    'multi-selector': INPUT_STATUS,
+    typeahead: INPUT_STATUS,
+    tokenizer: INPUT_STATUS,
+    switch: {
+      base: {
+        '--color-background-gray': 'var(--color-skeleton)',
+      },
     },
-    textarea: {
-      'status:success': { '--color-success': DRA.green },
-      'status:warning': { '--color-warning': DRA.yellow },
-      'status:error': { '--color-error': DRA.red },
-    },
-    'number-input': {
-      'status:success': { '--color-success': DRA.green },
-      'status:warning': { '--color-warning': DRA.yellow },
-      'status:error': { '--color-error': DRA.red },
-    },
-    'date-input': {
-      'status:success': { '--color-success': DRA.green },
-      'status:warning': { '--color-warning': DRA.yellow },
-      'status:error': { '--color-error': DRA.red },
-    },
-    'time-input': {
-      'status:success': { '--color-success': DRA.green },
-      'status:warning': { '--color-warning': DRA.yellow },
-      'status:error': { '--color-error': DRA.red },
-    },
-    selector: {
-      'status:success': { '--color-success': DRA.green },
-      'status:warning': { '--color-warning': DRA.yellow },
-      'status:error': { '--color-error': DRA.red },
-    },
-    'multi-selector': {
-      'status:success': { '--color-success': DRA.green },
-      'status:warning': { '--color-warning': DRA.yellow },
-      'status:error': { '--color-error': DRA.red },
-    },
-    typeahead: {
-      'status:success': { '--color-success': DRA.green },
-      'status:warning': { '--color-warning': DRA.yellow },
-      'status:error': { '--color-error': DRA.red },
-    },
-    tokenizer: {
-      'status:success': { '--color-success': DRA.green },
-      'status:warning': { '--color-warning': DRA.yellow },
-      'status:error': { '--color-error': DRA.red },
+    'field-status': {
+      'type:success': {
+        backgroundColor: 'var(--color-background-green)',
+      },
+      'type:warning': {
+        backgroundColor: 'var(--color-background-yellow)',
+      },
+      'type:error': {
+        backgroundColor: 'var(--color-background-red)',
+      },
     },
   },
 });

@@ -8,4 +8,6 @@
 
 /// <reference path="./astryx-dracula.variants.d.ts" />
 import type { DefinedTheme } from '@astryxdesign/core/theme';
+import type { IconRegistry } from '@astryxdesign/core/Icon';
+export declare const draculaIconRegistry: IconRegistry;
 export declare const astryxDraculaTheme: DefinedTheme;

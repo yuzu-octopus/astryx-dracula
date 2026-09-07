@@ -1,8 +1,8 @@
 {
   "dependencies": {
     "@astryxdesign/core": "^0.3.0",
-    "@astryxdesign/theme-stone": "0.3.0",
     "@stylexjs/stylex": "^0.19.0",
+    "lucide-react": "^1.33.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
@@ -19,7 +19,7 @@
   "name": "astryx-styles",
   "private": true,
   "scripts": {
-    "audit": "bun scripts/audit-dracula.ts && bun scripts/check-contrast.ts",
+    "audit": "bun scripts/check.ts",
     "build": "tsc --noEmit && vite build",
     "dev": "vite",
     "preview": "vite preview",

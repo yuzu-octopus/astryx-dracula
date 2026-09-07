@@ -79,12 +79,12 @@ Reread of `bunx astryx docs theme/tokens/typography` plus node_modules type trut
   ramps from `scripts/generate-chart-ramps.ts` (constant hue/sat, lightness 28/44/60/74/88).
 - dracula-ui audit round: on-fill text is `#21222C` (spec never uses raw black), links render
   accent underlined resolving to foreground on hover, banner surfaces route through muted tokens
-  per Stone architecture (no direct fills), categorical bg/border/text tints added for all 10 hues,
+  (no direct fills), categorical bg/border/text tints added for all 10 hues,
   input status scopes and progress fills pinned to Dracula, borders and tracks raised to visible.
   Warning stays yellow over orange by brand choice; classic syntax hexes kept over dracula-ui brights.
   Deliberately unset with reasons in `BRAND.md`: motion, radius/color scales, icon glyphs
-  (lucide-react, like glimpse), onDark, `--color-data-neutral`. Radii copy glimpse; dark-only stated.
+  (lucide-react, like glimpse), onDark, `--color-data-neutral`. Flat radii and glimpse type scale; dark-only stated.
 
 ## 9. Explicit non-goals
 
-No preset library port, no light mode, no npm publish, no framework support beyond React Vite + plain CSS. Component overrides stay at link/card/button base.
+No preset library port, no light mode, no npm publish, no framework support beyond React Vite + plain CSS. Component overrides cover link/card/button/banner/inputs/progress/switch/field-status; no other components are touched.

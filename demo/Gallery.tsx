@@ -32,7 +32,7 @@ export function Gallery() {
           <Banner
             status="info"
             title="Deploy preview active"
-            description="Preview branch synced with stone Dracula tokens."
+            description="Preview branch synced with Dracula tokens."
           />
           <Banner
             status="success"

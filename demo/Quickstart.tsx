@@ -49,7 +49,7 @@ export function Quickstart() {
               Install required peer packages and copy JetBrains Mono fonts into your public asset directory.
             </Text>
             <CodeBlock
-              code={`bun add @astryxdesign/core @astryxdesign/theme-stone @stylexjs/stylex\ncp -r <kit>/fonts public/fonts`}
+              code={`bun add @astryxdesign/core lucide-react @stylexjs/stylex\ncp -r <kit>/fonts public/fonts`}
               language="bash"
               hasCopyButton
               width="100%"
