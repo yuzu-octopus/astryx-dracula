@@ -1,69 +1,55 @@
 ---
 name: astryx-styles
-description: Use when styling an Astryx React app with the shared Dracula brand, picking colors or fonts, or when UI styling looks inconsistent across brand sites
+description: Use when styling an Astryx React app with the shared Dracula brand, starting a new brand site, migrating a codebase to the brand theme, or when UI styling looks inconsistent across brand sites
 ---
 
 # Astryx Styles
 
 ## Overview
 
-Shared Dracula brand for every Astryx site. One source of truth, three consumption paths. Never invent a color or a token name.
+Shared Dracula brand for every Astryx site. Kit lives at `~/Documents/Projects/astryx-styles`. Never invent a color or a token name.
 
-## When to Use
+## New site
 
-- New Astryx site needing brand styling
-- Colors, fonts, spacing, or radii decisions
-- Styling drift between brand sites
-- Adding a component that must match the brand
+```bash
+bun add react react-dom @stylexjs/stylex @astryxdesign/core @astryxdesign/theme-neutral
+bun add -d typescript vite @vitejs/plugin-react @astryxdesign/cli @types/react @types/react-dom
+cp -r <kit>/fonts public/fonts
+```
 
-When NOT to use: non-Astryx stacks beyond the plain-CSS path, or a one-off page that intentionally breaks brand.
+Entry (once): import `@astryxdesign/core/reset.css`, `@astryxdesign/core/astryx.css`, `<kit>/tokens.css`. Wrap app in `<Theme theme={astryxDraculaTheme} mode="dark">` with `<kit>/astryx-dracula.js` + `<kit>/theme.css`. Stock Vite React config plus the layer-order snippet in `<kit>/vite.config.ts`. Discover components with `bunx astryx component <Name>`.
 
-## Quick Reference
+## Migrating a codebase
 
-| Need | Do |
-|---|---|
-| Astryx app, best perf | `import { astryxDraculaTheme } from '<kit>/astryx-dracula'` + `import '<kit>/theme.css'`, wrap in `<Theme theme mode="dark">` |
-| Prototype | `defineTheme` object `astryxStylesTheme` from `<kit>/astryx-theme.ts` with runtime `<Theme>` |
-| Any stack | `@import '<kit>/tokens.css'`, use `var(--color-*)` |
-| Fonts | Copy `<kit>/fonts/` to served `public/fonts/` |
-| Change brand | Edit `astryx-theme.ts`, run `bun run theme:build`, commit outputs |
-| Check drift | `bun run audit` (hexes, fonts, stale build) and `bun run theme:check` |
+1. Inventory: grep for `#[0-9a-fA-F]{3,6}`, `:root`, `@apply`, Tailwind/StyleX utilities, and existing theme providers.
+2. Map every found color to the Exact list below; anything unmappable is a brand question, not a new hex.
+3. Replace: delete old theme provider and `:root` overrides, point imports at the kit (prebuilt path), swap raw elements for Card/Text/Link/Stack/Grid.
+4. Verify: `bun run build`, screenshot key pages, confirm no raw hex remains (`grep -ri '#[0-9a-f]\{3,6\}' src --include='*.tsx' --include='*.css'` should show only kit references).
 
 ## Exact token names (use these verbatim)
 
 Background `--color-background`, primary `--color-primary`, positive `--color-positive`,
-negative `--color-negative`, warning `--color-warning`, info `--color-info`,
-muted text `--color-text-subdue`, spacing `--space-gap` / `--space-viewport`,
+negative `--color-negative`, muted text `--color-text-subdue`, primary text `--color-text-primary`,
+border `--color-border`,
+accent `--color-accent`, success `--color-success`, error `--color-error`, warning `--color-warning`,
+info `--color-info`, radius `--radius-element`, spacing `--space-gap` / `--space-viewport`,
 radius `--border-radius`. Raw primitives: `--dracula-bg`, `--dracula-fg`,
 `--dracula-comment`, `--dracula-purple`, `--dracula-green`, `--dracula-red`,
 `--dracula-yellow`, `--dracula-cyan`, `--dracula-pink`, `--dracula-orange`,
-`--dracula-current-line`. No other color, space, or radius names exist in this kit.
-For Astryx component tokens beyond the kit, run `bunx astryx docs tokens`.
+`--dracula-current-line`. Nothing else exists. For Astryx tokens beyond the kit, `bunx astryx docs tokens`.
 
-## Implementation
+## Semantics
 
-```tsx
-import { Theme } from '@astryxdesign/core/theme';
-import { Card, Link, Text } from '@astryxdesign/core';
-import { astryxDraculaTheme } from '../astryx-styles/astryx-dracula';
-import '../astryx-styles/theme.css';
+Purple links and titles unvisited, green positive, red negative, yellow tags, cyan info, pink flair, orange warning. No `<div>` for layout. Unknown prop? `bunx astryx component <Name>` — do not guess (`label` on Button, `level` on Heading, `columns` on Grid).
 
-<Theme theme={astryxDraculaTheme} mode="dark">
-  <Card>
-    <Text>Body copy inherits theme text.</Text>
-    <Link href="/docs">Purple means tappable.</Link>
-  </Card>
-</Theme>;
-```
+## Changing the brand
 
-Semantics: purple links and titles unvisited, green positive, red negative, yellow tags, cyan info, pink flair, orange warning. No `<div>` for layout: Card for groups, Text for copy, Link for navigation, Stack/HStack/Grid for arrangement. Unknown prop? Run `bunx astryx component <Name>` — do not guess (`label` required on Button, `level` on Heading, `columns` on Grid).
+Edit `astryx-theme.ts`, run `bun run theme:build`, commit outputs. `bun run theme:check` fails on stale builds; `bun run audit` checks hexes, fonts, and freshness.
 
 ## Common Mistakes
 
-- Raw hex or px in components → kit variable or component prop.
-- Invented variable names (`--color-bg`, `--space-lg`) → only the Exact list above exists.
-- Raw `<div>`/`<span>`/`<a>` layout → Card/Text/Link/Stack/Grid.
-- Overriding `--color-*` in app `:root` → change `astryx-theme.ts` and rebuild.
-- Forgetting `fonts/` copy → monospace fallback; kit audit catches it.
-- Stale `theme.css` → `bun run theme:check` fails; rebuild.
-- Adding the StyleX source-compile plugin from the example-vite README → unneeded; this kit ships prebuilt CSS plus runtime injection.
+- Raw hex/px or invented names (`--color-bg`, `--space-lg`) → Exact list or component prop.
+- Raw `<div>`/`<span>`/`<a>` → Card/Text/Link/Stack/Grid.
+- Old `:root` `--color-*` overrides left in place → delete; brand lives in the kit theme.
+- Forgetting `fonts/` copy → monospace fallback.
+- Source-compile StyleX plugin from the example-vite README → unneeded; kit ships prebuilt CSS.

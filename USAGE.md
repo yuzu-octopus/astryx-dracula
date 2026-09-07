@@ -50,6 +50,13 @@ import '../tokens.css';
 Then use `var(--color-primary)`, `var(--dracula-purple)`, `var(--space-gap)`.
 `tokens.css` sets real `:root` values with `color-scheme: dark`, so first paint is correct with no runtime.
 
+## Migrating an existing site
+
+1. Inventory: grep for hex colors, `:root` blocks, Tailwind/StyleX utilities, and existing theme providers.
+2. Map every found color to `tokens.json`. Unmappable colors are brand questions, not new hexes.
+3. Replace: delete the old theme provider and `:root` overrides, point imports at the kit prebuilt path, swap raw elements for Astryx components.
+4. Verify: build, screenshot key pages, confirm no stray hexes remain in `src/`.
+
 ## Fonts
 
 Copy `fonts/` to your app's served static dir (Vite: `public/fonts/`).
