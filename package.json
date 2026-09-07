@@ -6,6 +6,7 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },
+  "description": "Pure Dracula brand theme for Astryx React sites. Dark-only tokens, syntax highlighting, and chart colors with prebuilt CSS.",
   "devDependencies": {
     "@astryxdesign/cli": "^0.3.0",
     "@types/bun": "^1.4.1",
@@ -16,8 +17,38 @@
     "typescript": "^7.0.2",
     "vite": "^8.0.0"
   },
-  "name": "astryx-dracula",
-  "private": true,
+  "exports": {
+    ".": {
+      "default": "./astryx-dracula.js",
+      "types": "./astryx-dracula.d.ts"
+    },
+    "./built": {
+      "default": "./astryx-dracula.js",
+      "types": "./astryx-dracula.d.ts"
+    },
+    "./package.json": "./package.json",
+    "./theme.css": "./theme.css",
+    "./tokens.css": "./tokens.css"
+  },
+  "files": [
+    "BRAND.md",
+    "LICENSE",
+    "USAGE.md",
+    "astryx-dracula.d.ts",
+    "astryx-dracula.js",
+    "astryx-dracula.variants.d.ts",
+    "fonts/",
+    "icons.tsx",
+    "theme.css",
+    "tokens.css"
+  ],
+  "license": "MIT",
+  "name": "@yuzu-octopus/astryx-dracula",
+  "peerDependencies": {
+    "@astryxdesign/core": "^0.3.0",
+    "react": ">=19.0.0",
+    "react-dom": ">=19.0.0"
+  },
   "scripts": {
     "audit": "bun scripts/check.ts",
     "build": "tsc --noEmit && vite build",
