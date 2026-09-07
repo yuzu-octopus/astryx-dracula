@@ -29,8 +29,11 @@ export default function App() {
         {applied && <Banner status="success" title="Theme applied — 266 tokens active" />}
         <CodeBlock code={HERO_CODE} language="tsx" title="wrap-your-app.tsx" hasLineNumbers isWrapped />
         <Palette />
+        <Divider />
         <Dashboard />
+        <Divider />
         <Gallery />
+        <Divider />
         <Quickstart />
         <Divider />
         <Text>Copy the kit, read the skill, ship dark interfaces. Dracula spec at draculatheme.com.</Text>

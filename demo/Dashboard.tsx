@@ -28,7 +28,7 @@ function Kpi({ label, value, delta }: { label: string; value: string; delta: num
   return (
     <Card>
       <Text>{label}</Text>
-      <Heading level={3}>{value}</Heading>
+      <Heading level={3} type="display-2">{value}</Heading>
       <Text style={{ color: up ? 'var(--color-positive)' : 'var(--color-negative)' }}>
         {up ? '+' : ''}{delta}%
       </Text>
@@ -49,14 +49,14 @@ export function Dashboard() {
       </Grid>
       <Heading level={2}>Traffic by month</Heading>
       <Card>
-        <svg viewBox="0 0 700 220" width="100%" role="img" aria-label="Monthly traffic bar chart">
+        <svg viewBox="0 0 700 168" width="100%" role="img" aria-label="Monthly traffic bar chart">
           {BARS.map((b, i) => {
-            const h = (b.value / 100) * 160;
+            const h = (b.value / 100) * 118;
             const x = 20 + i * 96;
             return (
               <g key={b.month}>
-                <rect x={x} y={180 - h} width={56} height={h} rx={5} fill={b.fill} />
-                <text x={x + 28} y={200} textAnchor="middle" fontSize={12} fill="var(--color-text-subdue)">
+                <rect x={x} y={132 - h} width={56} height={h} rx={5} fill={b.fill} />
+                <text x={x + 28} y={152} textAnchor="middle" fontSize={12} fill="var(--color-text-subdue)">
                   {b.month}
                 </text>
               </g>
