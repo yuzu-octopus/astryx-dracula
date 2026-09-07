@@ -22,11 +22,13 @@ export default function App() {
         <Text>
           Astryx Dracula <Badge label="dark-only" variant="purple" /> <Link href="https://github.com/yuzu-octopus/astryx-theme">GitHub</Link> <Link href="./llms.txt">llms.txt</Link>
         </Text>
-        <Heading level={1}>Dracula, live in every component</Heading>
-        <Text>Pure Dracula brand kit for Astryx sites. 266 tokens, syntax highlighting, chart colors. Prebuilt CSS, zero runtime cost.</Text>
-        <Button label={applied ? 'Theme applied' : 'Apply the theme'} variant="primary" onClick={() => setApplied(!applied)} />
-        <Link href="https://draculatheme.com">Purple means tappable</Link>
-        {applied && <Banner status="success" title="Theme applied — 266 tokens active" />}
+        <Card>
+          <Heading level={1}>Dracula, live in every component</Heading>
+          <Text>Pure Dracula brand kit for Astryx sites. Full token system, syntax highlighting, chart colors. Prebuilt CSS, zero runtime cost.</Text>
+          <Button label={applied ? 'Theme applied' : 'Apply the theme'} variant="primary" onClick={() => setApplied(!applied)} />
+          <Link href="https://draculatheme.com">Purple means tappable</Link>
+          {applied && <Banner status="success" title="Theme applied" />}
+        </Card>
         <CodeBlock code={HERO_CODE} language="tsx" title="wrap-your-app.tsx" hasLineNumbers isWrapped />
         <Palette />
         <Divider />

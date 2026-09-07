@@ -1,6 +1,6 @@
 import { defineTheme, type DefinedTheme, type TokenValue } from '@astryxdesign/core/theme';
 import { dracula } from '@astryxdesign/core/theme/syntax';
-import { neutralTheme } from '@astryxdesign/theme-neutral/built';
+import { stoneTheme } from '@astryxdesign/theme-stone/built';
 
 // Astryx Styles — pure Dracula theme for `<Theme theme mode>`.
 // Dark-only: Dracula is a dark spec, so both tuple slots pin the same hex
@@ -166,7 +166,7 @@ const tokens: Record<string, TokenValue> = {
 
 export const astryxStylesTheme: DefinedTheme = defineTheme({
   name: 'astryx-dracula',
-  extends: neutralTheme,
+  extends: stoneTheme,
   syntax: dracula,
   tokens,
   typography: {
