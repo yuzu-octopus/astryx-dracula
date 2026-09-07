@@ -1,0 +1,47 @@
+/* Astryx Styles — pure Dracula brand tokens.
+ * Plain-CSS path: `@import './tokens.css'` then use var(--color-*) / var(--dracula-*) / var(--space-*).
+ * This file is the pre-theme paint fallback (same role as glimpse src/index.css :root).
+ * Astryx path: `astryx-theme.ts` (defineTheme) is the runtime theme; this file keeps
+ * first paint and non-React pages identical. Do not add new hexes here — audit enforces 11. */
+
+:root {
+  color-scheme: dark;
+
+  --dracula-bg: #282A36;
+  --dracula-current-line: #44475A;
+  --dracula-fg: #F8F8F2;
+  --dracula-comment: #6272A4;
+  --dracula-cyan: #8BE9FD;
+  --dracula-green: #50FA7B;
+  --dracula-orange: #FFB86C;
+  --dracula-pink: #FF79C6;
+  --dracula-purple: #BD93F9;
+  --dracula-red: #FF5555;
+  --dracula-yellow: #F1FA8C;
+
+  --space-gap: 23px;
+  --space-viewport: 15px;
+  --widget-content-vertical: 15px;
+  --widget-content-horizontal: 17px;
+  --widget-gap: 23px;
+  --tile-row: 96px;
+  --border-radius: 5px;
+  --font-family-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-size-h1: 17px;
+  --font-size-h2: 16px;
+  --font-size-h3: 15px;
+  --font-size-h4: 14px;
+  --font-size-base: 13px;
+  --font-size-h5: 12px;
+  --font-size-h6: 11px;
+
+  --color-background: #282A36;
+  --color-primary: #BD93F9;
+  --color-positive: #50FA7B;
+  --color-negative: #FF5555;
+  --color-warning: #F1FA8C;
+  --color-info: #8BE9FD;
+  --color-tag-orange: #FFB86C;
+  --color-tag-pink: #FF79C6;
+  --color-text-subdue: #4C5067;
+}
