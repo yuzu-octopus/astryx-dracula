@@ -1,9 +1,9 @@
 /* Astryx Styles — pure Dracula brand tokens.
  * Plain-CSS path: `@import './tokens.css'` then use var(--color-*) / var(--dracula-*) / var(--space-*).
- * This file is the pre-theme paint fallback (same role as glimpse src/index.css :root).
- * Astryx path: `astryx-theme.ts` (defineTheme) is the runtime theme; this file keeps
- * first paint and non-React pages identical. Do not add new hexes here — audit enforces 11.
- * Fonts: copy `fonts/` to your app's served static dir (Vite: `public/fonts/`) so these resolve. */
+ * This file is the pre-theme paint fallback. Values follow the Dracula spec UI
+ * palette (Background Light #343746 surfaces, Selection #44475A quiet edges,
+ * Current Line #6272A4 visible edges). Do not add new hexes here.
+ * Fonts: copy `fonts/` to your app's served static dir (Vite: `public/fonts/`). */
 
 @font-face {
   font-family: 'JetBrains Mono';
@@ -25,7 +25,8 @@
   color-scheme: dark;
 
   --dracula-bg: #282A36;
-  --dracula-current-line: #44475A;
+  --dracula-current-line: #6272A4;
+  --dracula-selection: #44475A;
   --dracula-fg: #F8F8F2;
   --dracula-comment: #6272A4;
   --dracula-cyan: #8BE9FD;
@@ -35,6 +36,14 @@
   --dracula-purple: #BD93F9;
   --dracula-red: #FF5555;
   --dracula-yellow: #F1FA8C;
+  --dracula-bg-light: #343746;
+  --dracula-bg-lighter: #424450;
+  --dracula-bg-dark: #21222C;
+  --dracula-functional-red: #DE5735;
+  --dracula-functional-orange: #A39514;
+  --dracula-functional-green: #089108;
+  --dracula-functional-cyan: #0081D6;
+  --dracula-functional-purple: #815CD6;
 
   --space-gap: 23px;
   --space-viewport: 15px;
@@ -44,30 +53,21 @@
   --tile-row: 96px;
   --border-radius: 5px;
   --font-family-mono: 'JetBrains Mono', ui-monospace, monospace;
-  --font-size-h1: 17px;
-  --font-size-h2: 16px;
-  --font-size-h3: 15px;
-  --font-size-h4: 14px;
-  --font-size-base: 13px;
-  --font-size-h5: 12px;
-  --font-size-h6: 11px;
 
   --color-background: #282A36;
-  --color-widget-background: #2A2C39;
-  --color-widget-content-border: #313342;
-  --color-widget-background-highlight: #313342;
-  --color-separator: #313342;
-  --color-popover-background: #2D3040;
-  --color-popover-border: #424559;
-  --color-progress-border: #3E4153;
-  --color-progress-value: #606582;
-  --color-vertical-progress-value: #656A88;
-  --color-graph-gridlines: #353848;
-  --color-widget-shadow: #272935;
-  --color-text-highlight: #D3D5DE;
+  --color-widget-background: #343746;
+  --color-widget-content-border: #44475A;
+  --color-widget-background-highlight: #44475A;
+  --color-separator: #44475A;
+  --color-popover-background: #424450;
+  --color-popover-border: #6272A4;
+  --color-text-highlight: #F8F8F2;
   --color-text-paragraph: #B0B3C4;
-  --color-text-base: #8489A4;
-  --color-text-base-muted: #727897;
+  --color-text-base: #9AA1BC;
+  --color-text-base-muted: #8288A6;
+  --color-text-subdue: #4C5067;
+  --color-current-line: #6272A4;
+  --color-selection: #44475A;
   --color-primary: #BD93F9;
   --color-positive: #50FA7B;
   --color-negative: #FF5555;

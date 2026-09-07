@@ -2,7 +2,8 @@ import { Card, Grid, Heading, Text, VStack } from '@astryxdesign/core';
 
 const SWATCHES: Array<{ name: string; hex: string; fg: string }> = [
   { name: 'Background', hex: '#282A36', fg: '#F8F8F2' },
-  { name: 'Current line', hex: '#44475A', fg: '#F8F8F2' },
+  { name: 'Current line', hex: '#6272A4', fg: '#F8F8F2' },
+  { name: 'Selection', hex: '#44475A', fg: '#F8F8F2' },
   { name: 'Foreground', hex: '#F8F8F2', fg: '#282A36' },
   { name: 'Comment', hex: '#6272A4', fg: '#F8F8F2' },
   { name: 'Cyan', hex: '#8BE9FD', fg: '#282A36' },
@@ -18,7 +19,7 @@ export function Palette() {
   return (
     <VStack>
       <Heading level={2}>Palette</Heading>
-      <Text>Eleven frozen hexes. Every token below resolves to one of these.</Text>
+      <Text>Twelve spec tokens. Every token below resolves to one of these.</Text>
       <Grid columns={{ minWidth: 220 }} gap={2}>
         {SWATCHES.map((s) => (
           <Card key={s.name} style={{ backgroundColor: s.hex }}>

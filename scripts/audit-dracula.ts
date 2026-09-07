@@ -3,7 +3,8 @@
 export {};
 const expected: Record<string, string> = {
   bg: '#282A36',
-  currentLine: '#44475A',
+  currentLine: '#6272A4',
+  selection: '#44475A',
   fg: '#F8F8F2',
   comment: '#6272A4',
   cyan: '#8BE9FD',

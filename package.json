@@ -20,7 +20,7 @@
   "name": "astryx-styles",
   "private": true,
   "scripts": {
-    "audit": "bun scripts/audit-dracula.ts",
+    "audit": "bun scripts/audit-dracula.ts && bun scripts/check-contrast.ts",
     "build": "tsc --noEmit && vite build",
     "dev": "vite",
     "preview": "vite preview",

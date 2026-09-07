@@ -1,13 +1,17 @@
-import { defineTheme, type DefinedTheme, type TokenValue } from '@astryxdesign/core/theme';
-import { dracula } from '@astryxdesign/core/theme/syntax';
+import { defineTheme, defineSyntaxTheme, type DefinedTheme, type TokenValue } from '@astryxdesign/core/theme';
 import { stoneTheme } from '@astryxdesign/theme-stone/built';
 
 // Astryx Styles — pure Dracula theme for `<Theme theme mode>`.
-// Dark-only: Dracula is a dark spec, so both tuple slots pin the same hex
-// and light-dark() resolves identically in either mode.
-// Mapping mirrors glimpse glanceColorVars: Dracula accents onto valid Astryx
-// tokens, plus glance --color-* vars for widget CSS compat.
-// Component overrides ported verbatim from glimpse buildGlimpseTheme.
+// Dark-only: Dracula Classic is a dark spec, so both tuple slots pin the same
+// value and light-dark() resolves identically in either mode.
+//
+// Base is Stone (spacing, shadows, motion, radii, inputs, icons); this file
+// carries only Dracula color authority plus JetBrains Mono, per
+// https://raw.githubusercontent.com/dracula/draculatheme.com/refs/heads/main/content/spec.mdx
+// Key spec readings: Current Line #6272A4 doubles as the subtle-border color,
+// Selection #44475A is the quiet surface, UI surfaces come from the spec UI
+// palette, state indicators use Functional colors, text meets WCAG AA
+// (verified by scripts/check-contrast.ts).
 
 const DRA = {
   bg: '#282A36',
@@ -24,8 +28,28 @@ const DRA = {
 
 const pin = (hex: string): [string, string] => [hex, hex];
 
+const draculaSyntax = defineSyntaxTheme({
+  name: 'astryx-dracula',
+  tokens: {
+    keyword: DRA.pink,
+    string: DRA.yellow,
+    comment: DRA.comment,
+    number: DRA.orange,
+    function: DRA.green,
+    type: DRA.cyan,
+    variable: DRA.fg,
+    operator: DRA.pink,
+    constant: DRA.orange,
+    tag: DRA.pink,
+    attribute: DRA.yellow,
+    property: DRA.cyan,
+    punctuation: DRA.fg,
+    background: DRA.bg,
+  },
+});
+
 const tokens: Record<string, TokenValue> = {
-  // Dims (glimpse DIMS, frozen)
+  // Compat dims (glance widget CSS; no Astryx collision)
   '--space-gap': '23px',
   '--space-viewport': '15px',
   '--widget-content-vertical': '15px',
@@ -33,46 +57,46 @@ const tokens: Record<string, TokenValue> = {
   '--widget-gap': '23px',
   '--tile-row': '96px',
   '--border-radius': '5px',
-  '--font-size-h1': '17px',
-  '--font-size-h2': '16px',
-  '--font-size-h3': '15px',
-  '--font-size-h4': '14px',
-  '--font-size-base': '13px',
-  '--font-size-h5': '12px',
-  '--font-size-h6': '11px',
-  // Astryx surfaces
+  // Astryx surfaces from the spec UI palette
   '--color-background-body': pin(DRA.bg),
-  '--color-background-surface': pin('#2A2C39'),
-  '--color-background-card': pin('#2A2C39'),
-  '--color-background-popover': pin('#2D3040'),
-  '--color-background-muted': pin('#313342'),
-  '--color-overlay-hover': pin('#313342'),
-  '--color-overlay-pressed': pin('#313342'),
-  '--color-border': pin('#313342'),
-  '--color-border-emphasized': pin('#424559'),
-  // Astryx semantics from Dracula accents
+  '--color-background-surface': pin('#343746'),
+  '--color-background-card': pin('#343746'),
+  '--color-background-popover': pin('#424450'),
+  '--color-background-muted': pin('#44475A'),
+  '--color-overlay-hover': pin('#353747'),
+  '--color-overlay-pressed': pin('#44475A'),
+  '--color-border': pin('#44475A'),
+  '--color-border-emphasized': pin(DRA.comment),
+  // Astryx semantics from Dracula accents (text roles AA-verified)
   '--color-accent': pin(DRA.purple),
   '--color-accent-muted': pin(DRA.cyan),
   '--color-success': pin(DRA.green),
   '--color-error': pin(DRA.red),
   '--color-warning': pin(DRA.yellow),
   '--color-info': pin(DRA.cyan),
-  '--color-text-primary': pin('#D3D5DE'),
-  '--color-text-secondary': pin('#8489A4'),
+  '--color-text-primary': pin(DRA.fg),
+  '--color-text-secondary': pin('#9AA1BC'),
   '--color-text-disabled': pin(DRA.comment),
   '--color-text-accent': pin(DRA.purple),
-  '--color-icon-primary': pin('#D3D5DE'),
-  '--color-icon-secondary': pin('#8489A4'),
+  '--color-icon-primary': pin(DRA.fg),
+  '--color-icon-secondary': pin('#9AA1BC'),
   '--color-icon-disabled': pin(DRA.comment),
   '--color-icon-accent': pin(DRA.purple),
-  '--color-on-accent': pin('#FFFFFF'),
+  '--color-on-accent': pin('#000000'),
   '--color-on-success': pin('#000000'),
   '--color-on-warning': pin('#000000'),
   '--color-on-error': pin('#FFFFFF'),
-  '--color-track': pin('#313342'),
-  '--color-skeleton': pin('#313342'),
-  // Charts: categorical series in nearest Dracula hues (teal/brown/indigo have
-  // no spectral match, so they reuse cyan/orange/purple)
+  '--color-on-info': pin('#000000'),
+  '--color-track': pin('#44475A'),
+  '--color-skeleton': pin('#44475A'),
+  // Spec functional colors for fills, interactive borders, focus
+  '--color-functional-red': pin('#DE5735'),
+  '--color-functional-orange': pin('#A39514'),
+  '--color-functional-green': pin('#089108'),
+  '--color-functional-cyan': pin('#0081D6'),
+  '--color-functional-purple': pin('#815CD6'),
+  // Charts: categorical series in nearest Dracula hues (ANSI brights keep
+  // teal/indigo distinct; brown reuses orange, its closest hue)
   '--color-data-categorical-blue': pin(DRA.comment),
   '--color-data-categorical-orange': pin(DRA.orange),
   '--color-data-categorical-purple': pin(DRA.purple),
@@ -80,9 +104,9 @@ const tokens: Record<string, TokenValue> = {
   '--color-data-categorical-pink': pin(DRA.pink),
   '--color-data-categorical-cyan': pin(DRA.cyan),
   '--color-data-categorical-red': pin(DRA.red),
-  '--color-data-categorical-teal': pin(DRA.cyan),
+  '--color-data-categorical-teal': pin('#A4FFFF'),
   '--color-data-categorical-brown': pin(DRA.orange),
-  '--color-data-categorical-indigo': pin(DRA.purple),
+  '--color-data-categorical-indigo': pin('#D6ACFF'),
   // Sequential ramps from scripts/generate-chart-ramps.ts: constant hue/sat
   // per Dracula family, lightness 28/44/60/74/88 for dark-bg distinctness
   '--color-data-purple-5': pin('hsl(264.71 89.47% 28%)'),
@@ -132,21 +156,24 @@ const tokens: Record<string, TokenValue> = {
   '--color-data-gray-1': pin('hsl(231.43 14.89% 88%)'),
   // Glance compat vars (widget CSS reads these directly)
   '--color-background': pin(DRA.bg),
-  '--color-widget-background': pin('#2A2C39'),
-  '--color-widget-content-border': pin('#313342'),
-  '--color-widget-background-highlight': pin('#313342'),
-  '--color-separator': pin('#313342'),
-  '--color-popover-background': pin('#2D3040'),
-  '--color-popover-border': pin('#424559'),
-  '--color-progress-border': pin('#3E4153'),
-  '--color-progress-value': pin('#606582'),
-  '--color-vertical-progress-value': pin('#656A88'),
-  '--color-graph-gridlines': pin('#353848'),
-  '--color-widget-shadow': pin('#272935'),
-  '--color-text-highlight': pin('#D3D5DE'),
+  '--color-widget-background': pin('#343746'),
+  '--color-widget-content-border': pin('#44475A'),
+  '--color-widget-background-highlight': pin('#44475A'),
+  '--color-separator': pin('#44475A'),
+  '--color-popover-background': pin('#424450'),
+  '--color-popover-border': pin(DRA.comment),
+  '--color-progress-border': pin('#44475A'),
+  '--color-progress-value': pin(DRA.comment),
+  '--color-vertical-progress-value': pin(DRA.comment),
+  '--color-graph-gridlines': pin('#44475A'),
+  '--color-widget-shadow': pin('#21222C'),
+  '--color-text-highlight': pin(DRA.fg),
   '--color-text-paragraph': pin('#B0B3C4'),
-  '--color-text-base': pin('#8489A4'),
-  '--color-text-base-muted': pin('#727897'),
+  '--color-text-base': pin('#9AA1BC'),
+  '--color-text-base-muted': pin('#8288A6'),
+  '--color-text-subdue': pin('#4C5067'),
+  '--color-current-line': pin(DRA.comment),
+  '--color-selection': pin('#44475A'),
   '--color-primary': pin(DRA.purple),
   '--color-positive': pin(DRA.green),
   '--color-negative': pin(DRA.red),
@@ -156,45 +183,17 @@ const tokens: Record<string, TokenValue> = {
   '--color-tag-yellow': pin(DRA.yellow),
   '--color-tag-green': pin(DRA.green),
   '--color-tag-blue': pin(DRA.purple),
-  '--color-text-subdue': pin('#4C5067'),
-  // Radius: Dracula kit is uniformly 5px
-  '--radius-inner': '4px',
-  '--radius-element': '5px',
-  '--radius-container': '5px',
-  '--radius-page': '5px',
 };
 
 export const astryxStylesTheme: DefinedTheme = defineTheme({
   name: 'astryx-dracula',
   extends: stoneTheme,
-  syntax: dracula,
+  syntax: draculaSyntax,
   tokens,
   typography: {
-    scale: { base: 13, ratio: 1.2 },
+    scale: { base: 14, ratio: 1.25 },
     body: { family: 'JetBrains Mono', fallbacks: 'monospace' },
-    heading: { family: 'JetBrains Mono', fallbacks: 'monospace', weight: 'normal' },
+    heading: { family: 'JetBrains Mono', fallbacks: 'monospace', weight: 'normal', weights: { 3: 'bold', 4: 'bold' } },
     code: { family: 'JetBrains Mono', fallbacks: 'monospace' },
-  },
-  components: {
-    link: {
-      base: {
-        color: 'inherit',
-        textDecoration: 'none',
-        ':hover': { color: 'var(--color-text-highlight)' },
-      },
-    },
-    card: {
-      base: {
-        backgroundColor: 'var(--color-widget-background)',
-        border: '1px solid var(--color-widget-content-border)',
-        borderRadius: 'var(--border-radius)',
-      },
-    },
-    button: {
-      base: {
-        borderRadius: 'var(--border-radius)',
-        fontWeight: 'var(--font-weight-normal)',
-      },
-    },
   },
 });

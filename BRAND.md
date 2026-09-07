@@ -8,7 +8,11 @@ Single source: `tokens.json`. Do not add hexes; `bun scripts/audit-dracula.ts` e
 | Role | Hex | Use |
 |---|---|---|
 | Background | #282A36 | page bg |
-| Current line | #44475A | selection / emphasis surface |
+| Current line | #6272A4 | line highlight, subtle borders (doubles as comment) |
+| Selection | #44475A | selected rows, quiet surfaces |
+| Background Light | #343746 | cards, surfaces |
+| Background Lighter | #424450 | popovers, floating elements |
+| Background Dark | #21222C | shadows |
 | Foreground | #F8F8F2 | primary text on dark |
 | Comment | #6272A4 | disabled / muted text |
 | Cyan | #8BE9FD | info, secondary links |
