@@ -366,7 +366,7 @@ pink #FF79C6 orange #FFB86C current-line #44475A.
 
 - [ ] **Step 4: Write demo/App.tsx (swatch grid proving tokens)**
 
-Renders 11 swatches plus Card/Banner/Heading/Text/Grid from `@astryxdesign/core` inside `<Theme>`.
+Renders 11 swatches plus Card/Banner/Heading/Text/Grid from `@astryxdesign/core` inside `<Theme>`. Grid uses `columns={{ minWidth: 220 }} gap={2}` (columns prop required, else single-column stack).
 `Heading` needs `level={1}`. `demo/main.tsx` imports `@astryxdesign/core/reset.css`,
 `@astryxdesign/core/astryx.css`, `../tokens.css` then mounts `App`. No test file; visual proof only.
 

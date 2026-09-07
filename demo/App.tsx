@@ -24,7 +24,7 @@ export default function App() {
         <Text>11 frozen hexes. No new colors without an audit change.</Text>
       </Card>
       <Banner status="info" title="Semantic check: purple links, green good, red bad" />
-      <Grid>
+      <Grid columns={{ minWidth: 220 }} gap={2}>
         {SWATCHES.map((s) => (
           <Card key={s.name} style={{ backgroundColor: s.hex }}>
             <Text style={{ color: s.fg }}>
