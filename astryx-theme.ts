@@ -90,8 +90,8 @@ const tokens: Record<string, TokenValue> = {
   '--color-background-popover': pin('#424450'),
   '--color-background-muted': pin('#44475A'),
   '--color-overlay': pin('#191A21CC'),
-  '--color-overlay-hover': pin('#353747'),
-  '--color-overlay-pressed': pin('#44475A'),
+  '--color-overlay-hover': pin('#0000001F'),
+  '--color-overlay-pressed': pin('#00000033'),
   '--color-border': pin(DRA.comment),
   '--color-border-emphasized': pin(DRA.comment),
   // Astryx semantics from Dracula accents (text roles AA-verified)

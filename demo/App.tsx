@@ -208,7 +208,7 @@ export default function App() {
                   <Text weight="semibold">Astryx Dracula Theme</Text>
                   <Text type="supporting" color="secondary">
                     Copy the kit, read the skill, ship dark interfaces. Dracula spec at{' '}
-                    <Link href="https://draculatheme.com" isExternalLink>
+                    <Link href="https://draculatheme.com" target="_blank" rel="noopener noreferrer">
                       draculatheme.com
                     </Link>
                     .

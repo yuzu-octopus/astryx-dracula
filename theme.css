@@ -202,8 +202,8 @@
     --color-background-popover: light-dark(#424450, #424450);
     --color-background-muted: light-dark(#44475A, #44475A);
     --color-overlay: light-dark(#191A21CC, #191A21CC);
-    --color-overlay-hover: light-dark(#353747, #353747);
-    --color-overlay-pressed: light-dark(#44475A, #44475A);
+    --color-overlay-hover: light-dark(#0000001F, #0000001F);
+    --color-overlay-pressed: light-dark(#00000033, #00000033);
     --color-border: light-dark(#6272A4, #6272A4);
     --color-border-emphasized: light-dark(#6272A4, #6272A4);
     --color-accent: light-dark(#BD93F9, #BD93F9);

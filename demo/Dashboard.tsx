@@ -215,7 +215,7 @@ export function Dashboard() {
         </Card>
       </Grid>
 
-      <Card padding={4} style={{ overflowX: 'auto' }}>
+      <Card padding={4}>
         <VStack gap={3}>
           <HStack justify="between" vAlign="center">
             <VStack gap={0.5}>

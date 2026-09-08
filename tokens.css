@@ -89,3 +89,33 @@
   --color-tag-orange: #FFB86C;
   --color-tag-pink: #FF79C6;
 }
+
+/* Dracula scrollbars: Selection thumb on transparent track, Current Line on
+ * hover. Firefox uses the two properties; Chromium uses the pseudo-elements. */
+:root {
+  scrollbar-width: thin;
+  scrollbar-color: var(--dracula-selection) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--dracula-selection);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--dracula-current-line);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
