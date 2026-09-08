@@ -57,7 +57,10 @@
     "theme:build": "bunx astryx theme build astryx-theme.ts -o theme.css",
     "theme:check": "bunx astryx theme build astryx-theme.ts -o theme.css --check"
   },
-  "trustedDependencies": ["@astryxdesign/core", "@astryxdesign/cli"],
+  "trustedDependencies": [
+    "@astryxdesign/core",
+    "@astryxdesign/cli"
+  ],
   "type": "module",
-  "version": "0.1.0"
+  "version": "0.1.1"
 }
