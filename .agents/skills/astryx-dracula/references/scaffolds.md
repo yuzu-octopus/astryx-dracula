@@ -213,3 +213,15 @@ Copyright plus Powered by GitHub Pages plus Built with React, Vite, and Astryx. 
   </Text>
 </VStack>
 ```
+
+## Empty state
+
+Heading plus one-line why plus primary CTA, centered, width-constrained. Never a bare message.
+
+```tsx
+<VStack gap={3} style={{ alignItems: 'center', maxWidth: '420px', marginInline: 'auto', padding: '48px 24px' }}>
+  <Heading level={3}>No results yet</Heading>
+  <Text type="body" color="secondary">Run an attack and findings land here.</Text>
+  <Button label="Open panel" variant="primary" />
+</VStack>
+```

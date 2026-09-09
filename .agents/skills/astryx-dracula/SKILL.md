@@ -80,6 +80,7 @@ Type carries hierarchy, so weight stays quiet: headings normal, `semibold` for e
 3. **Cards are widgets.** Dashboard widgets, galleries, settings groups, showcase cells. Outer padding 4, nested inset 3, everywhere, no exceptions. A padding-2 inset next to a padding-3 inset is a defect.
 4. **No raw layout elements.** No `<div>`, `<span>`, or `<a>` for layout or text. Card, Text, Link, Stack, Grid do all of it.
 5. **Touch targets are floored.** WCAG AA 24px minimum; 44px where touch matters. The `sm` Button stays in dense contexts with a caption; CTAs stay default size.
+Map jobs to components, never to lookalikes: action goes to Button (never a nav-item class), navigation goes to SideNav or Link, count goes to Badge, status goes to StatusDot or Banner, label goes to Text type="label".
 
 ## State doctrine
 
