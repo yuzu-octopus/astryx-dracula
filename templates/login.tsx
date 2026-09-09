@@ -55,7 +55,9 @@ export default function LoginPage() {
         <Card padding={8} width="100%">
           <VStack gap={4} hAlign="stretch">
             <VStack gap={1} hAlign="center">
-              <Heading level={2}>Welcome back to the night</Heading>
+              <Heading level={2} justify="center">
+                Welcome back to the night
+              </Heading>
               <Text type="body" color="secondary">
                 Sign in to your crypt
               </Text>

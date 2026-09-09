@@ -39,3 +39,9 @@ coverage/
 
 # Archives
 *.tgz
+
+# Agent scratch (template scaffold samples, SDD workspaces)
+.tmp-*/
+.tmp-samp/
+.superpowers/
+local/

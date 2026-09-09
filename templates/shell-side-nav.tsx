@@ -13,11 +13,11 @@ import {
 import {NavIcon} from '@astryxdesign/core/NavIcon';
 import {Icon} from '@astryxdesign/core/Icon';
 import type {IconType} from '@astryxdesign/core/Icon';
-import {MoreMenu} from '@astryxdesign/core/MoreMenu';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
 import type {StatusDotVariant} from '@astryxdesign/core/StatusDot';
 import {Card} from '@astryxdesign/core/Card';
-import {Stack, VStack, HStack} from '@astryxdesign/core/Stack';
+import {TextInput} from '@astryxdesign/core/TextInput';
+import {VStack, HStack} from '@astryxdesign/core/Stack';
 import {
   Sparkles,
   Plus,
@@ -104,6 +104,9 @@ const WORKSPACES: Workspace[] = [
 ];
 
 const SELECTED_CHAT = 'StyleX migration notes';
+// Same-route hash: demo links stay focusable anchors without escaping the
+// template through the hash router (bare "#" would drop back to the home page).
+const SELF_HASH = '#/templates/shell-side-nav';
 
 const MESSAGES = [
   {role: 'assistant', width: '78%', height: 104},
@@ -117,47 +120,31 @@ function ConversationItem({
   status,
   statusLabel,
   isSelected,
+  onSelect,
 }: {
   label: string;
   status: StatusDotVariant;
   statusLabel: string;
   isSelected?: boolean;
+  onSelect: () => void;
 }) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const showMenu = isHovered || isMenuOpen;
-
+  // The hover-only MoreMenu was four dead actions unreachable by keyboard and
+  // touch, so it goes: the status dot is always visible (its label doubles as
+  // the tooltip), and selecting a conversation actually switches selection.
   return (
-    <Stack
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}>
-      <SideNavItem
-        label={label}
-        href="#"
-        isSelected={isSelected}
-        endContent={
-          showMenu ? (
-            <MoreMenu
-              size="sm"
-              label="Conversation options"
-              onOpenChange={setIsMenuOpen}
-              items={[
-                {label: 'Pin', onClick: () => {}},
-                {label: 'Rename', onClick: () => {}},
-                {label: 'Archive', onClick: () => {}},
-                {label: 'Delete', onClick: () => {}},
-              ]}
-            />
-          ) : (
-            <StatusDot variant={status} label={statusLabel} />
-          )
-        }
-      />
-    </Stack>
+    <SideNavItem
+      label={label}
+      href={SELF_HASH}
+      isSelected={isSelected}
+      onClick={onSelect}
+      endContent={<StatusDot variant={status} label={statusLabel} />}
+    />
   );
 }
 
 export default function ShellSideNav() {
+  const [selectedChat, setSelectedChat] = useState(SELECTED_CHAT);
+  const [draft, setDraft] = useState('');
   return (
     <AppShell
       contentPadding={0}
@@ -169,19 +156,23 @@ export default function ShellSideNav() {
             <SideNavHeading
               heading="Night Owl"
               icon={<NavIcon icon={<Icon icon={Sparkles} size="sm" />} />}
-              headingHref="#"
+              headingHref={SELF_HASH}
             />
           }
           footer={
             <SideNavSection title="Account" isHeaderHidden>
-              <SideNavItem label="Settings" icon={Settings} href="#" />
-              <SideNavItem label="Sarah Chen" icon={CircleUserRound} href="#" />
+              <SideNavItem label="Settings" icon={Settings} href={SELF_HASH} />
+              <SideNavItem
+                label="Sarah Chen"
+                icon={CircleUserRound}
+                href={SELF_HASH}
+              />
             </SideNavSection>
           }>
           <SideNavSection title="Menu" isHeaderHidden>
-            <SideNavItem label="New chat" icon={Plus} href="#" />
-            <SideNavItem label="Search" icon={Search} href="#" />
-            <SideNavItem label="Library" icon={BookOpen} href="#" />
+            <SideNavItem label="New chat" icon={Plus} href={SELF_HASH} />
+            <SideNavItem label="Search" icon={Search} href={SELF_HASH} />
+            <SideNavItem label="Library" icon={BookOpen} href={SELF_HASH} />
           </SideNavSection>
           <Divider />
           <SideNavSection title="Workspaces" isHeaderHidden>
@@ -198,7 +189,8 @@ export default function ShellSideNav() {
                       label={chat.label}
                       status={chat.status}
                       statusLabel={chat.statusLabel}
-                      isSelected={chat.label === SELECTED_CHAT}
+                      isSelected={chat.label === selectedChat}
+                      onSelect={() => setSelectedChat(chat.label)}
                     />
                   ))}
                 </VStack>
@@ -230,7 +222,14 @@ export default function ShellSideNav() {
         }
         footer={
           <LayoutFooter>
-            <Card variant="muted" padding={0} width="100%" height={56} />
+            <TextInput
+              label="Message Night Owl"
+              isLabelHidden
+              placeholder="Message Night Owl…"
+              value={draft}
+              onChange={setDraft}
+              width="100%"
+            />
           </LayoutFooter>
         }
       />

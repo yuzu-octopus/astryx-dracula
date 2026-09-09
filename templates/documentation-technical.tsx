@@ -143,7 +143,14 @@ export default function DocumentationTechnical() {
               <List density="compact" listStyle="disc">
                 <ListItem label="Node.js 18+" />
                 <ListItem label="React 18 or 19" />
-                <ListItem label="A package manager (npm, yarn, or pnpm)" />
+                <ListItem
+                  label="A package manager"
+                  description={
+                    <Text type="body" color="secondary" textWrap="wrap">
+                      npm, yarn, or pnpm
+                    </Text>
+                  }
+                />
               </List>
             </VStack>
 
@@ -235,11 +242,46 @@ export default function App({ children }) {
                 Next steps
               </Heading>
               <List density="compact" listStyle="disc">
-                <ListItem label="Fundamental concepts — How theming, layout, and composition work" />
-                <ListItem label="Component API reference — Props, variants, and examples for every component" />
-                <ListItem label="Accessibility — Built-in a11y features and ARIA patterns" />
-                <ListItem label="CLI tools — Scaffold projects and manage templates" />
-                <ListItem label="Design tokens — Colors, spacing, typography, and sizing" />
+                <ListItem
+                  label="Fundamental concepts"
+                  description={
+                    <Text type="body" color="secondary" textWrap="wrap">
+                      How theming, layout, and composition work
+                    </Text>
+                  }
+                />
+                <ListItem
+                  label="Component API reference"
+                  description={
+                    <Text type="body" color="secondary" textWrap="wrap">
+                      Props, variants, and examples for every component
+                    </Text>
+                  }
+                />
+                <ListItem
+                  label="Accessibility"
+                  description={
+                    <Text type="body" color="secondary" textWrap="wrap">
+                      Built-in a11y features and ARIA patterns
+                    </Text>
+                  }
+                />
+                <ListItem
+                  label="CLI tools"
+                  description={
+                    <Text type="body" color="secondary" textWrap="wrap">
+                      Scaffold projects and manage templates
+                    </Text>
+                  }
+                />
+                <ListItem
+                  label="Design tokens"
+                  description={
+                    <Text type="body" color="secondary" textWrap="wrap">
+                      Colors, spacing, typography, and sizing
+                    </Text>
+                  }
+                />
               </List>
             </VStack>
           </VStack>

@@ -150,12 +150,17 @@ export default function ProductGallery() {
                   label="Browse the collection"
                   variant="primary"
                   endContent={<Icon icon={ArrowRight} color="inherit" />}
+                  clickAction={() =>
+                    document
+                      .getElementById('products')
+                      ?.scrollIntoView({behavior: 'smooth'})
+                  }
                 />
               </VStack>
             </Grid>
 
             {/* Product Grid — reflows 3 → 2 → 1 columns as width narrows */}
-            <Grid columns={{minWidth: 300}} gap={6}>
+            <Grid columns={{minWidth: 300}} gap={6} id="products">
               {PRODUCTS.map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}

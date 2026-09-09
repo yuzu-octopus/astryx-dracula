@@ -89,10 +89,30 @@ const xAxisLabels: Record<number, string> = {
 
 // KPI summary metrics
 const metrics = [
-  {value: '$294,200', change: '+14.8%', label: 'Total value'},
-  {value: '14.8%', change: '+2.1%', label: 'Annual return'},
-  {value: '2.8%', change: '$2,060/qtr', label: 'Dividend yield'},
-  {value: '23', change: '+4 YTD', label: 'Total asset holdings'},
+  {
+    value: '$294,200',
+    change: '+14.8%',
+    label: 'Total value',
+    caption: 'Weekly closes · trailing 12 months',
+  },
+  {
+    value: '14.8%',
+    change: '+2.1%',
+    label: 'Annual return',
+    caption: 'Trailing 12 months under moonlight',
+  },
+  {
+    value: '2.8%',
+    change: '$2,060/qtr',
+    label: 'Dividend yield',
+    caption: 'Paid quarterly under moonlight',
+  },
+  {
+    value: '23',
+    change: '+4 YTD',
+    label: 'Total asset holdings',
+    caption: 'Across the night vault',
+  },
 ];
 
 // Top holdings
@@ -388,7 +408,7 @@ function PortfolioChart() {
               key={m}
               x={left + (m / 12) * width}
               y={192}
-              textAnchor="middle"
+              textAnchor={m === 12 ? 'end' : 'middle'}
               fontSize={13}
               fill="var(--color-text-paragraph)"
               fontFamily="var(--font-family-mono)">
@@ -545,7 +565,16 @@ const trendingColumns: TableColumn<StockRow>[] = [
       </Text>
     ),
   },
-  {key: 'price', header: 'Price', width: proportional(1)},
+  {
+    key: 'price',
+    header: 'Price',
+    width: proportional(1),
+    renderCell: (row: StockRow) => (
+      <Text type="body" hasTabularNumbers>
+        {row.price}
+      </Text>
+    ),
+  },
   {
     key: 'dailyPts',
     header: 'Daily Chg (pts)',
@@ -590,10 +619,12 @@ function MetricCard({
   value,
   change,
   label,
+  caption,
 }: {
   value: string;
   change: string;
   label: string;
+  caption: string;
 }) {
   const positive = !change.startsWith('-');
   return (
@@ -614,7 +645,7 @@ function MetricCard({
           </HStack>
         </HStack>
         <Text type="supporting" color="secondary">
-          Trailing 12 months under moonlight
+          {caption}
         </Text>
       </VStack>
     </Card>
@@ -636,11 +667,13 @@ function AssetRow({
     <ListItem
       label={<Text weight="bold">{ticker}</Text>}
       description={name}
-      href="#"
+      href="#/templates/dashboard-portfolio"
       startContent={<Avatar name={ticker} size="md" />}
       endContent={
         <VStack gap={0} hAlign="end">
-          <Text type="body">{value}</Text>
+          <Text type="body" hasTabularNumbers>
+            {value}
+          </Text>
           <Badge
             label={change}
             variant={change.startsWith('-') ? 'red' : 'green'}
@@ -703,7 +736,7 @@ export default function DashboardPortfolio() {
                   <VStack gap={4}>
                     <HStack hAlign="between" vAlign="center">
                       <Heading level={3}>Vault value</Heading>
-                      <Link href="#">View details</Link>
+                      <Link href="#/templates/dashboard-portfolio">View details</Link>
                     </HStack>
                     <PortfolioChart />
                   </VStack>
@@ -714,7 +747,7 @@ export default function DashboardPortfolio() {
                   <VStack gap={4}>
                     <HStack hAlign="between" vAlign="center">
                       <Heading level={3}>Top holdings</Heading>
-                      <Link href="#">View all</Link>
+                      <Link href="#/templates/dashboard-portfolio">View all</Link>
                     </HStack>
                     <List density="spacious">
                       {topAssets.map(asset => (
@@ -731,7 +764,7 @@ export default function DashboardPortfolio() {
             {/* Market section */}
             <HStack hAlign="between" vAlign="start">
               <VStack gap={1}>
-                <Heading level={1}>Market at midnight</Heading>
+                <Heading level={2}>Market at midnight</Heading>
                 <Text type="body" color="secondary">
                   Past 24 hours under moonlight
                 </Text>

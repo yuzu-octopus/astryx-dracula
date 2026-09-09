@@ -143,7 +143,7 @@ function InfoRowItem({label, value, action}: InfoRow) {
             {value}
           </Text>
         </VStack>
-        {action && <Link href="#">{action}</Link>}
+        {action && <Link href="#/templates/settings-sidebar">{action}</Link>}
       </HStack>
       <Divider />
     </>
@@ -193,7 +193,7 @@ function ExpandableRow({
             </Text>
           </VStack>
           <Link
-            href="#"
+            href="#/templates/settings-sidebar"
             onClick={(e: React.MouseEvent) => {
               e.preventDefault();
               onEdit();
@@ -406,7 +406,7 @@ export default function SettingsSidebar() {
                             </VStack>
                           </StackItem>
                           {device.action && (
-                            <Link href="#">{device.action}</Link>
+                            <Link href="#/templates/settings-sidebar">{device.action}</Link>
                           )}
                         </HStack>
                       ))}
@@ -431,7 +431,7 @@ export default function SettingsSidebar() {
                             This action cannot be undone
                           </Text>
                         </VStack>
-                        <Link href="#">Deactivate</Link>
+                        <Link href="#/templates/settings-sidebar">Deactivate</Link>
                       </HStack>
                       <Divider />
                     </VStack>
@@ -732,7 +732,7 @@ export default function SettingsSidebar() {
                       <Text type="body" weight="semibold">
                         Blocked people
                       </Text>
-                      <Link href="#">View</Link>
+                      <Link href="#/templates/settings-sidebar">View</Link>
                     </HStack>
                     <Divider />
                   </VStack>
@@ -756,7 +756,7 @@ export default function SettingsSidebar() {
                     <Heading level={3}>Reviews</Heading>
                     <Text type="body" color="secondary">
                       Choose what&apos;s shared when you write a review.{' '}
-                      <Link href="#" type="supporting">
+                      <Link href="#/templates/settings-sidebar" type="supporting">
                         Learn more
                       </Link>
                     </Text>
@@ -802,7 +802,7 @@ export default function SettingsSidebar() {
                     <Card>
                       <HStack hAlign="between" vAlign="center">
                         <Text type="body">Request my personal data</Text>
-                        <Link href="#">Request</Link>
+                        <Link href="#/templates/settings-sidebar">Request</Link>
                       </HStack>
                     </Card>
                     <Switch
@@ -816,7 +816,7 @@ export default function SettingsSidebar() {
                     <Card>
                       <HStack hAlign="between" vAlign="center">
                         <Text type="body">Delete my account</Text>
-                        <Link href="#">Delete</Link>
+                        <Link href="#/templates/settings-sidebar">Delete</Link>
                       </HStack>
                     </Card>
                     <Card variant="muted">
@@ -831,7 +831,7 @@ export default function SettingsSidebar() {
                           <Text type="supporting" color="secondary">
                             We&apos;re committed to keeping your data protected.
                             See details in our{' '}
-                            <Link href="#" type="supporting">
+                            <Link href="#/templates/settings-sidebar" type="supporting">
                               Privacy Policy
                             </Link>
                             .

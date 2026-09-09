@@ -303,7 +303,7 @@ const columns: TableColumn<IncidentRow>[] = [
     header: 'Incident',
     width: pixel(110),
     renderCell: (item: IncidentRow) => (
-      <Link href="#" isStandalone>
+      <Link href="#/templates/table-page-heatmap-status" isStandalone>
         {item.id}
       </Link>
     ),
@@ -323,7 +323,7 @@ const columns: TableColumn<IncidentRow>[] = [
   {
     key: 'startTime',
     header: 'Started',
-    width: pixel(80),
+    width: pixel(96),
     renderCell: (item: IncidentRow) => (
       <Text type="body" hasTabularNumbers>
         {item.startTime}
@@ -366,7 +366,11 @@ const columns: TableColumn<IncidentRow>[] = [
     key: 'date',
     header: 'Date',
     width: pixel(110),
-    renderCell: (item: IncidentRow) => <Text type="body">{item.date}</Text>,
+    renderCell: (item: IncidentRow) => (
+      <Text type="body" hasTabularNumbers>
+        {item.date}
+      </Text>
+    ),
   },
 ];
 
@@ -459,7 +463,7 @@ function OutageHeatmap() {
                         y={labelH + hi * (cellH + gap) + cellH / 2 + 3}
                         textAnchor="middle"
                         fontSize={9}
-                        fill="#21222C"
+                        fill="var(--dracula-bg-dark)"
                         fontFamily="var(--font-family-mono)">
                         {count}
                       </text>
@@ -510,11 +514,13 @@ export default function HeatmapTable() {
               label="Filter"
               icon={<Icon icon={Filter} size="sm" />}
               variant="ghost"
+              tooltip="Filter"
             />
             <IconButton
               label="Export"
               icon={<Icon icon={Download} size="sm" />}
               variant="ghost"
+              tooltip="Export"
             />
             <Button label="Refresh" icon={<Icon icon={RotateCw} size="sm" />} />
           </HStack>

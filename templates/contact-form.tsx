@@ -103,10 +103,15 @@ export default function ContactForm() {
   return (
     <Center axis="horizontal">
       <VStack hAlign="center" width="100%">
-        <Section maxWidth={800} padding={6} paddingBlock={10} variant="section">
+        <Section
+          maxWidth={800}
+          width="100%"
+          padding={6}
+          paddingBlock={10}
+          variant="section">
           <VStack gap={6}>
             {/* Header */}
-            <VStack gap={2} hAlign="center">
+            <VStack gap={2} hAlign="center" style={{textAlign: 'center'}}>
               <Text type="display-1" weight="bold">
                 Let&apos;s brew after dark
               </Text>
@@ -272,7 +277,7 @@ export default function ContactForm() {
               <HStack gap={1} hAlign="center">
                 <Text type="supporting" color="secondary">
                   By submitting you agree to our{' '}
-                  <Link href="#" type="supporting">
+                  <Link href="#/templates/contact-form" type="supporting">
                     Privacy Policy
                   </Link>
                   .

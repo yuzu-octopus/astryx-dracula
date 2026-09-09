@@ -474,7 +474,7 @@ const columns: TableColumn<OrderRow>[] = [
     header: 'Order',
     width: pixel(110),
     renderCell: (item: OrderRow) => (
-      <Link href="#" isStandalone>
+      <Link href="#/templates/table-page-chart" isStandalone>
         {item.id}
       </Link>
     ),
@@ -535,7 +535,11 @@ const columns: TableColumn<OrderRow>[] = [
     key: 'date',
     header: 'Date',
     width: pixel(110),
-    renderCell: (item: OrderRow) => <Text type="body">{item.date}</Text>,
+    renderCell: (item: OrderRow) => (
+      <Text type="body" hasTabularNumbers>
+        {item.date}
+      </Text>
+    ),
   },
 ];
 
@@ -615,9 +619,9 @@ function RevenueChart() {
               (i % 3 === 0 || i === points.length - 1) && (
                 <text
                   key={p.date}
-                  x={p.x}
+                  x={i === points.length - 1 ? W - padRight - 2 : p.x}
                   y={H - 8}
-                  textAnchor="middle"
+                  textAnchor={i === points.length - 1 ? 'end' : 'middle'}
                   fontSize={9}
                   fill="var(--color-text-paragraph)"
                   fontFamily="var(--font-family-mono)">
@@ -656,11 +660,13 @@ export default function ChartTable() {
               label="Filter"
               icon={<Icon icon={Filter} size="sm" />}
               variant="ghost"
+              tooltip="Filter"
             />
             <IconButton
               label="Export"
               icon={<Icon icon={Download} size="sm" />}
               variant="ghost"
+              tooltip="Export"
             />
             <Button label="New order" icon={<Icon icon={Plus} size="sm" />} />
           </HStack>

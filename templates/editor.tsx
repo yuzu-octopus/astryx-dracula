@@ -18,7 +18,7 @@ import {
 } from '@astryxdesign/core/Layout';
 import {Icon} from '@astryxdesign/core/Icon';
 import {List, ListItem} from '@astryxdesign/core/List';
-import {Table} from '@astryxdesign/core/Table';
+import {Table, proportional, pixel} from '@astryxdesign/core/Table';
 import type {TableColumn} from '@astryxdesign/core/Table';
 import {Section} from '@astryxdesign/core/Section';
 import {
@@ -52,7 +52,7 @@ import {
   ShoppingBag,
   ShoppingCart,
   Banknote,
-  MessageCircle,
+  CarFront,
   CirclePlay,
   Ellipsis,
   Lock,
@@ -96,7 +96,7 @@ const CATEGORY_ICONS: Record<string, IconComponent> = {
   'Food & Drink': ShoppingBag,
   Groceries: ShoppingCart,
   Income: Banknote,
-  Transport: MessageCircle,
+  Transport: CarFront,
   Entertainment: CirclePlay,
 };
 
@@ -104,6 +104,7 @@ const TRANSACTION_COLUMNS: TableColumn<Transaction>[] = [
   {
     key: 'name',
     header: 'Transaction',
+    width: proportional(2, {minWidth: 170}),
     renderCell: (item: Transaction) => (
       <HStack gap={3} vAlign="center">
         <Icon icon={CATEGORY_ICONS[item.category] || Sparkles} />
@@ -121,6 +122,7 @@ const TRANSACTION_COLUMNS: TableColumn<Transaction>[] = [
   {
     key: 'date',
     header: 'Date',
+    width: proportional(1, {minWidth: 100}),
     renderCell: (item: Transaction) => (
       <Text type="body" color="secondary" hasTabularNumbers>
         {item.date}
@@ -130,8 +132,9 @@ const TRANSACTION_COLUMNS: TableColumn<Transaction>[] = [
   {
     key: 'amount',
     header: 'Amount',
+    width: proportional(1, {minWidth: 90}),
     renderCell: (item: Transaction) => (
-      <Text type="label" weight="semibold" color={undefined} hasTabularNumbers>
+      <Text type="label" weight="semibold" hasTabularNumbers>
         {item.amount}
       </Text>
     ),
@@ -139,6 +142,7 @@ const TRANSACTION_COLUMNS: TableColumn<Transaction>[] = [
   {
     key: 'actions',
     header: '',
+    width: pixel(44),
     renderCell: () => (
       <Button
         label="More"
@@ -555,6 +559,7 @@ function BlockPreview({
               columns={TRANSACTION_COLUMNS}
               idKey="id"
               hasHover
+              textOverflow="truncate"
             />
           </VStack>
         </Card>

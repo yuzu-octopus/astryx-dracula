@@ -23,13 +23,13 @@ import {TabList, Tab} from '@astryxdesign/core/TabList';
 import {Badge} from '@astryxdesign/core/Badge';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Center} from '@astryxdesign/core/Center';
+import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {
   User,
   Lock,
   Globe,
   ShieldCheck,
   Monitor,
-  Wrench,
   Bell,
   FileText,
   CreditCard,
@@ -62,6 +62,13 @@ const sideNavHeading: CSSProperties = {
 };
 const dialogHeight: CSSProperties = {
   height: '85vh',
+};
+// Keeps row actions ("Log out", "Deactivate") on one line: without this the
+// action column wraps mid-phrase at tablet widths while the info column still
+// has room to wrap instead.
+const actionNoWrap: CSSProperties = {
+  flexShrink: 0,
+  whiteSpace: 'nowrap',
 };
 
 const NAV_ITEMS = [
@@ -171,7 +178,7 @@ function ExpandableRow({
             </Text>
           </VStack>
           <Link
-            href="#"
+            href="#/templates/settings-dialog"
             onClick={(e: React.MouseEvent) => {
               e.preventDefault();
               onEdit();
@@ -205,7 +212,7 @@ function InfoRowItem({
             {value}
           </Text>
         </VStack>
-        {action && <Link href="#">{action}</Link>}
+        {action && <Link>{action}</Link>}
       </HStack>
       <Divider />
     </>
@@ -236,6 +243,13 @@ export default function SettingsDialog() {
   const [showStayLength, setShowStayLength] = useState(true);
   const [showServices, setShowServices] = useState(true);
   const [aiFeatures, setAiFeatures] = useState(true);
+  const [emailNotif, setEmailNotif] = useState(true);
+  const [pushNotif, setPushNotif] = useState(false);
+  const [workTravel, setWorkTravel] = useState(false);
+
+  // Below ~640px the 280px section sidebar crushes the content column to
+  // ~110px. The sidebar hides and a section picker renders above the content.
+  const isCompact = useMediaQuery('(max-width: 640px)');
 
   const handleEdit = (row: string) => setExpandedRow(row);
   const handleCancel = () => setExpandedRow(null);
@@ -260,7 +274,7 @@ export default function SettingsDialog() {
       <Dialog
         isOpen={isOpen}
         onOpenChange={open => setIsOpen(open)}
-        width={900}
+        width={isCompact ? 'calc(100vw - 32px)' : 900}
         maxHeight="85vh"
         padding={0}
         purpose="form"
@@ -268,7 +282,8 @@ export default function SettingsDialog() {
         <Layout
           height="fill"
           start={
-            <LayoutPanel width={280} hasDivider role="navigation" padding={3}>
+            isCompact ? undefined : (
+              <LayoutPanel width={280} hasDivider role="navigation" padding={3}>
               <VStack gap={4}>
                 <Heading level={2} style={sideNavHeading}>
                   Account settings
@@ -287,16 +302,9 @@ export default function SettingsDialog() {
                     />
                   ))}
                 </List>
-                <Divider />
-                <List density="spacious">
-                  <ListItem
-                    label="Professional hosting tools"
-                    startContent={<Icon icon={Wrench} />}
-                    onClick={() => {}}
-                  />
-                </List>
               </VStack>
-            </LayoutPanel>
+              </LayoutPanel>
+            )
           }
           content={
             <LayoutContent isScrollable padding={6}>
@@ -312,6 +320,21 @@ export default function SettingsDialog() {
                     hasDivider={false}
                   />
                 </VStack>
+                {isCompact && (
+                  <Selector
+                    label="Settings section"
+                    value={activeNav}
+                    onChange={value => {
+                      setActiveNav(value);
+                      setExpandedRow(null);
+                    }}
+                    options={NAV_ITEMS.map(item => ({
+                      label: item.label,
+                      value: item.label,
+                    }))}
+                    width="100%"
+                  />
+                )}
                 <VStack gap={0} style={contentMaxWidth}>
                   {activeNav === 'Personal information' && (
                     <VStack gap={6}>
@@ -547,7 +570,9 @@ export default function SettingsDialog() {
                                     </VStack>
                                   </StackItem>
                                   {device.action && (
-                                    <Link href="#">{device.action}</Link>
+                                    <Link style={actionNoWrap}>
+                                      {device.action}
+                                    </Link>
                                   )}
                                 </HStack>
                                 <Divider />
@@ -573,7 +598,7 @@ export default function SettingsDialog() {
                                   This action cannot be undone
                                 </Text>
                               </VStack>
-                              <Link href="#">Deactivate</Link>
+                              <Link>Deactivate</Link>
                             </HStack>
                             <Divider />
                           </VStack>
@@ -680,6 +705,87 @@ export default function SettingsDialog() {
                     </VStack>
                   )}
 
+                  {activeNav === 'Notifications' && (
+                    <VStack gap={6}>
+                      <VStack gap={4}>
+                        <Heading level={3}>Notifications</Heading>
+                        <Switch
+                          label="Email notifications"
+                          description="Booking updates, reminders, and policy changes."
+                          value={emailNotif}
+                          onChange={setEmailNotif}
+                          labelPosition="start"
+                          labelSpacing="spread"
+                        />
+                        <Divider />
+                        <Switch
+                          label="Push notifications"
+                          description="Time-sensitive alerts on this device."
+                          value={pushNotif}
+                          onChange={setPushNotif}
+                          labelPosition="start"
+                          labelSpacing="spread"
+                        />
+                        <Divider />
+                      </VStack>
+                    </VStack>
+                  )}
+
+                  {activeNav === 'Payments' && (
+                    <VStack gap={6}>
+                      <VStack gap={4}>
+                        <Heading level={3}>Payments</Heading>
+                        <Divider />
+                        <InfoRowItem
+                          label="Payout method"
+                          value="Visa ending in 4821"
+                          action=""
+                        />
+                        <InfoRowItem
+                          label="Billing history"
+                          value="No invoices yet"
+                          action=""
+                        />
+                      </VStack>
+                    </VStack>
+                  )}
+
+                  {activeNav === 'Taxes' && (
+                    <VStack gap={6}>
+                      <VStack gap={4}>
+                        <Heading level={3}>Taxes</Heading>
+                        <Divider />
+                        <InfoRowItem
+                          label="Tax profile"
+                          value="Not submitted"
+                          action=""
+                        />
+                        <InfoRowItem
+                          label="Tax documents"
+                          value="Available after your first payout"
+                          action=""
+                        />
+                      </VStack>
+                    </VStack>
+                  )}
+
+                  {activeNav === 'Travel for work' && (
+                    <VStack gap={6}>
+                      <VStack gap={4}>
+                        <Heading level={3}>Travel for work</Heading>
+                        <Switch
+                          label="Show work-trip options"
+                          description="Adds a work-trip toggle at checkout."
+                          value={workTravel}
+                          onChange={setWorkTravel}
+                          labelPosition="start"
+                          labelSpacing="spread"
+                        />
+                        <Divider />
+                      </VStack>
+                    </VStack>
+                  )}
+
                   {activeNav === 'Privacy' && (
                     <VStack gap={6}>
                       <VStack gap={8}>
@@ -696,7 +802,7 @@ export default function SettingsDialog() {
                             <Text type="body" weight="semibold">
                               Blocked people
                             </Text>
-                            <Link href="#">View</Link>
+                                                          <Link>View</Link>
                           </HStack>
                           <Divider />
                         </VStack>
@@ -718,9 +824,7 @@ export default function SettingsDialog() {
                           <Heading level={3}>Reviews</Heading>
                           <Text type="supporting" color="secondary">
                             Choose what&apos;s shared when you write a review.{' '}
-                            <Link href="#" type="supporting">
-                              Learn more
-                            </Link>
+                            <Link type="supporting">Learn more</Link>
                           </Text>
                           <VStack gap={4}>
                             <Switch
@@ -764,7 +868,7 @@ export default function SettingsDialog() {
                           <Card>
                             <HStack hAlign="between" vAlign="center">
                               <Text type="body">Request my personal data</Text>
-                              <Link href="#">Request</Link>
+                              <Link>Request</Link>
                             </HStack>
                           </Card>
                           <Switch
@@ -778,7 +882,7 @@ export default function SettingsDialog() {
                           <Card>
                             <HStack hAlign="between" vAlign="center">
                               <Text type="body">Delete my account</Text>
-                              <Link href="#">Delete</Link>
+                              <Link>Delete</Link>
                             </HStack>
                           </Card>
                           <Card variant="muted">
@@ -793,7 +897,7 @@ export default function SettingsDialog() {
                                 <Text type="supporting" color="secondary">
                                   We&apos;re committed to keeping your data
                                   protected. See details in our{' '}
-                                  <Link href="#" type="supporting">
+                                  <Link type="supporting">
                                     Privacy Policy
                                   </Link>
                                   .

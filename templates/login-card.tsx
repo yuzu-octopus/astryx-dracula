@@ -129,7 +129,7 @@ export default function LoginCard() {
                 {loginFailed && (
                   <VStack hAlign="end">
                     <Link
-                      href="#"
+                      href="#/templates/login-card"
                       size="sm"
                       color="secondary"
                       type="supporting">
@@ -172,7 +172,7 @@ export default function LoginCard() {
             <VStack hAlign="center">
               <Text type="supporting" color="secondary">
                 New to the castle?{' '}
-                <Link href="#" type="supporting">
+                <Link href="#/templates/login-card" type="supporting">
                   Sign up
                 </Link>
               </Text>
@@ -184,11 +184,11 @@ export default function LoginCard() {
         <VStack hAlign="center" width="100%">
           <Text type="supporting" color="secondary" justify="center">
             By clicking continue, you agree to our{' '}
-            <Link href="#" type="supporting">
+            <Link href="#/templates/login-card" type="supporting">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link href="#" type="supporting">
+            <Link href="#/templates/login-card" type="supporting">
               Privacy Policy
             </Link>
             .

@@ -832,16 +832,16 @@ export default function PaymentForm() {
                         </VStack>
                         <Divider />
                         <HStack gap={4} vAlign="center" wrap="wrap">
-                          <Link href="#" type="supporting">
+                          <Link href="#/templates/payment-form" type="supporting">
                             Refund policy
                           </Link>
-                          <Link href="#" type="supporting">
+                          <Link href="#/templates/payment-form" type="supporting">
                             Privacy policy
                           </Link>
-                          <Link href="#" type="supporting">
+                          <Link href="#/templates/payment-form" type="supporting">
                             Terms of service
                           </Link>
-                          <Link href="#" type="supporting">
+                          <Link href="#/templates/payment-form" type="supporting">
                             Cancellations
                           </Link>
                         </HStack>
@@ -910,10 +910,10 @@ export default function PaymentForm() {
                                           max={10}
                                           isIntegerOnly
                                         />
-                                        <Link href="#" type="supporting">
+                                        <Link href="#/templates/payment-form" type="supporting">
                                           Remove
                                         </Link>
-                                        <Link href="#" type="supporting">
+                                        <Link href="#/templates/payment-form" type="supporting">
                                           Save
                                         </Link>
                                       </HStack>

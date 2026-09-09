@@ -187,7 +187,7 @@ export const TEMPLATES: TemplateEntry[] = [
   {
     id: 'product-gallery',
     name: 'Product Gallery',
-    description: 'Filterable product grid.',
+    description: 'Browsable product grid.',
     load: () => import('../templates/product-gallery'),
   },
   {

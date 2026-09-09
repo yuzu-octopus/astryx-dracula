@@ -13,6 +13,7 @@ import {
   SegmentedControlItem,
 } from '@astryxdesign/core/SegmentedControl';
 import {Badge} from '@astryxdesign/core/Badge';
+import {Banner} from '@astryxdesign/core/Banner';
 import {Divider} from '@astryxdesign/core/Divider';
 import {Collapsible, CollapsibleGroup} from '@astryxdesign/core/Collapsible';
 import {AspectRatio} from '@astryxdesign/core/AspectRatio';
@@ -94,7 +95,9 @@ function StarRating({rating, count}: {rating: number; count: number}) {
 }
 
 // ─── Image hues ─────────────────────────────────────────────────────────────
-// IMAGES[0] = fallback hero; IMAGES[1..6] = thumbnails (first is selected by default)
+// IMAGES[selected] is the hero; all six double as thumbnails so the 3-column
+// grid closes into two full rows (a slice(1) subset left a ragged 3+2 row and
+// a fallback entry that never rendered).
 const IMAGES = [
   'var(--dracula-purple)',
   'var(--dracula-cyan)',
@@ -141,8 +144,8 @@ function ImageGallery({
   selected: number;
   onSelect: (i: number) => void;
 }) {
-  const heroHue = IMAGES[selected + 1] ?? IMAGES[0];
-  const thumbnails = IMAGES.slice(1);
+  const heroHue = IMAGES[selected];
+  const thumbnails = IMAGES;
 
   return (
     <VStack gap={3}>
@@ -174,6 +177,10 @@ function ProductInfo() {
   const [color, setColor] = useState('midnight');
   const [finish, setFinish] = useState('matte');
   const [quantity, setQuantity] = useState<number | null>(1);
+  const [notice, setNotice] = useState<{
+    status: 'success' | 'info';
+    title: string;
+  } | null>(null);
 
   const decrement = () => setQuantity(q => Math.max(1, (q ?? 1) - 1));
   const increment = () => setQuantity(q => Math.min(10, (q ?? 1) + 1));
@@ -181,9 +188,9 @@ function ProductInfo() {
   return (
     <VStack gap={5}>
       <VStack gap={2}>
-        <Text type="display-2" as="h1">
+        <Heading level={1} type="display-2">
           {PRODUCT.name}
-        </Text>
+        </Heading>
         <StarRating rating={4.3} count={128} />
         <HStack gap={2} vAlign="center">
           <Text type="large" weight="bold" hasTabularNumbers>
@@ -236,6 +243,7 @@ function ProductInfo() {
             clickAction={decrement}
             isDisabled={(quantity ?? 1) <= 1}
             isIconOnly
+            tooltip="Decrease quantity"
           />
           <Center width={100}>
             <NumberInput
@@ -255,32 +263,73 @@ function ProductInfo() {
             clickAction={increment}
             isDisabled={(quantity ?? 1) >= 10}
             isIconOnly
+            tooltip="Increase quantity"
           />
         </HStack>
       </VStack>
       <VStack gap={2}>
-        <Button label="Add to Cart" variant="primary" size="lg" />
-        <Button label="Buy it now" size="lg" />
+        {notice && (
+          <Banner
+            status={notice.status}
+            title={notice.title}
+            container="card"
+            isDismissable
+            onDismiss={() => setNotice(null)}
+          />
+        )}
+        <Button
+          label="Add to Cart"
+          variant="primary"
+          size="lg"
+          clickAction={() =>
+            setNotice({
+              status: 'success',
+              title: `Added ${quantity ?? 1} × ${PRODUCT.name} to your cart.`,
+            })
+          }
+        />
+        <Button
+          label="Buy it now"
+          size="lg"
+          clickAction={() =>
+            setNotice({
+              status: 'info',
+              title: 'Checkout is disabled in this preview.',
+            })
+          }
+        />
       </VStack>
       <CollapsibleGroup type="multiple" defaultValue={['composition']}>
         <Divider />
         <Collapsible
           value="composition"
-          trigger={<Heading level={3}>Composition</Heading>}>
+          trigger={
+            <Heading level={3} accessibilityLevel={2}>
+              Composition
+            </Heading>
+          }>
           <Text type="body">{PRODUCT.composition}</Text>
         </Collapsible>
         <Divider />
         <Collapsible
           value="delivery"
           defaultIsOpen={false}
-          trigger={<Heading level={3}>Delivery &amp; Returns</Heading>}>
+          trigger={
+            <Heading level={3} accessibilityLevel={2}>
+              Delivery &amp; Returns
+            </Heading>
+          }>
           <Text type="body">{PRODUCT.deliveryReturns}</Text>
         </Collapsible>
         <Divider />
         <Collapsible
           value="dimensions"
           defaultIsOpen={false}
-          trigger={<Heading level={3}>Dimensions</Heading>}>
+          trigger={
+            <Heading level={3} accessibilityLevel={2}>
+              Dimensions
+            </Heading>
+          }>
           <Text type="body" hasTabularNumbers>
             {PRODUCT.dimensions}
           </Text>

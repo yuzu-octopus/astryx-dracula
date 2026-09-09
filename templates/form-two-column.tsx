@@ -7,7 +7,7 @@ import {Section} from '@astryxdesign/core/Section';
 import {Grid} from '@astryxdesign/core/Grid';
 import {AspectRatio} from '@astryxdesign/core/AspectRatio';
 import {Button} from '@astryxdesign/core/Button';
-import {Text} from '@astryxdesign/core/Text';
+import {Text, Heading} from '@astryxdesign/core/Text';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {Token} from '@astryxdesign/core/Token';
 import {TextArea} from '@astryxdesign/core/TextArea';
@@ -176,9 +176,9 @@ export default function TwoColumnForm() {
           <Grid columns={{minWidth: 320}} align="center" gap={10}>
             <VStack gap={6}>
               <VStack gap={3}>
-                <Text type="display-1" as="h1">
+                <Heading level={1} type="display-1">
                   Let&apos;s conjure together
-                </Text>
+                </Heading>
                 <Text type="body" color="secondary">
                   Tell us what you&apos;re brewing and we&apos;ll help you find
                   the best path through the night.

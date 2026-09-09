@@ -37,7 +37,7 @@ const columns: TableColumn<Relic>[] = [
     renderCell: (item: Relic) => (
       <Badge
         variant={item.status === 'active' ? 'success' : 'neutral'}
-        label={item.status}
+        label={item.status.charAt(0).toUpperCase() + item.status.slice(1)}
       />
     ),
   },
@@ -45,7 +45,7 @@ const columns: TableColumn<Relic>[] = [
     key: 'updatedAt',
     header: 'Updated',
     renderCell: (item: Relic) => (
-      <Text type="body" color="secondary">
+      <Text type="body" color="secondary" hasTabularNumbers>
         {item.updatedAt}
       </Text>
     ),
@@ -53,7 +53,11 @@ const columns: TableColumn<Relic>[] = [
   {
     key: 'actions',
     header: 'Actions',
-    renderCell: () => <Button label="Edit" variant="secondary" size="sm" />,
+    renderCell: (item: Relic) => (
+      <Button label={`Edit ${item.name}`} variant="secondary" size="sm">
+        Edit
+      </Button>
+    ),
   },
 ];
 

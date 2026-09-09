@@ -48,12 +48,18 @@ import {
   ChevronRight,
 } from 'lucide-react';
 
-// Below this width the split-pane collapses to a single chat column. Shared by
-// the CSS container query and the JS check in openArtifact so they can't drift.
-const MOBILE_MAX_WIDTH = 767;
+// Below this container width the split-pane collapses to a single chat column
+// and the artifact opens as a full-screen dialog instead. Shared by the CSS
+// container query and the JS check in openArtifact so they can't drift. 1023
+// keeps tablet widths from squeezing the chat into a ~100px rail beside the
+// 640px default artifact panel.
+const MOBILE_MAX_WIDTH = 1023;
 
 const root: CSSProperties = {
-  height: '100dvh',
+  // The showcase renders a 44px breadcrumb row above the template, so a full
+  // 100dvh root always spills exactly that far into page-level scroll. Subtract
+  // it so scrolling stays inside the message list and artifact body.
+  height: 'calc(100dvh - 44px)',
   width: '100%',
   containerType: 'inline-size',
   containerName: 'artifact',

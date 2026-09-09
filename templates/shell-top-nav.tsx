@@ -2,6 +2,7 @@
 
 import type {CSSProperties} from 'react';
 import {AppShell} from '@astryxdesign/core/AppShell';
+import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {
   TopNav,
   TopNavHeading,
@@ -9,6 +10,7 @@ import {
   TopNavMegaMenu,
   TopNavMegaMenuItem,
   TopNavMegaMenuFeaturedCard,
+  useTopNavRenderMode,
 } from '@astryxdesign/core/TopNav';
 import {NavIcon} from '@astryxdesign/core/NavIcon';
 import {Icon} from '@astryxdesign/core/Icon';
@@ -41,6 +43,9 @@ import {
 
 // Cap + center the page body so wide screens show whitespace gutters.
 const contentMax: CSSProperties = {maxWidth: 1100, marginInline: 'auto'};
+// Same-route hash: demo links stay focusable anchors without escaping the
+// template through the hash router (bare "#" would drop back to the home page).
+const SELF_HASH = '#/templates/shell-top-nav';
 // Lock both mega-menu panels to an identical size. Without this, Shop and
 // Brands size to their own content (different widths); since both anchor to
 // the centered nav, switching between them resizes the panel — which reads
@@ -95,6 +100,25 @@ const CATEGORY_TILES = [
 // Wraps the 8 items in a fixed-width 2-column grid so every mega menu's item
 // area is exactly the same width regardless of its content.
 function MegaItems({items}: {items: MegaItem[]}) {
+  // In the mobile drawer the fixed 520px panel would overflow the ~350px
+  // drawer, and the 2-column grid overlaps item text there — so the drawer
+  // gets a natural-width single column. Desktop keeps the lock.
+  const isDrawer = useTopNavRenderMode() === 'drawer';
+  if (isDrawer) {
+    return (
+      <VStack gap={1}>
+        {items.map(item => (
+          <TopNavMegaMenuItem
+            key={item.name}
+            title={item.name}
+            description={item.tagline}
+            icon={<Icon icon={item.icon} size="md" color="secondary" />}
+            href={SELF_HASH}
+          />
+        ))}
+      </VStack>
+    );
+  }
   return (
     <Stack style={megaItems}>
       <Grid columns={2} gap={2}>
@@ -104,7 +128,7 @@ function MegaItems({items}: {items: MegaItem[]}) {
             title={item.name}
             description={item.tagline}
             icon={<Icon icon={item.icon} size="md" color="secondary" />}
-            href="#"
+            href={SELF_HASH}
           />
         ))}
       </Grid>
@@ -119,14 +143,19 @@ function MegaFeatured(props: {
   linkLabel: string;
   linkHref: string;
 }) {
+  const isDrawer = useTopNavRenderMode() === 'drawer';
   return (
-    <Stack style={megaFeatured}>
+    <Stack style={isDrawer ? undefined : megaFeatured}>
       <TopNavMegaMenuFeaturedCard {...props} />
     </Stack>
   );
 }
 
 export default function ShellTopNav() {
+  // Below ~640px the mobile bar (heading + actions + toggle) overflows 390px
+  // viewports, pushing the nav toggle off-screen. Dropping the text Sign in
+  // button there restores room for search, checkout, and the toggle.
+  const isCompact = useMediaQuery('(max-width: 640px)');
   return (
     <AppShell
       variant="surface"
@@ -140,7 +169,6 @@ export default function ShellTopNav() {
               logo={
                 <NavIcon icon={<Icon icon={ShoppingBag} size="sm" />} />
               }
-              headingHref="#"
             />
           }
           centerContent={
@@ -153,7 +181,7 @@ export default function ShellTopNav() {
                     title="The Midnight Edit"
                     description="Layered staples in moonlit purples."
                     linkLabel="Shop the edit"
-                    linkHref="#midnight-edit"
+                    linkHref={SELF_HASH}
                   />
                 }
               />
@@ -165,12 +193,12 @@ export default function ShellTopNav() {
                     title="Meet Studio Mara"
                     description="Modern tailoring, made to last."
                     linkLabel="Discover the label"
-                    linkHref="#studio-mara"
+                    linkHref={SELF_HASH}
                   />
                 }
               />
-              <TopNavItem label="Sale" href="#" />
-              <TopNavItem label="Service" href="#" />
+              <TopNavItem label="Sale" href={SELF_HASH} />
+              <TopNavItem label="Service" href={SELF_HASH} />
             </>
           }
           endContent={
@@ -181,10 +209,11 @@ export default function ShellTopNav() {
                 variant="ghost"
                 icon={<Icon icon={Search} size="sm" />}
               />
-              <Button label="Sign in" variant="ghost" />
+              {!isCompact && <Button label="Sign in" variant="ghost" />}
               <Button
                 label="Checkout"
                 variant="primary"
+                tooltip="Cart, 3 items"
                 icon={<Icon icon={ShoppingCart} size="sm" />}
                 endContent={<Badge label={3} />}
               />

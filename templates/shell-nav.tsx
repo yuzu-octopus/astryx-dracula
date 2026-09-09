@@ -14,12 +14,10 @@ import {TreeList} from '@astryxdesign/core/TreeList';
 import type {TreeListItemData} from '@astryxdesign/core/TreeList';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Text} from '@astryxdesign/core/Text';
-import {IconButton} from '@astryxdesign/core/IconButton';
 import {Button} from '@astryxdesign/core/Button';
-import {TextInput} from '@astryxdesign/core/TextInput';
 import {Card} from '@astryxdesign/core/Card';
-import {Stack, VStack, HStack} from '@astryxdesign/core/Stack';
-import {Play, Search, Folder, FileText} from 'lucide-react';
+import {VStack, HStack} from '@astryxdesign/core/Stack';
+import {Search, Folder, FileText} from 'lucide-react';
 
 const noop = () => {};
 
@@ -64,7 +62,9 @@ const FILE_TREE: TreeListItemData[] = [
 // (e.g. ⌘N); an empty shortcut renders no Kbd.
 type MenuEntry = [label: string, shortcut: string];
 
-const MENU_WIDTH = 280;
+// Wide enough that label + Kbd shortcut never clip at the menu edge —
+// "Previous Tab ⌃⇧⇥" is the widest row and touched the border at 280.
+const MENU_WIDTH = 300;
 
 const MENUS: {label: string; groups: MenuEntry[][]}[] = [
   {
@@ -221,27 +221,19 @@ export default function ShellNav() {
               </>
             }
             endContent={
-              <>
-                <Stack onClick={() => setIsPaletteOpen(true)}>
-                  <TextInput
-                    label="Search files and commands"
-                    isLabelHidden
-                    size="sm"
-                    width={240}
-                    startIcon={Search}
-                    placeholder="Search the night shift…"
-                    value=""
-                    onChange={() => {}}
-                  />
-                </Stack>
-                <IconButton
-                  label="Run project"
-                  tooltip="Run"
-                  variant="ghost"
-                  icon={<Icon icon={Play} size="sm" />}
-                />
-                <Button label="Share" variant="secondary" />
-              </>
+              // A real palette trigger, not a lookalike field: the previous
+              // TextInput swallowed keystrokes (fixed value, noop onChange)
+              // while a wrapper div opened the palette on click. The dead Run
+              // and Share buttons go with it — demo chrome must not ship
+              // controls that do nothing.
+              <Button
+                label="Search files and commands"
+                variant="secondary"
+                size="sm"
+                tooltip="Search files and commands (⌘K)"
+                icon={<Icon icon={Search} size="sm" />}
+                onClick={() => setIsPaletteOpen(true)}
+              />
             }
           />
         }

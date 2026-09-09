@@ -209,7 +209,7 @@ function PageHeader({
         <HStack gap={4} vAlign="start">
           <StackItem size="fill">
             <VStack gap={0}>
-              <Link href="#" color="secondary">
+              <Link href="#/templates/detail-page" color="secondary">
                 <HStack gap={1} vAlign="center">
                   <Icon icon={ArrowLeft} size="sm" color="inherit" />
                   All orders
@@ -256,7 +256,7 @@ function PageHeader({
                   </HStack>
                   <HStack gap={1} vAlign="center">
                     <Bullet />
-                    <Link href="#" color="secondary">
+                    <Link href="#/templates/detail-page" color="secondary">
                       See all
                     </Link>
                   </HStack>
@@ -552,7 +552,10 @@ function TimelineSection() {
                         Reply
                       </Text>
                       <Bullet />
-                      <Text type="supporting" color="secondary">
+                      <Text
+                        type="supporting"
+                        color="secondary"
+                        hasTabularNumbers>
                         {item.time}
                       </Text>
                     </HStack>
@@ -578,7 +581,7 @@ function PanelContent() {
           Customer is a repeat buyer — 3rd order this quarter. Prefers
           moonlight and sage glazes. Requested gift wrapping for the mug set.
           Ships to a residential address in CA.{' '}
-          <Link href="#" color="secondary">
+          <Link href="#/templates/detail-page" color="secondary">
             Show more
           </Link>
         </Text>
@@ -589,7 +592,7 @@ function PanelContent() {
           <MetadataListItem label="Address">
             321 Smith Road, CA 38238
           </MetadataListItem>
-          <MetadataListItem label="Phone">234-</MetadataListItem>
+          <MetadataListItem label="Phone">234-555-0134</MetadataListItem>
           <MetadataListItem label="Email">janedoe@email.com</MetadataListItem>
           <MetadataListItem label="Billing Address">
             Same as shipping address

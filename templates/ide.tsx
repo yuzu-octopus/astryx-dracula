@@ -5,7 +5,9 @@ import {useState, useMemo, type CSSProperties} from 'react';
 import {Layout, LayoutContent, LayoutPanel} from '@astryxdesign/core/Layout';
 import {ResizeHandle, useResizable} from '@astryxdesign/core/Resizable';
 import {Text, Heading} from '@astryxdesign/core/Text';
+import {Center} from '@astryxdesign/core/Center';
 import {CodeBlock} from '@astryxdesign/core/CodeBlock';
+import {EmptyState} from '@astryxdesign/core/EmptyState';
 import {Stack, StackItem} from '@astryxdesign/core/Layout';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {TabList, Tab} from '@astryxdesign/core/TabList';
@@ -50,7 +52,6 @@ const styles: Record<string, CSSProperties> = {
     minHeight: 0,
   },
   fileExplorer: {
-    padding: 16,
     minWidth: 0,
   },
   propertiesPanel: {
@@ -121,6 +122,11 @@ $ next dev
 
 $ `;
 
+const OUTPUT_LOG = `[@astryxdesign/core] theme tokens resolved in 38ms
+[@astryxdesign/core] 12 components hydrated, 0 warnings
+[HMR] connected, watching src/components/NightCounter.tsx
+[HMR] updated src/tokens.ts in 122ms`;
+
 function buildFileTree(
   onFileClick: (name: string) => void,
 ): TreeListItemData[] {
@@ -171,6 +177,25 @@ function buildFileTree(
   ];
 }
 
+function filterFileTree(
+  items: TreeListItemData[],
+  query: string,
+): TreeListItemData[] {
+  const out: TreeListItemData[] = [];
+  for (const item of items) {
+    const children = item.children
+      ? filterFileTree(item.children, query)
+      : undefined;
+    if (
+      item.id.toLowerCase().includes(query) ||
+      (children && children.length > 0)
+    ) {
+      out.push({...item, ...(children ? {children, isExpanded: true} : null)});
+    }
+  }
+  return out;
+}
+
 const PROPERTIES = [
   {label: 'Type', value: 'React Component'},
   {label: 'Language', value: 'TypeScript'},
@@ -192,7 +217,12 @@ export default function IdeWorkspace() {
   const [activeFile, setActiveFile] = useState('NightCounter.tsx');
   const [activeTermTab, setActiveTermTab] = useState('terminal');
   const [activePropertiesTab, setActivePropertiesTab] = useState('properties');
+  const [query, setQuery] = useState('');
   const fileTree = useMemo(() => buildFileTree(setActiveFile), []);
+  const visibleTree = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return q ? filterFileTree(fileTree, q) : fileTree;
+  }, [fileTree, query]);
 
   const startPanel = useResizable({
     defaultSize: 256,
@@ -234,7 +264,7 @@ export default function IdeWorkspace() {
                     <LayoutPanel
                       width={startPanel.size}
                       hasDivider={false}
-                      padding={0}>
+                      padding={4}>
                       <Stack
                         direction="vertical"
                         style={styles.fileExplorer}
@@ -242,12 +272,22 @@ export default function IdeWorkspace() {
                         <TextInput
                           label="Search files"
                           isLabelHidden
-                          value=""
+                          value={query}
+                          onChange={setQuery}
                           placeholder="Search the night"
                           size="md"
                           startIcon={Search}
+                          hasClear
                         />
-                        <TreeList items={fileTree} density="compact" />
+                        {visibleTree.length > 0 ? (
+                          <TreeList items={visibleTree} density="compact" />
+                        ) : (
+                          <EmptyState
+                            title="No files match"
+                            description={`Nothing in the night answers to "${query.trim()}".`}
+                            isCompact
+                          />
+                        )}
                       </Stack>
                     </LayoutPanel>
                   )}
@@ -313,20 +353,56 @@ export default function IdeWorkspace() {
                             <StackItem
                               size="fill"
                               style={styles.terminalWrapper}>
-                              <CodeBlock
-                                code={TERMINAL_OUTPUT}
-                                language="bash"
-                                container="section"
-                                hasLanguageLabel={false}
-                                hasCopyButton={false}
-                                size="sm"
-                                style={{
-                                  width: '100%',
-                                  height: '100%',
-                                  borderWidth: 0,
-                                  borderRadius: 0,
-                                }}
-                              />
+                              {activeTermTab === 'terminal' && (
+                                <CodeBlock
+                                  code={TERMINAL_OUTPUT}
+                                  language="bash"
+                                  container="section"
+                                  hasLanguageLabel={false}
+                                  hasCopyButton={false}
+                                  size="sm"
+                                  style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    borderWidth: 0,
+                                    borderRadius: 0,
+                                  }}
+                                />
+                              )}
+                              {activeTermTab === 'output' && (
+                                <CodeBlock
+                                  code={OUTPUT_LOG}
+                                  language="bash"
+                                  container="section"
+                                  hasLanguageLabel={false}
+                                  hasCopyButton={false}
+                                  size="sm"
+                                  style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    borderWidth: 0,
+                                    borderRadius: 0,
+                                  }}
+                                />
+                              )}
+                              {activeTermTab === 'problems' && (
+                                <Center style={{height: '100%'}}>
+                                  <EmptyState
+                                    title="No problems"
+                                    description="The night watch reports no errors or warnings."
+                                    isCompact
+                                  />
+                                </Center>
+                              )}
+                              {activeTermTab === 'debug' && (
+                                <Center style={{height: '100%'}}>
+                                  <EmptyState
+                                    title="No debug session"
+                                    description="Start debugging to inspect the night shift."
+                                    isCompact
+                                  />
+                                </Center>
+                              )}
                             </StackItem>
                           </Stack>
                         )}
