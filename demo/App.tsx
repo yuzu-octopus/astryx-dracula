@@ -24,8 +24,12 @@ import { Gallery } from './Gallery';
 import { Dashboard } from './Dashboard';
 import { Quickstart } from './Quickstart';
 
-const HERO_CODE = `import { astryxDraculaTheme } from './astryx-dracula';
-import './theme.css';
+const HERO_CODE = `import '@astryxdesign/core/reset.css';
+import '@astryxdesign/core/astryx.css';
+import 'astryx-dracula/tokens.css';
+import 'astryx-dracula/theme.css';
+import { Theme } from '@astryxdesign/core/theme';
+import { astryxDraculaTheme } from 'astryx-dracula';
 
 <Theme theme={astryxDraculaTheme} mode="dark">
   <App />

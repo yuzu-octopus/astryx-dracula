@@ -40,7 +40,7 @@ import { astryxDraculaTheme } from 'astryx-dracula';
 </Theme>;
 ```
 
-Stock Vite React config plus the layer-order snippet in `<kit>/vite.config.ts`. Discover components with `bunx astryx component <Name>` before use.
+Stock Vite config plus the layer-order snippet in USAGE.md. Discover components with `bunx astryx component <Name>` before use.
 
 ## Migrating a codebase
 

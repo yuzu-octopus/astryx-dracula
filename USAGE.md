@@ -17,9 +17,12 @@ Or clone `https://github.com/yuzu-octopus/astryx-dracula.git` and copy
 Zero runtime cost. Built with `bun run theme:build` from `astryx-theme.ts`.
 
 ```tsx
+import '@astryxdesign/core/reset.css';
+import '@astryxdesign/core/astryx.css';
+import 'astryx-dracula/tokens.css';
+import 'astryx-dracula/theme.css';
 import { Theme } from '@astryxdesign/core/theme';
-import { astryxDraculaTheme } from './astryx-dracula';
-import './theme.css';
+import { astryxDraculaTheme } from 'astryx-dracula';
 
 <Theme theme={astryxDraculaTheme} mode="dark">
   <App />
@@ -55,7 +58,7 @@ import '../tokens.css';
 ## Plain CSS (any stack)
 
 ```css
-@import '../tokens.css';
+@import 'astryx-dracula/tokens.css';
 ```
 
 Then use `var(--color-primary)`, `var(--dracula-purple)`, `var(--space-gap)`.
@@ -80,7 +83,33 @@ for body, heading, and code roles. Without the files, text falls back to
 No special config needed. This kit follows the glimpse path: prebuilt
 `@astryxdesign/core` CSS plus `<Theme>` injection. A stock Vite React
 config works. The only recommended extra is the CSS layer-order snippet so
-theme overrides beat component base styles (see `vite.config.ts` in this repo).
+theme overrides beat component base styles (our repo `vite.config.ts` also
+sets a demo-only `base` path; do not copy that):
+
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [
+    {
+      name: 'astryx-css-layer-order',
+      transformIndexHtml() {
+        return [
+          {
+            tag: 'style',
+            children:
+              '@layer reset, priority1, priority2, priority3, priority4, priority5, priority6, priority7, priority8, priority9, astryx-theme;',
+            injectTo: 'head-prepend',
+          },
+        ];
+      },
+    },
+    react(),
+  ],
+});
+```
 
 Advanced: custom `astryx theme build` pipelines need the full StyleX
 source-compile setup. See the `/facebook/astryx` `apps/example-vite`
