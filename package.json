@@ -40,7 +40,9 @@
     "fonts/",
     "icons.tsx",
     "theme.css",
-    "tokens.css"
+    "tokens.css",
+    "templates/",
+    "astryx.integration.mjs"
   ],
   "license": "MIT",
   "name": "astryx-dracula",

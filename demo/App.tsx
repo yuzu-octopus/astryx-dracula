@@ -68,6 +68,7 @@ export default function App() {
                   <Link href="#dashboard">Dashboard</Link>
                   <Link href="#components">Components</Link>
                   <Link href="#quickstart">Quickstart</Link>
+                  <Link href="#/templates">Templates</Link>
                 </HStack>
               ) : undefined
             }
