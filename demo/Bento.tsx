@@ -40,6 +40,8 @@ const ROUTES: RouteRow[] = [
   { page: '/', views: '48,210', status: 'healthy' },
   { page: '/docs', views: '21,740', status: 'healthy' },
   { page: '/components', views: '9,430', status: 'degraded' },
+  { page: '/dashboard', views: '6,120', status: 'healthy' },
+  { page: '/themes', views: '3,908', status: 'healthy' },
 ];
 
 const SNIPPET = `import { astryxDraculaTheme } from 'astryx-dracula';
@@ -47,6 +49,19 @@ const SNIPPET = `import { astryxDraculaTheme } from 'astryx-dracula';
 <Theme theme={astryxDraculaTheme} mode="dark">
   <App />
 </Theme>;`;
+
+function Stat({ value, label, tint }: { value: string; label: string; tint: string }) {
+  return (
+    <VStack gap={0.5}>
+      <Text weight="semibold" style={{ color: tint, fontSize: '20px' }}>
+        {value}
+      </Text>
+      <Text type="supporting" color="secondary">
+        {label}
+      </Text>
+    </VStack>
+  );
+}
 
 export function Bento() {
   const [name, setName] = useState('octocat');
@@ -74,18 +89,104 @@ export function Bento() {
           </HStack>
         </HStack>
 
-        <Grid columns={{ minWidth: 300, max: 4 }} gap={4}>
+        <Card padding={4}>
+          <HStack justify="between" vAlign="center" wrap="wrap" gap={4}>
+            <VStack gap={1}>
+              <Heading level={1} type="display-2">
+                Dracula, live in every component
+              </Heading>
+              <Text type="body" color="secondary">
+                Pure Dracula brand kit for Astryx sites. Prebuilt CSS, zero runtime cost.
+              </Text>
+            </VStack>
+            <HStack gap={6} vAlign="center">
+              <Stat value="155" label="components" tint="var(--dracula-purple)" />
+              <Stat value="270+" label="tokens" tint="var(--dracula-cyan)" />
+              <Stat value="12" label="spec hexes" tint="var(--dracula-green)" />
+            </HStack>
+          </HStack>
+        </Card>
+
+        <Grid columns={4} gap={4}>
+          <Card padding={4} style={{ gridColumn: 'span 2' }}>
+            <VStack gap={3}>
+              <HStack justify="between" vAlign="center">
+                <Heading level={3}>Traffic</Heading>
+                <Badge label="6 mo" variant="neutral" />
+              </HStack>
+              <svg viewBox="0 0 460 150" width="100%" role="img" aria-label="Traffic bar chart">
+                {BARS.map((b, i) => {
+                  const h = (b.value / 100) * 105;
+                  const x = 16 + i * 74;
+                  return (
+                    <g key={b.month}>
+                      <rect x={x} y={120 - h} width={48} height={h} rx={4} fill={b.color} />
+                      <text
+                        x={x + 24}
+                        y={138}
+                        textAnchor="middle"
+                        fontSize={13}
+                        fill="var(--color-text-paragraph)"
+                        fontFamily="var(--font-family-mono)"
+                      >
+                        {b.month}
+                      </text>
+                    </g>
+                  );
+                })}
+              </svg>
+            </VStack>
+          </Card>
+
+          <Card padding={4} style={{ gridRow: 'span 2' }}>
+            <VStack gap={3}>
+              <HStack justify="between" vAlign="center">
+                <Heading level={3}>Routes</Heading>
+                <Badge label="live" variant="green" />
+              </HStack>
+              <Table
+                data={ROUTES}
+                idKey="page"
+                hasHover
+                density="compact"
+                columns={[
+                  {
+                    key: 'page',
+                    header: 'Route',
+                    renderCell: (row) => (
+                      <HStack gap={2} vAlign="center">
+                        <StatusDot
+                          variant={row.status === 'healthy' ? 'success' : 'warning'}
+                          label={String(row.status)}
+                        />
+                        <Text weight="semibold">{String(row.page)}</Text>
+                      </HStack>
+                    ),
+                  },
+                  {
+                    key: 'views',
+                    header: 'Views',
+                    align: 'end',
+                    renderCell: (row) => <Text hasTabularNumbers>{String(row.views)}</Text>,
+                  },
+                ]}
+              />
+              <Text type="supporting" color="secondary">
+                Edge routing throughput and p99 response times.
+              </Text>
+            </VStack>
+          </Card>
+
           <Card padding={4}>
             <VStack gap={3}>
-              <Heading level={3}>Actions</Heading>
-              <HStack gap={2} wrap="wrap">
-                <Button label="Primary" variant="primary" />
-                <Button label="Secondary" variant="secondary" />
-                <Button label="Ghost" variant="ghost" />
-                <Button label="Delete" variant="destructive" />
+              <Heading level={3}>Team</Heading>
+              <HStack gap={2} vAlign="center">
+                <Avatar name="Ada Lovelace" tooltip={false} />
+                <Avatar name="Alan Turing" tooltip={false} />
+                <Avatar name="Grace Hopper" tooltip={false} />
               </HStack>
               <Text type="supporting" color="secondary">
-                Dim on hover, 5px radii, JetBrains Mono throughout.
+                3 online, presence in Dracula green.
               </Text>
             </VStack>
           </Card>
@@ -130,85 +231,38 @@ export function Bento() {
             </VStack>
           </Card>
 
-          <Card padding={4}>
+          <Card padding={4} style={{ gridColumn: 'span 2' }}>
             <VStack gap={3}>
               <HStack justify="between" vAlign="center">
-                <Heading level={3}>Traffic</Heading>
-                <Badge label="6 mo" variant="neutral" />
+                <Heading level={3}>Actions</Heading>
+                <Text type="supporting" color="secondary">
+                  Dim on hover, 5px radii
+                </Text>
               </HStack>
-              <svg viewBox="0 0 360 140" width="100%" role="img" aria-label="Traffic bar chart">
-                {BARS.map((b, i) => {
-                  const h = (b.value / 100) * 100;
-                  const x = 14 + i * 58;
-                  return (
-                    <rect key={b.month} x={x} y={115 - h} width={38} height={h} rx={4} fill={b.color} />
-                  );
-                })}
-              </svg>
-            </VStack>
-          </Card>
-
-          <Card padding={4}>
-            <VStack gap={3}>
-              <HStack justify="between" vAlign="center">
-                <Heading level={3}>Routes</Heading>
-                <Badge label="live" variant="green" />
+              <HStack gap={2} wrap="wrap">
+                <Button label="Primary" variant="primary" />
+                <Button label="Secondary" variant="secondary" />
+                <Button label="Ghost" variant="ghost" />
+                <Button label="Delete" variant="destructive" />
+                <Button label="Small" size="sm" variant="primary" />
+                <Button label="Loading..." isLoading variant="secondary" />
               </HStack>
-              <Table
-                data={ROUTES}
-                idKey="page"
-                hasHover
-                density="compact"
-                columns={[
-                  {
-                    key: 'page',
-                    header: 'Route',
-                    renderCell: (row) => (
-                      <HStack gap={2} vAlign="center">
-                        <StatusDot
-                          variant={row.status === 'healthy' ? 'success' : 'warning'}
-                          label={String(row.status)}
-                        />
-                        <Text weight="semibold">{String(row.page)}</Text>
-                      </HStack>
-                    ),
-                  },
-                  {
-                    key: 'views',
-                    header: 'Views',
-                    align: 'end',
-                    renderCell: (row) => <Text hasTabularNumbers>{String(row.views)}</Text>,
-                  },
-                ]}
-              />
-            </VStack>
-          </Card>
-
-          <Card padding={4}>
-            <VStack gap={3}>
-              <Heading level={3}>Code</Heading>
               <CodeBlock code={SNIPPET} language="tsx" isWrapped width="100%" />
             </VStack>
           </Card>
 
           <Card padding={4}>
             <VStack gap={3}>
-              <Heading level={3}>Team</Heading>
-              <HStack gap={2} vAlign="center">
-                <Avatar name="Ada Lovelace" tooltip={false} />
-                <Avatar name="Alan Turing" tooltip={false} />
-                <Avatar name="Grace Hopper" tooltip={false} />
-                <VStack gap={0.5}>
-                  <Text weight="semibold">3 online</Text>
-                  <Text type="supporting" color="secondary">
-                    Presence in Dracula green
-                  </Text>
-                </VStack>
-              </HStack>
+              <Heading level={3}>Checks</Heading>
               <Banner
                 status="success"
                 title="All checks green"
                 description="Zero drift across 12 spec tokens."
+              />
+              <Banner
+                status="warning"
+                title="WCAG AA held"
+                description="Contrast gates pass on every pair."
               />
             </VStack>
           </Card>
