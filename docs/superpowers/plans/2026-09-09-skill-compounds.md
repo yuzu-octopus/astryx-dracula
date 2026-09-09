@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add premade sidebar, footer, app-shell, empty-state scaffolds plus a component mapping table, truncation rule, and math-content font exception to the astryx-dracula skill.
+**Goal:** Add premade sidebar, footer, app-shell, empty-state scaffolds plus a component mapping table and truncation rule to the astryx-dracula skill.
 
 **Architecture:** Docs-only change. New copy-paste blocks go in `.agents/skills/astryx-dracula/references/scaffolds.md`; enforceable rules go in `.agents/skills/astryx-dracula/SKILL.md` (doctrine, mapping table, red flags). No theme, CSS, or demo changes.
 
@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - Never invent a color, token name, font, or radius.
-- Dark-only; mono default with one exception: math formulas may use serif (observable predicate: element renders math notation only).
+- Dark-only; JetBrains Mono everywhere, no exceptions.
 - No raw `<div>`, `<span>`, `<a>` for layout or text.
 - Section subtitles are `body`, metadata is `supporting`, nothing meaningful below 12px.
 - Blind-test with a fresh subagent before commit (established skill-test method).
@@ -156,7 +156,7 @@ git add .agents/skills/astryx-dracula/references/scaffolds.md
 git commit -m "docs: footer scaffold in skill"
 ```
 
-### Task 4: Empty state plus mapping table plus math exception in SKILL.md
+### Task 4: Empty state plus mapping table in SKILL.md
 
 **Files:**
 - Modify: `.agents/skills/astryx-dracula/SKILL.md` (three insertions)
@@ -190,24 +190,16 @@ Insert after the touch-targets item:
 Map jobs to components, never to lookalikes: action goes to Button (never a nav-item class), navigation goes to SideNav or Link, count goes to Badge, status goes to StatusDot or Banner, label goes to Text type="label".
 ```
 
-- [ ] **Step 3: Add the math-content exception to SKILL.md typography doctrine**
+- [ ] **Step 3: Verify insertions**
 
-Insert after the JetBrains Mono paragraph:
+Run: `grep -n "Map jobs to components" .agents/skills/astryx-dracula/SKILL.md && grep -n "^## Empty state" .agents/skills/astryx-dracula/references/scaffolds.md`
+Expected: two matches, one per insertion.
 
-```markdown
-One exception: math formulas may use serif, and only math formulas. Everything else stays mono; a serif paragraph is a defect unless it renders math notation.
-```
-
-- [ ] **Step 4: Verify insertions**
-
-Run: `grep -n "Map jobs to components" .agents/skills/astryx-dracula/SKILL.md && grep -n "math formulas may use serif" .agents/skills/astryx-dracula/SKILL.md && grep -n "^## Empty state" .agents/skills/astryx-dracula/references/scaffolds.md`
-Expected: three matches, one per insertion.
-
-- [ ] **Step 5: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
 git add .agents/skills/astryx-dracula/SKILL.md .agents/skills/astryx-dracula/references/scaffolds.md
-git commit -m "docs: mapping table, math exception, empty state in skill"
+git commit -m "docs: mapping table and empty state in skill"
 ```
 
 ### Task 5: Blind-test and push
@@ -225,7 +217,7 @@ Dispatch one scout subagent: give it the skill path plus references path and ask
 
 - [ ] **Step 2: Check the result for the five additions**
 
-Expected: sidebar rows carry tooltips, footer matches the three-line shape with `target="_blank"` links, empty state has heading plus body plus primary Button, no `isExternalLink` on small text, no serif outside math, mapping table visibly applied (Button for CTA).
+Expected: sidebar rows carry tooltips, footer matches the three-line shape with `target="_blank"` links, empty state has heading plus body plus primary Button, no `isExternalLink` on small text, mapping table visibly applied (Button for CTA).
 
 - [ ] **Step 3: Fix gaps in the skill when the agent misses**
 
