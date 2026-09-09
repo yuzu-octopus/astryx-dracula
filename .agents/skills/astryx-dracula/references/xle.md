@@ -51,4 +51,4 @@ Expansion emits stock Astryx. Then apply the brand, in order:
 
 ## Template headers
 
-Pilot templates carry their structural XLE in a header comment, validated with `layout check`. XLE is canonical going forward: structural edits author XLE first, expand, then brand-pass. Never edit the TSX structure without updating the header.
+All 43 templates carry their canonical structural XLE in a header comment (`// XLE (...)`), validated with `bunx astryx layout check`. When reading or modifying any template, read the header comment first to grasp the entire component tree at ~1/5th the token cost. XLE is canonical: for structural changes, update the XLE first, validate with `check`, expand, then apply the brand pass.
