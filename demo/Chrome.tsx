@@ -8,7 +8,6 @@ import {
   HStack,
   Link,
   Section,
-  StatusDot,
   Text,
   TopNav,
   VStack,
@@ -46,7 +45,12 @@ export function SiteShell({
           <TopNav
             heading={
               <HStack gap={1.5} vAlign="center">
-                <StatusDot variant="accent" label="Dracula" isPulsing />
+                <svg width="20" height="20" viewBox="0 0 96 96" role="img" aria-label="Astryx Dracula">
+                  <path
+                    fill="var(--dracula-purple)"
+                    d="M26.88 0c8.483 0 15.36 6.877 15.36 15.36v13.92a4.8 4.8 0 0 0 4.8 4.8h1.92a4.8 4.8 0 0 0 4.8-4.8V15.36C53.76 6.877 60.637 0 69.12 0h21.12A5.76 5.76 0 0 1 96 5.76v21.12c0 8.483-6.877 15.36-15.36 15.36H66.72a4.8 4.8 0 0 0-4.8 4.8v1.92a4.8 4.8 0 0 0 4.8 4.8h13.92c8.483 0 15.36 6.877 15.36 15.36v21.12A5.76 5.76 0 0 1 90.24 96H69.12c-8.483 0-15.36-6.877-15.36-15.36V66.72a4.8 4.8 0 0 0-4.8-4.8h-1.92a4.8 4.8 0 0 0-4.8 4.8v13.92c0 8.483-6.877 15.36-15.36 15.36H5.76A5.76 5.76 0 0 1 0 90.24V69.12c0-8.483 6.877-15.36 15.36-15.36h13.92a4.8 4.8 0 0 0 4.8-4.8v-1.92a4.8 4.8 0 0 0-4.8-4.8H15.36C6.877 42.24 0 35.363 0 26.88V5.76A5.76 5.76 0 0 1 5.76 0z"
+                  />
+                </svg>
                 <Text weight="semibold">Astryx Dracula</Text>
                 {!narrow && <Badge label="dark-only" variant="purple" />}
               </HStack>
