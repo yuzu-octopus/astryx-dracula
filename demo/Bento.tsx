@@ -50,6 +50,21 @@ const SNIPPET = `import { astryxDraculaTheme } from 'astryx-dracula';
   <App />
 </Theme>;`;
 
+const SPEC = [
+  { name: 'bg', token: 'var(--dracula-bg)' },
+  { name: 'fg', token: 'var(--dracula-fg)' },
+  { name: 'comment', token: 'var(--dracula-comment)' },
+  { name: 'cyan', token: 'var(--dracula-cyan)' },
+  { name: 'green', token: 'var(--dracula-green)' },
+  { name: 'orange', token: 'var(--dracula-orange)' },
+  { name: 'pink', token: 'var(--dracula-pink)' },
+  { name: 'purple', token: 'var(--dracula-purple)' },
+  { name: 'red', token: 'var(--dracula-red)' },
+  { name: 'yellow', token: 'var(--dracula-yellow)' },
+  { name: 'line', token: 'var(--dracula-current-line)' },
+  { name: 'select', token: 'var(--dracula-selection)' },
+];
+
 function Stat({ value, label, tint }: { value: string; label: string; tint: string }) {
   return (
     <VStack gap={0.5}>
@@ -70,11 +85,11 @@ export function Bento() {
   return (
     <Theme theme={astryxDraculaTheme} mode="dark">
       <VStack
-        gap={4}
+        gap={3}
         style={{
           backgroundColor: 'var(--color-background)',
           minHeight: '100vh',
-          padding: '32px',
+          padding: '24px',
         }}
       >
         <HStack justify="between" vAlign="center">
@@ -85,7 +100,11 @@ export function Bento() {
           </HStack>
           <HStack gap={2} vAlign="center">
             <Link href="https://github.com/yuzu-octopus/astryx-dracula">GitHub</Link>
-            <Button label="Use this theme" variant="primary" />
+            <Button
+              label="Use this theme"
+              variant="primary"
+              href="https://yuzu-octopus.github.io/astryx-dracula/#quickstart"
+            />
           </HStack>
         </HStack>
 
@@ -264,6 +283,62 @@ export function Bento() {
                 title="WCAG AA held"
                 description="Contrast gates pass on every pair."
               />
+            </VStack>
+          </Card>
+
+          <Card padding={4} style={{ gridColumn: 'span 2' }}>
+            <VStack gap={3}>
+              <HStack justify="between" vAlign="center">
+                <Heading level={3}>Spec palette</Heading>
+                <Badge label="12 pinned" variant="purple" />
+              </HStack>
+              <Grid columns={6} gap={2}>
+                {SPEC.map((s) => (
+                  <VStack key={s.name} gap={1}>
+                    <Card
+                      padding={0}
+                      style={{
+                        backgroundColor: s.token,
+                        height: '28px',
+                        width: '100%',
+                        borderRadius: 'var(--border-radius)',
+                        border: 'var(--border-width) solid var(--color-separator)',
+                      }}
+                    >
+                      <></>
+                    </Card>
+                    <Text type="code" color="secondary">
+                      {s.name}
+                    </Text>
+                  </VStack>
+                ))}
+              </Grid>
+            </VStack>
+          </Card>
+
+          <Card padding={4}>
+            <VStack gap={2}>
+              <Heading level={3}>Type scale</Heading>
+              <Text weight="semibold" style={{ fontSize: '20px' }}>
+                Heading 20
+              </Text>
+              <Text type="body">Body copy at fourteen pixels.</Text>
+              <Text type="code" color="secondary">
+                mono code fourteen
+              </Text>
+              <Text type="supporting" color="secondary">
+                Supporting twelve, metadata only.
+              </Text>
+            </VStack>
+          </Card>
+
+          <Card padding={4}>
+            <VStack gap={3}>
+              <Heading level={3}>Ship it</Heading>
+              <CodeBlock code="bun add astryx-dracula" language="bash" width="100%" />
+              <Text type="supporting" color="secondary">
+                Zero runtime cost. Copy the skill, paste the prompt, ship dark.
+              </Text>
             </VStack>
           </Card>
         </Grid>
