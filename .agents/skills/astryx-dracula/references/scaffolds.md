@@ -175,3 +175,41 @@ Three regions: left nav, main panel, right rail. For tool apps like the RSA tool
 ```
 
 Main panel gets `minWidth: 0` so wide children (tables, code) never force page-level horizontal scroll.
+
+## Sidebar groups
+
+Group header carries the count badge and chevron; rows truncate with full-text tooltips, never raw clip.
+
+```tsx
+<VStack gap={1}>
+  <HStack justify="between" vAlign="center">
+    <Text weight="semibold">Factorization</Text>
+    <HStack gap={1} vAlign="center">
+      <Badge label="20" variant="neutral" />
+      {/* chevron */}
+    </HStack>
+  </HStack>
+  <Link href="#ecm" tooltip="ECM Full Factorization">ECM Full Factorization</Link>
+  {/* rows: Link with tooltip holding the full label */}
+</VStack>
+```
+
+Truncation rule: any label that can exceed its container gets ellipsis plus a tooltip with the full text. Applies to nav rows, table cells, badge labels, and card titles.
+
+## Footer
+
+Copyright plus Powered by GitHub Pages plus Built with React, Vite, and Astryx. One line, supporting size, links inherit.
+
+```tsx
+<VStack gap={1} style={{ padding: '24px', borderTop: '1px solid var(--color-separator)' }}>
+  <Text type="supporting" color="secondary">© 2026 yuzu-octopus</Text>
+  <Text type="supporting" color="secondary">
+    Powered by <Link href="https://pages.github.com/" target="_blank" rel="noopener noreferrer">GitHub Pages</Link>
+  </Text>
+  <Text type="supporting" color="secondary">
+    Built with <Link href="https://react.dev/" target="_blank" rel="noopener noreferrer">React</Link>
+    , <Link href="https://vite.dev/" target="_blank" rel="noopener noreferrer">Vite</Link>
+    , <Link href="https://astryx.atmeta.com/" target="_blank" rel="noopener noreferrer">Astryx</Link>
+  </Text>
+</VStack>
+```
