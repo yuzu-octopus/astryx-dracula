@@ -74,4 +74,4 @@ Radii flat and crisp (5px elements, 4px inner). Everything below is a core defau
 
 ## Dims
 
-Gap 23px, viewport 15px, content 15px vertical / 17px horizontal, widget-gap 23px, tile-row 96px, radius 5px everywhere, JetBrains Mono, type scale h1 17 / h2 16 / h3 15 / h4 14 / base 13 / h5 12 / h6 11.
+Gap 23px, viewport 15px, content 15px vertical / 17px horizontal, widget-gap 23px, tile-row 96px, radius 5px everywhere, JetBrains Mono, type scale base 14 ratio 1.2: h1 24 / h2 20 / h3 17 / h4 14 / body 14 / supporting 12 / h6 10. Outer Card padding 4, nested inset 3.

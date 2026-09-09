@@ -102,7 +102,7 @@ export function Dashboard() {
             </HStack>
 
             <Card
-              padding={2}
+              padding={3}
               style={{
                 backgroundColor: 'var(--color-background)',
                 border: 'var(--border-width) solid var(--color-separator)',
@@ -136,7 +136,7 @@ export function Dashboard() {
                         x={x + 23}
                         y={120 - h}
                         textAnchor="middle"
-                        fontSize={11}
+                        fontSize={13}
                         fill="var(--color-text-highlight)"
                         fontFamily="var(--font-family-mono)"
                       >
@@ -146,7 +146,7 @@ export function Dashboard() {
                         x={x + 23}
                         y={150}
                         textAnchor="middle"
-                        fontSize={12}
+                        fontSize={13}
                         fill="var(--color-text-paragraph)"
                         fontFamily="var(--font-family-mono)"
                       >
@@ -158,7 +158,7 @@ export function Dashboard() {
               </svg>
             </Card>
 
-            <HStack gap={1} wrap="wrap" justify="center">
+            <HStack gap={1.5} wrap="wrap" justify="center">
               <Badge label="purple" variant="purple" />
               <Badge label="pink" variant="pink" />
               <Badge label="cyan" variant="cyan" />

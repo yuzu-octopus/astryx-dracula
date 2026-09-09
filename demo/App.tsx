@@ -147,7 +147,7 @@ export default function App() {
                 </VStack>
 
                 <Card
-                  padding={2}
+                  padding={3}
                   style={{
                     backgroundColor: 'var(--color-background)',
                     border: 'var(--border-width) solid var(--color-separator)',
