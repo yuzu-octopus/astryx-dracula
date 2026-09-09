@@ -152,3 +152,26 @@ Step badges purple; one nested token inset (`Card padding={3}` plus `insetCard`)
 - Multi-column grids collapse to fewer columns, then a single stack. Hero and summary content keeps the top.
 - Nothing may force page-level horizontal scroll on mobile. Tables and charts scroll inside their own containers; flex children need room to shrink.
 - Verify at 1568 and 390 before calling a layout done.
+
+## App shell (sidebar tool)
+
+Three regions: left nav, main panel, right rail. For tool apps like the RSA toolkit, not showcases.
+
+```tsx
+<HStack gap={0} style={{ minHeight: '100vh', backgroundColor: 'var(--color-background)' }}>
+  <SideNav>{/* groups below */}</SideNav>
+  <VStack gap={4} style={{ flex: 1, padding: '24px', minWidth: 0 }}>
+    <VStack gap={1}>
+      <Heading level={2}>Panel title</Heading>
+      <Text type="body" color="secondary">What this panel does.</Text>
+    </VStack>
+    {/* panel body */}
+  </VStack>
+  <VStack gap={3} style={{ width: '280px', padding: '24px' }}>
+    <Heading level={3}>Results</Heading>
+    {/* rail body; empty state when idle */}
+  </VStack>
+</HStack>
+```
+
+Main panel gets `minWidth: 0` so wide children (tables, code) never force page-level horizontal scroll.
