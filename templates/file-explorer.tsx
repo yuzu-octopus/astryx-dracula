@@ -5,6 +5,7 @@ import {Layout, LayoutContent} from '@astryxdesign/core/Layout';
 import {Toolbar} from '@astryxdesign/core/Toolbar';
 import {List, ListItem} from '@astryxdesign/core/List';
 import {HStack, VStack} from '@astryxdesign/core/Layout';
+import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {Text} from '@astryxdesign/core/Text';
 import {Icon} from '@astryxdesign/core/Icon';
 import {IconButton} from '@astryxdesign/core/IconButton';
@@ -266,6 +267,7 @@ const detailColumn: CSSProperties = {
   flexShrink: 0,
   flexBasis: 320,
 };
+const controlsScroll: CSSProperties = {overflowX: 'auto'};
 
 function findItem(items: FileSystemItem[], id: string): FileSystemItem | null {
   for (const item of items) {
@@ -294,6 +296,9 @@ export default function FileExplorer() {
     'component-lab',
   ]);
 
+  const isNarrow = useMediaQuery('(max-width: 768px)');
+  const isPhone = useMediaQuery('(max-width: 767px)');
+
   const columns = useMemo(() => {
     const cols: {items: FileSystemItem[]; selectedId: string | null}[] = [];
     cols.push({items: FILESYSTEM, selectedId: selectedPath[0] ?? null});
@@ -312,6 +317,9 @@ export default function FileExplorer() {
     }
     return cols;
   }, [selectedPath]);
+
+  const columnOffset = isNarrow ? Math.max(columns.length - 1, 0) : 0;
+  const visibleColumns = isNarrow ? columns.slice(-1) : columns;
 
   const currentFolderName = useMemo(() => {
     if (selectedPath.length === 0) {
@@ -345,122 +353,142 @@ export default function FileExplorer() {
     setSelectedPath([...selectedPath.slice(0, columnIndex), itemId]);
   };
 
+  const titleContent = (
+    <>
+      <IconButton
+        variant="ghost"
+        size="sm"
+        icon={<Icon icon={ChevronLeft} size="sm" />}
+        onClick={() => {
+          if (selectedPath.length > 0) {
+            setSelectedPath(selectedPath.slice(0, -1));
+          }
+        }}
+        isDisabled={selectedPath.length === 0}
+        label="Go back"
+        tooltip="Go back"
+      />
+      <IconButton
+        variant="ghost"
+        size="sm"
+        icon={<Icon icon={ChevronRight} size="sm" />}
+        isDisabled
+        label="Go forward"
+        tooltip="Go forward"
+      />
+      <Text type="label" maxLines={1}>
+        {currentFolderName}
+      </Text>
+    </>
+  );
+  const viewSwitcher = (
+    <SegmentedControl
+      value="column"
+      onChange={() => {}}
+      label="View mode">
+      <SegmentedControlItem
+        value="grid"
+        label="Grid"
+        icon={<Icon icon={LayoutGrid} size="sm" />}
+        isLabelHidden
+      />
+      <SegmentedControlItem
+        value="list"
+        label="List"
+        icon={<Icon icon={Rows3} size="sm" />}
+        isLabelHidden
+      />
+      <SegmentedControlItem
+        value="column"
+        label="Column"
+        icon={<Icon icon={Columns} size="sm" />}
+        isLabelHidden
+      />
+      <SegmentedControlItem
+        value="gallery"
+        label="Gallery"
+        icon={<Icon icon={Table} size="sm" />}
+        isLabelHidden
+      />
+    </SegmentedControl>
+  );
+  const fileActions = (
+    <>
+      <IconButton
+        variant="ghost"
+        size="sm"
+        icon={<Icon icon={SlidersHorizontal} size="sm" />}
+        label="Group"
+        tooltip="Group"
+      />
+      <IconButton
+        variant="ghost"
+        size="sm"
+        icon={<Icon icon={Share2} size="sm" />}
+        label="Share"
+        tooltip="Share"
+      />
+      <IconButton
+        variant="ghost"
+        size="sm"
+        icon={<Icon icon={Tag} size="sm" />}
+        label="Tags"
+        tooltip="Tags"
+      />
+      <IconButton
+        variant="ghost"
+        size="sm"
+        icon={<Icon icon={Ellipsis} size="sm" />}
+        label="More"
+        tooltip="More"
+      />
+      <IconButton
+        variant="ghost"
+        size="sm"
+        icon={<Icon icon={Search} size="sm" />}
+        label="Search"
+        tooltip="Search"
+      />
+    </>
+  );
+
   return (
     <Layout
       style={page}
       height="fill"
       header={
-        <Toolbar
-          label="File Explorer"
-          size="sm"
-          dividers={['bottom']}
-          startContent={
-            <>
-              <IconButton
-                variant="ghost"
-                size="sm"
-                icon={<Icon icon={ChevronLeft} size="sm" />}
-                onClick={() => {
-                  if (selectedPath.length > 0) {
-                    setSelectedPath(selectedPath.slice(0, -1));
-                  }
-                }}
-                isDisabled={selectedPath.length === 0}
-                label="Go back"
-                tooltip="Go back"
-              />
-              <IconButton
-                variant="ghost"
-                size="sm"
-                icon={<Icon icon={ChevronRight} size="sm" />}
-                isDisabled
-                label="Go forward"
-                tooltip="Go forward"
-              />
-              <Text type="label">{currentFolderName}</Text>
-            </>
-          }
-          centerContent={
-            <SegmentedControl
-              value="column"
-              onChange={() => {}}
-              label="View mode">
-              <SegmentedControlItem
-                value="grid"
-                label="Grid"
-                icon={<Icon icon={LayoutGrid} size="sm" />}
-                isLabelHidden
-              />
-              <SegmentedControlItem
-                value="list"
-                label="List"
-                icon={<Icon icon={Rows3} size="sm" />}
-                isLabelHidden
-              />
-              <SegmentedControlItem
-                value="column"
-                label="Column"
-                icon={<Icon icon={Columns} size="sm" />}
-                isLabelHidden
-              />
-              <SegmentedControlItem
-                value="gallery"
-                label="Gallery"
-                icon={<Icon icon={Table} size="sm" />}
-                isLabelHidden
-              />
-            </SegmentedControl>
-          }
-          endContent={
-            <>
-              <IconButton
-                variant="ghost"
-                size="sm"
-                icon={<Icon icon={SlidersHorizontal} size="sm" />}
-                label="Group"
-                tooltip="Group"
-              />
-              <IconButton
-                variant="ghost"
-                size="sm"
-                icon={<Icon icon={Share2} size="sm" />}
-                label="Share"
-                tooltip="Share"
-              />
-              <IconButton
-                variant="ghost"
-                size="sm"
-                icon={<Icon icon={Tag} size="sm" />}
-                label="Tags"
-                tooltip="Tags"
-              />
-              <IconButton
-                variant="ghost"
-                size="sm"
-                icon={<Icon icon={Ellipsis} size="sm" />}
-                label="More"
-                tooltip="More"
-              />
-              <IconButton
-                variant="ghost"
-                size="sm"
-                icon={<Icon icon={Search} size="sm" />}
-                label="Search"
-                tooltip="Search"
-              />
-            </>
-          }
-        />
+        <>
+          <Toolbar
+            label="File Explorer"
+            size="sm"
+            dividers={isPhone ? undefined : ['bottom']}
+            startContent={titleContent}
+            centerContent={isPhone ? undefined : viewSwitcher}
+            endContent={isPhone ? undefined : fileActions}
+          />
+          {isPhone && (
+            <Section
+              variant="transparent"
+              padding={2}
+              dividers={['bottom']}>
+              <HStack gap={2} vAlign="center" style={controlsScroll}>
+                {viewSwitcher}
+                {fileActions}
+              </HStack>
+            </Section>
+          )}
+        </>
       }
       content={
         <LayoutContent padding={0} isScrollable={false}>
           <HStack height="100%" style={columnRow}>
-            {columns.map((col, colIndex) => {
+            {visibleColumns.map((col, colIndex) => {
+              const trueIndex = columnOffset + colIndex;
               const showDivider =
-                colIndex < columns.length - 1 || selectedFile != null;
+                trueIndex < columns.length - 1 || selectedFile != null;
               return (
                 <Section
-                  key={colIndex}
+                  key={trueIndex}
                   width={240}
                   padding={2}
                   variant="transparent"
@@ -476,7 +504,11 @@ export default function FileExplorer() {
                       return (
                         <ListItem
                           key={item.id}
-                          label={item.name}
+                          label={
+                            <Text type="body" maxLines={1}>
+                              {item.name}
+                            </Text>
+                          }
                           startContent={
                             <Icon
                               icon={
@@ -499,7 +531,7 @@ export default function FileExplorer() {
                               />
                             ) : undefined
                           }
-                          onClick={() => handleSelect(colIndex, item.id)}
+                          onClick={() => handleSelect(trueIndex, item.id)}
                           isSelected={isSelected}
                         />
                       );
@@ -516,7 +548,9 @@ export default function FileExplorer() {
                 <VStack gap={4} hAlign="center">
                   <Avatar name={selectedFile.name} size={96} />
                   <VStack gap={1} hAlign="center">
-                    <Text type="label">{selectedFile.name}</Text>
+                    <Text type="label" maxLines={1}>
+                      {selectedFile.name}
+                    </Text>
                     <Text type="supporting">
                       {getFileExtension(selectedFile.name)} Document
                     </Text>

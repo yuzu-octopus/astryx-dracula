@@ -50,7 +50,7 @@ Stock Vite config plus the layer-order snippet in USAGE.md. Discover components 
 
 ## Templates
 
-Twelve themed pages ship in `templates/`, also published as an Astryx integration pack (`astryx.integration.mjs`). Consumers with the package in `astryx.config` scaffold with `bunx astryx template <id> --package astryx-dracula`. Live at `#/templates` on the showcase. Pack rules: templates import React plus `@astryxdesign/core` only, no chart or icon libraries; every template carries its `<id>.template.mjs` spec. IDs: dashboard, table-grouped, table-page, kanban-board, settings-sidebar, settings, payment-form, login-card, file-explorer, ai-chat-landing, library, centered-hero.
+Thirty-six themed pages ship in `templates/`, also published as an Astryx integration pack (`astryx.integration.mjs`). Consumers with the package in `astryx.config` scaffold with `bunx astryx template <id> --package astryx-dracula`. Live at `#/templates` on the showcase. Pack rules: templates import React plus `@astryxdesign/core` only, no chart or icon libraries; every template carries its `<id>.template.mjs` spec. IDs: dashboard, table-grouped, table-page, kanban-board, settings-sidebar, settings, payment-form, login-card, file-explorer, ai-chat-landing, library, centered-hero, ai-chat, classic-gallery, contact-form, dashboard-portfolio, detail-page, documentation, documentation-design, documentation-technical, editor, form-two-column, gallery-hero, ide, login, mixed-gallery, product-detail, product-gallery, settings-dialog, shell-nav, shell-side-nav, shell-top-nav, table, table-page-chart, table-page-heatmap-status, table-page-shoe-store-heatmap.
 
 ## Brand principles
 

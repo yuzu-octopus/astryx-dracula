@@ -31,6 +31,7 @@ import {Tooltip} from '@astryxdesign/core/Tooltip';
 import {Divider} from '@astryxdesign/core/Divider';
 import {Toolbar} from '@astryxdesign/core/Toolbar';
 import {Section} from '@astryxdesign/core/Section';
+import {Grid} from '@astryxdesign/core/Grid';
 
 import {
   Plus,
@@ -234,24 +235,23 @@ const INITIAL_ITEMS: WorkItem[] = [
 // on card controls still register normally.
 const DRAG_THRESHOLD = 5;
 
-// Shared width for every board column, so they stay visually aligned.
-const COLUMN_WIDTH = 300;
-
 // ============= STYLES =============
 
-// Cards stay static per the Dracula brand (no hover lift); the floating drag
-// clone floats above the board with the high shadow token instead.
+// Responsive board grid: columns collapse to fewer tracks, then a single
+// stack. The board keeps its own internal scroll as the only scroller;
+// grid children get room to shrink so nothing forces page-level scroll.
 const boardColumnsStyle: CSSProperties = {
   overflowX: 'auto',
-  overflowY: 'hidden',
+  overflowY: 'auto',
   height: '100%',
   padding: 'var(--space-gap)',
 };
 const columnShellStyle: CSSProperties = {
-  flexShrink: 0,
-  flexBasis: COLUMN_WIDTH,
+  minWidth: 0,
   height: '100%',
 };
+// Cards stay static per the Dracula brand (no hover lift); the floating drag
+// clone floats above the board with the high shadow token instead.
 const cardStyle: CSSProperties = {
   cursor: 'grab',
   userSelect: 'none',
@@ -673,6 +673,7 @@ export default function KanbanBoard() {
                 <HStack gap={2} wrap="wrap">
                   <Selector
                     label="Sprint"
+                    size="lg"
                     width={160}
                     isLabelHidden
                     value={sprint}
@@ -714,7 +715,7 @@ export default function KanbanBoard() {
         }
         content={
           <LayoutContent padding={0}>
-            <HStack gap={4} style={boardColumnsStyle}>
+            <Grid columns={{ minWidth: 280, max: 4 }} gap={4} style={boardColumnsStyle}>
               {COLUMNS.map(meta => (
                 <BoardColumn
                   key={meta.id}
@@ -724,7 +725,7 @@ export default function KanbanBoard() {
                   {renderColumnCards(meta.id)}
                 </BoardColumn>
               ))}
-            </HStack>
+            </Grid>
           </LayoutContent>
         }
       />

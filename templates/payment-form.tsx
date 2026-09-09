@@ -191,6 +191,7 @@ const cardLogo: CSSProperties = {
 
 export default function PaymentForm() {
   const isMobile = useMediaQuery('(max-width: 767px)');
+  const isStacked = useMediaQuery('(max-width: 1024px)');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [address, setAddress] = useState('');
@@ -303,12 +304,12 @@ export default function PaymentForm() {
                 </VStack>
 
                 <Stack
-                  direction={isMobile ? 'vertical' : 'horizontal'}
+                  direction={isStacked ? 'vertical' : 'horizontal'}
                   gap={8}
                   vAlign="start">
                   <StackItem
                     size="fill"
-                    style={isMobile ? undefined : formColBasis}>
+                    style={isStacked ? undefined : formColBasis}>
                     <VStack gap={8}>
                       {/* Sign in */}
                       <VStack gap={1}>
@@ -510,7 +511,7 @@ export default function PaymentForm() {
 
                         {/* Express checkout */}
                         <VStack gap={3}>
-                          <Grid columns={2} gap={3}>
+                          <Grid columns={isMobile ? 1 : 2} gap={3}>
                             {/* PayPal */}
                             <Button
                               label="PayPal"
@@ -585,7 +586,7 @@ export default function PaymentForm() {
                                 : undefined
                             }
                           />
-                          <Grid columns={3} gap={3}>
+                          <Grid columns={isMobile ? 1 : 3} gap={3}>
                             <Selector
                               size="lg"
                               label="Expiry Month"
@@ -718,12 +719,11 @@ export default function PaymentForm() {
                         <Text type="large" weight="bold">
                           Promo Code
                         </Text>
-                        <HStack gap={2} vAlign="center">
+                        <HStack gap={2} vAlign="end">
                           <StackItem size="fill">
                             <TextInput
                               size="lg"
                               label="Promo code"
-                              isLabelHidden
                               placeholder="Enter promo code"
                               value={promo}
                               onChange={setPromo}
@@ -851,7 +851,7 @@ export default function PaymentForm() {
 
                   <StackItem
                     size="fill"
-                    style={isMobile ? summaryMobileOrder : summarySticky}>
+                    style={isStacked ? summaryMobileOrder : summarySticky}>
                     <Card padding={5}>
                       <VStack gap={4}>
                         {/* Accordion header — clickable on mobile only */}
@@ -873,7 +873,7 @@ export default function PaymentForm() {
                                         gap={2}
                                         hAlign="between"
                                         vAlign="start">
-                                        <HStack gap={2} vAlign="center">
+                                        <HStack gap={2} vAlign="center" wrap="wrap">
                                           <Text type="body" weight="medium">
                                             {item.name}
                                           </Text>
@@ -894,10 +894,9 @@ export default function PaymentForm() {
                                       <Text type="supporting" color="secondary">
                                         {item.variant}
                                       </Text>
-                                      <HStack gap={2} vAlign="center">
+                                      <HStack gap={2} vAlign="end" wrap="wrap">
                                         <NumberInput
                                           label="Qty"
-                                          isLabelHidden
                                           value={
                                             quantities[item.id] ?? item.qty
                                           }

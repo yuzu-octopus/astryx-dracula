@@ -1008,12 +1008,18 @@ export default function TableGrouped() {
                             )}
                           </TableCell>
                           <TableCell>
-                            <Text type="supporting" color="secondary">
+                            <Text
+                              type="supporting"
+                              color="secondary"
+                              maxLines={1}>
                               {task.created}
                             </Text>
                           </TableCell>
                           <TableCell>
-                            <Text type="supporting" color="secondary">
+                            <Text
+                              type="supporting"
+                              color="secondary"
+                              maxLines={1}>
                               {task.updated}
                             </Text>
                           </TableCell>

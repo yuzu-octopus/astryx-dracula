@@ -151,7 +151,10 @@ Step badges purple; one nested token inset (`Card padding={3}` plus `insetCard`)
 
 - Multi-column grids collapse to fewer columns, then a single stack. Hero and summary content keeps the top.
 - Nothing may force page-level horizontal scroll on mobile. Tables and charts scroll inside their own containers; flex children need room to shrink.
-- Verify at 1568 and 390 before calling a layout done.
+- Verify at 1568, 768, and 390 before calling a layout done. The 768 checkpoint catches its own class of defect: two-column yields with no gap, sticky panels covering form inputs, toolbar crowding.
+- Sticky elements must never cover interactive content at any width. A sticky summary or rail that overlaps inputs unsticks or restacks below 1024px. Sticky needs a top offset clearing the nav and a z-order below overlays.
+- Touch targets floor at 24px (WCAG AA); build to 44 where touch matters. Wrappers and pills do not count, only the native control box that fires.
+- Truncation always pairs with tooltips: ellipsis plus full-text tooltip on nav rows, table cells, badge labels, and card titles. A clipped node without a tooltip is a defect; verify in the DOM, not by eye.
 
 ## App shell (sidebar tool)
 
