@@ -78,7 +78,7 @@ Copy-paste skeletons distilled from the showcase (`demo/`). Same vocabulary ever
 //   border: 'var(--border-width) solid var(--color-separator)' }
 ```
 
-## Bento overview (dense showcase, `?shot=bento` pattern)
+## Bento overview (dense showcase, `#/bento` route)
 
 Fixed `columns={4}` with spans through `style` (Grid has no span prop). Size equals importance: hero strip, wide feature span 2, tall table row-span 2, metric cells.
 

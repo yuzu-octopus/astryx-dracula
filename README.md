@@ -16,6 +16,7 @@ Live showcase: https://yuzu-octopus.github.io/astryx-dracula/
 - WCAG contrast gates enforced in CI via `bun run audit`
 - Vendored JetBrains Mono fonts and Lucide icons, zero theme dependencies
 - Agent skill, `llms.txt`, and copy-paste quickstart for AI-assisted adoption
+- 43 themed pages in `templates/`, published as an Astryx integration pack and viewable live at `/astryx-dracula/#/templates`
 
 ## Installation
 
@@ -48,6 +49,7 @@ theme.css         prebuilt output of bun run theme:build
 tokens.css        plain-CSS :root fallback for any stack
 icons.tsx         vendored Lucide icon registry
 fonts/            JetBrains Mono woff2 files
+templates/        43 themed pages plus integration specs
 scripts/check.ts  palette plus contrast gates
 demo/             showcase source, deployed to GitHub Pages
 ```

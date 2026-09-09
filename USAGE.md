@@ -71,6 +71,19 @@ Then use `var(--color-primary)`, `var(--dracula-purple)`, `var(--space-gap)`.
 3. Replace: delete the old theme provider and `:root` overrides, point imports at the kit prebuilt path, swap raw elements for Astryx components.
 4. Verify: build, screenshot key pages, confirm no stray hexes remain in `src/`.
 
+## Templates
+
+43 themed pages ship in `templates/`, each with a `<id>.template.mjs` spec, published
+as an Astryx integration pack (`astryx.integration.mjs`). List this package in your
+`astryx.config`, then scaffold any of them:
+
+```bash
+bunx astryx template dashboard --package astryx-dracula
+```
+
+View all 43 live at `/astryx-dracula/#/templates` on the showcase. Pack rules: templates
+import React plus `@astryxdesign/core` only.
+
 ## Fonts
 
 Copy `fonts/` to your app's served static dir (Vite: `public/fonts/`).

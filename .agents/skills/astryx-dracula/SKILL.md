@@ -7,7 +7,7 @@ description: Use when styling an Astryx React app with the shared Dracula brand,
 
 ## Overview
 
-One dark Dracula identity for every Astryx site. Dark-only, no light mode exists or is planned. Never invent a color, a token name, a font, or a radius. The reference implementation is the live showcase (Overview, Palette, Dashboard, Gallery, Quickstart) plus the dense bento screenshot page (`?shot=bento`): information-heavy, interlocking cards, zero wasted space. Match that density and hierarchy, not a generic SaaS-card kit.
+One dark Dracula identity for every Astryx site. Dark-only, no light mode exists or is planned. Never invent a color, a token name, a font, or a radius. The reference implementation is the live showcase (Overview, Palette, Dashboard, Gallery, Quickstart, Templates) plus the dense bento page (`#/bento`): information-heavy, interlocking cards, zero wasted space. Match that density and hierarchy, not a generic SaaS-card kit.
 
 ## Reference files
 
@@ -50,7 +50,7 @@ Stock Vite config plus the layer-order snippet in USAGE.md. Discover components 
 
 ## Templates
 
-Thirty-six themed pages ship in `templates/`, also published as an Astryx integration pack (`astryx.integration.mjs`). Consumers with the package in `astryx.config` scaffold with `bunx astryx template <id> --package astryx-dracula`. Live at `#/templates` on the showcase. Pack rules: templates import React plus `@astryxdesign/core` only, no chart or icon libraries; every template carries its `<id>.template.mjs` spec. IDs: dashboard, table-grouped, table-page, kanban-board, settings-sidebar, settings, payment-form, login-card, file-explorer, ai-chat-landing, library, centered-hero, ai-chat, classic-gallery, contact-form, dashboard-portfolio, detail-page, documentation, documentation-design, documentation-technical, editor, form-two-column, gallery-hero, ide, login, mixed-gallery, product-detail, product-gallery, settings-dialog, shell-nav, shell-side-nav, shell-top-nav, table, table-page-chart, table-page-heatmap-status, table-page-shoe-store-heatmap.
+Forty-three themed pages ship in `templates/`, also published as an Astryx integration pack (`astryx.integration.mjs`). Consumers with the package in `astryx.config` scaffold with `bunx astryx template <id> --package astryx-dracula`. Live at `#/templates` on the showcase. Pack rules: templates import React plus `@astryxdesign/core` only, no chart or icon libraries; every template carries its `<id>.template.mjs` spec. IDs: dashboard, table-grouped, table-page, kanban-board, settings-sidebar, settings, payment-form, login-card, file-explorer, ai-chat-landing, library, centered-hero, ai-chat, classic-gallery, contact-form, dashboard-portfolio, detail-page, documentation, documentation-design, documentation-technical, editor, form-two-column, gallery-hero, ide, login, mixed-gallery, product-detail, product-gallery, settings-dialog, shell-nav, shell-side-nav, shell-top-nav, table, table-page-chart, table-page-heatmap-status, table-page-shoe-store-heatmap, blank, incident-console, login-split, login-sso, messaging-shell, side-gallery, theme-showcase.
 
 ## Brand principles
 
@@ -98,7 +98,7 @@ Map jobs to components, never to lookalikes: action goes to Button (never a nav-
 1. Inventory: grep for `#[0-9a-fA-F]{3,6}`, `:root`, `@apply`, Tailwind/StyleX utilities, and existing theme providers.
 2. Map every found color to the Exact list below; anything unmappable is a brand question, not a new hex.
 3. Replace: delete old theme provider and `:root` overrides, point entry imports at the kit block above, swap raw elements for Card/Text/Link/Stack/Grid, assign each text node its role per the typography doctrine.
-4. Verify: `bun run build`, screenshot key pages at 1568 and 390, confirm no raw hex remains (`grep -ri '#[0-9a-f]\{3,6\}' src --include='*.tsx' --include='*.css'` should show only kit references), confirm no page-level horizontal overflow at 390.
+4. Verify: `bun run build`, screenshot key pages at 1568, 768, and 390, confirm no raw hex remains (`grep -ri '#[0-9a-f]\{3,6\}' src --include='*.tsx' --include='*.css'` should show only kit references), confirm no page-level horizontal overflow at 390.
 
 ## Exact token names (use these verbatim)
 
@@ -136,7 +136,7 @@ For Astryx tokens beyond the kit, `bunx astryx docs tokens`.
 - Text that needs reading set in `supporting`
 - A hover state you designed instead of the dim
 - A second font family, a new radius, a custom shadow
-- A `?shot=` page you would not screenshot for the org
+- A route you would not screenshot for the org
 
 ## Troubleshooting
 
