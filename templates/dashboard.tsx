@@ -143,15 +143,6 @@ const activeUsersData = [
   {hour: 95, label: 'Apr 2 14:00', allUsers: 120, desktop: 83, mobile: 37},
 ];
 
-// X-axis tick indices and their display labels
-const xAxisTicks = [0, 32, 64, 95];
-const xAxisLabels: Record<number, string> = {
-  0: 'Apr 1 14:00',
-  32: 'Apr 1 22:00',
-  64: 'Apr 2 06:00',
-  95: 'Apr 2 14:00',
-};
-
 // Metric cards
 const metrics = [
   {
@@ -176,7 +167,7 @@ const metrics = [
     label: 'Sunrise bounce rate',
     value: '42.3%',
     change: '-8.7%',
-    positive: false,
+    positive: true,
   },
 ];
 
@@ -252,7 +243,6 @@ interface PageRow extends Record<string, unknown> {
   views: number;
   newUsers: string;
   avgTime: string;
-  exits: string;
 }
 
 const topPagesData: PageRow[] = [
@@ -262,7 +252,6 @@ const topPagesData: PageRow[] = [
     views: 8420,
     newUsers: '62.3%',
     avgTime: '3:42',
-    exits: '18.5%',
   },
   {
     id: '2',
@@ -270,7 +259,6 @@ const topPagesData: PageRow[] = [
     views: 6150,
     newUsers: '45.1%',
     avgTime: '4:15',
-    exits: '22.8%',
   },
   {
     id: '3',
@@ -278,7 +266,6 @@ const topPagesData: PageRow[] = [
     views: 4830,
     newUsers: '38.7%',
     avgTime: '2:58',
-    exits: '35.2%',
   },
   {
     id: '4',
@@ -286,7 +273,6 @@ const topPagesData: PageRow[] = [
     views: 3920,
     newUsers: '71.4%',
     avgTime: '5:30',
-    exits: '12.1%',
   },
   {
     id: '5',
@@ -294,7 +280,6 @@ const topPagesData: PageRow[] = [
     views: 3410,
     newUsers: '29.8%',
     avgTime: '6:12',
-    exits: '8.4%',
   },
   {
     id: '6',
@@ -302,7 +287,6 @@ const topPagesData: PageRow[] = [
     views: 2980,
     newUsers: '55.6%',
     avgTime: '2:15',
-    exits: '28.3%',
   },
   {
     id: '7',
@@ -310,7 +294,6 @@ const topPagesData: PageRow[] = [
     views: 2540,
     newUsers: '48.2%',
     avgTime: '1:48',
-    exits: '41.7%',
   },
   {
     id: '8',
@@ -318,7 +301,6 @@ const topPagesData: PageRow[] = [
     views: 2210,
     newUsers: '22.1%',
     avgTime: '4:55',
-    exits: '15.6%',
   },
   {
     id: '9',
@@ -326,7 +308,6 @@ const topPagesData: PageRow[] = [
     views: 1870,
     newUsers: '59.3%',
     avgTime: '3:22',
-    exits: '30.9%',
   },
   {
     id: '10',
@@ -334,7 +315,6 @@ const topPagesData: PageRow[] = [
     views: 1520,
     newUsers: '83.1%',
     avgTime: '2:34',
-    exits: '45.2%',
   },
 ];
 
@@ -355,7 +335,7 @@ const topPagesColumns: TableColumn<PageRow>[] = [
           isLabelHidden
         />
         <Text type="supporting" hasTabularNumbers>
-          {item.views.toLocaleString()} views
+          {item.views.toLocaleString()}
         </Text>
       </VStack>
     ),
@@ -442,23 +422,11 @@ const topEventsColumns: TableColumn<EventRow>[] = [
 
 // ============= CHART COMPONENTS =============
 
-// Chart series colors via Dracula categorical hues (blue goes comment)
+// Chart series colors: desktop glows orange, mobile purple
 const chartColors = {
-  allUsers: 'var(--dracula-comment)',
   desktop: 'var(--dracula-orange)',
   mobile: 'var(--dracula-purple)',
 };
-
-// Bar-strip palette cycling the Dracula spectral hues, house pattern style
-const STRIP_COLORS = [
-  'var(--dracula-purple)',
-  'var(--dracula-pink)',
-  'var(--dracula-cyan)',
-  'var(--dracula-green)',
-  'var(--dracula-yellow)',
-  'var(--dracula-orange)',
-  'var(--dracula-red)',
-];
 
 function ChartLegendItem({color, label}: {color: string; label: string}) {
   return (
@@ -472,10 +440,12 @@ function ChartLegendItem({color, label}: {color: string; label: string}) {
 }
 
 function ActiveUsersChart() {
-  // Downsample the 96 quarter-hour points to one bar per hour
+  // Downsample the 96 quarter-hour points to one bar per hour, stacking
+  // mobile atop desktop so each bar total is all users
   const bars = activeUsersData.filter((_, i) => i % 4 === 0);
   const max = 130;
   const tickHours = [0, 32, 64, 92];
+  // SVG type scales up with the viewBox, so unit sizes stay small
   return (
     <VStack gap={3}>
       <Card
@@ -488,29 +458,38 @@ function ActiveUsersChart() {
           viewBox="0 0 540 180"
           width="100%"
           role="img"
-          aria-label="Hourly active familiars bar strip across Dracula theme colors">
+          aria-label="Hourly active users, desktop and mobile stacked">
           <line x1="20" y1="30" x2="520" y2="30" stroke="var(--color-separator)" strokeDasharray="3 3" opacity={0.5} />
           <line x1="20" y1="80" x2="520" y2="80" stroke="var(--color-separator)" strokeDasharray="3 3" opacity={0.5} />
           <line x1="20" y1="130" x2="520" y2="130" stroke="var(--color-separator)" />
           {bars.map((d, i) => {
-            const h = (d.allUsers / max) * 110;
+            const hAll = (d.allUsers / max) * 110;
+            const hDesktop = (d.desktop / max) * 110;
             const x = 32 + i * 21;
             return (
               <g key={d.hour}>
                 <rect
                   x={x}
-                  y={130 - h}
+                  y={130 - hAll}
                   width={14}
-                  height={h}
+                  height={hAll - hDesktop}
                   rx={4}
-                  fill={STRIP_COLORS[i % STRIP_COLORS.length]}
+                  fill={chartColors.mobile}
                 />
-                {i % 6 === 0 && (
+                <rect
+                  x={x}
+                  y={130 - hDesktop}
+                  width={14}
+                  height={hDesktop}
+                  rx={4}
+                  fill={chartColors.desktop}
+                />
+                {(i % 6 === 0 || i === bars.length - 1) && (
                   <text
                     x={x + 7}
-                    y={120 - h}
+                    y={120 - hAll}
                     textAnchor="middle"
-                    fontSize={13}
+                    fontSize={5.5}
                     fill="var(--color-text-highlight)"
                     fontFamily="var(--font-family-mono)">
                     {d.allUsers}
@@ -521,10 +500,10 @@ function ActiveUsersChart() {
                     x={x + 7}
                     y={150}
                     textAnchor="middle"
-                    fontSize={13}
+                    fontSize={5.5}
                     fill="var(--color-text-paragraph)"
                     fontFamily="var(--font-family-mono)">
-                    {xAxisLabels[d.hour] ?? ''}
+                    {d.label}
                   </text>
                 )}
               </g>
@@ -536,7 +515,6 @@ function ActiveUsersChart() {
         Hourly intervals · trailing 24 hours
       </Text>
       <HStack gap={6} vAlign="center">
-        <ChartLegendItem color={chartColors.allUsers} label="All Users" />
         <ChartLegendItem color={chartColors.desktop} label="Desktop" />
         <ChartLegendItem color={chartColors.mobile} label="Mobile" />
       </HStack>
@@ -544,7 +522,7 @@ function ActiveUsersChart() {
   );
 }
 
-function Sparkline({data}: {data: number[]}) {
+function Sparkline({data, label}: {data: number[]; label: string}) {
   const max = Math.max(...data);
   return (
     <svg
@@ -552,7 +530,7 @@ function Sparkline({data}: {data: number[]}) {
       width="100%"
       height={40}
       role="img"
-      aria-label="Thirty-day trend strip">
+      aria-label={`${label} thirty-day trend`}>
       {data.map((v, i) => {
         const h = Math.max(3, (v / max) * 32);
         return (
@@ -593,11 +571,11 @@ function MetricCard({
         <HStack gap={2} vAlign="center">
           <Heading level={2}>{value}</Heading>
           <HStack gap={1} vAlign="center">
-            {positive ? (
-              <Icon icon={ArrowUp} size="xsm" color="success" />
-            ) : (
-              <Icon icon={ArrowDown} size="xsm" color="error" />
-            )}
+            <Icon
+              icon={change.trim().startsWith('-') ? ArrowDown : ArrowUp}
+              size="xsm"
+              color={positive ? 'success' : 'error'}
+            />
             <Text type="body" color="secondary" hasTabularNumbers>
               {change}
             </Text>
@@ -606,7 +584,7 @@ function MetricCard({
         <Text type="supporting" color="secondary">
           Last 30 days vs. Previous
         </Text>
-        <Sparkline data={sparkline} />
+        <Sparkline data={sparkline} label={label} />
       </VStack>
     </Card>
   );
@@ -665,7 +643,7 @@ function StackedBarCard({
                 <Text type="supporting">{d.label}</Text>
               </HStack>
               <Text type="supporting" color="secondary" hasTabularNumbers>
-                {d.value} - {((d.value / total) * 100).toFixed(2)}%
+                {((d.value / total) * 100).toFixed(0)}%
               </Text>
             </VStack>
           ))}

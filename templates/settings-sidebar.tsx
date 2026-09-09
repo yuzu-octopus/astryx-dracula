@@ -80,7 +80,12 @@ const SECTION_TITLES: Record<string, string> = {
   'Personal information': 'Personal info',
   'Login & security': 'Login & security',
   Privacy: 'Privacy',
+  Notifications: 'Notifications',
+  Taxes: 'Taxes',
+  Payments: 'Payments',
   'Languages & currency': 'Languages & currency',
+  'Travel for work': 'Travel for work',
+  'Professional hosting tools': 'Hosting tools',
 };
 
 interface InfoRow {
@@ -95,6 +100,16 @@ const LOGIN_ROWS: InfoRow[] = [
 
 const SOCIAL_ROWS: InfoRow[] = [
   {label: 'Google', value: 'Connected', action: 'Disconnect'},
+];
+
+const TAX_ROWS: InfoRow[] = [
+  {label: 'Taxpayer information', value: 'Not provided', action: 'Add'},
+  {label: 'Tax documents', value: 'No documents yet', action: 'View'},
+];
+
+const PAYOUT_ROWS: InfoRow[] = [
+  {label: 'Payout method', value: 'Not set up', action: 'Add'},
+  {label: 'Past payments', value: 'No payments yet', action: 'View'},
 ];
 
 const DEVICE_ROWS: {
@@ -232,6 +247,9 @@ export default function SettingsSidebar() {
   const [showStayLength, setShowStayLength] = useState(true);
   const [showServices, setShowServices] = useState(true);
   const [aiFeatures, setAiFeatures] = useState(true);
+  const [emailNotif, setEmailNotif] = useState(true);
+  const [pushNotif, setPushNotif] = useState(true);
+  const [workTrips, setWorkTrips] = useState(false);
 
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [language, setLanguage] = useState('en-CA');
@@ -381,7 +399,8 @@ export default function SettingsSidebar() {
                               <Text
                                 type="supporting"
                                 color="secondary"
-                                display="block">
+                                display="block"
+                                hasTabularNumbers>
                                 {device.location}
                               </Text>
                             </VStack>
@@ -822,6 +841,107 @@ export default function SettingsSidebar() {
                     </Card>
                   </VStack>
                 </VStack>
+              </VStack>
+            )}
+
+            {activeNav === 'Notifications' && (
+              <VStack gap={6}>
+                {!isNarrow && <Heading level={2}>Notifications</Heading>}
+                <VStack gap={0}>
+                  <Heading level={3}>Messages</Heading>
+                  <VStack style={rowPadding}>
+                    <Switch
+                      label="Email notifications"
+                      description="Listing updates, trip reminders, and account activity."
+                      value={emailNotif}
+                      onChange={setEmailNotif}
+                      labelPosition="start"
+                      labelSpacing="spread"
+                    />
+                  </VStack>
+                  <Divider />
+                  <VStack style={rowPadding}>
+                    <Switch
+                      label="Push notifications"
+                      description="Instant alerts for messages and reservation requests."
+                      value={pushNotif}
+                      onChange={setPushNotif}
+                      labelPosition="start"
+                      labelSpacing="spread"
+                    />
+                  </VStack>
+                  <Divider />
+                </VStack>
+              </VStack>
+            )}
+
+            {activeNav === 'Taxes' && (
+              <VStack gap={6}>
+                {!isNarrow && <Heading level={2}>Taxes</Heading>}
+                <VStack gap={0}>
+                  <Heading level={3}>Tax documents</Heading>
+                  <Divider />
+                  {TAX_ROWS.map(row => (
+                    <InfoRowItem key={row.label} {...row} />
+                  ))}
+                </VStack>
+              </VStack>
+            )}
+
+            {activeNav === 'Payments' && (
+              <VStack gap={6}>
+                {!isNarrow && <Heading level={2}>Payments</Heading>}
+                <VStack gap={0}>
+                  <Heading level={3}>Payouts</Heading>
+                  <Divider />
+                  {PAYOUT_ROWS.map(row => (
+                    <InfoRowItem key={row.label} {...row} />
+                  ))}
+                </VStack>
+              </VStack>
+            )}
+
+            {activeNav === 'Travel for work' && (
+              <VStack gap={6}>
+                {!isNarrow && <Heading level={2}>Travel for work</Heading>}
+                <VStack gap={0}>
+                  <Heading level={3}>Work trips</Heading>
+                  <VStack style={rowPadding}>
+                    <Switch
+                      label="Show work-trip options at checkout"
+                      description="Add a work email to expense trips and unlock business-ready listings."
+                      value={workTrips}
+                      onChange={setWorkTrips}
+                      labelPosition="start"
+                      labelSpacing="spread"
+                    />
+                  </VStack>
+                  <Divider />
+                </VStack>
+              </VStack>
+            )}
+
+            {activeNav === 'Professional hosting tools' && (
+              <VStack gap={6}>
+                {!isNarrow && (
+                  <Heading level={2}>Professional hosting tools</Heading>
+                )}
+                <Card variant="muted">
+                  <HStack gap={4} vAlign="start">
+                    <Center width={48} height={48} style={iconBox}>
+                      <Icon icon={Wrench} />
+                    </Center>
+                    <VStack gap={1}>
+                      <Text type="body" weight="bold">
+                        Tools for professional hosts
+                      </Text>
+                      <Text type="supporting" color="secondary">
+                        Manage multiple listings, route tasks to co-hosts, and
+                        review consolidated payouts from one place.
+                      </Text>
+                    </VStack>
+                  </HStack>
+                </Card>
               </VStack>
             )}
           </VStack>

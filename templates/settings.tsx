@@ -13,7 +13,7 @@ import {
 } from '@astryxdesign/core/Layout';
 import {Grid} from '@astryxdesign/core/Grid';
 import {List, ListItem} from '@astryxdesign/core/List';
-import {TabList, Tab} from '@astryxdesign/core/TabList';
+import {TabList, Tab, TabMenu} from '@astryxdesign/core/TabList';
 import {Text, Heading} from '@astryxdesign/core/Text';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {Button} from '@astryxdesign/core/Button';
@@ -113,9 +113,16 @@ export default function SettingsTemplate() {
             {isNarrow && (
               <VStack hAlign="center">
                 <TabList value={activeNav} onChange={setActiveNav}>
-                  {NAV_ITEMS.map(item => (
+                  {NAV_ITEMS.slice(0, 3).map(item => (
                     <Tab key={item} value={item} label={item} />
                   ))}
+                  <TabMenu
+                    label="More"
+                    options={NAV_ITEMS.slice(3).map(item => ({
+                      value: item,
+                      label: item,
+                    }))}
+                  />
                 </TabList>
               </VStack>
             )}

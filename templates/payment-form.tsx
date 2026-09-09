@@ -143,10 +143,8 @@ const ORDER_ITEMS = [
   },
 ];
 
-const SUBTOTAL = 230;
-// SHIPPING is now computed from deliveryMethod state
-const TAX = 18.4;
-// TOTAL is computed dynamically based on delivery selection
+const TAX_RATE = 0.08;
+const FREE_SHIPPING_THRESHOLD = 300;
 const fmt = (n: number) => `$${n.toFixed(2)}`;
 
 // ── Styles ────────────────────────────────────────────────────────────────────
@@ -226,6 +224,21 @@ export default function PaymentForm() {
     '3': 1,
   });
   const [submitted, setSubmitted] = useState(false);
+
+  // Totals follow the editable quantities (and the free-shipping banner:
+  // orders at or over the threshold ship free).
+  const subtotal = ORDER_ITEMS.reduce(
+    (sum, item) => sum + item.price * (quantities[item.id] ?? item.qty),
+    0,
+  );
+  const shipping =
+    subtotal >= FREE_SHIPPING_THRESHOLD
+      ? 0
+      : deliveryMethod === 'expedited'
+        ? 9.95
+        : 4.95;
+  const tax = Math.round(subtotal * TAX_RATE * 100) / 100;
+  const total = subtotal + shipping + tax;
 
   const errors = submitted
     ? {
@@ -310,7 +323,7 @@ export default function PaymentForm() {
                             onClick={() => {}}
                           />
                         </HStack>
-                        <Text type="supporting" color="secondary">
+                        <Text type="body" color="secondary">
                           Sign in to track your order and save your information
                           for faster checkout.
                         </Text>
@@ -345,7 +358,7 @@ export default function PaymentForm() {
                         <Text type="large" weight="bold">
                           Shipping Information
                         </Text>
-                        <Grid columns={2} gap={3}>
+                        <Grid columns={isMobile ? 1 : 2} gap={3}>
                           <TextInput
                             size="lg"
                             label="First Name"
@@ -383,7 +396,7 @@ export default function PaymentForm() {
                               : undefined
                           }
                         />
-                        <Grid columns={2} gap={3}>
+                        <Grid columns={isMobile ? 1 : 2} gap={3}>
                           <TextInput
                             size="lg"
                             label="City"
@@ -448,7 +461,7 @@ export default function PaymentForm() {
                           <Text type="large" weight="bold">
                             Delivery
                           </Text>
-                          <Text type="supporting" color="secondary">
+                          <Text type="body" color="secondary">
                             Please allow 1–3 business days processing time
                             before your order ships.
                           </Text>
@@ -490,7 +503,7 @@ export default function PaymentForm() {
                           <Text type="large" weight="bold">
                             Payment Method
                           </Text>
-                          <Text type="supporting" color="secondary">
+                          <Text type="body" color="secondary">
                             All transactions are secure and encrypted.
                           </Text>
                         </VStack>
@@ -647,7 +660,7 @@ export default function PaymentForm() {
                                     : undefined
                                 }
                               />
-                              <Grid columns={2} gap={3}>
+                              <Grid columns={isMobile ? 1 : 2} gap={3}>
                                 <TextInput
                                   size="lg"
                                   label="City"
@@ -738,7 +751,7 @@ export default function PaymentForm() {
                         />
                         {addGiftMessage && (
                           <VStack gap={3}>
-                            <Grid columns={2} gap={3}>
+                            <Grid columns={isMobile ? 1 : 2} gap={3}>
                               <TextInput
                                 size="lg"
                                 label="To"
@@ -818,7 +831,7 @@ export default function PaymentForm() {
                           />
                         </VStack>
                         <Divider />
-                        <HStack gap={4} vAlign="center">
+                        <HStack gap={4} vAlign="center" wrap="wrap">
                           <Link href="#" type="supporting">
                             Refund policy
                           </Link>
@@ -866,7 +879,7 @@ export default function PaymentForm() {
                                           </Text>
                                           {item.limited && (
                                             <Badge
-                                              variant="green"
+                                              variant="yellow"
                                               label="LIMITED EDITION"
                                             />
                                           )}
@@ -923,7 +936,7 @@ export default function PaymentForm() {
                                     Subtotal
                                   </Text>
                                   <Text type="body" hasTabularNumbers>
-                                    {fmt(SUBTOTAL)}
+                                    {fmt(subtotal)}
                                   </Text>
                                 </HStack>
                                 <HStack hAlign="between" vAlign="center">
@@ -931,11 +944,7 @@ export default function PaymentForm() {
                                     Shipping
                                   </Text>
                                   <Text type="body" hasTabularNumbers>
-                                    {fmt(
-                                      deliveryMethod === 'expedited'
-                                        ? 9.95
-                                        : 4.95,
-                                    )}
+                                    {fmt(shipping)}
                                   </Text>
                                 </HStack>
                                 <HStack hAlign="between" vAlign="center">
@@ -943,7 +952,7 @@ export default function PaymentForm() {
                                     Tax
                                   </Text>
                                   <Text type="body" hasTabularNumbers>
-                                    {fmt(TAX)}
+                                    {fmt(tax)}
                                   </Text>
                                 </HStack>
                               </VStack>
@@ -956,13 +965,7 @@ export default function PaymentForm() {
                                   type="large"
                                   weight="bold"
                                   hasTabularNumbers>
-                                  {fmt(
-                                    SUBTOTAL +
-                                      (deliveryMethod === 'expedited'
-                                        ? 9.95
-                                        : 4.95) +
-                                      TAX,
-                                  )}
+                                  {fmt(total)}
                                 </Text>
                               </HStack>
                               <Banner

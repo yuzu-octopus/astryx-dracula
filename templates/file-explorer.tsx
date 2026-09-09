@@ -367,6 +367,7 @@ export default function FileExplorer() {
                 }}
                 isDisabled={selectedPath.length === 0}
                 label="Go back"
+                tooltip="Go back"
               />
               <IconButton
                 variant="ghost"
@@ -374,6 +375,7 @@ export default function FileExplorer() {
                 icon={<Icon icon={ChevronRight} size="sm" />}
                 isDisabled
                 label="Go forward"
+                tooltip="Go forward"
               />
               <Text type="label">{currentFolderName}</Text>
             </>
@@ -416,30 +418,35 @@ export default function FileExplorer() {
                 size="sm"
                 icon={<Icon icon={SlidersHorizontal} size="sm" />}
                 label="Group"
+                tooltip="Group"
               />
               <IconButton
                 variant="ghost"
                 size="sm"
                 icon={<Icon icon={Share2} size="sm" />}
                 label="Share"
+                tooltip="Share"
               />
               <IconButton
                 variant="ghost"
                 size="sm"
                 icon={<Icon icon={Tag} size="sm" />}
                 label="Tags"
+                tooltip="Tags"
               />
               <IconButton
                 variant="ghost"
                 size="sm"
                 icon={<Icon icon={Ellipsis} size="sm" />}
                 label="More"
+                tooltip="More"
               />
               <IconButton
                 variant="ghost"
                 size="sm"
                 icon={<Icon icon={Search} size="sm" />}
                 label="Search"
+                tooltip="Search"
               />
             </>
           }

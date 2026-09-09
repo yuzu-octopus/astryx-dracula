@@ -19,11 +19,8 @@ import {Button} from '@astryxdesign/core/Button';
 import {Badge} from '@astryxdesign/core/Badge';
 import {Avatar} from '@astryxdesign/core/Avatar';
 import {Selector} from '@astryxdesign/core/Selector';
-import {PowerSearch} from '@astryxdesign/core/PowerSearch';
-import type {
-  PowerSearchConfig,
-  PowerSearchFilter,
-} from '@astryxdesign/core/PowerSearch';
+import {PowerSearch, usePowerSearchConfig} from '@astryxdesign/core/PowerSearch';
+import type {PowerSearchFilter} from '@astryxdesign/core/PowerSearch';
 import {Dialog, DialogHeader} from '@astryxdesign/core/Dialog';
 import {Popover} from '@astryxdesign/core/Popover';
 import {RadioList, RadioListItem} from '@astryxdesign/core/RadioList';
@@ -631,7 +628,7 @@ const columns: TableColumn<TaskRow>[] = [
   {
     key: 'project',
     header: 'Project',
-    width: pixel(180),
+    width: pixel(144),
   },
   {
     key: 'created',
@@ -655,71 +652,34 @@ const columns: TableColumn<TaskRow>[] = [
   },
 ];
 
-const powerSearchConfig: PowerSearchConfig = {
-  name: 'IssueSearch',
-  fields: [
-    {
-      key: 'status',
-      label: 'Status',
-      operators: [
-        {
-          key: 'is',
-          label: 'is',
-          value: {
-            type: 'enum',
-            values: [
-              {value: 'in_progress', label: 'In Progress'},
-              {value: 'todo', label: 'Todo'},
-              {value: 'backlog', label: 'Backlog'},
-              {value: 'done', label: 'Done'},
-            ],
-          },
-        },
-      ],
-    },
-    {
-      key: 'priority',
-      label: 'Priority',
-      operators: [
-        {
-          key: 'is',
-          label: 'is',
-          value: {
-            type: 'enum',
-            values: [
-              {value: 'urgent', label: 'Urgent'},
-              {value: 'high', label: 'High'},
-              {value: 'medium', label: 'Medium'},
-              {value: 'low', label: 'Low'},
-              {value: 'none', label: 'None'},
-            ],
-          },
-        },
-      ],
-    },
-    {
-      key: 'title',
-      label: 'Title',
-      operators: [
-        {key: 'contains', label: 'contains', value: {type: 'string'}},
-      ],
-    },
-    {
-      key: 'assignee',
-      label: 'Assignee',
-      operators: [
-        {key: 'contains', label: 'contains', value: {type: 'string'}},
-      ],
-    },
-    {
-      key: 'project',
-      label: 'Project',
-      operators: [
-        {key: 'contains', label: 'contains', value: {type: 'string'}},
-      ],
-    },
-  ],
-};
+const fieldDefs = [
+  {
+    key: 'status',
+    type: 'enum',
+    label: 'Status',
+    enumValues: [
+      {value: 'in_progress', label: 'In Progress'},
+      {value: 'todo', label: 'Todo'},
+      {value: 'backlog', label: 'Backlog'},
+      {value: 'done', label: 'Done'},
+    ],
+  },
+  {
+    key: 'priority',
+    type: 'enum',
+    label: 'Priority',
+    enumValues: [
+      {value: 'urgent', label: 'Urgent'},
+      {value: 'high', label: 'High'},
+      {value: 'medium', label: 'Medium'},
+      {value: 'low', label: 'Low'},
+      {value: 'none', label: 'None'},
+    ],
+  },
+  {key: 'title', type: 'string', label: 'Title'},
+  {key: 'assignee', type: 'string', label: 'Assignee'},
+  {key: 'project', type: 'string', label: 'Project'},
+] as const;
 
 const PRIORITY_LABEL: Record<TaskPriority, string> = {
   urgent: 'Urgent',
@@ -804,10 +764,20 @@ function TaskDetailPanel({
             </HStack>
           </MetadataListItem>
           <MetadataListItem label="Project">
-            {task.project || '\u2014'}
+            {task.project ? (
+              <Text type="body">{task.project}</Text>
+            ) : (
+              <Text type="supporting" color="secondary">
+                —
+              </Text>
+            )}
           </MetadataListItem>
-          <MetadataListItem label="Created">{task.created}</MetadataListItem>
-          <MetadataListItem label="Updated">{task.updated}</MetadataListItem>
+          <MetadataListItem label="Created">
+            <Text type="body">{task.created}</Text>
+          </MetadataListItem>
+          <MetadataListItem label="Updated">
+            <Text type="body">{task.updated}</Text>
+          </MetadataListItem>
         </MetadataList>
 
         {task.tags.length > 0 && (
@@ -829,34 +799,23 @@ function TaskDetailPanel({
 }
 
 export default function TableGrouped() {
-  const [search, _setSearch] = useState('');
-  const [priorityFilter, _setPriorityFilter] = useState('all');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskRow | null>(null);
   const [powerSearchFilters, setPowerSearchFilters] = useState<
     ReadonlyArray<PowerSearchFilter>
   >([]);
+  const {config: powerSearchConfig, applyFilters} = usePowerSearchConfig(
+    fieldDefs,
+    'IssueSearch',
+  );
   const [groupBy, setGroupBy] = useState<GroupByField>('status');
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
     () => new Set(GROUP_ORDER as string[]),
   );
 
   const filtered = useMemo(() => {
-    let data = allTasks;
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      data = data.filter(
-        t =>
-          t.title.toLowerCase().includes(q) ||
-          t.taskId.toLowerCase().includes(q) ||
-          t.subtitle.toLowerCase().includes(q),
-      );
-    }
-    if (priorityFilter !== 'all') {
-      data = data.filter(t => t.priority === priorityFilter);
-    }
-    return data;
-  }, [search, priorityFilter]);
+    return applyFilters(powerSearchFilters, allTasks);
+  }, [powerSearchFilters, applyFilters]);
 
   const grouped = useMemo(
     () => groupTasks(filtered, groupBy),
@@ -1015,7 +974,7 @@ export default function TableGrouped() {
                             </Center>
                           </TableCell>
                           <TableCell>
-                            <HStack gap={3} vAlign="center">
+                            <HStack gap={3} vAlign="center" wrap="wrap">
                               <Icon
                                 icon={ChartBar}
                                 size="sm"
@@ -1024,17 +983,17 @@ export default function TableGrouped() {
                               <Text type="supporting" color="secondary">
                                 {task.taskId}
                               </Text>
-                              <Text type="body" maxLines={1}>
-                                {task.title}
-                              </Text>
-                              {task.subtitle && (
-                                <Text
-                                  type="body"
-                                  color="secondary"
-                                  maxLines={1}>
-                                  › {task.subtitle}
+                              <StackItem size="fill">
+                                <Text type="body" maxLines={1}>
+                                  {task.title}
+                                  {task.subtitle && (
+                                    <Text type="inherit" color="secondary">
+                                      {' › '}
+                                      {task.subtitle}
+                                    </Text>
+                                  )}
                                 </Text>
-                              )}
+                              </StackItem>
                             </HStack>
                           </TableCell>
                           <TableCell>

@@ -89,7 +89,7 @@ export default function LoginCard() {
             {/* Header */}
             <VStack gap={1} hAlign="center">
               <Heading level={2}>Welcome back to the night</Heading>
-              <Text type="body" color="secondary" size="sm">
+              <Text type="body" color="secondary">
                 Sign in to your crypt
               </Text>
             </VStack>

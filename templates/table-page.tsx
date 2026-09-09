@@ -355,12 +355,16 @@ const columns: TableColumn<FamiliarRow>[] = [
     renderCell: (item: FamiliarRow) => (
       <HStack gap={3} vAlign="center">
         <Avatar name={item.name} size="md" />
-        <VStack gap={0}>
-          <Text type="body">{item.name}</Text>
-          <Text type="supporting" color="secondary">
-            {item.kind}
-          </Text>
-        </VStack>
+        <StackItem size="fill">
+          <VStack gap={0}>
+            <Text type="body" maxLines={1}>
+              {item.name}
+            </Text>
+            <Text type="supporting" color="secondary" maxLines={1}>
+              {item.kind}
+            </Text>
+          </VStack>
+        </StackItem>
       </HStack>
     ),
   },

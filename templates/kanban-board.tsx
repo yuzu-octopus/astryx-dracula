@@ -185,6 +185,17 @@ const INITIAL_ITEMS: WorkItem[] = [
     dueDate: 'Jul 4',
   },
   {
+    id: 'v1',
+    column: 'in-review',
+    ref: 'Task 4831',
+    priority: 'medium',
+    title: 'Review the moonlight contrast pass',
+    description:
+      'Check the new palette against text and border contrast gates before it ships.',
+    lastEdited: '2h ago',
+    dueDate: 'Jul 5',
+  },
+  {
     id: 'r1',
     column: 'done',
     ref: 'Task 4788',
@@ -307,7 +318,7 @@ function BoardCardBody({
 
       <VStack gap={1}>
         <Heading level={4}>{item.title}</Heading>
-        <Text type="supporting" color="secondary" maxLines={2}>
+        <Text type="body" color="secondary" maxLines={2}>
           {item.description}
         </Text>
       </VStack>
@@ -659,10 +670,10 @@ export default function KanbanBoard() {
                 </>
               }
               endContent={
-                <HStack gap={2}>
+                <HStack gap={2} wrap="wrap">
                   <Selector
                     label="Sprint"
-                    width={200}
+                    width={160}
                     isLabelHidden
                     value={sprint}
                     onChange={setSprint}
@@ -677,7 +688,7 @@ export default function KanbanBoard() {
                     orientation="vertical"
                     style={toolbarDividerStyle}
                   />
-                  <HStack gap={1} vAlign="center">
+                  <HStack gap={1} vAlign="center" wrap="wrap">
                     <IconButton
                       icon={<Icon icon={ArrowUpDown} size="sm" />}
                       label="Sort"

@@ -18,6 +18,8 @@ const heroFrame: CSSProperties = {
   maxWidth: 1200,
   marginInline: 'auto',
   borderRadius: 'var(--radius-page)',
+  border: 'var(--border-width) solid var(--color-separator)',
+  overflow: 'clip',
 };
 
 function NightCastleScene() {
@@ -162,7 +164,7 @@ export default function CenteredHero() {
                   night around.
                 </Text>
               </VStack>
-              <HStack gap={3}>
+              <HStack gap={3} wrap="wrap" justify="center">
                 <Button
                   label="Embrace the night"
                   variant="primary"

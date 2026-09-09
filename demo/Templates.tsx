@@ -2,7 +2,7 @@ import { lazy } from 'react';
 import type { ComponentType } from 'react';
 import {
   Badge,
-  Card,
+  ClickableCard,
   Grid,
   HStack,
   Heading,
@@ -12,6 +12,7 @@ import {
 } from '@astryxdesign/core';
 import { Theme } from '@astryxdesign/core/theme';
 import { astryxDraculaTheme } from '../astryx-theme';
+import { SiteShell } from './Chrome';
 
 export interface TemplateEntry {
   id: string;
@@ -97,24 +98,9 @@ export const TEMPLATES: TemplateEntry[] = [
 
 export function TemplatesIndex() {
   return (
-    <Theme theme={astryxDraculaTheme} mode="dark">
-      <VStack
-        gap={6}
-        style={{
-          backgroundColor: 'var(--color-background)',
-          minHeight: '100vh',
-          padding: '32px',
-          maxWidth: '1160px',
-          marginInline: 'auto',
-          width: '100%',
-        }}
-      >
+    <SiteShell ctaHref="#/">
+      <VStack gap={6}>
         <VStack gap={1}>
-          <HStack gap={2} vAlign="center">
-            <Link href="#/">Showcase</Link>
-            <Text color="secondary">/</Text>
-            <Text weight="semibold">Templates</Text>
-          </HStack>
           <Heading level={1}>Templates in Dracula</Heading>
           <Text type="body" color="secondary">
             Twelve Astryx pages, themed and retokened. Open one live, or scaffold it with
@@ -123,7 +109,7 @@ export function TemplatesIndex() {
         </VStack>
         <Grid columns={{ minWidth: 300, max: 3 }} gap={4}>
           {TEMPLATES.map((t) => (
-            <Card key={t.id} padding={4}>
+            <ClickableCard key={t.id} padding={4} href={`#/templates/${t.id}`} label={`Open ${t.name}`}>
               <VStack gap={2}>
                 <HStack justify="between" vAlign="center">
                   <Heading level={3}>{t.name}</Heading>
@@ -132,13 +118,12 @@ export function TemplatesIndex() {
                 <Text type="body" color="secondary">
                   {t.description}
                 </Text>
-                <Link href={`#/templates/${t.id}`}>Open live</Link>
               </VStack>
-            </Card>
+            </ClickableCard>
           ))}
         </Grid>
       </VStack>
-    </Theme>
+    </SiteShell>
   );
 }
 

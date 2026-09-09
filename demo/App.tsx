@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
-  AppShell,
   Badge,
   Banner,
   Button,
@@ -11,18 +10,15 @@ import {
   Heading,
   HStack,
   Link,
-  Section,
   StatusDot,
   Text,
-  TopNav,
   VStack,
 } from '@astryxdesign/core';
-import { Theme } from '@astryxdesign/core/theme';
-import { astryxDraculaTheme } from '../astryx-theme';
 import { Palette } from './Palette';
 import { Gallery } from './Gallery';
 import { Dashboard } from './Dashboard';
 import { Quickstart } from './Quickstart';
+import { SiteShell } from './Chrome';
 
 const HERO_CODE = `import '@astryxdesign/core/reset.css';
 import '@astryxdesign/core/astryx.css';
@@ -37,73 +33,11 @@ import { astryxDraculaTheme } from 'astryx-dracula';
 
 export default function App() {
   const [applied, setApplied] = useState(false);
-  const [narrow, setNarrow] = useState(false);
-
-  useEffect(() => {
-    const q = window.matchMedia('(max-width: 768px)');
-    setNarrow(q.matches);
-    const fn = (e: MediaQueryListEvent) => setNarrow(e.matches);
-    q.addEventListener('change', fn);
-    return () => q.removeEventListener('change', fn);
-  }, []);
 
   return (
-    <Theme theme={astryxDraculaTheme} mode="dark">
-      <AppShell
-        height="auto"
-        contentPadding={0}
-        topNav={
-          <TopNav
-            heading={
-              <HStack gap={1.5} vAlign="center">
-                <StatusDot variant="accent" label="Dracula" isPulsing />
-                <Text weight="semibold">Astryx Dracula</Text>
-                {!narrow && <Badge label="dark-only" variant="purple" />}
-              </HStack>
-            }
-            startContent={
-              !narrow ? (
-                <HStack gap={3} vAlign="center">
-                  <Link href="#palette">Palette</Link>
-                  <Link href="#dashboard">Dashboard</Link>
-                  <Link href="#components">Components</Link>
-                  <Link href="#quickstart">Quickstart</Link>
-                  <Link href="#/templates">Templates</Link>
-                </HStack>
-              ) : undefined
-            }
-            endContent={
-              <HStack gap={2} vAlign="center">
-                {!narrow && (
-                  <>
-                    <Link href="https://github.com/yuzu-octopus/astryx-dracula" isExternalLink>
-                      GitHub
-                    </Link>
-                    <Link href="./llms.txt">llms.txt</Link>
-                  </>
-                )}
-                <Button
-                  label="Use this theme"
-                  variant="primary"
-                  onClick={() => document.getElementById('quickstart')?.scrollIntoView({ behavior: 'smooth' })}
-                />
-              </HStack>
-            }
-          />
-        }
-      >
-        <Section
-          variant="transparent"
-          padding={0}
-          style={{
-            maxWidth: '1160px',
-            marginInline: 'auto',
-            width: '100%',
-            paddingInline: 'var(--spacing-4)',
-            paddingBlock: 'var(--spacing-8)',
-          }}
-        >
-          <VStack gap={10}>
+    <SiteShell
+      onCta={() => document.getElementById('quickstart')?.scrollIntoView({ behavior: 'smooth' })}
+    >
             {/* HERO SECTION */}
             <section id="top">
               <Grid columns={{ minWidth: 340, max: 2 }} gap={6} align="center">
@@ -197,39 +131,6 @@ export default function App() {
             <section id="quickstart">
               <Quickstart />
             </section>
-
-            <Divider />
-
-            {/* FOOTER */}
-            <Card
-              padding={4}
-              style={{
-                backgroundColor: 'var(--color-background)',
-                border: 'var(--border-width) solid var(--color-separator)',
-              }}
-            >
-              <HStack justify="between" vAlign="center" wrap="wrap" gap={3}>
-                <VStack gap={0.5}>
-                  <Text weight="semibold">Astryx Dracula Theme</Text>
-                  <Text type="supporting" color="secondary">
-                    Copy the kit, read the skill, ship dark interfaces. Dracula spec at{' '}
-                    <Link href="https://draculatheme.com" target="_blank" rel="noopener noreferrer">
-                      draculatheme.com
-                    </Link>
-                    .
-                  </Text>
-                </VStack>
-                <HStack gap={2} vAlign="center">
-                  <Link href="https://github.com/yuzu-octopus/astryx-dracula" isExternalLink>
-                    GitHub
-                  </Link>
-                  <Link href="./llms.txt">llms.txt</Link>
-                </HStack>
-              </HStack>
-            </Card>
-          </VStack>
-        </Section>
-      </AppShell>
-    </Theme>
+    </SiteShell>
   );
 }

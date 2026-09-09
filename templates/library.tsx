@@ -12,7 +12,10 @@ import {Grid} from '@astryxdesign/core/Grid';
 import {HStack, VStack, StackItem} from '@astryxdesign/core/Stack';
 import {DropdownMenu} from '@astryxdesign/core/DropdownMenu';
 import {OverflowList} from '@astryxdesign/core/OverflowList';
-import {Center} from '@astryxdesign/core/Center';
+import {AspectRatio} from '@astryxdesign/core/AspectRatio';
+import {Button} from '@astryxdesign/core/Button';
+import {EmptyState} from '@astryxdesign/core/EmptyState';
+import {Icon} from '@astryxdesign/core/Icon';
 import {Search} from 'lucide-react';
 
 interface LibraryItem {
@@ -265,18 +268,10 @@ const ITEMS: LibraryItem[] = [
   },
 ];
 
-const thumbnailWrapper: CSSProperties = {
-  position: 'relative',
-  aspectRatio: '16/9',
-  overflow: 'clip',
-  flexShrink: 0,
-};
 const thumbnailImage: CSSProperties = {
-  position: 'absolute',
-  inset: 0,
   width: '100%',
   height: '100%',
-  objectFit: 'cover',
+  display: 'block',
 };
 
 // =============================================================================
@@ -287,7 +282,7 @@ function LibraryCard({item}: {item: LibraryItem}) {
   const hue = CATEGORY_HUES[item.category] ?? 'var(--dracula-purple)';
   return (
     <Card padding={0}>
-      <div style={thumbnailWrapper}>
+      <AspectRatio ratio={16 / 9}>
         <svg
           viewBox="0 0 400 300"
           preserveAspectRatio="xMidYMid slice"
@@ -307,11 +302,11 @@ function LibraryCard({item}: {item: LibraryItem}) {
             <path d="M-34 30 L-8 0 L10 18 L20 8 L34 24" />
           </g>
         </svg>
-      </div>
+      </AspectRatio>
       <Section variant="transparent" padding={4}>
         <VStack gap={1}>
           <Heading level={3}>{item.name}</Heading>
-          <Text type="body" size="sm" color="secondary">
+          <Text type="body" color="secondary">
             {item.description}
           </Text>
         </VStack>
@@ -329,7 +324,12 @@ function LibrarySection({
 }) {
   return (
     <VStack gap={6}>
-      <Heading level={2}>{category}</Heading>
+      <HStack justify="between" vAlign="center">
+        <Heading level={2}>{category}</Heading>
+        <Text type="supporting" color="secondary" hasTabularNumbers>
+          {items.length} {items.length === 1 ? 'item' : 'items'}
+        </Text>
+      </HStack>
       <Grid columns={{minWidth: 320}} gap={4}>
         {items.map(item => (
           <LibraryCard key={item.id} item={item} />
@@ -452,11 +452,21 @@ export default function LibraryGrid() {
             </VStack>
 
             {filtered.length === 0 ? (
-              <Center>
-                <Text type="supporting" color="secondary">
-                  Nothing stirs in the stacks.
-                </Text>
-              </Center>
+              <EmptyState
+                icon={<Icon icon={Search} size="lg" color="secondary" />}
+                title="Nothing stirs in the stacks"
+                description="No entries match this search and filter. Clear them to browse the full library."
+                actions={
+                  <Button
+                    label="Clear search & filters"
+                    variant="primary"
+                    onClick={() => {
+                      setSearch('');
+                      setActiveTab('All');
+                    }}
+                  />
+                }
+              />
             ) : (
               <VStack gap={6}>
                 {(

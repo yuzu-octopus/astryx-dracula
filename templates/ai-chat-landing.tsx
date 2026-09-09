@@ -310,13 +310,13 @@ export default function AiChatLanding() {
             <VStack gap={1}>
               <HStack gap={2} vAlign="center">
                 <Icon icon={Sparkles} size="md" color="accent" />
-                <Text type="large" as="h2">
+                <Text type="large">
                   Hi, Vlad
                 </Text>
               </HStack>
-              <Text type="display-2" as="h1">
+              <Heading level={1} type="display-2">
                 Where should we start?
-              </Text>
+              </Heading>
             </VStack>
 
             {/* Composer */}
@@ -452,14 +452,14 @@ export default function AiChatLanding() {
                       key={suggestion.heading}
                       label={suggestion.heading}
                       variant="muted"
-                      padding={3}
+                      padding={4}
                       onClick={() => {
                         applySuggestion(suggestion.prompt);
                         setMode(category);
                       }}>
                       <VStack gap={0.5}>
                         <Heading level={4}>{suggestion.heading}</Heading>
-                        <Text type="body" color="secondary" size="xsm">
+                        <Text type="body" color="secondary">
                           {suggestion.body}
                         </Text>
                       </VStack>
