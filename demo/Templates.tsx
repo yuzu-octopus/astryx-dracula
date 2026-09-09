@@ -238,6 +238,48 @@ export const TEMPLATES: TemplateEntry[] = [
     description: 'Product rows with cyan trend strips.',
     load: () => import('../templates/table-page-shoe-store-heatmap'),
   },
+  {
+    id: 'blank',
+    name: 'Blank',
+    description: 'Minimal page scaffold.',
+    load: () => import('../templates/blank'),
+  },
+  {
+    id: 'incident-console',
+    name: 'Incident Console',
+    description: 'On-call response with severity rows and inspector.',
+    load: () => import('../templates/incident-console'),
+  },
+  {
+    id: 'login-split',
+    name: 'Login Split',
+    description: 'Split auth with brand cover panel.',
+    load: () => import('../templates/login-split'),
+  },
+  {
+    id: 'login-sso',
+    name: 'Login SSO',
+    description: 'Single sign-on with provider list.',
+    load: () => import('../templates/login-sso'),
+  },
+  {
+    id: 'messaging-shell',
+    name: 'Messaging Shell',
+    description: 'Conversation list with message thread.',
+    load: () => import('../templates/messaging-shell'),
+  },
+  {
+    id: 'side-gallery',
+    name: 'Side Gallery',
+    description: 'Sidebar plus gallery wall.',
+    load: () => import('../templates/side-gallery'),
+  },
+  {
+    id: 'theme-showcase',
+    name: 'Theme Showcase',
+    description: 'Storefront theme switcher demo.',
+    load: () => import('../templates/theme-showcase'),
+  },
 ];
 
 export function TemplatesIndex() {
