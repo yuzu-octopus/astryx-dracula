@@ -9,6 +9,12 @@ description: Use when styling an Astryx React app with the shared Dracula brand,
 
 One dark Dracula identity for every Astryx site. Dark-only, no light mode exists or is planned. Never invent a color, a token name, a font, or a radius. The reference implementation is the live showcase (Overview, Palette, Dashboard, Gallery, Quickstart) plus the dense bento screenshot page (`?shot=bento`): information-heavy, interlocking cards, zero wasted space. Match that density and hierarchy, not a generic SaaS-card kit.
 
+## Reference files
+
+- `references/scaffolds.md` — copy-paste skeletons: showcase shell, hero, bento, dashboard, steps, spec grid, responsive rules.
+- `references/spacing.md` — canonical spacing values with provenance, card insets, type floors, touch targets, table density.
+- `references/visual.md` — color semantics, charts, code highlighting, motion, scrollbars, surfaces.
+
 ## Get the kit
 
 ```bash
@@ -73,6 +79,7 @@ Type carries hierarchy, so weight stays quiet: headings normal, `semibold` for e
 2. **Bento for showcases, rows for data.** Marketing and overview surfaces interlock: hero strip, wide feature (span 2), tall table (row span 2), metric cells. Astryx Grid has no span prop, so spans go through `style={{ gridColumn: 'span 2' }}`. Dense data stays rows: Table edge-to-edge, never Card-wrapped list items.
 3. **Cards are widgets.** Dashboard widgets, galleries, settings groups, showcase cells. Outer padding 4, nested inset 3, everywhere, no exceptions. A padding-2 inset next to a padding-3 inset is a defect.
 4. **No raw layout elements.** No `<div>`, `<span>`, or `<a>` for layout or text. Card, Text, Link, Stack, Grid do all of it.
+5. **Touch targets are floored.** WCAG AA 24px minimum; 44px where touch matters. The `sm` Button stays in dense contexts with a caption; CTAs stay default size.
 
 ## State doctrine
 
