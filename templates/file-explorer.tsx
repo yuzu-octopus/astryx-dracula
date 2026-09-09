@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > (Tbar[size=sm] > (H > IB"Go back" + IB"Go forward" + Tx"Folder"[t=label]) + (SG"View mode" > SGI*4) + (H > IB"Group" + IB"Share" + IB"Tags" + IB"More" + IB"Search")) + (LC[p=0 !scroll] > H[h=fill] > (S.transparent[p=2 w=240 dv=[end]] > UL[density=compact !hasDividers] > (LI > Ic + Tx"Item"[t=body])*3)*3 + (S.transparent[p=6] > V[g=4 a=center] > Av[size=96] + (V[g=1 a=center] > Tx"Name"[t=label] + Tx"Kind"[t=supporting]) + (ML"Information" > MLI*3)))
 
 import {useState, useMemo, type CSSProperties} from 'react';
 import {Layout, LayoutContent} from '@astryxdesign/core/Layout';
@@ -551,7 +553,7 @@ export default function FileExplorer() {
                     <Text type="label" maxLines={1}>
                       {selectedFile.name}
                     </Text>
-                    <Text type="supporting">
+                    <Text type="supporting" color="secondary">
                       {getFileExtension(selectedFile.name)} Document
                     </Text>
                   </VStack>

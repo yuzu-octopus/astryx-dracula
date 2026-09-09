@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > (LH[divider] > V[g=4] > (H[j=between a=center] > Hd"Night-shift issues"[level=2] + B.primary"Raise issue") + (H[g=2 a=center] > PS + B.secondary"View Options")) + (LC[p=0] > T[hover] > (TR > THC*7) + (TR > TC*7)*4)
 
 import React, {useState, useMemo} from 'react';
 import {useResizable, ResizeHandle} from '@astryxdesign/core/Resizable';
@@ -787,7 +789,7 @@ function TaskDetailPanel({
               <Text type="label">Labels</Text>
               <HStack gap={2}>
                 {task.tags.map(tag => (
-                  <Badge key={tag} variant="neutral" label={tag} />
+                  <Badge key={tag} variant="yellow" label={tag} />
                 ))}
               </HStack>
             </VStack>

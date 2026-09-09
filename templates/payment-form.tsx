@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > LC[p=0] > Ctr > (S > V[g=5] > (V[g=1] > Hd"Payment Request"[level=1] + Tx"Review your order"[t=body]) + (H > (SI > V[g=6] > (C > V[g=3] > Hd"Sign in"[level=3] + B) + (F > TI"Email" + TI"Address" + B.primary"Place Order")) + (SI > C[p=5] > (Col > V[g=4] > (H > Tmb + V[g=1] > Tx + Tx)*3 + D + (H > Tx + Tx) + Bn.info))))
 
 import {useState, type CSSProperties} from 'react';
 import {

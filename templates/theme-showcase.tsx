@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   TN"Nocturne" + (S[p6] > V[g10] > (Ctr > V[g4 a=center] > Tx"Little haunts"[t=display-2] + Tx"We believe"[t=body]) + (G[c{min:200,max:3} g4] > (C[p0] > AR + V[g2 a=center] > Bd + Hd"Product"[level=2] + Tx"Description"[t=body] + (H[g2] > NI + B"Add to cart"))*3)) + (V[g8] > (G[c{min:200} g4] > (GS[c1] > C > Hd"Checkout"[level=2]) + (GS[c2] > C > Hd"Night Owl AI"[level=2])) + (G[c{min:200} g4] > (GS[c3] > C > T) + (GS[c1] > C > Hd"Revenue"[level=2])))
 
 import {type CSSProperties, type ReactNode} from 'react';
 import {
@@ -555,7 +557,7 @@ function CheckoutCard({isMobile}: {isMobile: boolean}) {
               label="Economy Shipping"
               description="Delivered in 5–7 business days"
               endContent={
-                <Text type="body" weight="bold" hasTabularNumbers>
+                <Text type="body" weight="semibold" hasTabularNumbers>
                   $12.00
                 </Text>
               }
@@ -565,7 +567,7 @@ function CheckoutCard({isMobile}: {isMobile: boolean}) {
               label="Standard Shipping"
               description="Delivered in 3–5 business days"
               endContent={
-                <Text type="body" weight="bold" hasTabularNumbers>
+                <Text type="body" weight="semibold" hasTabularNumbers>
                   $16.00
                 </Text>
               }
@@ -575,7 +577,7 @@ function CheckoutCard({isMobile}: {isMobile: boolean}) {
               label="Express Shipping"
               description="Delivered in 1–2 business days"
               endContent={
-                <Text type="body" weight="bold" hasTabularNumbers>
+                <Text type="body" weight="semibold" hasTabularNumbers>
                   $24.00
                 </Text>
               }
@@ -583,7 +585,7 @@ function CheckoutCard({isMobile}: {isMobile: boolean}) {
           </RadioList>
 
           <VStack gap={2} style={styles.checkoutStack}>
-            <Text type="label" weight="bold">
+            <Text type="label" weight="semibold">
               Payment method
             </Text>
             <Grid columns={isMobile ? 1 : {minWidth: 70, max: 3}} gap={2}>
@@ -597,7 +599,7 @@ function CheckoutCard({isMobile}: {isMobile: boolean}) {
                   hAlign="center"
                   style={styles.paymentCardContent}>
                   <CreditCard size={20} />
-                  <Text type="supporting" weight="bold">
+                  <Text type="supporting" weight="semibold">
                     Card
                   </Text>
                 </VStack>
@@ -612,7 +614,7 @@ function CheckoutCard({isMobile}: {isMobile: boolean}) {
                   hAlign="center"
                   style={styles.paymentCardContent}>
                   <Smartphone size={20} />
-                  <Text type="supporting" weight="bold">
+                  <Text type="supporting" weight="semibold">
                     Apple Pay
                   </Text>
                 </VStack>
@@ -627,7 +629,7 @@ function CheckoutCard({isMobile}: {isMobile: boolean}) {
                   hAlign="center"
                   style={styles.paymentCardContent}>
                   <Wallet size={20} />
-                  <Text type="supporting" weight="bold">
+                  <Text type="supporting" weight="semibold">
                     Google Pay
                   </Text>
                 </VStack>
@@ -773,7 +775,7 @@ function ChatCard() {
                     label="Items"
                     description="Moonphase Watch · Belfry Throw"
                     endContent={
-                      <Text type="body" weight="bold" hasTabularNumbers>
+                      <Text type="body" weight="semibold" hasTabularNumbers>
                         $248
                       </Text>
                     }
@@ -782,7 +784,7 @@ function ChatCard() {
                     label="Shipping"
                     description="UPS Ground"
                     endContent={
-                      <Text type="body" weight="bold" hasTabularNumbers>
+                      <Text type="body" weight="semibold" hasTabularNumbers>
                         $12
                       </Text>
                     }
@@ -914,7 +916,7 @@ function LatestActivityCard({isMobile}: {isMobile: boolean}) {
 
         <Grid columns={isMobile ? 1 : 2} gap={3}>
           <VStack gap={0}>
-            <Text type="display-3" weight="bold" hasTabularNumbers>
+            <Text type="display-3" weight="semibold" hasTabularNumbers>
               18K
             </Text>
             <Text type="supporting" color="secondary">
@@ -922,7 +924,7 @@ function LatestActivityCard({isMobile}: {isMobile: boolean}) {
             </Text>
           </VStack>
           <VStack gap={0}>
-            <Text type="display-3" weight="bold" hasTabularNumbers>
+            <Text type="display-3" weight="semibold" hasTabularNumbers>
               +12%
             </Text>
             <Text type="supporting" color="secondary">
@@ -952,7 +954,7 @@ function LatestActivityCard({isMobile}: {isMobile: boolean}) {
               endContent={
                 <Text
                   type="body"
-                  weight="bold"
+                  weight="semibold"
                   hasTabularNumbers
                   color={item.amount < 0 ? 'secondary' : 'primary'}>
                   {formatAmount(item.amount)}
@@ -1061,7 +1063,7 @@ function ItemCell({row}: {row: InventoryRow}) {
     <HStack gap={3} vAlign="center">
       <ThumbSwatch hue={row.hue} label={row.name} />
       <VStack gap={0} style={{minWidth: 0}}>
-        <Text type="body" weight="bold">
+        <Text type="body" weight="semibold">
           {row.name}
         </Text>
         <Text type="supporting" color="secondary">

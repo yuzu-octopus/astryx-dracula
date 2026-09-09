@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   A[cp=0 @sideNav=(SN > SNI"New chat" + SNI"Search" + SNI"Library" + D + (SNI"Personal" > SNI"Weekend trip planning")*3)] > L > (LC[p=6] > V[g=5] > (H > C.muted[p=0])*4) + (LF > TI"Message Night Owl")
 
 import {useState} from 'react';
 import {AppShell} from '@astryxdesign/core/AppShell';

@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > LC[p=0] > H > (SI[fill] > ChL > ChML > (ChM > ChB)*4 + ChC"Ask a follow up...") + (C.transparent > Tbar + S.section > MD) ;; Dlg#artifact[variant=fullscreen] > L > (DH"JWT Token Refresh" + (LC[p=0] > S.section > MD))
 
 import {useRef, useState, type CSSProperties} from 'react';
 
@@ -121,7 +123,7 @@ const AI_CHAT_CSS = `
 // Artifact content
 
 const MENTION_TOKENS = [
-  {value: '@agent', label: '@Agent', variant: 'blue' as const},
+  {value: '@agent', label: '@Agent', variant: 'cyan' as const},
 ];
 
 const ARTIFACT_TITLE = 'JWT Token Refresh: Design & Rollout';
@@ -440,6 +442,7 @@ The fix is to catch \`TokenExpiredError\` specifically and attempt a refresh bef
                         <CodeBlock
                           title="middleware.ts"
                           language="typescript"
+                          width="100%"
                           code={`async function authMiddleware(req: Request) {
   try {
     const decoded = validateToken(req.headers.authorization);
@@ -556,6 +559,7 @@ The fix is to catch \`TokenExpiredError\` specifically and attempt a refresh bef
                         <CodeBlock
                           title="middleware.test.ts"
                           language="typescript"
+                          width="100%"
                           code={`describe('authMiddleware', () => {
   it('refreshes an expired token silently', async () => {
     const expiredToken = createExpiredJWT(mockUser);

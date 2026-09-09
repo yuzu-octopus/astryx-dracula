@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > (LC > V[g=8] > (V[g=2] > Tx.display-1"Getting started with Astryx Dracula" + Tx"Last updated March 30, 2026"[t=supporting]) + (C > V[g=3] > (H[j=between] > (H[g=2] > Ic + Tx"AI Assistance"[t=body]) + (H > B"Copy prompt" + DM)) + Tx"Prompt description"[t=body]) + (V[g=4] > Hd"Prerequisites"[level=2] + UL) + D + (V[g=4] > Hd"Install the package"[level=2] + Tx"Description"[t=body] + (V[g=2] > Tx"Step"[t=body] + Cd)*3) + D + (V[g=4] > Hd"Configure theming"[level=2] + Tx"Description"[t=body] + Cd + Tx"Note"[t=body]) + D + (V[g=4] > Hd"Next steps"[level=2] + UL)) + (LP > Outline)
 
 import {useCallback, useState, type CSSProperties} from 'react';
 import {Heading, Text} from '@astryxdesign/core/Text';
@@ -165,7 +167,7 @@ export default function DocumentationTechnical() {
                 gives you access to all components, tokens, and utilities.
               </Text>
               <VStack gap={2}>
-                <Text type="body" weight="bold">
+                <Text type="body" weight="semibold">
                   Step 1: Install the core package
                 </Text>
                 <CodeBlock
@@ -175,7 +177,7 @@ export default function DocumentationTechnical() {
                 />
               </VStack>
               <VStack gap={2}>
-                <Text type="body" weight="bold">
+                <Text type="body" weight="semibold">
                   Step 2: Import the precompiled styles
                 </Text>
                 <Text type="body" color="secondary">
@@ -191,7 +193,7 @@ import '@astryxdesign/core/astryx.css';`}
                 />
               </VStack>
               <VStack gap={2}>
-                <Text type="body" weight="bold">
+                <Text type="body" weight="semibold">
                   Step 3: Import your first component
                 </Text>
                 <CodeBlock

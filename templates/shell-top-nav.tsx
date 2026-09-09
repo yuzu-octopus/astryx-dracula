@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   A[cp=6 @topNav=(TN > TNI"Shop" + TNI"Brands" + TNI"Sale" + TNI"Service")] > V[g=10] > C.muted[p=0] + (V[g=4] > C.muted[p=0] + (G[c={min:160} g=4] > (V[g=2] > C.muted[p=0] + C.muted[p=0])*6))*3
 
 import type {CSSProperties} from 'react';
 import {AppShell} from '@astryxdesign/core/AppShell';

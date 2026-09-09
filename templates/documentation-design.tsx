@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > (LC > V[g=8] > (V[g=2] > Tx.display-1"Button" + Tx"March 30, 2026"[t=supporting]) + (C.muted[p=0] > Ctr[h=360]) + (V[g=4] > Hd"Usage"[level=2] + Tx.lg"Usage" + Hd"Best practices"[level=3] + T) + D + (V[g=4] > Hd"Examples"[level=2] + Tx.lg"Explore") + (V[g=8] > (C[p=0] > (S[p=3] > H[j=between] > Tx"Title"[t=body] + (H[g=1] > B"Open in Craft" + IB)) + Ctr[h=280] + (S.muted[p=3] > V[g=3] > (TL > Tab"Description"! + Tab"Code") + Tx"Description"[t=body]))*2)) + (LP > Outline)
 
 import {useCallback, useState, useMemo, type CSSProperties} from 'react';
 import {Heading, Text} from '@astryxdesign/core/Text';
@@ -532,11 +534,11 @@ function ComponentDetailView({activeNav}: {activeNav: string}) {
         label="Button"
         variant="secondary"
         icon={<Icon icon={Plus} />}
-        endContent={<Badge label="New" variant="info" />}
+        endContent={<Badge label="New" variant="cyan" />}
       />
     ),
     avatar: <Avatar name="Vlad" size="lg" />,
-    badge: <Badge label="Success" variant="success" />,
+    badge: <Badge label="Success" variant="green" />,
     card: (
       <Card>
         <VStack gap={2}>
@@ -635,7 +637,7 @@ function ComponentDetailView({activeNav}: {activeNav: string}) {
                     renderCell: (item: Record<string, unknown>) => (
                       <Badge
                         label={item.type === 'do' ? 'Do' : "Don't"}
-                        variant={item.type === 'do' ? 'success' : 'error'}
+                        variant={item.type === 'do' ? 'green' : 'red'}
                       />
                     ),
                   },

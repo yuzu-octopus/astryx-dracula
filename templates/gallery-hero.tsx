@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > LC[p=6] > V[g=10] > (V[g=6 a=center] > (V[g=3 a=center] > Hd"Little haunts, everywhere you roam"[level=1 t=display-2] + Tx"Sometimes all it takes"[t=body]) + (H[j=center g=3] > B.primary"Enter the gallery" + B.secondary"Read the lore")) + (G[c={min:200} g=4] > AR*3)
 
 import type {CSSProperties} from 'react';
 import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';

@@ -62,3 +62,9 @@ demo/             showcase source, deployed to GitHub Pages
 | `bun run theme:build`| Rebuild `theme.css` from the source        |
 | `bun run theme:check`| Fail if committed theme outputs are stale  |
 | `bun run build`      | Typecheck plus showcase build              |
+
+## Attribution & License
+
+- **Astryx Design System**: Created by the Astryx team at Meta Platforms, Inc. under the [MIT License](https://github.com/facebook/astryx/blob/main/LICENSE). The 43 template files in `templates/` are derived from Astryx's open source page templates and adapted for the Dracula brand (pure Dracula spec retokening, recharts replaced with zero-dependency inline SVGs, heroicons mapped to Lucide, XLE/XLO structural expression headers, and responsive layout hardening).
+- **Dracula Theme**: Color palette and specification by [Zeno Rocha and the Dracula Theme community](https://draculatheme.com).
+- **Package & Additions**: Released under the [MIT License](LICENSE).

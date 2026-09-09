@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   Ctr > V[g=4 a=center] > (V[g=2 a=center] > Ic + Tx"Castle Dracula"[t=body]) + (C[p=8] > V[g=4] > (V[g=1 a=center] > Hd"Welcome back to the night"[level=2] + Tx"Sign in to your crypt"[t=body]) + TI"Email"[t=email] + TI"Password"[t=password] + B.primary"Enter the night")
 
 import {useState, type CSSProperties} from 'react';
 import {Moon} from 'lucide-react';

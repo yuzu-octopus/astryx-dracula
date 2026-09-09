@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > LC > Ctr[h=80vh] > B.primary"Open settings"[opens=#settings] ;; Dlg#settings > L > (LP[w=280 divider p=3] > V[g=4] > Hd"Account settings"[level=2] + (List > LI"Personal information"*8)) + (LC[p=6] > V[g=6] > DH"Account" + (V[g=4] > (H[j=between] > (V[g=0] > Tx"Legal name"[weight=semibold] + Tx"Vlad Dracul"[t=supporting color=secondary]) + Link"Edit")*4))
 
 import React, {useState, type CSSProperties} from 'react';
 import {
@@ -70,6 +72,10 @@ const actionNoWrap: CSSProperties = {
   flexShrink: 0,
   whiteSpace: 'nowrap',
 };
+
+// Same-route hash: demo links stay focusable anchors without escaping the
+// template through the hash router (bare "#" would drop back to the home page).
+const SELF_HASH = '#/templates/settings-dialog';
 
 const NAV_ITEMS = [
   {label: 'Personal information', icon: User},
@@ -178,7 +184,7 @@ function ExpandableRow({
             </Text>
           </VStack>
           <Link
-            href="#/templates/settings-dialog"
+            href={SELF_HASH}
             onClick={(e: React.MouseEvent) => {
               e.preventDefault();
               onEdit();
@@ -212,7 +218,7 @@ function InfoRowItem({
             {value}
           </Text>
         </VStack>
-        {action && <Link>{action}</Link>}
+        {action && <Link href={SELF_HASH}>{action}</Link>}
       </HStack>
       <Divider />
     </>
@@ -570,7 +576,7 @@ export default function SettingsDialog() {
                                     </VStack>
                                   </StackItem>
                                   {device.action && (
-                                    <Link style={actionNoWrap}>
+                                    <Link href={SELF_HASH} style={actionNoWrap}>
                                       {device.action}
                                     </Link>
                                   )}
@@ -598,7 +604,7 @@ export default function SettingsDialog() {
                                   This action cannot be undone
                                 </Text>
                               </VStack>
-                              <Link>Deactivate</Link>
+                              <Link href={SELF_HASH}>Deactivate</Link>
                             </HStack>
                             <Divider />
                           </VStack>
@@ -802,7 +808,7 @@ export default function SettingsDialog() {
                             <Text type="body" weight="semibold">
                               Blocked people
                             </Text>
-                                                          <Link>View</Link>
+                            <Link href={SELF_HASH}>View</Link>
                           </HStack>
                           <Divider />
                         </VStack>
@@ -824,7 +830,7 @@ export default function SettingsDialog() {
                           <Heading level={3}>Reviews</Heading>
                           <Text type="supporting" color="secondary">
                             Choose what&apos;s shared when you write a review.{' '}
-                            <Link type="supporting">Learn more</Link>
+                            <Link href={SELF_HASH}>Learn more</Link>
                           </Text>
                           <VStack gap={4}>
                             <Switch
@@ -868,7 +874,7 @@ export default function SettingsDialog() {
                           <Card>
                             <HStack hAlign="between" vAlign="center">
                               <Text type="body">Request my personal data</Text>
-                              <Link>Request</Link>
+                              <Link href={SELF_HASH}>Request</Link>
                             </HStack>
                           </Card>
                           <Switch
@@ -882,7 +888,7 @@ export default function SettingsDialog() {
                           <Card>
                             <HStack hAlign="between" vAlign="center">
                               <Text type="body">Delete my account</Text>
-                              <Link>Delete</Link>
+                              <Link href={SELF_HASH}>Delete</Link>
                             </HStack>
                           </Card>
                           <Card variant="muted">
@@ -897,7 +903,7 @@ export default function SettingsDialog() {
                                 <Text type="supporting" color="secondary">
                                   We&apos;re committed to keeping your data
                                   protected. See details in our{' '}
-                                  <Link type="supporting">
+                                  <Link href={SELF_HASH}>
                                     Privacy Policy
                                   </Link>
                                   .

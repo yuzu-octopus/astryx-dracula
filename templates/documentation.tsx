@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > LC > V[g=10] > (C[p=10] > (H[g=8 a=center] > (V[g=4] > Tx.display-1"The coven grimoire" + Tx.lg"Every incantation in the Astryx spellbook"[t=large] + (H > B.primary"Enter the grimoire")))) + (V[g=4] > (H[j=between a=center] > Hd"Category"[level=2] + Tx"18 spells"[t=supporting]) + (G[c=4 g=2] > (CC[p=2] > V[g=3] > C[p=0] + (V[g=1] > Tx"AppShell"[t=body] + Tx"Description"[t=body]))*4))*4
 
 import type {CSSProperties} from 'react';
 import {Heading, Text} from '@astryxdesign/core/Text';
@@ -326,7 +328,7 @@ export default function DocumentationCatalog() {
                           />
                         </Card>
                         <VStack gap={0.5}>
-                          <Text type="body" weight="bold">
+                          <Text type="body" weight="semibold">
                             {item.name}
                           </Text>
                           <Text type="body" color="secondary" maxLines={3}>

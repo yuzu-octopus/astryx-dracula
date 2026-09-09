@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > LC > V[g=8 a=center] > (V[g=1] > (H[g=2 a=center] > Ic + Tx.lg"Hi, Vlad") + Hd"Where should we start?"[level=1 type=display-2]) + ChC"Ask anything" + (V[g=6] > (TgG"Category" > Tg"Writing"*4) + (G[c={min:280} g=3] > (CC[p=4] > V[g=0.5] > Hd"Draft"[level=4] + Tx"Compose"[t=body])*4))
 
 import {useRef, useState, type CSSProperties} from 'react';
 

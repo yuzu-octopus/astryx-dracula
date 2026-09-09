@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   Ctr > V[g4] > (C[p0] > G[c{min:240} g8 a=stretch] > (S[p0] > V[g4] > (H[g2] > Ic + Tx"Castle Dracula"[t=body]) + (V[g4] > (V[g1] > Hd"Welcome back to the night"[level=2] + Tx"Sign in to your crypt"[t=body]) + (V[g2] > TI"Email"[t=email] + TI"Password"[t=password]) + B.primary"Enter the night" + D"Or continue with" + (G[c2 g3] > B.secondary"Apple" + B.secondary"Google")) + (Tx"New to the castle?"[t=supporting] > Lk"Sign up")) + (C[p0] > AR)) + (V[a=center] > Tx"Terms"[t=supporting])
 
 import {useState, type CSSProperties} from 'react';
 import {VStack, HStack, StackItem} from '@astryxdesign/core/Layout';
@@ -174,7 +176,7 @@ export default function LoginSplit() {
                 <VStack gap={4} height="100%">
                   <HStack gap={2} vAlign="center">
                     <Icon icon={Moon} color="accent" />
-                    <Text type="body" weight="bold">
+                    <Text type="body" weight="semibold">
                       Castle Dracula
                     </Text>
                   </HStack>
@@ -232,11 +234,7 @@ export default function LoginSplit() {
                               />
                               {loginFailed && (
                                 <VStack hAlign="end">
-                                  <Link
-                                    href="#/templates/login-split"
-                                    size="sm"
-                                    color="secondary"
-                                    type="supporting">
+                                  <Link href="#/templates/login-split">
                                     Forgot your password?
                                   </Link>
                                 </VStack>
@@ -276,7 +274,7 @@ export default function LoginSplit() {
                   {!isSuccess && (
                     <Text type="supporting" color="secondary">
                       New to the castle?{' '}
-                      <Link href="#/templates/login-split" type="supporting">
+                      <Link href="#/templates/login-split">
                         Sign up
                       </Link>
                     </Text>
@@ -302,11 +300,11 @@ export default function LoginSplit() {
         <VStack hAlign="center">
           <Text type="supporting" color="secondary">
             By clicking continue, you agree to our{' '}
-            <Link href="#/templates/login-split" type="supporting">
+            <Link href="#/templates/login-split">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link href="#/templates/login-split" type="supporting">
+            <Link href="#/templates/login-split">
               Privacy Policy
             </Link>
             .

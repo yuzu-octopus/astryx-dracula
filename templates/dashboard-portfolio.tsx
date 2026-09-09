@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > LC > V[g=6] > (H[j=between a=center] > Hd"The night vault"[level=1] + DM"1 year") + (G[c=4 g=4] > (C > V[g=2] > Hd"Label"[level=4] + (H[g=2] > Hd"$1.2M"[level=2] + Tx"+2.4%"[t=body]))*4) + (G[c=4 g=4] > (GS[c=3] > C > V[g=4] > (H[j=between] > Hd"Vault value"[level=3] + Lk"View details") + AR) + (GS[c=1] > C > V[g=4] > (H[j=between] > Hd"Top holdings"[level=3] + Lk"View all") + UL)) + D + (H[j=between a=start] > (V[g=1] > Hd"Market at midnight"[level=2] + Tx"Past 24 hours under moonlight"[t=body]) + B"View more") + (G[c=3 g=4] > (C > V[g=3] > Hd"Index"[level=4] + Tx"$5,200"[t=body])*3) + (C > V[g=4] > Hd"Trending Stocks"[level=3] + T)
 
 import {useState} from 'react';
 
@@ -493,7 +495,7 @@ function MarketCard({
         </VStack>
         <Sparkline data={spark} positive={positive} />
         <HStack gap={3} vAlign="center">
-          <Text type="display-3" weight="bold" hasTabularNumbers>
+          <Text type="display-3" weight="semibold" hasTabularNumbers>
             {price}
           </Text>
           <HStack gap={1} vAlign="center">
@@ -560,7 +562,7 @@ const trendingColumns: TableColumn<StockRow>[] = [
     header: 'Ticker',
     width: proportional(1),
     renderCell: (row: StockRow) => (
-      <Text type="body" weight="bold">
+      <Text type="body" weight="semibold">
         {row.ticker}
       </Text>
     ),
@@ -665,7 +667,7 @@ function AssetRow({
 }) {
   return (
     <ListItem
-      label={<Text weight="bold">{ticker}</Text>}
+      label={<Text weight="semibold">{ticker}</Text>}
       description={name}
       href="#/templates/dashboard-portfolio"
       startContent={<Avatar name={ticker} size="md" />}

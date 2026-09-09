@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > (LH[divider] > H[a=center g=2] > (SI[size=fill] > Hd"Matcha Bar"[level=1]) + IB"Filter"[variant=ghost] + IB"Export"[variant=ghost] + B.primary"New order") + (LC[p=3] > V[g=4] > C[p=3] + (T[hover] > (TR > THC"Order" + THC"Product" + THC"Amount" + THC"Customer" + THC"Email" + THC"Status" + THC"Date") + (TR > TC"ORD-1001" + TC"Ceremonial Matcha Latte" + TC"$6" + TC"Sarah Chen" + TC"sarah.chen@acme.co" + (TC > Bd.green"Completed") + TC"2025-01-15")*6))
 
 import type {CSSProperties} from 'react';
 import {
@@ -668,7 +670,11 @@ export default function ChartTable() {
               variant="ghost"
               tooltip="Export"
             />
-            <Button label="New order" icon={<Icon icon={Plus} size="sm" />} />
+            <Button
+              label="New order"
+              variant="primary"
+              icon={<Icon icon={Plus} size="sm" />}
+            />
           </HStack>
         </LayoutHeader>
       }

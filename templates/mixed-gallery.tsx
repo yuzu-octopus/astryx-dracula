@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > LC[p=6] > V[g=6] > (V[g=2 a=center] > Hd"Every corner of the castle, caught after dark."[level=1] + Tx"Relics, sketches, and moonlit views"[t=body]) + (G[g=4] > (V[g=2] > AR + Tx"Title"[t=supporting])*5)
 
 import type {CSSProperties} from 'react';
 import {VStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
@@ -154,7 +156,7 @@ export default function MixedGallery() {
               <Heading level={1} justify="center">
                 Every corner of the castle, caught after dark.
               </Heading>
-              <Text type="body" justify="center">
+              <Text type="body" color="secondary" justify="center">
                 Relics, sketches, and moonlit views from the coven archives —
                 collected over one long Transylvanian night.
               </Text>

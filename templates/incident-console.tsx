@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > (LH > H[g3 a=center] > (H[g2 a=center] > Hd"Night watch"[level=1] + Tx"3 investigating"[t=supporting]) + SegmentedControl"Filter by status" + B"Declare incident") + (LC[p0] > V[g0] > (H > PowerSearch"Search the night watch...") + (List > (ListItem)*6)) + (LayoutPanel[w380 p0] > V[g4] > (V[g2] > (H[g2 a=center] > StatusDot + Tx"INC-2417"[t=supporting] + Token"Investigating") + Hd"Checkout API elevated 5xx rate"[level=2]) + (H[g2] > B.primary"Mark mitigated" + B.secondary"Escalate") + Divider + MetadataList + Divider + (V[g2] > Hd"Timeline"[level=3] + List))
 
 /**
  * Incident Console — an on-call incident response tool for the night watch.
@@ -415,7 +417,7 @@ function IncidentInspector({incident}: {incident: Incident}) {
       </VStack>
 
       <HStack gap={2}>
-        <Button label={nextAction} size="sm" />
+        <Button label={nextAction} variant="primary" size="sm" />
         <Button label="Escalate" variant="secondary" size="sm" />
       </HStack>
 

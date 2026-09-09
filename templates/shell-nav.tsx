@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   A[cp=0 @topNav=(TN) @sideNav=(SN > TL)] > L > (LH[divider] > H[g=2] > C.muted[p=0]*3) + (LC[p=6] > V[g=2] > (H[g=3 a=center] > C.muted[p=0] + C.muted[p=0])*8)
 
 import {Fragment, useState, useMemo, useEffect} from 'react';
 import {AppShell} from '@astryxdesign/core/AppShell';

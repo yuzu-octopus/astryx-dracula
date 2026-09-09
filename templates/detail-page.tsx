@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > (LH > V[g=4] > (H[j=between] > Lk"All orders" + (H[g=2] > B"Restock" + B"Edit")) + (H[g=2 a=center] > Hd"#1001"[level=1] + Bd.warning"Unfulfilled") + (H[j=between] > TL > Tab"Details"! + Tab"Invoices" + Tab"Timeline")) + (LC > V[g=4] > (C > V[g=4] > (H[j=between] > Hd"Items"[level=2] + B"Fulfill item") + UL) + (C > V[g=4] > (H[j=between] > Hd"Invoice"[level=2] + B"Send Invoice") + ML) + (S > V[g=4] > Hd"Timeline"[level=2] + UL)) + (LP[w=320] > V[g=4] > Col"Notes" + Col"Customer" + Col"Fraud Analysis")
 
 import {useState} from 'react';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
@@ -209,7 +211,7 @@ function PageHeader({
         <HStack gap={4} vAlign="start">
           <StackItem size="fill">
             <VStack gap={0}>
-              <Link href="#/templates/detail-page" color="secondary">
+              <Link href="#/templates/detail-page">
                 <HStack gap={1} vAlign="center">
                   <Icon icon={ArrowLeft} size="sm" color="inherit" />
                   All orders
@@ -234,7 +236,7 @@ function PageHeader({
                   </HStack>
                   <HStack gap={1} vAlign="center">
                     <Bullet />
-                    <Badge variant="warning" label="Unfulfilled" />
+                    <Badge variant="orange" label="Unfulfilled" />
                   </HStack>
                   <HStack gap={1} vAlign="center">
                     <Bullet />
@@ -256,7 +258,7 @@ function PageHeader({
                   </HStack>
                   <HStack gap={1} vAlign="center">
                     <Bullet />
-                    <Link href="#/templates/detail-page" color="secondary">
+                    <Link href="#/templates/detail-page">
                       See all
                     </Link>
                   </HStack>
@@ -328,7 +330,7 @@ function ItemsCard() {
           <StackItem size="fill">
             <HStack gap={2} vAlign="center">
               <Heading level={2}>Items</Heading>
-              <Badge variant="warning" label="Unfulfilled" />
+              <Badge variant="orange" label="Unfulfilled" />
             </HStack>
           </StackItem>
           <HStack gap={2}>
@@ -363,7 +365,7 @@ function ItemsCard() {
                 <VStack gap={0} hAlign="end">
                   <Text
                     type="body"
-                    weight="bold"
+                    weight="semibold"
                     maxLines={1}
                     hasTabularNumbers>
                     {fmt(product.price * product.qty)}
@@ -394,7 +396,7 @@ function InvoiceCard() {
           <StackItem size="fill">
             <HStack gap={2} vAlign="center">
               <Heading level={2}>Invoice</Heading>
-              <Badge variant="success" label="Paid" />
+              <Badge variant="green" label="Paid" />
             </HStack>
           </StackItem>
           <HStack gap={2}>
@@ -453,7 +455,7 @@ function InvoiceCard() {
           <MetadataListItem label="Total">
             <HStack>
               <StackItem size="fill" />
-              <Text type="body" weight="bold" hasTabularNumbers>
+              <Text type="body" weight="semibold" hasTabularNumbers>
                 {fmt(TOTAL)}
               </Text>
             </HStack>
@@ -507,7 +509,7 @@ function TimelineSection() {
                   <VStack gap={2}>
                     <Card variant="muted" padding={3}>
                       <VStack gap={1}>
-                        <Text type="body" weight="bold">
+                        <Text type="body" weight="semibold">
                           {item.user}
                         </Text>
                         <Text type="body">{item.text}</Text>
@@ -581,7 +583,7 @@ function PanelContent() {
           Customer is a repeat buyer — 3rd order this quarter. Prefers
           moonlight and sage glazes. Requested gift wrapping for the mug set.
           Ships to a residential address in CA.{' '}
-          <Link href="#/templates/detail-page" color="secondary">
+          <Link href="#/templates/detail-page">
             Show more
           </Link>
         </Text>

@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   Ctr > C[p8 mw400] > V[g4] > (V[g1 a=center] > Hd"Welcome back to the night"[level=2] + Tx"Whisper your details"[t=body]) + (V[g2] > TI"Work email"[t=email] + TI"Password"[t=password]) + Lk"Having trouble signing in?" + B.primary"Enter the night" + D"Or sign in with" + B.secondary"Continue with SSO" + (V[a=center] > Tx"New to the castle?"[t=supporting])
 
 import {useState, type CSSProperties} from 'react';
 import {VStack, HStack} from '@astryxdesign/core/Layout';
@@ -135,7 +137,7 @@ export default function LoginSso() {
                 />
               </VStack>
 
-              <Link href="#/templates/login-sso" size="sm" color="secondary" type="supporting">
+              <Link href="#/templates/login-sso">
                 Having trouble signing in?
               </Link>
 
@@ -160,7 +162,7 @@ export default function LoginSso() {
               <VStack hAlign="center">
                 <Text type="supporting" color="secondary">
                   New to the castle?{' '}
-                  <Link href="#/templates/login-sso" type="supporting">
+                  <Link href="#/templates/login-sso">
                     Request access
                   </Link>
                 </Text>
@@ -243,11 +245,7 @@ export default function LoginSso() {
                   />
                   {loginFailed && (
                     <VStack hAlign="end">
-                      <Link
-                        href="#/templates/login-sso"
-                        size="sm"
-                        color="secondary"
-                        type="supporting">
+                      <Link href="#/templates/login-sso">
                         Forgot password?
                       </Link>
                     </VStack>

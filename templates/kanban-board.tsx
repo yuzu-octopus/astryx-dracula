@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   S > L > (LH[divider] > Tbar > (Hd"Sprint Board"[level=3] + Bd.neutral"8") + (H[g=2] > SE + D.strong + IB"Sort" + IB"Filter" + IB"Search" + B.primary"Add task")) + (LC[p=0] > G[c=4 g=4] > (C.muted[p=0] > L > (LH[divider] > H[j=between a=center] > (H[g=2 a=center] > SD + Hd"To-do"[level=4] + Ic) + Tx) + (LC[p=2] > V[g=2] > (C[p=3] > V[g=2] > (H[j=between] > (H[g=1] > Bd + Bd) + MM) + (V[g=1] > Hd[level=4] + Tx) + Tx)*2))*4)
 
 import {
   useEffect,

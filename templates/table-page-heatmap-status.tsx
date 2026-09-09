@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > (LH > H[g2 a=center] > Hd"Status"[level=1] + IB*2 + B"Refresh") + (LC[p3] > V[g4] > (V[g3] > C[p3] + Tx"Incidents by day and hour"[t=supporting] + (H[g4] > (H[g2] > Tx[t=supporting])*4)) + (T > (TR > THC*8) + (TR > TC*8)*5))
 
 import {
   VStack,

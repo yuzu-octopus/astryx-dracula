@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > LC > G[c{min:360} g8 a=center] > (V[g6] > (V[g3] > Tx"AFTER DARK"[t=supporting] + Hd"Make every night"[level=1] + Tx"The smallest rituals"[t=body]) + B.primary"Explore the night" + (V[g4] > D + (H[g6] > (V > Tx"12k+"[t=large] + Tx"Night shots"[t=supporting])*3))) + (G[c3 g3] > AR*9)
 
 import type {CSSProperties} from 'react';
 import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
@@ -103,7 +105,7 @@ function NightScene({alt, hue, index}: {alt: string; hue: string; index: number}
 function StatBlock({value, label}: {value: string; label: string}) {
   return (
     <VStack gap={0}>
-      <Text type="large" weight="bold" hasTabularNumbers>
+      <Text type="large" weight="semibold" hasTabularNumbers>
         {value}
       </Text>
       <Text type="supporting" color="secondary">

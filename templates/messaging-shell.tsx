@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > (LP[w68] > V > Av + (V > IB*4) + IB) + (LP[w260] > V > (H > Hd"Night Watch"[level=3] + IB) + TI"Jump to..." + (V > Tx"Channels"[t=label] + (List > (ListItem)*4)) + (V > Tx"Direct messages"[t=label] + (List > (ListItem)*3))) + (LC[p0] > ChL > ChML > (ChM > ChB)*6 + ChC) + (LP[w340] > V > (H > Hd"Thread"[level=3] + IB) + (ChL > ChML > (ChM > ChB)*3 + ChC))
 
 /**
  * Messaging Shell — Slack-style column frame for team messaging tools.

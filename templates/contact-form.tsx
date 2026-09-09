@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   Ctr > V[a=center] > S.section[p=6] > V[g=6] > (V[g=2 a=center] > Hd"Let's brew after dark"[level=1] + Tx"Tell us a bit"[t=body]) + (G[c={min:200} g=4] > (C > V[g=3] > Ic + (V[g=1] > Tx"Title"[t=body] + Tx"Desc"[t=supporting]))*3) + (G[c={min:260} g=4] > TI"Full Name" + TI"Email") + (G[c={min:260} g=4] > TI"Company" + TI"Phone") + D + (V[g=5] > (V[g=2] > Tx"Goals"[t=label] + (H[g=2] > Tk"Goal"*3)) + SE"Timeline" + SE"Budget" + (RL"Source" > RLI*5) + TA"Notes" + CB"Decision maker") + (V[g=3] > B.primary"Submit" + (H[j=center g=1] > Tx[t=supporting] > Lk"Privacy Policy"))
 
 import {useState} from 'react';
 import {VStack, HStack} from '@astryxdesign/core/Layout';
@@ -7,7 +9,7 @@ import {Section} from '@astryxdesign/core/Section';
 import {Grid} from '@astryxdesign/core/Grid';
 import {Card} from '@astryxdesign/core/Card';
 import {Button} from '@astryxdesign/core/Button';
-import {Text} from '@astryxdesign/core/Text';
+import {Text, Heading} from '@astryxdesign/core/Text';
 import {Icon} from '@astryxdesign/core/Icon';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {Selector} from '@astryxdesign/core/Selector';
@@ -112,9 +114,9 @@ export default function ContactForm() {
           <VStack gap={6}>
             {/* Header */}
             <VStack gap={2} hAlign="center" style={{textAlign: 'center'}}>
-              <Text type="display-1" weight="bold">
+              <Heading level={1} type="display-1">
                 Let&apos;s brew after dark
-              </Text>
+              </Heading>
               <Text type="body" color="secondary">
                 Tell us a bit about what you&apos;re summoning — the coven
                 would love to help it take flight.

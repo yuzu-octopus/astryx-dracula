@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > (LH > H[g2 a=center] > Hd"Midnight Kicks"[level=1] + IB*2 + B.primary"New order") + (LC[p3] > V[g4] > (V[g3] > C[p3] + Tx"Daily revenue"[t=supporting] + (H[g2 a=center] > Ic + Tx"Revenue"[t=supporting])) + (T > (TR > THC*7) + (TR > TC*7)*5))
 
 import type {CSSProperties} from 'react';
 import {
@@ -1013,7 +1015,11 @@ export default function ShoeStoreTable() {
               variant="ghost"
               tooltip="Export"
             />
-            <Button label="New order" icon={<Icon icon={Plus} size="sm" />} />
+            <Button
+              label="New order"
+              variant="primary"
+              icon={<Icon icon={Plus} size="sm" />}
+            />
           </HStack>
         </LayoutHeader>
       }

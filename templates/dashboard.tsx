@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > LC[p=6] > V[g=6] > (V[g=6] > (H[j=between a=center] > Hd"Awake after dark"[level=3] + B.secondary"Reload") + C[p=3]) + (G[c=4 g=4] > C*4) + D + (H[j=between a=center] > Hd"Night denizens"[level=3] + B.secondary"View more") + (G[c=2 g=4] > C*2) + D + (H[j=between a=center] > Hd"Engagement"[level=3] + B.secondary"View more") + (G[c=2 g=4] > (C > V[g=6] > (H[j=between a=center] > Hd"Top pages"[level=4] + Lk"All pages") + T)*2)
 
 import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
@@ -192,7 +194,7 @@ const regionData = [
   {
     label: 'NORAM',
     value: 38,
-    color: 'var(--dracula-comment)',
+    color: 'var(--dracula-cyan)',
   },
   {
     label: 'EMEA',
@@ -209,14 +211,14 @@ const regionData = [
     value: 8,
     color: 'var(--dracula-purple)',
   },
-  {label: 'Other', value: 4, color: 'var(--dracula-selection)'},
+  {label: 'Other', value: 4, color: 'var(--dracula-comment)'},
 ];
 
 const roleData = [
   {
     label: 'Engineer',
     value: 45,
-    color: 'var(--dracula-comment)',
+    color: 'var(--dracula-cyan)',
   },
   {
     label: 'Manager',
@@ -233,7 +235,7 @@ const roleData = [
     value: 12,
     color: 'var(--dracula-purple)',
   },
-  {label: 'Other', value: 8, color: 'var(--dracula-selection)'},
+  {label: 'Other', value: 8, color: 'var(--dracula-comment)'},
 ];
 
 // Engagement — Top pages

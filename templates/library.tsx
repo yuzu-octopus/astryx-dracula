@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > (LH[divider] > Hd"Library"[level=1]) + (LC[p=6] > V[g=6] > (V[g=4] > TI"Search the stacks..." + (H[a=center g=4] > (SI[fill] > TgG"Filter" > OFL > Tg"All"! + Tg"Layout" + Tg"Forms") + DM"Sort")) + D + (V[g=6] > (H[j=between a=center] > Hd"Layout"[level=2] + Tx"6 items"[t=supporting]) + (G[c={min:320} g=4] > (C[p=0] > AR + (S.transparent[p=4] > V[g=1] > Hd"Card"[level=3] + Tx"Description"[t=body]))*4)))
 
 import {useState, useMemo, type CSSProperties} from 'react';
 import {Layout, LayoutHeader, LayoutContent} from '@astryxdesign/core/Layout';

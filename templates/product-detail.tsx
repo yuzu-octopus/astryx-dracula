@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > LC[p=6] > G[c={min:360} g=8] > (V[g=4] > AR + (G[c=3 g=3] > C*6)) + (V[g=6] > (V[g=2] > Hd"Midnight Ceremony Mug & Plate Set"[level=1 t=display-2] + (H[g=2] > Tx"$89.00"[t=large] + Tx"$119.00"[t=body] + Bd.pink"Sale")) + Tx"A hand-thrown mug and plate set"[t=large] + (V[g=2] > Tx"Glaze"[t=label] + SG) + (V[g=2] > Tx"Finish"[t=label] + SG) + (V[g=2] > Tx"Quantity"[t=label] + (H[g=1] > B.ghost"-" + TI"1" + B.ghost"+")) + (V[g=2] > B.primary"Add to Cart" + B.secondary"Buy it now") + (ColG > Col"Composition" + Col"Delivery & Returns" + Col"Dimensions"))
 
 import {useState} from 'react';
 import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
@@ -85,7 +87,7 @@ function StarRating({rating, count}: {rating: number; count: number}) {
         <Icon key={`full-${i}`} icon={Star} size="sm" color="warning" />
       ))}
       {Array.from({length: empty}, (_, i) => (
-        <Icon key={`empty-${i}`} icon={Star} size="sm" />
+        <Icon key={`empty-${i}`} icon={Star} size="sm" color="disabled" />
       ))}
       <Text type="body" color="secondary" hasTabularNumbers>
         {rating} ({count})
@@ -199,7 +201,7 @@ function ProductInfo() {
           <Text type="body" color="secondary" hasStrikethrough hasTabularNumbers>
             {fmt(PRODUCT.originalPrice)}
           </Text>
-          <Badge variant="error" label="Sale" />
+          <Badge variant="pink" label="Sale" />
         </HStack>
       </VStack>
       <Text type="large" weight="normal">

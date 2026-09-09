@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > LC > V[g=6] > (G[c={min:280} g=4 a=start] > Hd"Small comforts for the midnight hours."[level=1] + (V[g=3 a=start] > Tx"Provisions from the castle workshops"[t=body] + B.primary"Browse the collection")) + (G[c={min:300} g=6] > (V[g=3] > (C[p=0] > AR[ratio=1]) + (V[g=1] > Hd"Nightfall Stoneware Mug"[level=3] + Tx"Description"[t=body color=secondary] + Tx.lg"$75.00"))*6)
 
 import {VStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';

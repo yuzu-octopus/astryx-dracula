@@ -1,8 +1,11 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > (LP[p=4] > V[g=2] > TI"Search files" + TreeList) + (LC[p=0] > V > (SI[fill] > Cd) + (V > (TL > Tab"Terminal"! + Tab"Problems" + Tab"Output" + Tab"Debug") + Cd)) + (LP[p=4] > V[g=3] > (SG > SGI"Properties"! + SGI"History") + (V[g=3] > (V[g=1] > Hd"NightCounter.tsx"[level=3] + Tx"src/components/NightCounter.tsx"[t=supporting]) + ML + (V[g=2] > B.secondary"Format Document" + B.secondary"Go to Definition" + B.secondary"Find References")))
 
 import {useState, useMemo, type CSSProperties} from 'react';
 
 import {Layout, LayoutContent, LayoutPanel} from '@astryxdesign/core/Layout';
+import {StatusDot} from '@astryxdesign/core/StatusDot';
 import {ResizeHandle, useResizable} from '@astryxdesign/core/Resizable';
 import {Text, Heading} from '@astryxdesign/core/Text';
 import {Center} from '@astryxdesign/core/Center';
@@ -507,8 +510,9 @@ export default function IdeWorkspace() {
                                           </Text>
                                         }
                                         startContent={
-                                          <span
-                                            style={styles.historyTimelineDot}
+                                          <StatusDot
+                                            variant="neutral"
+                                            label="Timeline marker"
                                           />
                                         }
                                       />

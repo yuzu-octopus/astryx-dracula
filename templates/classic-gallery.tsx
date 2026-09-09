@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > LC[p=0] > Ctr > V[g=8] > (V[g=4 a=center] > (V[g=2 a=center] > Hd"Hung after dark"[level=1] + Tx"A coven-curated wall"[t=body]) + (TL > Tab"All"! + Tab"Lifestyle" + Tab"Scenery" + Tab"Home") + Tx"10 pieces on the wall"[t=supporting]) + (G[g=4] > (C[p=0] > AR)*6)
 
 import {useState, type CSSProperties} from 'react';
 import {VStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';

@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > (LP > V[g=4] > Hd"Account settings"[level=2] + (UL > LI*8) + D + LI) + (LC[p=4] > V[g=6] > Hd"Personal info"[level=2] + (V > (H[j=between a=center] > (V > Tx"Legal name" + Tx"Vlad Dracul"[t=supporting]) + Lk"Edit")*7) + (C.muted > V[g=4] > (H[g=3 a=start] > Ic + (V[g=1] > Tx"Why is info hidden" + Tx[t=supporting]))*3))
 
 import {useState, type CSSProperties} from 'react';
 import {useMediaQuery} from '@astryxdesign/core/hooks';

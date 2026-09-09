@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > (LP[w=320] > V[g=4] > (S[p=4] > V[g=4] > Hd"Page Editor"[level=2] + Tbar) + (V[g=4] > (TL > Tab"Blocks"! + Tab"Properties") + D + (S[p=4] > V[g=2] > Hd"Add Block"[level=3] + UL + Hd"Layers"[level=3] + UL))) + (LC > V[g=4] > C*3)
 
 import {useState, useCallback, type CSSProperties} from 'react';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
@@ -109,7 +111,7 @@ const TRANSACTION_COLUMNS: TableColumn<Transaction>[] = [
       <HStack gap={3} vAlign="center">
         <Icon icon={CATEGORY_ICONS[item.category] || Sparkles} />
         <VStack gap={0}>
-          <Text type="label" weight="semibold">
+          <Text type="body" weight="semibold">
             {item.name}
           </Text>
           <Text type="supporting" color="secondary">
@@ -134,7 +136,7 @@ const TRANSACTION_COLUMNS: TableColumn<Transaction>[] = [
     header: 'Amount',
     width: proportional(1, {minWidth: 90}),
     renderCell: (item: Transaction) => (
-      <Text type="label" weight="semibold" hasTabularNumbers>
+      <Text type="body" weight="semibold" hasTabularNumbers>
         {item.amount}
       </Text>
     ),
@@ -314,14 +316,14 @@ const clickable: CSSProperties = {
 // Selection ring on the active block — Card has no `isSelected` state.
 const selectedCard: CSSProperties = {
   outline: '2px solid',
-  outlineColor: 'var(--color-border-blue)',
+  outlineColor: 'var(--color-accent)',
   outlineOffset: -2,
 };
 // Circular muted chip behind the CTA icon — Center handles the centering
 // and sizing; only the surface (radius + fill) needs custom CSS.
 const iconCircle: CSSProperties = {
   borderRadius: '50%',
-  backgroundColor: 'var(--color-background-muted)',
+  backgroundColor: 'var(--color-selection)',
 };
 
 // ---------------------------------------------------------------------------
@@ -470,7 +472,7 @@ function BlockPreview({
             <Heading level={2}>
               {(props.heading as string) || 'Hero Heading'}
             </Heading>
-            <Text type="supporting" color="secondary">
+            <Text type="body" color="secondary">
               {(props.subheading as string) || 'Subtitle text goes here'}
             </Text>
             {(props.buttonLabel as string) && (
@@ -596,10 +598,10 @@ function BlockPreview({
               <Icon icon={Lock} color="secondary" />
             </Center>
             <VStack gap={1}>
-              <Text type="label" weight="semibold">
+              <Heading level={4}>
                 {(props.heading as string) || 'Notice'}
-              </Text>
-              <Text type="supporting" color="secondary">
+              </Heading>
+              <Text type="body" color="secondary">
                 {(props.description as string) || 'Description text'}
               </Text>
             </VStack>
