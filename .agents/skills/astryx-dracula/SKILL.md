@@ -11,6 +11,7 @@ One dark Dracula identity for every Astryx site. Dark-only, no light mode exists
 
 ## Reference files
 
+- `references/xle.md` — layout expressions (XLE/XLO): when to use, workflow, node anatomy, example, brand pass.
 - `references/scaffolds.md` — copy-paste skeletons: showcase shell, hero, bento, dashboard, steps, spec grid, responsive rules.
 - `references/spacing.md` — canonical spacing values with provenance, card insets, type floors, touch targets, table density.
 - `references/visual.md` — color semantics, charts, code highlighting, motion, scrollbars, surfaces.
@@ -47,6 +48,10 @@ import { astryxDraculaTheme } from 'astryx-dracula';
 ```
 
 Stock Vite config plus the layer-order snippet in USAGE.md. Discover components with `bunx astryx component <Name>` before use. Never guess a prop (`label` on Button, `level` on Heading, `columns` on Grid).
+
+## Layout expressions
+
+New page from scratch: write XLE, expand, then brand-pass. `bunx astryx layout check "<expr>"` validates; `bunx astryx layout expand "<expr>" ./path.tsx` emits TSX. Full grammar lives in the tool (`bunx astryx layout grammar`), details in `references/xle.md`. Expansion emits stock Astryx, so the brand pass in `references/xle.md` still applies after. Never hand-write full TSX first; never use XLE for small edits.
 
 ## Templates
 

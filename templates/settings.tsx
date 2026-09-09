@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   V[g6] > (V[g1] > Hd"Settings"[level=2] + Tx"Profile"[t=body]) + (G[c2 g4] > C[p4] + C[p4])
 
 import {useState} from 'react';
 import {useMediaQuery} from '@astryxdesign/core/hooks';

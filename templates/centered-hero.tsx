@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > LC > (V[g6 a=center] > Hd"Hero"[level=1] + Tx"Remit"[t=body] + (H[j=center g3] > B.primary"CTA" + B"Secondary"))
 
 import type {CSSProperties} from 'react';
 import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';

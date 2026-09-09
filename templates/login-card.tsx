@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   C[p4] > V[g3] > (Hd"Sign in"[level=3] + F > (TI"Email"[t=email req] + TI"Password"[t=password req]) + B.primary"Enter the night")
 
 import {useState, type CSSProperties} from 'react';
 import {Moon} from 'lucide-react';

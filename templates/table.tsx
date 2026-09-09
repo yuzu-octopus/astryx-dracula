@@ -1,4 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
+// XLE (canonical structure, validated with `bunx astryx layout check`):
+//   L > LC > V[g6] > (V[g1] > Hd"Vault"[level=2] + Tx"Remit"[t=body]) + (C[p0] > T[striped] > (TR > THC"Name" + THC"Status" + THC"Updated") + (TR > TC"Blood Vial" + (TC > Bd.success"Active") + TC"2025-01-15")*3)
 
 import {useState} from 'react';
 import {Layout, LayoutHeader, LayoutContent, HStack} from '@astryxdesign/core/Layout';
