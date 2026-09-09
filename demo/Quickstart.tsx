@@ -15,7 +15,7 @@ export function Quickstart() {
     <VStack gap={6}>
       <VStack gap={1}>
         <Heading level={2}>Quickstart</Heading>
-        <Text type="supporting" color="secondary">
+        <Text type="body" color="secondary">
           Five steps to drop pure Dracula into your Astryx application.
         </Text>
       </VStack>
@@ -27,7 +27,7 @@ export function Quickstart() {
               <Badge label="01" variant="purple" />
               <Heading level={3}>Add the Package</Heading>
             </HStack>
-            <Text type="supporting" color="secondary">
+            <Text type="body" color="secondary">
               Install the frozen tokens, assets, and type definitions from npm.
             </Text>
             <CodeBlock
@@ -45,7 +45,7 @@ export function Quickstart() {
               <Badge label="02" variant="purple" />
               <Heading level={3}>Install Dependencies & Fonts</Heading>
             </HStack>
-            <Text type="supporting" color="secondary">
+            <Text type="body" color="secondary">
               Install required peer packages and copy JetBrains Mono fonts into your public asset directory.
             </Text>
             <CodeBlock
@@ -63,7 +63,7 @@ export function Quickstart() {
               <Badge label="03" variant="purple" />
               <Heading level={3}>Wrap Your Application Root</Heading>
             </HStack>
-            <Text type="supporting" color="secondary">
+            <Text type="body" color="secondary">
               Import the prebuilt stylesheet and pass <Code>astryxDraculaTheme</Code> to the Theme provider.
             </Text>
             <CodeBlock
@@ -82,7 +82,7 @@ export function Quickstart() {
               <Badge label="04" variant="purple" />
               <Heading level={3}>Style With Tokens</Heading>
             </HStack>
-            <Text type="supporting" color="secondary">
+            <Text type="body" color="secondary">
               Component props first, <Code>var(--color-*)</Code> second, raw hex never. Pinned hexes enforce zero drift.
             </Text>
             <Card

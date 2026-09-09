@@ -20,7 +20,7 @@ export function Gallery() {
     <VStack gap={6}>
       <VStack gap={1}>
         <Heading level={2}>Component System</Heading>
-        <Text type="supporting" color="secondary">
+        <Text type="body" color="secondary">
           Statuses, interactive surfaces, and taxonomy wearing the dark Dracula ramp.
         </Text>
       </VStack>

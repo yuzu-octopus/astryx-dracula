@@ -76,7 +76,7 @@ export function Dashboard() {
     <VStack gap={6}>
       <VStack gap={1}>
         <Heading level={2}>Observability Dashboard</Heading>
-        <Text type="supporting" color="secondary">
+        <Text type="body" color="secondary">
           Dense telemetry, key indicators, and categorical data visualisations styled with Dracula tokens.
         </Text>
       </VStack>

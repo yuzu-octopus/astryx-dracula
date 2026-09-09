@@ -28,7 +28,7 @@ export function Palette() {
     <VStack gap={5}>
       <VStack gap={1}>
         <Heading level={2}>Spec Palette</Heading>
-        <Text type="supporting" color="secondary">
+        <Text type="body" color="secondary">
           Twelve pinned hex values from the official Dracula specification. Every component token resolves to this palette.
         </Text>
       </VStack>
