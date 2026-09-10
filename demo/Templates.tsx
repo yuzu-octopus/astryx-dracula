@@ -251,6 +251,12 @@ const TEMPLATES: TemplateEntry[] = [
     load: () => import('../templates/incident-console'),
   },
   {
+    id: 'three-pane',
+    name: 'Three-Pane Workspace',
+    description: 'Sidebar rail, working pane, and results pane.',
+    load: () => import('../templates/three-pane'),
+  },
+  {
     id: 'login-split',
     name: 'Login Split',
     description: 'Split auth with brand cover panel.',
@@ -289,7 +295,7 @@ export function TemplatesIndex() {
         <VStack gap={1}>
           <Heading level={1}>Templates in Dracula</Heading>
           <Text type="body" color="secondary">
-            Twelve Astryx pages, themed and retokened. Open one live, or scaffold it with
+            {TEMPLATES.length} Astryx pages, themed and retokened. Open one live, or scaffold it with
             bunx astryx template.
           </Text>
         </VStack>
