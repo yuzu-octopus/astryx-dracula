@@ -130,9 +130,13 @@
 /* A resizable SideNav reports exactly 1px of horizontal overflow: the resize
  * handle renders 1px wider than its own box, and the side-nav panel scrolls
  * both axes, so a permanent horizontal scrollbar paints under the rail even
- * though nothing overflows visually. A navigation rail never scrolls
- * sideways, so clip that axis on the shell's side-nav region. Needed until the
+ * though nothing overflows visually. Clip the offending pixel on the handle
+ * itself rather than on the panel: a collapsed rail renders its child popovers
+ * as descendants of that panel, and they only escape the clip because their
+ * root happens to be position:fixed. Clipping the panel would break them the
+ * day an ancestor gains a transform. The handle contains nothing but its pill,
+ * which sits inside its box, so clipping it costs nothing. Needed until the
  * resize handle stops reporting the extra pixel. */
-.astryx-app-shell-sidenav {
-  overflow-x: hidden;
+.astryx-app-shell-sidenav .astryx-resize-handle {
+  overflow: hidden;
 }
