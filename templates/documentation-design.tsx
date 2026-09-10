@@ -1,11 +1,35 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LC > V[g=8] > (V[g=2] > Tx.display-1"Button" + Tx"March 30, 2026"[t=supporting]) + (C.muted[p=0] > Ctr[h=360]) + (V[g=4] > Hd"Usage"[level=2] + Tx.lg"Usage" + Hd"Best practices"[level=3] + T) + D + (V[g=4] > Hd"Examples"[level=2] + Tx.lg"Explore") + (V[g=8] > (C[p=0] > (S[p=3] > H[j=between] > Tx"Title"[t=body] + (H[g=1] > B"Open in Craft" + IB)) + Ctr[h=280] + (S.muted[p=3] > V[g=3] > (TL > Tab"Description"! + Tab"Code") + Tx"Description"[t=body]))*2)) + (LP > Outline)
+//   L > (LC > V[g=8] > (V[g=2] > Tx.display-1"Button" + Tx"March 30, 2026"[t=supporting]) + (C.muted[p=0] > Ctr[h=360]) + (V[g=4] > Hd"Usage"[level=2] + Tx.lg"Usage" + Hd"Best practices"[level=3] + T) + D + (V[g=4] > Hd"Examples"[level=2] + Tx.lg"Explore") + (V[g=8] > (C[p=0] > (S[p=3] > Tx"Title"[t=body]) + Ctr[h=280] + (S.muted[p=3] > V[g=3] > (TL > Tab"Description"! + Tab"Code") + Tx"Description"[t=body]))*2)) + (LP > Outline)
 
-import {useCallback, useState, useMemo, type CSSProperties} from 'react';
+/**
+ * Documentation detail — one component, its usage, its guidance and its
+ * live examples.
+ *
+ * Frame-first layout (see `npx astryx docs layout`):
+ *
+ *   Frame: component page (fill) | on-this-page outline
+ *
+ * Responsive contract:
+ *   > 768px  the outline is a sticky end panel beside the page
+ *   <= 768px the outline collapses into an "On this page" Selector at the
+ *            top of the page; the examples stack their preview over the
+ *            description panel
+ *
+ * Container policy (docs detail archetype): prose sections run full width;
+ * examples are cards because each one pairs a preview with a switchable
+ * description/code panel.
+ */
+
+import {
+  useCallback,
+  useState,
+  useMemo,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
 import {Heading, Text} from '@astryxdesign/core/Text';
 import {Button} from '@astryxdesign/core/Button';
-import {IconButton} from '@astryxdesign/core/IconButton';
 import {Card} from '@astryxdesign/core/Card';
 import {Avatar} from '@astryxdesign/core/Avatar';
 import {Badge} from '@astryxdesign/core/Badge';
@@ -14,7 +38,7 @@ import {Banner} from '@astryxdesign/core/Banner';
 import {CodeBlock} from '@astryxdesign/core/CodeBlock';
 import {TabList, Tab} from '@astryxdesign/core/TabList';
 import {Selector} from '@astryxdesign/core/Selector';
-import {HStack, VStack, StackItem} from '@astryxdesign/core/Stack';
+import {HStack, VStack} from '@astryxdesign/core/Stack';
 import {Layout, LayoutContent, LayoutPanel} from '@astryxdesign/core/Layout';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {Dialog, DialogHeader} from '@astryxdesign/core/Dialog';
@@ -25,14 +49,19 @@ import {Icon} from '@astryxdesign/core/Icon';
 import {Section} from '@astryxdesign/core/Section';
 import {Center} from '@astryxdesign/core/Center';
 import {Outline, type OutlineItem} from '@astryxdesign/core/Outline';
-import {ExternalLink, Expand, Plus} from 'lucide-react';
+import {Plus} from 'lucide-react';
 
-const tabListFlush: CSSProperties = {marginInlineStart: '-12px'};
+// Flush the tab list with the example card's 12px inset (Section padding 3).
+const tabListFlush: CSSProperties = {
+  marginInlineStart: 'calc(var(--spacing-3) * -1)',
+};
+// The outline is sticky so it tracks the page as the document scrolls; the
+// large block offset parks its first item level with the "Usage" heading.
 const outlinePanel: CSSProperties = {
   position: 'sticky',
-  top: 24,
+  top: 'var(--spacing-6)',
   alignSelf: 'start',
-  paddingBlockStart: 120,
+  paddingBlockStart: 'calc(var(--spacing-10) * 3)',
 };
 
 const COMPONENT_OUTLINE_ITEMS: OutlineItem[] = [
@@ -496,7 +525,7 @@ function getComponentDocs(key: string) {
   };
 }
 
-const EXAMPLE_PREVIEWS: Record<string, React.ReactNode[]> = {
+const EXAMPLE_PREVIEWS: Record<string, ReactNode[]> = {
   button: [
     <HStack key="semantics" gap={3} vAlign="center" wrap="wrap">
       <Button label="Flat" variant="ghost" />
@@ -508,7 +537,7 @@ const EXAMPLE_PREVIEWS: Record<string, React.ReactNode[]> = {
   ],
 };
 
-const COMPONENT_PREVIEWS: Record<string, React.ReactNode> = {
+const COMPONENT_PREVIEWS: Record<string, ReactNode> = {
   button: (
     <Button
       label="Button"
@@ -518,7 +547,7 @@ const COMPONENT_PREVIEWS: Record<string, React.ReactNode> = {
     />
   ),
   avatar: <Avatar name="Vlad" size="lg" />,
-  badge: <Badge label="Success" variant="green" />,
+  badge: <Badge label="Design" variant="teal" />,
   card: (
     <Card>
       <VStack gap={2}>
@@ -673,32 +702,9 @@ function ComponentDetailView({activeNav}: {activeNav: string}) {
                 return (
                   <Card key={example.title} padding={0}>
                     <Section padding={3} variant="transparent">
-                      <HStack gap={3} vAlign="center" wrap="wrap">
-                        <StackItem size="fill">
-                          <Text type="body" weight="medium">
-                            {example.title}
-                          </Text>
-                        </StackItem>
-                        <HStack gap={1} vAlign="center" wrap="wrap">
-                          <Button
-                            label="Open in Craft"
-                            variant="ghost"
-                            size="sm"
-                            icon={<Icon icon={ExternalLink} />}
-                          />
-                          <Button
-                            label="Send to CLI"
-                            variant="ghost"
-                            size="sm"
-                          />
-                          <IconButton
-                            label="Fullscreen"
-                            variant="ghost"
-                            size="sm"
-                            icon={<Icon icon={Expand} />}
-                          />
-                        </HStack>
-                      </HStack>
+                      <Text type="body" weight="medium">
+                        {example.title}
+                      </Text>
                     </Section>
                     <Center height={280}>
                       {previews[i] ?? (

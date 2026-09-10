@@ -110,11 +110,13 @@ const SELECTED_CHAT = 'StyleX migration notes';
 // template through the hash router (bare "#" would drop back to the home page).
 const SELF_HASH = '#/templates/shell-side-nav';
 
+// `id` carries the React key: the bubbles are positional placeholders, and an
+// index key would remount every row below an inserted one.
 const MESSAGES = [
-  {role: 'assistant', width: '78%', height: 104},
-  {role: 'user', width: '48%', height: 48},
-  {role: 'assistant', width: '64%', height: 132},
-  {role: 'user', width: '38%', height: 40},
+  {id: 'context', role: 'assistant', width: '78%', height: 104},
+  {id: 'follow-up', role: 'user', width: '48%', height: 48},
+  {id: 'answer', role: 'assistant', width: '64%', height: 132},
+  {id: 'reply', role: 'user', width: '38%', height: 40},
 ];
 
 function ConversationItem({
@@ -207,9 +209,9 @@ export default function ShellSideNav() {
         content={
           <LayoutContent padding={6}>
             <VStack gap={5}>
-              {MESSAGES.map((message, mi) => (
+              {MESSAGES.map(message => (
                 <HStack
-                  key={mi}
+                  key={message.id}
                   hAlign={message.role === 'assistant' ? 'start' : 'end'}>
                   <Card
                     variant="muted"

@@ -10,7 +10,7 @@ Live showcase: https://yuzu-octopus.github.io/astryx-dracula/
 
 ## Features
 
-- 270+ tokens pinned to the official Dracula specification, dark-only
+- 191 Dracula tokens pinned in `astryx-theme.ts` (270 resolved tokens; 273 custom properties in the prebuilt `theme.css`, the extra 3 are private core radius aliases), dark-only
 - Spec-exact code syntax theme plus chart series and sequential ramps
 - Prebuilt CSS with zero runtime cost, or runtime injection for prototyping
 - WCAG contrast gates enforced in CI via `bun run audit`

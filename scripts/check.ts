@@ -1,5 +1,8 @@
 // Kit checks: Dracula palette purity plus WCAG contrast floors.
 // Run with `bun scripts/check.ts`.
+import { isValidElement } from 'react';
+import * as lucideReact from 'lucide-react';
+import { draculaIconRegistry } from '../icons';
 export {};
 
 function lum(hex: string): number {
@@ -63,7 +66,20 @@ for (const f of ['fonts/JetBrainsMono-Regular.woff2', 'fonts/JetBrainsMono-SemiB
 const built = await Bun.file('theme.css').text().catch(() => '');
 if (built && !built.includes('astryx-dracula')) fail('theme.css stale: rebuild with `bun run theme:build`');
 
+// Every registered glyph must resolve to a real lucide-react export, so a
+// lucide rename (AlertTriangle, CheckCircle) fails here instead of rendering
+// a blank icon.
+const lucideExports: Array<unknown> = Object.values(lucideReact);
+for (const [name, element] of Object.entries(draculaIconRegistry)) {
+  if (!isValidElement(element) || !lucideExports.includes(element.type)) {
+    fail(`icon ${name} is not a lucide-react export`);
+  }
+}
+
 // Contrast floors per the Dracula spec (WCAG 2.1 AA 4.5 for body text).
+// --color-text-subdue is the one token below every text floor: it is a legacy
+// glance compat value for chrome (separators, hairline rules), never text, so
+// it is pinned to chrome minimums instead of an AA threshold.
 const pairs: Array<[string, string, string, number]> = [
   ['text-primary/bg', '#F8F8F2', '#282A36', 4.5],
   ['text-secondary/bg', '#9AA1BC', '#282A36', 4.5],
@@ -72,6 +88,8 @@ const pairs: Array<[string, string, string, number]> = [
   ['text-accent/bg', '#BD93F9', '#282A36', 3.0],
   ['text-paragraph/bg', '#B0B3C4', '#282A36', 4.5],
   ['text-muted/bg', '#8288A6', '#282A36', 3.0],
+  ['text-subdue/bg (chrome only, never text)', '#4C5067', '#282A36', 1.5],
+  ['text-subdue/card (chrome only, never text)', '#4C5067', '#343746', 1.3],
   ['on-accent/accent', '#21222C', '#BD93F9', 3.0],
   ['on-success/success', '#21222C', '#50FA7B', 3.0],
   ['on-warning/warning', '#21222C', '#F1FA8C', 3.0],

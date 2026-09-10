@@ -8,15 +8,18 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   base: '/astryx-dracula/',
   plugins: [
-    // Declare CSS layer order so theme overrides beat component base styles.
+    // Declare the layer order Astryx core expects (see the header of its
+    // reset.css): reset, then component styles in astryx-base (astryx.css),
+    // then theme overrides in astryx-theme (theme.css or runtime injection).
+    // Any layer left out of this statement gets appended after the declared
+    // ones, which would let core base styles beat the theme.
     {
       name: 'astryx-css-layer-order',
       transformIndexHtml() {
         return [
           {
             tag: 'style',
-            children:
-              '@layer reset, priority1, priority2, priority3, priority4, priority5, priority6, priority7, priority8, priority9, astryx-theme;',
+            children: '@layer reset, astryx-base, astryx-theme;',
             injectTo: 'head-prepend',
           },
         ];

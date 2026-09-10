@@ -1,21 +1,38 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC > V[g=6] > (H[j=between a=center] > Hd"The night vault"[level=1] + DM"1 year") + (G[c=4 g=4] > (C > V[g=2] > Hd"Label"[level=4] + (H[g=2] > Hd"$1.2M"[level=2] + Tx"+2.4%"[t=body]))*4) + (G[c=4 g=4] > (GS[c=3] > C > V[g=4] > (H[j=between] > Hd"Vault value"[level=3] + Lk"View details") + AR) + (GS[c=1] > C > V[g=4] > (H[j=between] > Hd"Top holdings"[level=3] + Lk"View all") + UL)) + D + (H[j=between a=start] > (V[g=1] > Hd"Market at midnight"[level=2] + Tx"Past 24 hours under moonlight"[t=body]) + B"View more") + (G[c=3 g=4] > (C > V[g=3] > Hd"Index"[level=4] + Tx"$5,200"[t=body])*3) + (C > V[g=4] > Hd"Trending Stocks"[level=3] + T)
+//   L > LC > V[g=6] > (H[j=between a=center] > Hd"The night vault"[level=1] + DM"1 year") + (G[c={min:280} g=4] > (C > V[g=2] > Tx"Total value"[t=supporting] + (H[g=2] > Tx"$294,200"[t=display-3] + Tx"+14.8%"[t=body]))*4) + (G[c={min:280} g=4] > (C > V[g=4] > (H[j=between] > Hd"Vault value"[level=2] + Lk"View details") + (C > V[g=3] > Tx"Weekly closes"[t=supporting])) + (V[g=4] > (H[j=between] > Hd"Top holdings"[level=2] + Lk"View all") + UL)) + D + (H[j=between a=start] > (V[g=1] > Hd"Market at midnight"[level=2] + Tx"Past 24 hours under moonlight"[t=body]) + B"View more") + (G[c={min:280} g=4] > (C > V[g=3] > Hd"Index"[level=3] + Tx"$5,200"[t=body])*8) + (C > V[g=4] > Hd"Trending Stocks"[level=3] + T)
+
+/**
+ * Portfolio Dashboard — the night vault: KPI tiles, a weekly value chart, the
+ * holdings list, and the market board.
+ *
+ * Frame: single content column (page header, tile rows, market section).
+ *
+ * Container policy: tiles are Cards (KPI, market index); the holdings list is
+ * dense rows (List/ListItem) and the trending table is edge-to-edge, neither
+ * card-wrapped. Sparklines are one shared component at two sizes, and signed
+ * figures pair an arrow with the sign so tone never carries the direction.
+ *
+ * Responsive contract:
+ *   no media queries — every row is an auto-fit Grid or a full-width Table.
+ *   Tiles collapse from 4 columns to 1 as the content column narrows (280px
+ *   track floor), and below the table's ~570px floor the trending table
+ *   scrolls horizontally inside its own wrapper while cells truncate.
+ */
 
 import {useState} from 'react';
 
 import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
 import {Card} from '@astryxdesign/core/Card';
-import {Grid, GridSpan} from '@astryxdesign/core/Grid';
+import {Grid} from '@astryxdesign/core/Grid';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Link} from '@astryxdesign/core/Link';
 import {Avatar} from '@astryxdesign/core/Avatar';
 import {List, ListItem} from '@astryxdesign/core/List';
 import {DropdownMenu} from '@astryxdesign/core/DropdownMenu';
-import {Badge} from '@astryxdesign/core/Badge';
 import {Button} from '@astryxdesign/core/Button';
-import {Table, proportional} from '@astryxdesign/core/Table';
+import {Table, proportional, pixel} from '@astryxdesign/core/Table';
 import type {TableColumn} from '@astryxdesign/core/Table';
 import {Divider} from '@astryxdesign/core/Divider';
 import {ArrowUp, ArrowDown} from 'lucide-react';
@@ -117,11 +134,6 @@ const metrics = [
   },
 ];
 
-const metricChunks = [
-  metrics.slice(0, 2),
-  metrics.slice(2, 4),
-];
-
 // Top holdings
 const topAssets = [
   {ticker: 'AAPL', name: 'Apple Inc.', value: '$87,200', change: '+18.4%'},
@@ -141,21 +153,28 @@ const topAssets = [
   },
 ];
 
+interface SparkPoint {
+  id: string;
+  value: number;
+}
+
 // 96 points per series = one tick every 15 minutes across a 24h window.
-// Deterministic LCG so the sparklines are stable across renders.
+// Deterministic LCG so the sparklines are stable across renders. Each point
+// carries the slot it was generated for, so the bars key off data rather than
+// off the array position.
 function genSpark(
   seed: number,
   start: number,
   end: number,
   volatility: number,
   N: number = 96,
-): number[] {
+): SparkPoint[] {
   let s = seed >>> 0;
   const rand = () => {
     s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
     return s / 0x100000000;
   };
-  const points: number[] = [];
+  const points: SparkPoint[] = [];
   let drift = 0;
   for (let i = 0; i < N; i++) {
     const t = i / (N - 1);
@@ -170,7 +189,7 @@ function genSpark(
     drift = drift * 0.55 + (rand() - 0.5) * volatility * 2.2;
     // Occasional sharper spike to mimic news-driven moves.
     const spike = rand() < 0.04 ? (rand() - 0.5) * volatility * 4 : 0;
-    points.push(trend + wave + drift + spike);
+    points.push({id: `${seed}-${i}`, value: trend + wave + drift + spike});
   }
   return points;
 }
@@ -251,7 +270,7 @@ interface StockRow extends Record<string, unknown> {
   dailyPts: number;
   dailyPct: number;
   weekChg: number;
-  spark: number[];
+  spark: SparkPoint[];
 }
 
 const trendingStocks: StockRow[] = [
@@ -444,31 +463,45 @@ function PortfolioChart() {
 
 // ============= CARD COMPONENTS =============
 
-function Sparkline({data, positive}: {data: number[]; positive: boolean}) {
-  const max = Math.max(...data);
-  const min = Math.min(...data);
+// 24h trend bars, shared by the market cards (40px) and the trending table
+// rows (24px). The variant drives the bar geometry; the direction of the move
+// picks the hue.
+function Sparkline({
+  data,
+  positive,
+  isCompact = false,
+}: {
+  data: SparkPoint[];
+  positive: boolean;
+  isCompact?: boolean;
+}) {
+  const values = data.map(point => point.value);
+  const max = Math.max(...values);
+  const min = Math.min(...values);
   const range = Math.max(1, max - min);
   const step = 300 / data.length;
+  const height = isCompact ? 24 : 40;
+  const baseline = isCompact ? 21 : 36;
+  const plot = isCompact ? 18 : 32;
+  const floor = isCompact ? 2 : 3;
   return (
     <svg
-      viewBox="0 0 300 40"
+      viewBox={`0 0 300 ${height}`}
       width="100%"
-      height={40}
+      height={height}
       role="img"
       aria-label="Twenty-four hour trend">
-      {data.map((v, i) => {
-        const h = Math.max(3, ((v - min) / range) * 32);
+      {data.map((point, slot) => {
+        const barHeight = Math.max(floor, ((point.value - min) / range) * plot);
         return (
           <rect
-            key={i}
-            x={i * step}
-            y={36 - h}
+            key={point.id}
+            x={slot * step}
+            y={baseline - barHeight}
             width={Math.max(1.5, step - 1)}
-            height={h}
+            height={barHeight}
             rx={4}
-            fill={
-              positive ? 'var(--dracula-green)' : 'var(--dracula-red)'
-            }
+            fill={positive ? 'var(--dracula-green)' : 'var(--dracula-red)'}
           />
         );
       })}
@@ -489,7 +522,7 @@ function MarketCard({
   price: string;
   change: string;
   positive: boolean;
-  spark: number[];
+  spark: SparkPoint[];
 }) {
   return (
     <Card>
@@ -521,38 +554,12 @@ function MarketCard({
   );
 }
 
-function TrendSparkline({data, positive}: {data: number[]; positive: boolean}) {
-  const max = Math.max(...data);
-  const min = Math.min(...data);
-  const range = Math.max(1, max - min);
-  const step = 300 / data.length;
-  return (
-    <svg
-      viewBox="0 0 300 24"
-      width="100%"
-      height={24}
-      role="img"
-      aria-label="Daily trend">
-      {data.map((v, i) => {
-        const h = Math.max(2, ((v - min) / range) * 18);
-        return (
-          <rect
-            key={i}
-            x={i * step}
-            y={21 - h}
-            width={Math.max(1.5, step - 1)}
-            height={h}
-            rx={4}
-            fill={
-              positive ? 'var(--dracula-green)' : 'var(--dracula-red)'
-            }
-          />
-        );
-      })}
-    </svg>
-  );
-}
+// Signed figures render with an explicit sign, so the value reads as a move
+// even before the tone does.
+const formatSigned = (value: number, digits: number, suffix = '') =>
+  `${value >= 0 ? '+' : ''}${value.toFixed(digits)}${suffix}`;
 
+// The sign and the arrow carry the direction; the tone only reinforces it.
 function ColoredValue({
   value,
   isPositive,
@@ -560,16 +567,27 @@ function ColoredValue({
   value: string;
   isPositive: boolean;
 }) {
-  return <Badge label={value} variant={isPositive ? 'green' : 'red'} />;
+  return (
+    <HStack gap={1} vAlign="center">
+      <Icon
+        icon={isPositive ? ArrowUp : ArrowDown}
+        size="xsm"
+        color={isPositive ? 'success' : 'error'}
+      />
+      <Text type="body" color="secondary" hasTabularNumbers maxLines={1}>
+        {value}
+      </Text>
+    </HStack>
+  );
 }
 
 const trendingColumns: TableColumn<StockRow>[] = [
   {
     key: 'ticker',
     header: 'Ticker',
-    width: proportional(1),
+    width: pixel(88),
     renderCell: (row: StockRow) => (
-      <Text type="body" weight="semibold">
+      <Text type="body" weight="semibold" maxLines={1}>
         {row.ticker}
       </Text>
     ),
@@ -577,49 +595,52 @@ const trendingColumns: TableColumn<StockRow>[] = [
   {
     key: 'price',
     header: 'Price',
-    width: proportional(1),
+    width: pixel(88),
     renderCell: (row: StockRow) => (
-      <Text type="body" hasTabularNumbers>
+      <Text type="body" hasTabularNumbers maxLines={1}>
         {row.price}
       </Text>
     ),
   },
   {
     key: 'dailyPts',
-    header: 'Daily Chg (pts)',
-    width: proportional(1),
-    renderCell: (row: StockRow) => {
-      const isPos = row.dailyPts >= 0;
-      const formatted = (isPos ? '+' : '') + row.dailyPts.toFixed(2);
-      return <ColoredValue value={formatted} isPositive={isPos} />;
-    },
+    header: 'Chg (pts)',
+    width: pixel(104),
+    renderCell: (row: StockRow) => (
+      <ColoredValue
+        value={formatSigned(row.dailyPts, 2)}
+        isPositive={row.dailyPts >= 0}
+      />
+    ),
   },
   {
     key: 'dailyPct',
-    header: 'Daily Chg (%)',
-    width: proportional(1),
-    renderCell: (row: StockRow) => {
-      const isPos = row.dailyPct >= 0;
-      const formatted = (isPos ? '+' : '') + row.dailyPct.toFixed(2) + '%';
-      return <ColoredValue value={formatted} isPositive={isPos} />;
-    },
+    header: 'Chg (%)',
+    width: pixel(96),
+    renderCell: (row: StockRow) => (
+      <ColoredValue
+        value={formatSigned(row.dailyPct, 2, '%')}
+        isPositive={row.dailyPct >= 0}
+      />
+    ),
   },
   {
     key: 'weekChg',
-    header: '52W Chg (%)',
-    width: proportional(1),
-    renderCell: (row: StockRow) => {
-      const isPos = row.weekChg >= 0;
-      const formatted = (isPos ? '+' : '') + row.weekChg.toFixed(1) + '%';
-      return <ColoredValue value={formatted} isPositive={isPos} />;
-    },
+    header: '52W (%)',
+    width: pixel(96),
+    renderCell: (row: StockRow) => (
+      <ColoredValue
+        value={formatSigned(row.weekChg, 1, '%')}
+        isPositive={row.weekChg >= 0}
+      />
+    ),
   },
   {
     key: 'spark',
     header: '24h Trend',
-    width: proportional(1),
+    width: proportional(1, {minWidth: 96}),
     renderCell: (row: StockRow) => (
-      <TrendSparkline data={row.spark} positive={row.dailyPct >= 0} />
+      <Sparkline data={row.spark} positive={row.dailyPct >= 0} isCompact />
     ),
   },
 ];
@@ -639,19 +660,14 @@ function MetricCard({
   return (
     <Card>
       <VStack gap={2}>
-        <Heading level={4}>{label}</Heading>
+        <Text type="supporting" color="secondary">
+          {label}
+        </Text>
         <HStack gap={2} vAlign="center">
-          <Heading level={2}>{value}</Heading>
-          <HStack gap={1} vAlign="center">
-            <Icon
-              icon={positive ? ArrowUp : ArrowDown}
-              size="xsm"
-              color={positive ? 'success' : 'error'}
-            />
-            <Text type="body" color="secondary" hasTabularNumbers>
-              {change}
-            </Text>
-          </HStack>
+          <Text type="display-3" weight="semibold" hasTabularNumbers>
+            {value}
+          </Text>
+          <ColoredValue value={change} isPositive={positive} />
         </HStack>
         <Text type="supporting" color="secondary">
           {caption}
@@ -683,10 +699,7 @@ function AssetRow({
           <Text type="body" hasTabularNumbers>
             {value}
           </Text>
-          <Badge
-            label={change}
-            variant={change.startsWith('-') ? 'red' : 'green'}
-          />
+          <ColoredValue value={change} isPositive={!change.startsWith('-')} />
         </VStack>
       }
     />
@@ -729,43 +742,35 @@ export default function DashboardPortfolio() {
 
             {/* KPI metric cards */}
             <Grid columns={{minWidth: 280, repeat: 'fit'}} gap={4}>
-              {metricChunks.map(chunk => (
-                <Grid key={chunk[0]?.label ?? 'chunk'} columns={{minWidth: 280, repeat: 'fit'}} gap={4}>
-                  {chunk.map(m => (
-                    <MetricCard key={m.label} {...m} />
-                  ))}
-                </Grid>
+              {metrics.map(m => (
+                <MetricCard key={m.label} {...m} />
               ))}
             </Grid>
 
-            {/* Chart + Top assets */}
-            <Grid columns={{minWidth: 280, max: 4}} gap={4}>
-              <GridSpan columns={3}>
-                <Card>
-                  <VStack gap={4}>
-                    <HStack hAlign="between" vAlign="center">
-                      <Heading level={3}>Vault value</Heading>
-                      <Link href="#/templates/dashboard-portfolio">View details</Link>
-                    </HStack>
-                    <PortfolioChart />
-                  </VStack>
-                </Card>
-              </GridSpan>
-              <GridSpan columns={1}>
-                <Card>
-                  <VStack gap={4}>
-                    <HStack hAlign="between" vAlign="center">
-                      <Heading level={3}>Top holdings</Heading>
-                      <Link href="#/templates/dashboard-portfolio">View all</Link>
-                    </HStack>
-                    <List density="spacious">
-                      {topAssets.map(asset => (
-                        <AssetRow key={asset.ticker} {...asset} />
-                      ))}
-                    </List>
-                  </VStack>
-                </Card>
-              </GridSpan>
+            {/* Chart + Top holdings */}
+            <Grid columns={{minWidth: 280, repeat: 'fit'}} gap={4}>
+              <Card>
+                <VStack gap={4}>
+                  <HStack hAlign="between" vAlign="center">
+                    <Heading level={2}>Vault value</Heading>
+                    <Link href="#/templates/dashboard-portfolio">
+                      View details
+                    </Link>
+                  </HStack>
+                  <PortfolioChart />
+                </VStack>
+              </Card>
+              <VStack gap={4}>
+                <HStack hAlign="between" vAlign="center">
+                  <Heading level={2}>Top holdings</Heading>
+                  <Link href="#/templates/dashboard-portfolio">View all</Link>
+                </HStack>
+                <List density="spacious">
+                  {topAssets.map(asset => (
+                    <AssetRow key={asset.ticker} {...asset} />
+                  ))}
+                </List>
+              </VStack>
             </Grid>
 
             <Divider />
@@ -782,7 +787,7 @@ export default function DashboardPortfolio() {
             </HStack>
 
             {/* Market index cards */}
-            <Grid columns={{minWidth: 320, repeat: 'fit'}} gap={4}>
+            <Grid columns={{minWidth: 280, repeat: 'fit'}} gap={4}>
               {marketIndices.map(m => (
                 <MarketCard key={m.ticker} {...m} />
               ))}
@@ -796,6 +801,7 @@ export default function DashboardPortfolio() {
                   data={trendingStocks}
                   columns={trendingColumns}
                   idKey="id"
+                  textOverflow="truncate"
                   hasHover
                   dividers="rows"
                 />

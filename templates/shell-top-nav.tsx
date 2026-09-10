@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   A[cp=6 @topNav=(TN > TNI"Shop" + TNI"Brands" + TNI"Sale" + TNI"Service")] > V[g=10] > C.muted[p=0] + (V[g=4] > C.muted[p=0] + (G[c={min:160} g=4] > (V[g=2] > C.muted[p=0] + C.muted[p=0])*6))*3
+//   A[cp=6 @topNav=(TN > TNI"Shop" + TNI"Brands" + TNI"Sale" + TNI"Service")] > Ctr[axis=horizontal] > S[mw=1100 w=100% p=0] > V[g=10] > C.muted[p=0 w=100% h=360] + (V[g=4] > C.muted[p=0 w=200 h=24] + (G[c={min:160} g=4] > (V[g=2] > C.muted[p=0 w=100% h=120] + C.muted[p=0 w=60% h=14])*6))*3
 
 import type {CSSProperties} from 'react';
 import {AppShell} from '@astryxdesign/core/AppShell';
@@ -21,7 +21,9 @@ import {IconButton} from '@astryxdesign/core/IconButton';
 import {Button} from '@astryxdesign/core/Button';
 import {Badge} from '@astryxdesign/core/Badge';
 import {Card} from '@astryxdesign/core/Card';
+import {Center} from '@astryxdesign/core/Center';
 import {Grid} from '@astryxdesign/core/Grid';
+import {Section} from '@astryxdesign/core/Section';
 import {Stack, VStack} from '@astryxdesign/core/Stack';
 import {
   ShoppingBag,
@@ -44,7 +46,7 @@ import {
 } from 'lucide-react';
 
 // Cap + center the page body so wide screens show whitespace gutters.
-const contentMax: CSSProperties = {maxWidth: 1100, marginInline: 'auto'};
+const CONTENT_MAX_WIDTH = 1100;
 // Same-route hash: demo links stay focusable anchors without escaping the
 // template through the hash router (bare "#" would drop back to the home page).
 const SELF_HASH = '#/templates/shell-top-nav';
@@ -52,9 +54,14 @@ const SELF_HASH = '#/templates/shell-top-nav';
 // Brands size to their own content (different widths); since both anchor to
 // the centered nav, switching between them resizes the panel — which reads
 // as flashing/jumping. Fixed item + featured widths make the panels
-// pixel-identical so the transition is seamless.
+// pixel-identical so the transition is seamless. The pair needs roughly
+// 800px of clear space, so narrower viewports fall back to natural-width
+// single columns (see MegaItems) instead of painting past the edge.
 const megaItems: CSSProperties = {gridColumn: '1 / -1', width: 520};
 const megaFeatured: CSSProperties = {width: 240};
+
+// Three identical shelves; the ids keep React keys stable if they reorder.
+const SHELVES = ['new-in', 'featured', 'sale'];
 
 type MegaItem = {name: string; tagline: string; icon: IconType};
 
@@ -104,9 +111,12 @@ const CATEGORY_TILES = [
 function MegaItems({items}: {items: MegaItem[]}) {
   // In the mobile drawer the fixed 520px panel would overflow the ~350px
   // drawer, and the 2-column grid overlaps item text there — so the drawer
-  // gets a natural-width single column. Desktop keeps the lock.
+  // gets a natural-width single column. The same goes for viewports too
+  // narrow to seat the locked desktop panel, which would otherwise paint
+  // past the edge: below 1024px the popover keeps the natural-width column.
   const isDrawer = useTopNavRenderMode() === 'drawer';
-  if (isDrawer) {
+  const isCompact = useMediaQuery('(max-width: 1024px)');
+  if (isDrawer || isCompact) {
     return (
       <VStack gap={1}>
         {items.map(item => (
@@ -146,8 +156,9 @@ function MegaFeatured(props: {
   linkHref: string;
 }) {
   const isDrawer = useTopNavRenderMode() === 'drawer';
+  const isCompact = useMediaQuery('(max-width: 1024px)');
   return (
-    <Stack style={isDrawer ? undefined : megaFeatured}>
+    <Stack style={isDrawer || isCompact ? undefined : megaFeatured}>
       <TopNavMegaMenuFeaturedCard {...props} />
     </Stack>
   );
@@ -223,23 +234,41 @@ export default function ShellTopNav() {
           }
         />
       }>
-      <VStack gap={10} style={contentMax}>
-        <Card variant="muted" padding={0} width="100%" height={360} />
+      <Center axis="horizontal">
+        <Section
+          variant="transparent"
+          maxWidth={CONTENT_MAX_WIDTH}
+          width="100%"
+          padding={0}>
+          <VStack gap={10}>
+            <Card variant="muted" padding={0} width="100%" height={360} />
 
-        {[0, 1, 2].map(section => (
-          <VStack key={section} gap={4}>
-            <Card variant="muted" padding={0} width={200} height={24} />
-            <Grid columns={{minWidth: 160, repeat: 'fit'}} gap={4}>
-              {CATEGORY_TILES.map(tile => (
-                <VStack key={tile} gap={2}>
-                  <Card variant="muted" padding={0} width="100%" height={120} />
-                  <Card variant="muted" padding={0} width="60%" height={14} />
-                </VStack>
-              ))}
-            </Grid>
+            {SHELVES.map(shelf => (
+              <VStack key={shelf} gap={4}>
+                <Card variant="muted" padding={0} width={200} height={24} />
+                <Grid columns={{minWidth: 160, repeat: 'fit'}} gap={4}>
+                  {CATEGORY_TILES.map(tile => (
+                    <VStack key={tile} gap={2}>
+                      <Card
+                        variant="muted"
+                        padding={0}
+                        width="100%"
+                        height={120}
+                      />
+                      <Card
+                        variant="muted"
+                        padding={0}
+                        width="60%"
+                        height={14}
+                      />
+                    </VStack>
+                  ))}
+                </Grid>
+              </VStack>
+            ))}
           </VStack>
-        ))}
-      </VStack>
+        </Section>
+      </Center>
     </AppShell>
   );
 }

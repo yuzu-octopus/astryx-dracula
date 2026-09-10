@@ -1,13 +1,13 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC > V[g6] > (V[g1] > Hd"Vault"[level=2] + Tx"Remit"[t=body]) + (C[p0] > T[striped] > (TR > THC"Name" + THC"Status" + THC"Updated") + (TR > TC"Blood Vial" + (TC > Bd.success"Active") + TC"2025-01-15")*3)
+//   L > (LH[divider] > H[a=center j=between] > Hd"Artifacts"[level=1] + B.primary"Add artifact") + (LC > T[hover] > (TR > THC"Name" + THC"Status" + THC"Updated" + THC"Actions") + (TR > TC"Blood Vial" + (TC > SD.success + Tx"Active") + TC"2025-01-15" + (TC > B.secondary"Edit"))*3)
 
 import {useState} from 'react';
 import {Layout, LayoutHeader, LayoutContent, HStack} from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
 import {Button} from '@astryxdesign/core/Button';
 import {Table} from '@astryxdesign/core/Table';
-import {Badge} from '@astryxdesign/core/Badge';
+import {StatusDot} from '@astryxdesign/core/StatusDot';
 import type {TableColumn} from '@astryxdesign/core/Table';
 
 type Relic = {
@@ -15,6 +15,16 @@ type Relic = {
   name: string;
   status: 'active' | 'inactive';
   updatedAt: string;
+};
+
+const STATUS_LABEL: Record<Relic['status'], string> = {
+  active: 'Active',
+  inactive: 'Inactive',
+};
+
+const STATUS_VARIANT: Record<Relic['status'], 'success' | 'neutral'> = {
+  active: 'success',
+  inactive: 'neutral',
 };
 
 const SAMPLE_DATA: Relic[] = [
@@ -37,10 +47,15 @@ const columns: TableColumn<Relic>[] = [
     key: 'status',
     header: 'Status',
     renderCell: (item: Relic) => (
-      <Badge
-        variant={item.status === 'active' ? 'success' : 'neutral'}
-        label={item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-      />
+      <HStack gap={2} vAlign="center">
+        <StatusDot
+          variant={STATUS_VARIANT[item.status]}
+          label={STATUS_LABEL[item.status]}
+        />
+        <Text type="supporting" color="secondary">
+          {STATUS_LABEL[item.status]}
+        </Text>
+      </HStack>
     ),
   },
   {

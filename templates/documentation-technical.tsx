@@ -22,6 +22,39 @@ import {Sparkles, ClipboardCopy, ChevronDown} from 'lucide-react';
 // Main component
 // ---------------------------------------------------------------------------
 
+/**
+ * Documentation technical — the getting-started guide: prerequisites, install
+ * steps, theming, and next steps.
+ *
+ * Frame-first layout (see `npx astryx docs layout`):
+ *
+ *   Frame: guide column (fill) | on-this-page outline
+ *
+ * Responsive contract:
+ *   > 768px  the outline is a sticky end panel beside the guide
+ *   <= 768px the outline collapses into an "On this page" Selector under the
+ *            page title
+ *
+ * Container policy (docs archetype): one prose column of headings, code and
+ * lists. The page is long, so the outline carries the structure and cards are
+ * reserved for the one thing that is not prose — the AI prompt.
+ */
+
+// Same prompt in the copy action and the visible body: one string, so the
+// two can never drift.
+const SETUP_PROMPT =
+  'Help me get set up with Astryx Dracula. Based on my project, do the following: 1. Install @astryxdesign/core and the StyleX compiler. 2. Wrap my app in ThemeProvider. 3. Replace one existing component with an Astryx equivalent. After setup, suggest relevant next steps based on my project.';
+
+// Copies the setup prompt in the shape each tool wants to receive it. The
+// menu cannot navigate anywhere from a static template, so the action says
+// what it does.
+const PROMPT_TARGETS = ['v0', 'Claude', 'ChatGPT', 'Cursor'].map(target => ({
+  label: `Copy for ${target}`,
+  onClick: () => {
+    void navigator.clipboard.writeText(SETUP_PROMPT);
+  },
+}));
+
 const OUTLINE_ITEMS: OutlineItem[] = [
   {id: 'prerequisites', label: 'Prerequisites', level: 2},
   {id: 'install-package', label: 'Install the package', level: 2},
@@ -34,11 +67,14 @@ const OUTLINE_OPTIONS = OUTLINE_ITEMS.map(item => ({
   label: item.label,
 }));
 
+// The outline is sticky so it tracks the guide as the document scrolls; the
+// large block offset parks its first item level with the "Prerequisites"
+// heading.
 const outlinePanel: CSSProperties = {
   position: 'sticky',
-  top: 24,
+  top: 'var(--spacing-6)',
   alignSelf: 'start',
-  paddingBlockStart: 120,
+  paddingBlockStart: 'calc(var(--spacing-10) * 3)',
 };
 
 export default function DocumentationTechnical() {
@@ -108,9 +144,7 @@ export default function DocumentationTechnical() {
                     size="sm"
                     icon={<Icon icon={ClipboardCopy} />}
                     onClick={() => {
-                      void navigator.clipboard.writeText(
-                        'Help me get set up with Astryx Dracula. Based on my project, do the following: 1. Install @astryxdesign/core and the StyleX compiler. 2. Wrap my app in ThemeProvider. 3. Replace one existing component with an Astryx equivalent. After setup, suggest relevant next steps based on my project.',
-                      );
+                      void navigator.clipboard.writeText(SETUP_PROMPT);
                     }}
                   />
                   <DropdownMenu
@@ -121,12 +155,7 @@ export default function DocumentationTechnical() {
                       isIconOnly: true,
                       icon: <Icon icon={ChevronDown} />,
                     }}
-                    items={[
-                      {label: 'Open in v0', onClick: () => {}},
-                      {label: 'Open in Claude', onClick: () => {}},
-                      {label: 'Open in ChatGPT', onClick: () => {}},
-                      {label: 'Open in Cursor', onClick: () => {}},
-                    ]}
+                    items={PROMPT_TARGETS}
                   />
                 </HStack>
                 <Text type="body" color="secondary">

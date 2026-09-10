@@ -51,4 +51,4 @@ Expansion emits stock Astryx. Then apply the brand, in order:
 
 ## Template headers
 
-All 43 templates carry their canonical structural XLE in a header comment (`// XLE (...)`), validated with `bunx astryx layout check`. When reading or modifying any template, read the header comment first to grasp the entire component tree at ~1/5th the token cost. XLE is canonical: for structural changes, update the XLE first, validate with `check`, expand, then apply the brand pass.
+All 44 templates carry their canonical structural XLE in a header comment (`// XLE (...)`), validated with `bunx astryx layout check`. When reading or modifying any template, read the header comment first to grasp the entire component tree at ~1/5th the token cost. XLE is canonical: for structural changes, update the XLE first, validate with `check`, expand, then apply the brand pass.

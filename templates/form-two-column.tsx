@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   Ctr > S.transparent[p=10] > V[g=10] > (G[c={min:320} g=10] > (V[g=6] > (V[g=3] > Hd"Let's conjure together"[level=1 t=display-1] + Tx"Tell us what you're brewing"[t=body]) + AR) + (C[p=8] > V[g=4] > Tx"Your details"[t=label] + TI"Full name" + (G[c={min:180} g=3] > TI"Email" + TI"Company") + (G[c={min:180} g=3] > TI"Job title" + TI"Phone") + (V[g=2] > Tx"Reason"[t=label] + (H[g=2] > Tk"Reason"*3)) + SE"Budget" + TA"Project details" + B.primary"Send it into the night")) + (V[g=6] > D + (G[c={min:200} g=6] > (V[g=1 a=center] > Tx"General"[t=supporting] + Lk"hello@castle.dracula")*3))
+//   Ctr > S.transparent[p=10] > V[g=10] > (G[c={min:280,max:2} g=10] > (V[g=6] > (V[g=3] > Hd"Let's conjure together"[level=1 t=display-1] + Tx"Tell us what you're brewing"[t=body]) + AR) + (C[p=8] > V[g=4] > Hd"Your details"[level=2] + TI"Full name"[req] + (G[c={min:180} g=3] > TI"Email"[req] + TI"Company") + (G[c={min:180} g=3] > TI"Job title" + TI"Phone") + (V[g=2] > Tx"Reason"[t=label] + (H[g=2] > Tk"Reason"*7)) + SE"Budget" + TA"Project details" + B.primary"Send it into the night")) + (V[g=6] > D + (G[c={min:200} g=6] > (V[g=1 a=center] > Tx"General"[t=supporting] + Lk"hello@castle.dracula")*3))
 
 import {useState, type CSSProperties} from 'react';
 import {VStack, HStack} from '@astryxdesign/core/Layout';
@@ -17,6 +17,8 @@ import {Link} from '@astryxdesign/core/Link';
 import {Divider} from '@astryxdesign/core/Divider';
 import {Card} from '@astryxdesign/core/Card';
 import {Selector} from '@astryxdesign/core/Selector';
+import {Icon} from '@astryxdesign/core/Icon';
+import {Check} from 'lucide-react';
 
 function CastleIllustration() {
   return (
@@ -147,7 +149,12 @@ const illustrationImg: CSSProperties = {
  *   Top: two-column — left has headline + description + illustration,
  *        right has the contact form on a card.
  *   Bottom: three-column contact info strip.
- *   Mobile (<768px): single column stack.
+ *
+ * Responsive contract (both grids reflow on their own; no JS breakpoints):
+ *   Form grid (min 280px tracks, capped at 2 columns): two columns from a
+ *   680px viewport up, one column below that.
+ *   Contact strip (min 200px tracks): three columns from 728px, two columns
+ *   from 504px, one column below.
  */
 export default function TwoColumnForm() {
   const [fullName, setFullName] = useState('');
@@ -174,8 +181,7 @@ export default function TwoColumnForm() {
     <Center style={pageStyle}>
       <Section maxWidth={1100} width="100%" padding={10} variant="transparent">
         <VStack gap={10}>
-          {/* Two-column; stacks to one column below ~520px. */}
-          <Grid columns={{minWidth: 320}} align="center" gap={10}>
+          <Grid columns={{minWidth: 280, max: 2}} align="center" gap={10}>
             <VStack gap={6}>
               <VStack gap={3}>
                 <Heading level={1} type="display-1">
@@ -193,11 +199,11 @@ export default function TwoColumnForm() {
 
             <Card padding={8}>
               <VStack gap={4}>
-                <Text type="label">Your details</Text>
+                <Heading level={2}>Your details</Heading>
                 <TextInput
                   label="Full name"
-                  isLabelHidden
-                  placeholder="Full name*"
+                  isRequired
+                  placeholder="Full name"
                   value={fullName}
                   onChange={setFullName}
                   status={
@@ -209,8 +215,8 @@ export default function TwoColumnForm() {
                 <Grid columns={{minWidth: 180}} gap={3}>
                   <TextInput
                     label="Email"
-                    isLabelHidden
-                    placeholder="Email*"
+                    isRequired
+                    placeholder="Email"
                     value={email}
                     onChange={setEmail}
                     status={
@@ -221,7 +227,6 @@ export default function TwoColumnForm() {
                   />
                   <TextInput
                     label="Company name"
-                    isLabelHidden
                     placeholder="Company name"
                     value={company}
                     onChange={setCompany}
@@ -230,14 +235,12 @@ export default function TwoColumnForm() {
                 <Grid columns={{minWidth: 180}} gap={3}>
                   <TextInput
                     label="Job title"
-                    isLabelHidden
                     placeholder="Job title"
                     value={jobTitle}
                     onChange={setJobTitle}
                   />
                   <TextInput
                     label="Phone number"
-                    isLabelHidden
                     placeholder="Phone number"
                     value={phone}
                     onChange={setPhone}
@@ -247,18 +250,27 @@ export default function TwoColumnForm() {
                 <VStack gap={2}>
                   <Text type="label">What are you reaching out about?</Text>
                   <HStack gap={2} wrap="wrap">
-                    {INQUIRY_REASONS.map(reason => (
-                      <Token
-                        key={reason}
-                        label={reason}
-                        color={inquiryReason === reason ? 'yellow' : 'default'}
-                        onClick={() =>
-                          setInquiryReason(prev =>
-                            prev === reason ? '' : reason,
-                          )
-                        }
-                      />
-                    ))}
+                    {INQUIRY_REASONS.map(reason => {
+                      const isSelected = inquiryReason === reason;
+                      return (
+                        <Token
+                          key={reason}
+                          label={reason}
+                          color={isSelected ? 'yellow' : 'default'}
+                          icon={
+                            isSelected ? (
+                              <Icon icon={Check} size="xsm" color="inherit" />
+                            ) : undefined
+                          }
+                          description={isSelected ? 'Selected' : undefined}
+                          onClick={() =>
+                            setInquiryReason(prev =>
+                              prev === reason ? '' : reason,
+                            )
+                          }
+                        />
+                      );
+                    })}
                   </HStack>
                 </VStack>
                 <Selector
@@ -270,8 +282,8 @@ export default function TwoColumnForm() {
                 />
                 <TextArea
                   label="Project details"
-                  isLabelHidden
-                  placeholder="Project details*"
+                  isRequired
+                  placeholder="Project details"
                   value={details}
                   onChange={setDetails}
                   status={
@@ -293,7 +305,6 @@ export default function TwoColumnForm() {
             </Card>
           </Grid>
 
-          {/* Contact strip; stacks below ~440px. */}
           <VStack gap={6}>
             <Divider />
             <Grid columns={{minWidth: 200}} gap={6}>

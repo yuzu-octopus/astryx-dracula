@@ -1,6 +1,25 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC[p=6] > V[g=6] > (V[g=6] > (H[j=between a=center] > Hd"Awake after dark"[level=3] + B.secondary"Reload") + C[p=3]) + (G[c=4 g=4] > C*4) + D + (H[j=between a=center] > Hd"Night denizens"[level=3] + B.secondary"View more") + (G[c=2 g=4] > C*2) + D + (H[j=between a=center] > Hd"Engagement"[level=3] + B.secondary"View more") + (G[c=2 g=4] > (C > V[g=6] > (H[j=between a=center] > Hd"Top pages"[level=4] + Lk"All pages") + T)*2)
+//   L > LC[p=6] > V[g=6] > (V[g=6] > (H[j=between a=center] > Hd"Awake after dark"[level=2] + B.secondary"Reload") + (V[g=3] > C[p=3] + Tx"Hourly intervals"[t=supporting] + (H[g=6] > (H[g=2 a=center] > Ic + Tx"Desktop"[t=supporting])*2))) + (G[c={min:280} g=4] > (C > V[g=2] > Tx"Moonlit visitors"[t=supporting] + (H[g=2] > Tx"27.3 k"[t=display-3] + Tx"+18.2%"[t=body]) + Tx"Last 30 days vs. Previous"[t=supporting])*4) + D + (H[j=between a=center] > Hd"Night denizens"[level=2] + B.secondary"View more") + (G[c={min:280} g=4] > (C > V[g=4] > Hd"Territory"[level=3] + (H[g=4 wrap] > (V[g=0] > (H[g=2 a=center] > Ic + Tx[t=supporting]) + Tx[t=supporting])*5))*2) + D + (H[j=between a=center] > Hd"Engagement"[level=2] + B.secondary"View more") + (G[c={min:280} g=4] > (C > V[g=6] > (H[j=between a=center] > Hd"Top pages"[level=3] + Lk"All pages") + T)*2)
+
+/**
+ * Analytics Dashboard — the night shift at a glance: live active users, four
+ * KPI tiles, audience breakdown strips, and engagement tables.
+ *
+ * Frame: one content column, sections separated by dividers.
+ *
+ * Container policy: a widget dashboard, so tiles are Cards on an auto-fit grid
+ * while the engagement tables stay edge-to-edge inside their own card. KPI
+ * tiles lead with a supporting label above the figure, chart hues follow the
+ * metric's direction (green up, red down), and card headings sit at level 3
+ * under level 2 sections.
+ *
+ * Responsive contract:
+ *   no media queries — every row is an auto-fit Grid. Tiles step from four
+ *   columns down to one as the content column narrows (280px track floor), and
+ *   the two engagement tables scroll horizontally inside their card below
+ *   ~440px while every cell truncates to a single line.
+ */
 
 import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
@@ -173,20 +192,31 @@ const metrics = [
   },
 ];
 
-// Sparkline data for each metric card (30 days, weekends at indices 5-6, 12-13, 19-20, 26-27)
-const sparklines = [
+interface SparkPoint {
+  id: string;
+  value: number;
+}
+
+// Sparkline data for each metric card (30 days, weekends at indices 5-6, 12-13,
+// 19-20, 26-27). Every sample carries its day, so the bars key off the series
+// rather than off the array slot.
+function toSparkSeries(values: number[]): SparkPoint[] {
+  return values.map((value, day) => ({id: `day-${day + 1}`, value}));
+}
+
+const sparklines: SparkPoint[][] = [
   // Monthly Visitors: +18.2% — declining first 2 weeks, hits bottom around day 14, then sharp recovery
   // prettier-ignore
-  [48, 46, 44, 42, 40, 18, 16, 38, 36, 34, 32, 30, 12, 10, 28, 26, 28, 32, 36, 14, 12, 40, 44, 48, 52, 56, 28, 24, 58, 62],
+  toSparkSeries([48, 46, 44, 42, 40, 18, 16, 38, 36, 34, 32, 30, 12, 10, 28, 26, 28, 32, 36, 14, 12, 40, 44, 48, 52, 56, 28, 24, 58, 62]),
   // Monthly Page Views: +12.5% — flat/choppy first 3 weeks, then kicks up sharply in final week
   // prettier-ignore
-  [36, 38, 35, 37, 36, 14, 12, 38, 36, 34, 37, 35, 12, 10, 36, 34, 36, 35, 38, 14, 12, 40, 44, 50, 54, 56, 26, 22, 58, 60],
+  toSparkSeries([36, 38, 35, 37, 36, 14, 12, 38, 36, 34, 37, 35, 12, 10, 36, 34, 36, 35, 38, 14, 12, 40, 44, 50, 54, 56, 26, 22, 58, 60]),
   // Avg. Session: -14.3% — strong start, holds through week 2, then clear drop-off week 3-4
   // prettier-ignore
-  [58, 56, 60, 58, 62, 30, 26, 60, 58, 62, 60, 58, 28, 24, 56, 54, 50, 46, 42, 18, 14, 38, 36, 34, 32, 30, 10, 8, 28, 26],
+  toSparkSeries([58, 56, 60, 58, 62, 30, 26, 60, 58, 62, 60, 58, 28, 24, 56, 54, 50, 46, 42, 18, 14, 38, 36, 34, 32, 30, 10, 8, 28, 26]),
   // Bounce Rate: -8.7% — high and volatile first half, starts dropping around day 16, steady decline
   // prettier-ignore
-  [52, 56, 50, 54, 58, 62, 60, 54, 52, 56, 50, 54, 60, 58, 50, 48, 46, 44, 40, 46, 44, 38, 36, 34, 36, 32, 38, 36, 30, 28],
+  toSparkSeries([52, 56, 50, 54, 58, 62, 60, 54, 52, 56, 50, 54, 60, 58, 50, 48, 46, 44, 40, 46, 44, 38, 36, 34, 36, 32, 38, 36, 30, 28]),
 ];
 
 // Demographics
@@ -320,10 +350,13 @@ const topPagesData: PageRow[] = [
   },
 ];
 
+// Counts render with thousands separators in every table cell.
+const formatCount = (value: number) => value.toLocaleString();
+
 const topPagesMaxViews = Math.max(...topPagesData.map(d => d.views));
 
 const topPagesColumns: TableColumn<PageRow>[] = [
-  {key: 'page', header: 'Page', width: pixel(160)},
+  {key: 'page', header: 'Page', width: pixel(112)},
   {
     key: 'views',
     header: 'Views',
@@ -336,8 +369,8 @@ const topPagesColumns: TableColumn<PageRow>[] = [
           label={`${item.page} views`}
           isLabelHidden
         />
-        <Text type="supporting" hasTabularNumbers>
-          {item.views.toLocaleString()}
+        <Text type="supporting" hasTabularNumbers maxLines={1}>
+          {formatCount(item.views)}
         </Text>
       </VStack>
     ),
@@ -345,17 +378,21 @@ const topPagesColumns: TableColumn<PageRow>[] = [
   {
     key: 'newUsers',
     header: 'New Users',
-    width: pixel(120),
+    width: pixel(104),
     renderCell: (item: PageRow) => (
-      <Text hasTabularNumbers>{item.newUsers}</Text>
+      <Text hasTabularNumbers maxLines={1}>
+        {item.newUsers}
+      </Text>
     ),
   },
   {
     key: 'avgTime',
     header: 'Avg. Time',
-    width: pixel(120),
+    width: pixel(104),
     renderCell: (item: PageRow) => (
-      <Text hasTabularNumbers>{item.avgTime}</Text>
+      <Text hasTabularNumbers maxLines={1}>
+        {item.avgTime}
+      </Text>
     ),
   },
 ];
@@ -385,7 +422,7 @@ const topEventsData: EventRow[] = [
 const topEventsMaxCount = Math.max(...topEventsData.map(d => d.count));
 
 const topEventsColumns: TableColumn<EventRow>[] = [
-  {key: 'event', header: 'Event', width: pixel(160)},
+  {key: 'event', header: 'Event', width: pixel(112)},
   {
     key: 'count',
     header: 'Count',
@@ -398,8 +435,8 @@ const topEventsColumns: TableColumn<EventRow>[] = [
           label={`${item.count}`}
           isLabelHidden
         />
-        <Text type="supporting" hasTabularNumbers>
-          {item.count.toLocaleString()}
+        <Text type="supporting" hasTabularNumbers maxLines={1}>
+          {formatCount(item.count)}
         </Text>
       </VStack>
     ),
@@ -407,17 +444,21 @@ const topEventsColumns: TableColumn<EventRow>[] = [
   {
     key: 'users',
     header: 'Users',
-    width: pixel(120),
+    width: pixel(72),
     renderCell: (item: EventRow) => (
-      <Text hasTabularNumbers>{item.users.toLocaleString()}</Text>
+      <Text hasTabularNumbers maxLines={1}>
+        {formatCount(item.users)}
+      </Text>
     ),
   },
   {
     key: 'newUsers',
     header: 'New Users',
-    width: pixel(120),
+    width: pixel(104),
     renderCell: (item: EventRow) => (
-      <Text hasTabularNumbers>{item.newUsers.toLocaleString()}</Text>
+      <Text hasTabularNumbers maxLines={1}>
+        {formatCount(item.newUsers)}
+      </Text>
     ),
   },
 ];
@@ -524,8 +565,18 @@ function ActiveUsersChart() {
   );
 }
 
-function Sparkline({data, label}: {data: number[]; label: string}) {
-  const max = Math.max(...data);
+// Thirty-day trend bars. The tone follows the metric's direction; purple stays
+// out of the chart so it keeps meaning "interactive".
+function Sparkline({
+  data,
+  label,
+  positive,
+}: {
+  data: SparkPoint[];
+  label: string;
+  positive: boolean;
+}) {
+  const max = Math.max(...data.map(point => point.value));
   return (
     <svg
       viewBox="0 0 300 40"
@@ -533,17 +584,17 @@ function Sparkline({data, label}: {data: number[]; label: string}) {
       height={40}
       role="img"
       aria-label={`${label} thirty-day trend`}>
-      {data.map((v, i) => {
-        const h = Math.max(3, (v / max) * 32);
+      {data.map((point, day) => {
+        const barHeight = Math.max(3, (point.value / max) * 32);
         return (
           <rect
-            key={i}
-            x={i * 10}
-            y={36 - h}
+            key={point.id}
+            x={day * 10}
+            y={36 - barHeight}
             width={7}
-            height={h}
+            height={barHeight}
             rx={4}
-            fill="var(--dracula-purple)"
+            fill={positive ? 'var(--dracula-green)' : 'var(--dracula-red)'}
           />
         );
       })}
@@ -564,17 +615,22 @@ function MetricCard({
   value: string;
   change: string;
   positive: boolean;
-  sparkline: number[];
+  sparkline: SparkPoint[];
 }) {
+  const isUp = !change.trim().startsWith('-');
   return (
     <Card>
       <VStack gap={2}>
-        <Heading level={4}>{label}</Heading>
+        <Text type="supporting" color="secondary">
+          {label}
+        </Text>
         <HStack gap={2} vAlign="center">
-          <Heading level={2}>{value}</Heading>
+          <Text type="display-3" weight="semibold" hasTabularNumbers>
+            {value}
+          </Text>
           <HStack gap={1} vAlign="center">
             <Icon
-              icon={change.trim().startsWith('-') ? ArrowDown : ArrowUp}
+              icon={isUp ? ArrowUp : ArrowDown}
               size="xsm"
               color={positive ? 'success' : 'error'}
             />
@@ -586,7 +642,7 @@ function MetricCard({
         <Text type="supporting" color="secondary">
           Last 30 days vs. Previous
         </Text>
-        <Sparkline data={sparkline} label={label} />
+        <Sparkline data={sparkline} label={label} positive={positive} />
       </VStack>
     </Card>
   );
@@ -611,7 +667,7 @@ function StackedBarCard({
   return (
     <Card>
       <VStack gap={4}>
-        <Heading level={4}>{title}</Heading>
+        <Heading level={3}>{title}</Heading>
         <svg
           viewBox="0 0 540 24"
           width="100%"
@@ -674,7 +730,7 @@ function TableCard<T extends {id: string}>({
     <Card>
       <VStack gap={6}>
         <HStack hAlign="between" vAlign="center">
-          <Heading level={4}>{title}</Heading>
+          <Heading level={3}>{title}</Heading>
           <Link href={linkHref}>{linkLabel}</Link>
         </HStack>
         <Table<T>
@@ -683,6 +739,7 @@ function TableCard<T extends {id: string}>({
           idKey="id"
           density="compact"
           dividers="rows"
+          textOverflow="truncate"
           hasHover
         />
       </VStack>
@@ -704,7 +761,7 @@ export default function DashboardTemplate() {
             {/* Active Users Chart */}
             <VStack gap={6}>
               <HStack hAlign="between" vAlign="center">
-                <Heading level={3}>Awake after dark</Heading>
+                <Heading level={2}>Awake after dark</Heading>
                 <Button
                   label="Reload"
                   variant="secondary"
@@ -716,20 +773,9 @@ export default function DashboardTemplate() {
             </VStack>
 
             {/* Metric Cards */}
-            <Grid columns={{minWidth: 320, repeat: 'fit'}} gap={4}>
-              {[0, 2].map(start => (
-                <Grid
-                  key={start}
-                  columns={{minWidth: 240, repeat: 'fit'}}
-                  gap={4}>
-                  {metrics.slice(start, start + 2).map((m, i) => (
-                    <MetricCard
-                      key={m.label}
-                      {...m}
-                      sparkline={sparklines[start + i]}
-                    />
-                  ))}
-                </Grid>
+            <Grid columns={{minWidth: 280, repeat: 'fit'}} gap={4}>
+              {metrics.map((m, index) => (
+                <MetricCard key={m.label} {...m} sparkline={sparklines[index]} />
               ))}
             </Grid>
 
@@ -737,10 +783,10 @@ export default function DashboardTemplate() {
 
             {/* Demographics */}
             <HStack hAlign="between" vAlign="center">
-              <Heading level={3}>Night denizens</Heading>
+              <Heading level={2}>Night denizens</Heading>
               <Button label="View more" variant="secondary" size="md" />
             </HStack>
-            <Grid columns={{minWidth: 320, repeat: 'fit'}} gap={4}>
+            <Grid columns={{minWidth: 280, repeat: 'fit'}} gap={4}>
               <StackedBarCard title="Territory" data={regionData} />
               <StackedBarCard title="Role" data={roleData} />
             </Grid>
@@ -749,10 +795,10 @@ export default function DashboardTemplate() {
 
             {/* Engagement */}
             <HStack hAlign="between" vAlign="center">
-              <Heading level={3}>Engagement</Heading>
+              <Heading level={2}>Engagement</Heading>
               <Button label="View more" variant="secondary" size="md" />
             </HStack>
-            <Grid columns={{minWidth: 320, repeat: 'fit'}} gap={4}>
+            <Grid columns={{minWidth: 280, repeat: 'fit'}} gap={4}>
               <TableCard
                 title="Top pages"
                 linkLabel="All pages"

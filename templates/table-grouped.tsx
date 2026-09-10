@@ -1,6 +1,22 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LH[divider] > V[g=4] > (H[j=between a=center] > Hd"Night-shift issues"[level=2] + B.primary"Raise issue") + (H[g=2 a=center] > PS + B.secondary"View Options")) + (LC[p=0] > T[hover] > (TR > THC*7) + (TR > TC*7)*4)
+//   L > (LH[divider] > V[g=4] > (H[j=between a=center] > Hd"Night-shift issues"[level=1] + B.primary"Raise issue"[opens=#raise-issue]) + (H[g=2 a=center] > PS + Po > B.secondary"View Options")) + (LC[p=0] > T[hover] > (TR > THC*7) + (TR > TC*7)*4) + (LP > V[g=4] > (H > Tx[t=supporting] + IB"Close panel") + (V[g=1] > Hd[level=2] + Tx[t=body]) + ML + (D + (V[g=2] > Tx"Labels"[t=label] + (H[g=2] > Tk*2)))) ;; Dlg#raise-issue > (DH"Raise an issue" + (LC[p=4] > V[g=4] > TI*4) + (LF > H[j=end g=2] > B.secondary"Cancel" + B.primary"Raise"))
+
+/**
+ * Table Grouped — the night-shift issue tracker: a grouped, collapsible issue
+ * table with a PowerSearch bar and a resizable detail inspector.
+ *
+ * Frame: page header (title, search, view options) | grouped table | inspector
+ *
+ * Container policy: dense rows only, zero Cards. Status rides a StatusDot plus
+ * its label, priority a bar-chart glyph plus its name; a count Badge marks each
+ * group header, and labels are Tokens rather than decorative badges.
+ *
+ * Responsive contract:
+ *   > 1024px  header | table | inspector 360 (resizable)
+ *   <= 1024px inspector hidden; the table keeps the full width and scrolls
+ *             horizontally inside its own wrapper
+ */
 
 import React, {useState, useMemo} from 'react';
 import {useResizable, ResizeHandle} from '@astryxdesign/core/Resizable';
@@ -32,6 +48,8 @@ import {Icon} from '@astryxdesign/core/Icon';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
 import {Divider} from '@astryxdesign/core/Divider';
 import {MetadataList, MetadataListItem} from '@astryxdesign/core/MetadataList';
+import {Token} from '@astryxdesign/core/Token';
+import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {
   Table,
   TableRow,
@@ -588,7 +606,7 @@ function groupTasks(
   }
   const map = new Map<string, TaskRow[]>();
   for (const task of tasks) {
-    const key = String(task[groupBy]) || '—';
+    const key = String(task[groupBy]) || 'None';
     let group = map.get(key);
     if (!group) {
       group = [];
@@ -630,7 +648,7 @@ const columns: TableColumn<TaskRow>[] = [
   {
     key: 'project',
     header: 'Project',
-    width: pixel(144),
+    width: proportional(1),
   },
   {
     key: 'created',
@@ -731,7 +749,7 @@ function TaskDetailPanel({
         </HStack>
 
         <VStack gap={1}>
-          <Heading level={3}>{task.title}</Heading>
+          <Heading level={2}>{task.title}</Heading>
           {task.subtitle && (
             <Text type="body" color="secondary">
               {task.subtitle}
@@ -770,7 +788,7 @@ function TaskDetailPanel({
               <Text type="body">{task.project}</Text>
             ) : (
               <Text type="supporting" color="secondary">
-                —
+                None
               </Text>
             )}
           </MetadataListItem>
@@ -789,7 +807,7 @@ function TaskDetailPanel({
               <Text type="label">Labels</Text>
               <HStack gap={2}>
                 {task.tags.map(tag => (
-                  <Badge key={tag} variant="yellow" label={tag} />
+                  <Token key={tag} color="yellow" label={tag} />
                 ))}
               </HStack>
             </VStack>
@@ -815,6 +833,10 @@ export default function TableGrouped() {
     () => new Set(GROUP_ORDER as string[]),
   );
 
+  // Responsive contract (see file header): below 1024px the inspector would
+  // squeeze the grouped table, so it steps aside entirely.
+  const isNarrow = useMediaQuery('(max-width: 1024px)');
+
   const filtered = useMemo(() => {
     return applyFilters(powerSearchFilters, allTasks);
   }, [powerSearchFilters, applyFilters]);
@@ -824,11 +846,13 @@ export default function TableGrouped() {
     [filtered, groupBy],
   );
 
-  const groupKeys = useMemo(() => Array.from(grouped.keys()), [grouped]);
+  const groupKeys = Array.from(grouped.keys());
 
+  // Expand every group whenever the grouping itself changes. Keyed on the
+  // memoized Map, not on groupKeys, which is a fresh array each render.
   React.useEffect(() => {
-    setExpandedGroups(new Set(groupKeys));
-  }, [groupKeys]);
+    setExpandedGroups(new Set(grouped.keys()));
+  }, [grouped]);
 
   const toggleGroup = (key: string) => {
     setExpandedGroups(prev => {
@@ -882,7 +906,7 @@ export default function TableGrouped() {
                 <Popover
                   placement="below"
                   alignment="end"
-                  width={320}
+                  width="min(20rem, calc(100vw - 2 * var(--space-viewport)))"
                   label="Grouping options"
                   content={
                     <VStack gap={4}>
@@ -1005,7 +1029,7 @@ export default function TableGrouped() {
                               </Text>
                             ) : (
                               <Text type="supporting" color="secondary">
-                                —
+                                None
                               </Text>
                             )}
                           </TableCell>
@@ -1087,6 +1111,7 @@ export default function TableGrouped() {
           </LayoutContent>
         }
         end={
+          !isNarrow &&
           selectedTask && (
             <>
               <ResizeHandle

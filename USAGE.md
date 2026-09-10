@@ -73,7 +73,7 @@ Then use `var(--color-primary)`, `var(--dracula-purple)`, `var(--space-gap)`.
 
 ## Templates
 
-43 themed pages ship in `templates/`, each with a `<id>.template.mjs` spec, published
+44 themed pages ship in `templates/`, each with a `<id>.template.mjs` spec, published
 as an Astryx integration pack (`astryx.integration.mjs`). List this package in your
 `astryx.config`, then scaffold any of them:
 
@@ -81,8 +81,8 @@ as an Astryx integration pack (`astryx.integration.mjs`). List this package in y
 bunx astryx template dashboard --package astryx-dracula
 ```
 
-View all 43 live at `/astryx-dracula/#/templates` on the showcase. Pack rules: templates
-import React plus `@astryxdesign/core` only.
+View all 44 live at `/astryx-dracula/#/templates` on the showcase. Pack rules: templates
+import React plus `@astryxdesign/core` and `lucide-react`, no chart libraries.
 
 ## Fonts
 
@@ -113,7 +113,7 @@ export default defineConfig({
           {
             tag: 'style',
             children:
-              '@layer reset, priority1, priority2, priority3, priority4, priority5, priority6, priority7, priority8, priority9, astryx-theme;',
+              '@layer reset, astryx-base, astryx-theme;',
             injectTo: 'head-prepend',
           },
         ];

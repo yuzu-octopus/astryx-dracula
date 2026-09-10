@@ -27,7 +27,7 @@ Source of truth is `astryx-theme.ts`. Do not add hexes; `bun run audit` enforces
 
 - Purple links/titles unvisited. Visited falls back to text-base, hover goes primary + underline. Users learn purple means tappable title.
 - Green positive and success. Red negative and error. Yellow tags and chips. Cyan info and secondary links. Pink flair. Orange warning.
-- Subdue #4C5067 for metadata and separators. Not a Dracula hex; derived from glimpse ramp for text-on-dark hierarchy.
+- Subdue #4C5067 for separators and hairline chrome, never text (1.8:1 on the page background, 1.5:1 on cards). Not a Dracula hex; derived from the glimpse ramp for chrome hierarchy.
 
 ## Charts
 
@@ -49,13 +49,14 @@ Each status scope redefines its muted token to the categorical tint
 (`--color-background-<hue>`, 10% accent wash) with a semantic accent border.
 Text on fills is always `#21222C`; spec never uses raw black. Links render accent
 with underline and resolve to foreground on hover. Focus and interactive edges
-use Functional Purple `#815CD6`.
+use accent, not Functional Purple: `--color-functional-*` is pinned for spec parity
+and no shipped component consumes it.
 
 ## Interactions
 
 Buttons darken on hover; destructive pairs red fill with dark text. Links render accent
 underlined and resolve to foreground on hover. Focus rings use accent, not Functional
-Purple: 5.9 contrast beats 3.5 on dark backgrounds, verified by keyboard screenshot.
+Purple: 5.9 contrast beats 3.0 on dark backgrounds, verified by keyboard screenshot.
 Inputs take accent and error rings from core; table rows lift on hover. Cards, banners,
 badges, and progress bars are static.
 
@@ -66,7 +67,7 @@ Radii flat and crisp (5px elements, 4px inner). Everything below is a core defau
 - Motion durations: neutral defaults (fast 175ms, medium 410ms).
 - Spacing/size/ease scales: core defaults. Shadows, radii, and surfaces are Dracula-hued tokens above.
 - Zero theme dependencies: icons vendored (Lucide), everything else defined here.
-- Derived AA lifts (not spec hexes, same hues): secondary text #9AA1BC, muted text #8288A6, paragraph #B0B3C4, subdue #4C5067.
+- Derived AA lifts (not spec hexes, same hues): secondary text #9AA1BC, muted text #8288A6, paragraph #B0B3C4. Subdue #4C5067 is chrome, below every text floor.
 - Icon glyphs vendored from Lucide in `icons.tsx` (MIT). The theme also sets icon colors (primary, secondary, disabled, accent).
 - onDark: generated defaults inherited. Dark-surface content resolves from the same ramp.
 - `--color-data-neutral`: default gray reads fine on dark.
@@ -74,4 +75,4 @@ Radii flat and crisp (5px elements, 4px inner). Everything below is a core defau
 
 ## Dims
 
-Gap 24px, viewport 16px, content 15px vertical / 16px horizontal, widget-gap 24px, tile-row 96px, radius 5px everywhere, JetBrains Mono, type scale base 14 ratio 1.2: h1 24 / h2 20 / h3 17 / h4 14 / body 14 / supporting 12 / h6 10. Outer Card padding 4, nested inset 3. Touch targets 24px floor, 44 where touch matters.
+Gap 24px, viewport 16px, content 15px vertical / 16px horizontal, widget-gap 24px, tile-row 96px, radius 5px everywhere, JetBrains Mono, type scale base 14 ratio 1.2, generated steps 12 / 14 / 17 / 20 / 24. The pinned heading tokens are compat dims, not a strict 1.2 ladder: h1 24 / h2 20 / h3 16 / h4 14 / h5 13 / h6 12, body 14, supporting 12. Astryx `Heading` sizes come from the scale roles instead, so level 3 renders the 17px `lg` step. Outer Card padding 4, nested inset 3. Touch targets 24px floor, 44 where touch matters.

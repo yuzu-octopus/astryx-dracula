@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC > V[g=8 a=center] > (V[g=1] > (H[g=2 a=center] > Ic + Tx.lg"Hi, Vlad") + Hd"Where should we start?"[level=1 type=display-2]) + ChC"Ask anything" + (V[g=6] > (TgG"Category" > Tg"Writing"*4) + (G[c={min:280} g=3] > (CC[p=4] > V[g=0.5] > Hd"Draft"[level=4] + Tx"Compose"[t=body])*4))
+//   L > LC > V[g=8 a=center] > (V[g=1] > (H[g=2 a=center] > Ic + Tx.lg"Hi, Vlad") + Hd"Where should we start?"[level=1 type=display-2]) + ChC"Ask anything" + (V[g=6] > (TgG"Category" > Tg"Writing"*4) + (G[c={min:280} g=3] > (CC[p=4] > V[g=0.5] > Hd"Draft"[level=2] + Tx"Compose"[t=body])*4))
 
 import {useRef, useState, type CSSProperties} from 'react';
 
@@ -40,7 +40,9 @@ import {
 
 // Fill the content area so the greeting and composer stay vertically centered.
 const pageStyle: CSSProperties = {minHeight: '100%'};
-const composerInput: CSSProperties = {minHeight: 84};
+// Five --spacing-4 steps: the box opens at ~80px so the empty composer reads
+// as a writing surface, not a single-line field. No single token is 80px.
+const composerInput: CSSProperties = {minHeight: 'calc(var(--spacing-4) * 5)'};
 const categories: CSSProperties = {paddingInline: 'var(--space-viewport)'};
 
 // Suggestion cards shown once a category is selected.
@@ -232,6 +234,21 @@ const commandTrigger: ChatComposerTrigger = {
 
 const composerTriggers = [mentionTrigger, commandTrigger];
 
+/** Composer attachment. The name is user-facing; the id is the React key, since
+ * two dropped files can share a name. */
+interface Attachment {
+  id: string;
+  name: string;
+}
+
+const INITIAL_ATTACHMENTS: Attachment[] = [
+  'palette_brief.pdf',
+  'nocturne_v2.fig',
+  'api_spec.yaml',
+  'contrast_audit.csv',
+  'dracula_spec.pdf',
+].map((name, index) => ({id: `file-${index + 1}`, name}));
+
 // The composer's imperative insert methods mutate the DOM without emitting a
 // change, so dispatch an input event to sync its value and clear the placeholder.
 const syncComposerValue = () => {
@@ -243,16 +260,14 @@ const syncComposerValue = () => {
 export default function AiChatLanding() {
   const [mode, setMode] = useState<string | null>('auto');
   const [category, setCategory] = useState<string | null>(null);
-  const [attachments, setAttachments] = useState<string[]>([
-    'palette_brief.pdf',
-    'nocturne_v2.fig',
-    'api_spec.yaml',
-    'contrast_audit.csv',
-    'dracula_spec.pdf',
-  ]);
+  const [attachments, setAttachments] = useState<Attachment[]>(
+    INITIAL_ATTACHMENTS,
+  );
   const [isModeMenuOpen, setIsModeMenuOpen] = useState(false);
   const composerInputRef = useRef<ChatComposerInputHandle>(null);
   const shouldFocusComposerRef = useRef(false);
+  // Two dropped files can share a name, so attachments carry their own id.
+  const nextAttachmentId = useRef(INITIAL_ATTACHMENTS.length);
   const dictation = useChatDictation({inputRef: composerInputRef});
 
   const activeMode = MODE_OPTIONS.find(m => m.key === mode) ?? MODE_OPTIONS[0];
@@ -331,19 +346,27 @@ export default function AiChatLanding() {
                   triggers={composerTriggers}
                   style={composerInput}
                   onFiles={files =>
-                    setAttachments(prev => [...prev, ...files.map(f => f.name)])
+                    setAttachments(prev => [
+                      ...prev,
+                      ...files.map(file => ({
+                        id: `file-${++nextAttachmentId.current}`,
+                        name: file.name,
+                      })),
+                    ])
                   }
                 />
               }
               drawer={
                 attachments.length > 0 ? (
                   <ChatComposerDrawer count={attachments.length}>
-                    {attachments.map(name => (
+                    {attachments.map(attachment => (
                       <Token
-                        key={name}
-                        label={name}
+                        key={attachment.id}
+                        label={attachment.name}
                         onRemove={() =>
-                          setAttachments(prev => prev.filter(n => n !== name))
+                          setAttachments(prev =>
+                            prev.filter(item => item.id !== attachment.id),
+                          )
                         }
                       />
                     ))}
@@ -460,7 +483,9 @@ export default function AiChatLanding() {
                         setMode(category);
                       }}>
                       <VStack gap={0.5}>
-                        <Heading level={4}>{suggestion.heading}</Heading>
+                        {/* Section tier: the deck sits directly under the page
+                            h1, so h3 would skip h2. */}
+                        <Heading level={2}>{suggestion.heading}</Heading>
                         <Text type="body" color="secondary">
                           {suggestion.body}
                         </Text>

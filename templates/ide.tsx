@@ -42,14 +42,6 @@ const styles: Record<string, CSSProperties> = {
   metadataCompact: {
     gap: 'var(--spacing-1) var(--spacing-3)',
   },
-  historyTimelineDot: {
-    width: 8,
-    height: 8,
-    borderRadius: '50%',
-    backgroundColor: 'var(--color-border-emphasized)',
-    marginTop: 6,
-    flexShrink: 0,
-  },
   editorArea: {
     overflow: 'auto',
     minHeight: 0,
@@ -243,10 +235,12 @@ export default function IdeWorkspace() {
     collapsedSize: 50,
   });
 
+  // Capped so the terminal cannot swallow the canvas: the editor stack above
+  // has no minimum of its own, and an unbounded drag leaves nothing to grab.
   const bottomPanel = useResizable({
     defaultSize: 300,
     minSizePx: 80,
-    maxSizePx: Infinity,
+    maxSizePx: 520,
     collapsible: true,
     collapsedSize: 40,
   });

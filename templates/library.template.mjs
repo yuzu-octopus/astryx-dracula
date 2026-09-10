@@ -1,6 +1,6 @@
 export default {
   type: 'page',
-  name: 'Card Grid',
+  name: 'Library',
   description: 'Browsable grid with tabs and filters',
-  category: 'marketing',
+  category: 'docs',
 };

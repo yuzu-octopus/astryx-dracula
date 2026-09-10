@@ -37,6 +37,9 @@ export function Palette() {
         {SWATCHES.map((s) => (
           <Card key={s.name} padding={3}>
             <VStack gap={2}>
+              {/* Raw hex is correct here: the swatch shows the pinned spec
+                  value, so it paints s.hex rather than var(--dracula-*);
+                  a token reference could not reveal a drifted token. */}
               <Card
                 padding={0}
                 style={{

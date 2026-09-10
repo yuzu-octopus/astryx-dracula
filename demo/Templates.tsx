@@ -13,280 +13,7 @@ import {
 import { Theme } from '@astryxdesign/core/theme';
 import { astryxDraculaTheme } from '../astryx-theme';
 import { SiteShell } from './Chrome';
-
-export interface TemplateEntry {
-  id: string;
-  name: string;
-  description: string;
-  load: () => Promise<{ default: ComponentType }>;
-}
-
-const TEMPLATES: TemplateEntry[] = [
-  {
-    id: 'dashboard',
-    name: 'Analytics Dashboard',
-    description: 'KPI cards, SVG chart strips, and data tables.',
-    load: () => import('../templates/dashboard'),
-  },
-  {
-    id: 'table-grouped',
-    name: 'Grouped Table',
-    description: 'Collapsible status sections with detail panel.',
-    load: () => import('../templates/table-grouped'),
-  },
-  {
-    id: 'table-page',
-    name: 'Searchable Table',
-    description: 'Filterable data table with toolbar actions.',
-    load: () => import('../templates/table-page'),
-  },
-  {
-    id: 'kanban-board',
-    name: 'Kanban Board',
-    description: 'Status columns with priority tags and metadata.',
-    load: () => import('../templates/kanban-board'),
-  },
-  {
-    id: 'settings-sidebar',
-    name: 'Settings Panels',
-    description: 'Sidebar sections with account and workspace panels.',
-    load: () => import('../templates/settings-sidebar'),
-  },
-  {
-    id: 'settings',
-    name: 'Settings Form',
-    description: 'Single scrolling form with profile sections.',
-    load: () => import('../templates/settings'),
-  },
-  {
-    id: 'payment-form',
-    name: 'Checkout Form',
-    description: 'Billing info, card details, and order summary.',
-    load: () => import('../templates/payment-form'),
-  },
-  {
-    id: 'login-card',
-    name: 'Login Card',
-    description: 'Centered auth card with email and password.',
-    load: () => import('../templates/login-card'),
-  },
-  {
-    id: 'file-explorer',
-    name: 'File Explorer',
-    description: 'Column-based file browser with preview.',
-    load: () => import('../templates/file-explorer'),
-  },
-  {
-    id: 'ai-chat-landing',
-    name: 'AI Chat Landing',
-    description: 'Composer, greeting, and category toggles.',
-    load: () => import('../templates/ai-chat-landing'),
-  },
-  {
-    id: 'library',
-    name: 'Card Grid',
-    description: 'Browsable grid with tabs and filters.',
-    load: () => import('../templates/library'),
-  },
-  {
-    id: 'centered-hero',
-    name: 'Centered Hero',
-    description: 'Headline, CTAs, and hero visual.',
-    load: () => import('../templates/centered-hero'),
-  },
-  {
-    id: 'ai-chat',
-    name: 'AI Chat',
-    description: 'Conversation view with tool calls and artifacts.',
-    load: () => import('../templates/ai-chat'),
-  },
-  {
-    id: 'classic-gallery',
-    name: 'Classic Gallery',
-    description: 'Image gallery with filter tabs.',
-    load: () => import('../templates/classic-gallery'),
-  },
-  {
-    id: 'contact-form',
-    name: 'Contact Form',
-    description: 'Lead capture with toggles and full-width CTA.',
-    load: () => import('../templates/contact-form'),
-  },
-  {
-    id: 'dashboard-portfolio',
-    name: 'Portfolio Dashboard',
-    description: 'Holdings overview with trend strips.',
-    load: () => import('../templates/dashboard-portfolio'),
-  },
-  {
-    id: 'detail-page',
-    name: 'Detail Page',
-    description: 'Record detail with metadata and timeline.',
-    load: () => import('../templates/detail-page'),
-  },
-  {
-    id: 'documentation',
-    name: 'Documentation Catalog',
-    description: 'Hero banner plus component category grid.',
-    load: () => import('../templates/documentation'),
-  },
-  {
-    id: 'documentation-design',
-    name: 'Documentation Design',
-    description: 'Live preview with usage and best practices.',
-    load: () => import('../templates/documentation-design'),
-  },
-  {
-    id: 'documentation-technical',
-    name: 'Documentation Technical',
-    description: 'Getting-started guide with theming setup.',
-    load: () => import('../templates/documentation-technical'),
-  },
-  {
-    id: 'editor',
-    name: 'Page Editor',
-    description: 'Block editor with toolbar and preview.',
-    load: () => import('../templates/editor'),
-  },
-  {
-    id: 'form-two-column',
-    name: 'Two-column Form',
-    description: 'Split form with summary rail.',
-    load: () => import('../templates/form-two-column'),
-  },
-  {
-    id: 'gallery-hero',
-    name: 'Gallery Hero',
-    description: 'Headline above a three-image gallery.',
-    load: () => import('../templates/gallery-hero'),
-  },
-  {
-    id: 'ide',
-    name: 'IDE',
-    description: 'File explorer, tabbed editor, terminal.',
-    load: () => import('../templates/ide'),
-  },
-  {
-    id: 'login',
-    name: 'Login Page',
-    description: 'Full-page auth with brand panel.',
-    load: () => import('../templates/login'),
-  },
-  {
-    id: 'mixed-gallery',
-    name: 'Mixed Gallery',
-    description: 'Uneven card heights, masonry feel.',
-    load: () => import('../templates/mixed-gallery'),
-  },
-  {
-    id: 'product-detail',
-    name: 'Product Detail',
-    description: 'Gallery, options, reviews, related.',
-    load: () => import('../templates/product-detail'),
-  },
-  {
-    id: 'product-gallery',
-    name: 'Product Gallery',
-    description: 'Browsable product grid.',
-    load: () => import('../templates/product-gallery'),
-  },
-  {
-    id: 'settings-dialog',
-    name: 'Settings Dialog',
-    description: 'Modal settings with section nav.',
-    load: () => import('../templates/settings-dialog'),
-  },
-  {
-    id: 'shell-nav',
-    name: 'Shell Nav',
-    description: 'App shell with combined navigation.',
-    load: () => import('../templates/shell-nav'),
-  },
-  {
-    id: 'shell-side-nav',
-    name: 'Side Nav Shell',
-    description: 'Workspace sidebar with status.',
-    load: () => import('../templates/shell-side-nav'),
-  },
-  {
-    id: 'shell-top-nav',
-    name: 'Top Nav Shell',
-    description: 'Store top bar with featured card.',
-    load: () => import('../templates/shell-top-nav'),
-  },
-  {
-    id: 'table',
-    name: 'Simple Table',
-    description: 'Minimal vault table.',
-    load: () => import('../templates/table'),
-  },
-  {
-    id: 'table-page-chart',
-    name: 'Chart Table',
-    description: 'Orders with SVG trend strips.',
-    load: () => import('../templates/table-page-chart'),
-  },
-  {
-    id: 'table-page-heatmap-status',
-    name: 'Heatmap Table',
-    description: 'Day-hour activity grid with status.',
-    load: () => import('../templates/table-page-heatmap-status'),
-  },
-  {
-    id: 'table-page-shoe-store-heatmap',
-    name: 'Store Heatmap Table',
-    description: 'Product rows with cyan trend strips.',
-    load: () => import('../templates/table-page-shoe-store-heatmap'),
-  },
-  {
-    id: 'blank',
-    name: 'Blank',
-    description: 'Minimal page scaffold.',
-    load: () => import('../templates/blank'),
-  },
-  {
-    id: 'incident-console',
-    name: 'Incident Console',
-    description: 'On-call response with severity rows and inspector.',
-    load: () => import('../templates/incident-console'),
-  },
-  {
-    id: 'product-tour',
-    name: 'Product Tour',
-    description: 'Chapter rail, walkthrough content, and outline.',
-    load: () => import('../templates/product-tour'),
-  },
-  {
-    id: 'login-split',
-    name: 'Login Split',
-    description: 'Split auth with brand cover panel.',
-    load: () => import('../templates/login-split'),
-  },
-  {
-    id: 'login-sso',
-    name: 'Login SSO',
-    description: 'Single sign-on with provider list.',
-    load: () => import('../templates/login-sso'),
-  },
-  {
-    id: 'messaging-shell',
-    name: 'Messaging Shell',
-    description: 'Conversation list with message thread.',
-    load: () => import('../templates/messaging-shell'),
-  },
-  {
-    id: 'side-gallery',
-    name: 'Side Gallery',
-    description: 'Sidebar plus gallery wall.',
-    load: () => import('../templates/side-gallery'),
-  },
-  {
-    id: 'theme-showcase',
-    name: 'Theme Showcase',
-    description: 'Storefront theme switcher demo.',
-    load: () => import('../templates/theme-showcase'),
-  },
-];
+import { TEMPLATES } from './templateRegistry';
 
 export function TemplatesIndex() {
   return (
@@ -299,12 +26,12 @@ export function TemplatesIndex() {
             bunx astryx template.
           </Text>
         </VStack>
-        <Grid columns={{ minWidth: 300, max: 3 }} gap={4}>
+        <Grid columns={{ minWidth: 280, max: 3 }} gap={4}>
           {TEMPLATES.map((t) => (
             <ClickableCard key={t.id} padding={4} href={`#/templates/${t.id}`} label={`Open ${t.name}`}>
               <VStack gap={2}>
-                <HStack justify="between" vAlign="center">
-                  <Heading level={3}>{t.name}</Heading>
+                <HStack justify="between" vAlign="center" wrap="wrap" gap={2}>
+                  <Heading level={2}>{t.name}</Heading>
                   <Badge label={t.id} variant="neutral" />
                 </HStack>
                 <Text type="body" color="secondary">
@@ -333,6 +60,7 @@ const bareHref = (id: string) => `${window.location.pathname}?bare=${id}`;
 
 const viewerFrame: CSSProperties = {
   height: '100dvh',
+  overflow: 'hidden',
   backgroundColor: 'var(--color-background)',
 };
 const viewerBar: CSSProperties = {
@@ -353,7 +81,7 @@ export function TemplateDetail({ id }: { id: string }) {
     return (
       <Theme theme={astryxDraculaTheme} mode="dark">
         <VStack gap={3} style={{ padding: '32px' }}>
-          <Heading level={2}>Unknown template</Heading>
+          <Heading level={1}>Unknown template</Heading>
           <Text type="body" color="secondary">
             No template named {id}.
           </Text>
@@ -370,19 +98,31 @@ export function TemplateDetail({ id }: { id: string }) {
           <Text color="secondary">/</Text>
           <Text weight="semibold">{entry.name}</Text>
         </HStack>
-        <iframe title={entry.name} src={bareHref(entry.id)} style={viewerPage} />
+        {/* Bundled same-origin templates: allow-scripts keeps the page app
+            running, allow-same-origin keeps module, font, and runtime theme
+            fetches working. Top navigation, forms, popups, pointer lock, and
+            downloads stay blocked. */}
+        <iframe
+          title={entry.name}
+          src={bareHref(entry.id)}
+          sandbox="allow-scripts allow-same-origin"
+          loading="lazy"
+          style={viewerPage}
+        />
       </VStack>
     </Theme>
   );
 }
 
-// Renders a template with no viewer chrome, for the frame above.
+// Renders a template with no viewer chrome, for the frame above. An id the
+// registry does not know falls back to the index, so no `?bare=` value can end
+// up as an empty page.
 export function BareTemplate({ id }: { id: string }) {
-  const entry = TEMPLATES.find((t) => t.id === id);
-  const Page = entry ? LAZY_PAGES[entry.id] : undefined;
+  const Page = LAZY_PAGES[id];
+  if (!Page) return <TemplatesIndex />;
   return (
     <Theme theme={astryxDraculaTheme} mode="dark">
-      {Page ? <Page /> : null}
+      <Page />
     </Theme>
   );
 }

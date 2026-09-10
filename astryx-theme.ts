@@ -48,6 +48,13 @@ const draculaSyntax = defineSyntaxTheme({
   },
 });
 
+// Deliberate spec deviations, mirrored in tokens.css. Spec Comment #6272A4
+// measures 1.80:1 on the page background, so it cannot carry body text:
+// #9AA1BC (secondary), #B0B3C4 (paragraph) and #8288A6 (base-muted) are
+// same-hue lifts that clear their WCAG floors, #4C5067 (subdue) is chrome
+// only and never text, and #FFD5CC is the pale surface for the inverted
+// error Toast, which the spec palette does not supply. Floor checks live in
+// scripts/check.ts. Do not "correct" these back to spec hexes.
 const tokens: Record<string, TokenValue> = {
   // Compat dims (glance widget CSS; no Astryx collision)
   '--radius-inner': '4px',

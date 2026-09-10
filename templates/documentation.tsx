@@ -1,6 +1,23 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC > V[g=10] > (C[p=10] > (H[g=8 a=center] > (V[g=4] > Tx.display-1"The coven grimoire" + Tx.lg"Every incantation in the Astryx spellbook"[t=large] + (H > B.primary"Enter the grimoire")))) + (V[g=4] > (H[j=between a=center] > Hd"Category"[level=2] + Tx"18 spells"[t=supporting]) + (G[c=4 g=2] > (CC[p=2] > V[g=3] > C[p=0] + (V[g=1] > Tx"AppShell"[t=body] + Tx"Description"[t=body]))*4))*4
+//   L > LC > V[g=10] > (C[p=10] > (H[g=8 a=center] > (V[g=4] > Tx.display-1"The coven grimoire" + Tx.lg"Every incantation in the Astryx spellbook"[t=large] + (H > B.primary"Enter the grimoire")))) + (V[g=4] > (H[j=between a=center] > Hd"Category"[level=2] + Tx"18 spells"[t=supporting]) + (G[c={min:260} g=2] > (CC[p=2] > V[g=3] > C[p=0] + (V[g=1] > Tx"AppShell"[t=body] + Tx"Description"[t=body]))*4))*4
+
+/**
+ * Documentation catalog — every component shelf in the grimoire.
+ *
+ * Frame-first layout (see `npx astryx docs layout`):
+ *
+ *   Frame: hero card | category shelves (heading + card grid)
+ *
+ * Responsive contract:
+ *   No JS breakpoints: the grid fills the content column with as many 260px
+ *   cards as fit and lands on a single column on phone widths; the hero copy
+ *   wraps in place.
+ *
+ * Container policy (catalog archetype): the shelf is the only grouping. Each
+ * category pairs a level-2 heading with its card grid, and the previews carry
+ * the density — rows would flatten them into a list of names.
+ */
 
 import type {CSSProperties} from 'react';
 import {Heading, Text} from '@astryxdesign/core/Text';
@@ -23,12 +40,17 @@ const previewClip: CSSProperties = {
 // Negative margin offsets each card's 8px padding so the grid content stays
 // visually aligned while giving every card a padded hover/click target.
 const cardGrid: CSSProperties = {
-  margin: -8,
+  margin: 'calc(var(--spacing-2) * -1)',
 };
 
-// Dracula accent per grimoire shelf.
+// Same-route hash: demo links stay focusable anchors without escaping the
+// template through the hash router (bare "#" would drop back to the home page).
+const SELF_HASH = '#/templates/documentation';
+
+// Decorative accent per grimoire shelf. None of them is purple: the sigils
+// are not interactive, and purple belongs to the things that are.
 const SHELF_HUES: Record<string, string> = {
-  Core: 'var(--dracula-purple)',
+  Core: 'var(--dracula-pink)',
   Layout: 'var(--dracula-cyan)',
   Navigation: 'var(--dracula-green)',
   Form: 'var(--dracula-yellow)',
@@ -221,7 +243,7 @@ const COMPONENT_CATEGORIES = [
 // ---------------------------------------------------------------------------
 
 function PreviewArt({name, shelf}: {name: string; shelf: string}) {
-  const hue = SHELF_HUES[shelf] ?? 'var(--dracula-purple)';
+  const hue = SHELF_HUES[shelf] ?? 'var(--dracula-comment)';
   return (
     <svg
       viewBox="0 0 400 300"
@@ -313,7 +335,7 @@ export default function DocumentationCatalog() {
                     <ClickableCard
                       key={item.key}
                       label={`Open ${item.name}`}
-                      onClick={() => {}}
+                      href={SELF_HASH}
                       variant="transparent"
                       padding={2}>
                       <VStack gap={3}>

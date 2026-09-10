@@ -2,7 +2,15 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   L > (LP[w=320] > V[g=4] > (S[p=4] > V[g=4] > Hd"Page Editor"[level=2] + Tbar) + (V[g=4] > (TL > Tab"Blocks"! + Tab"Properties") + D + (S[p=4] > V[g=2] > Hd"Add Block"[level=3] + UL + Hd"Layers"[level=3] + UL))) + (LC > V[g=4] > C*3)
 
-import {useState, useCallback, type CSSProperties} from 'react';
+import {
+  useState,
+  useCallback,
+  type ComponentType,
+  type CSSProperties,
+  type KeyboardEvent,
+  type MouseEvent,
+  type SVGProps,
+} from 'react';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {Button} from '@astryxdesign/core/Button';
 import {Card} from '@astryxdesign/core/Card';
@@ -20,7 +28,7 @@ import {
 } from '@astryxdesign/core/Layout';
 import {Icon} from '@astryxdesign/core/Icon';
 import {List, ListItem} from '@astryxdesign/core/List';
-import {Table, proportional, pixel} from '@astryxdesign/core/Table';
+import {Table, proportional} from '@astryxdesign/core/Table';
 import type {TableColumn} from '@astryxdesign/core/Table';
 import {Section} from '@astryxdesign/core/Section';
 import {
@@ -56,7 +64,6 @@ import {
   Banknote,
   CarFront,
   CirclePlay,
-  Ellipsis,
   Lock,
 } from 'lucide-react';
 import {Spinner} from '@astryxdesign/core/Spinner';
@@ -73,7 +80,7 @@ interface Block {
 
 type ViewportSize = 'desktop' | 'tablet' | 'phone';
 type SidebarTab = 'blocks' | 'properties';
-type IconComponent = React.ComponentType<React.SVGProps<SVGSVGElement>>;
+type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
 const BLOCK_META: Record<BlockType, {label: string; icon: IconComponent}> = {
   hero: {label: 'Hero', icon: LayoutGrid},
@@ -102,11 +109,14 @@ const CATEGORY_ICONS: Record<string, IconComponent> = {
   Entertainment: CirclePlay,
 };
 
+// The minimums clear the 375px phone canvas once the preview card's 24px
+// padding is taken out; the widest column carries the slack and every cell
+// truncates rather than pushing the table past the card.
 const TRANSACTION_COLUMNS: TableColumn<Transaction>[] = [
   {
     key: 'name',
     header: 'Transaction',
-    width: proportional(2, {minWidth: 170}),
+    width: proportional(2, {minWidth: 104}),
     renderCell: (item: Transaction) => (
       <HStack gap={3} vAlign="center">
         <Icon icon={CATEGORY_ICONS[item.category] || Sparkles} />
@@ -124,7 +134,7 @@ const TRANSACTION_COLUMNS: TableColumn<Transaction>[] = [
   {
     key: 'date',
     header: 'Date',
-    width: proportional(1, {minWidth: 100}),
+    width: proportional(1, {minWidth: 64}),
     renderCell: (item: Transaction) => (
       <Text type="body" color="secondary" hasTabularNumbers>
         {item.date}
@@ -134,25 +144,11 @@ const TRANSACTION_COLUMNS: TableColumn<Transaction>[] = [
   {
     key: 'amount',
     header: 'Amount',
-    width: proportional(1, {minWidth: 90}),
+    width: proportional(1, {minWidth: 88}),
     renderCell: (item: Transaction) => (
       <Text type="body" weight="semibold" hasTabularNumbers>
         {item.amount}
       </Text>
-    ),
-  },
-  {
-    key: 'actions',
-    header: '',
-    width: pixel(44),
-    renderCell: () => (
-      <Button
-        label="More"
-        icon={<Icon icon={Ellipsis} size="sm" />}
-        variant="ghost"
-        size="sm"
-        isIconOnly
-      />
     ),
   },
 ];
@@ -313,12 +309,16 @@ const canvasStyle = (maxWidth: number): CSSProperties => ({
 const clickable: CSSProperties = {
   cursor: 'pointer',
 };
-// Selection ring on the active block — Card has no `isSelected` state.
+// Selection ring on the active block — Card has no `isSelected` state. Ring
+// weight and inset both derive from the surface border token.
 const selectedCard: CSSProperties = {
-  outline: '2px solid',
+  outlineWidth: 'calc(var(--border-width) * 2)',
+  outlineStyle: 'solid',
   outlineColor: 'var(--color-accent)',
-  outlineOffset: -2,
+  outlineOffset: 'calc(var(--border-width) * -2)',
 };
+// The sidebar keeps its width when the canvas is wider than the window.
+const panelShrink: CSSProperties = {flexShrink: 0};
 // Circular muted chip behind the CTA icon — Center handles the centering
 // and sizing; only the surface (radius + fill) needs custom CSS.
 const iconCircle: CSSProperties = {
@@ -598,7 +598,7 @@ function BlockPreview({
               <Icon icon={Lock} color="secondary" />
             </Center>
             <VStack gap={1}>
-              <Heading level={4}>
+              <Heading level={3}>
                 {(props.heading as string) || 'Notice'}
               </Heading>
               <Text type="body" color="secondary">
@@ -703,7 +703,7 @@ export default function PageEditor() {
   const blocksTabContent = (
     <VStack gap={2}>
       <VStack gap={1}>
-        <Heading level={4}>Add Block</Heading>
+        <Heading level={3}>Add Block</Heading>
         <List density="balanced" hasDividers={false}>
           {(Object.keys(BLOCK_META) as BlockType[]).map(type => (
             <ListItem
@@ -719,7 +719,7 @@ export default function PageEditor() {
       </VStack>
 
       <VStack gap={1}>
-        <Heading level={4}>Layers</Heading>
+        <Heading level={3}>Layers</Heading>
         <List density="balanced" hasDividers={false}>
           {blocks.map(block => (
             <ListItem
@@ -737,7 +737,7 @@ export default function PageEditor() {
                     icon={<Icon icon={ChevronUp} size="sm" />}
                     variant="ghost"
                     size="sm"
-                    onClick={(e: React.MouseEvent) => {
+                    onClick={(e: MouseEvent) => {
                       e.stopPropagation();
                       moveBlock(block.id, -1);
                     }}
@@ -748,7 +748,7 @@ export default function PageEditor() {
                     icon={<Icon icon={ChevronDown} size="sm" />}
                     variant="ghost"
                     size="sm"
-                    onClick={(e: React.MouseEvent) => {
+                    onClick={(e: MouseEvent) => {
                       e.stopPropagation();
                       moveBlock(block.id, 1);
                     }}
@@ -759,7 +759,7 @@ export default function PageEditor() {
                     icon={<Icon icon={Trash2} size="sm" />}
                     variant="ghost"
                     size="sm"
-                    onClick={(e: React.MouseEvent) => {
+                    onClick={(e: MouseEvent) => {
                       e.stopPropagation();
                       deleteBlock(block.id);
                     }}
@@ -811,7 +811,8 @@ export default function PageEditor() {
     <LayoutPanel
       hasDivider={!isMobile}
       padding={0}
-      style={{width: isMobile ? '100%' : 320, flexShrink: 0}}>
+      width={isMobile ? '100%' : 320}
+      style={panelShrink}>
       <VStack gap={4}>
         {/* Panel Header */}
         <Section variant="transparent" padding={4}>
@@ -839,7 +840,7 @@ export default function PageEditor() {
                   isLabelHidden
                   value={pageTitle}
                   onChange={setPageTitle}
-                  onKeyDown={(e: React.KeyboardEvent) => {
+                  onKeyDown={(e: KeyboardEvent) => {
                     if (e.key === 'Enter') {
                       setIsEditingTitle(false);
                     }

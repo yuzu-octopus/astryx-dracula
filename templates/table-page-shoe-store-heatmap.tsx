@@ -1,6 +1,24 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LH > H[g2 a=center] > Hd"Midnight Kicks"[level=1] + IB*2 + B.primary"New order") + (LC[p3] > V[g4] > (V[g3] > C[p3] + Tx"Daily revenue"[t=supporting] + (H[g2 a=center] > Ic + Tx"Revenue"[t=supporting])) + (T > (TR > THC*7) + (TR > TC*7)*5))
+//   L > (LH[divider] > H[g2 a=center] > Hd"Midnight Kicks"[level=1] + IB"Filter"[variant=ghost] + IB"Export"[variant=ghost] + B.primary"New order") + (LC[p3] > V[g4] > (V[g3] > C[p3] + Tx"Daily revenue"[t=supporting] + (H[g2 a=center] > Ic + Tx"Revenue"[t=supporting])) + (T[hover] > (TR > THC"Order" + THC"Product" + THC"Amount" + THC"Customer" + THC"Email" + THC"Status" + THC"Date") + (TR > TC"ORD-1001" + TC"Air Max 90" + TC"$130" + TC"Sarah Chen" + TC"sarah.chen@acme.co" + (TC > Tk.green"Completed") + TC"2025-01-12")*5))
+
+/**
+ * Midnight Kicks — sneaker order desk: a daily revenue line over the order log.
+ *
+ * Frame: page header (title + icon actions) | content column (chart, table).
+ *
+ * Container policy: the chart is a single Card widget; the orders are dense
+ * rows in one edge-to-edge table (never card-wrapped). Status is a Token, the
+ * numeric columns carry tabular figures, and product swatch accents come from
+ * the catalogue. Shared swatch/chart helpers are kept byte-aligned with
+ * table-page-chart.
+ *
+ * Responsive contract:
+ *   no media queries — the chart is an SVG that scales to its column, so it
+ *   reflows at any width. The table declares a ~820px floor across its seven
+ *   columns and truncates each text cell (maxLines=1), so narrower viewports
+ *   scroll the table horizontally instead of widening the page.
+ */
 
 import type {CSSProperties} from 'react';
 import {
@@ -15,7 +33,7 @@ import {Text, Heading} from '@astryxdesign/core/Text';
 import {Button} from '@astryxdesign/core/Button';
 import {IconButton} from '@astryxdesign/core/IconButton';
 import {Icon} from '@astryxdesign/core/Icon';
-import {Badge} from '@astryxdesign/core/Badge';
+import {Token} from '@astryxdesign/core/Token';
 import {Card} from '@astryxdesign/core/Card';
 import {Link} from '@astryxdesign/core/Link';
 import {Table, proportional, pixel} from '@astryxdesign/core/Table';
@@ -808,18 +826,28 @@ const revenueData = [
   {date: 'Jan 15', revenue: 7100},
 ];
 
-const statusColor: Record<string, 'green' | 'blue' | 'orange' | 'red'> = {
+const STATUS_TOKEN_COLOR: Record<
+  OrderRow['status'],
+  'green' | 'blue' | 'orange' | 'red'
+> = {
   completed: 'green',
   shipped: 'blue',
   processing: 'orange',
   refunded: 'red',
 };
 
+const STATUS_LABEL: Record<OrderRow['status'], string> = {
+  completed: 'Completed',
+  shipped: 'Shipped',
+  processing: 'Processing',
+  refunded: 'Refunded',
+};
+
 const columns: TableColumn<OrderRow>[] = [
   {
     key: 'id',
     header: 'Order',
-    width: pixel(110),
+    width: pixel(96),
     renderCell: (item: OrderRow) => (
       <Link href="#/templates/table-page-shoe-store-heatmap" isStandalone>
         {item.id}
@@ -829,28 +857,32 @@ const columns: TableColumn<OrderRow>[] = [
   {
     key: 'product',
     header: 'Product',
-    width: proportional(3),
+    width: proportional(3, {minWidth: 160}),
     renderCell: (item: OrderRow) => (
       <HStack gap={3} vAlign="center">
         <ProductSwatch
           accent={PRODUCTS[item.imageIndex].accent}
           label={item.product}
         />
-        <VStack gap={0}>
-          <Text type="body">{item.product}</Text>
-          <Text type="supporting" color="secondary">
-            {item.category}
-          </Text>
-        </VStack>
+        <StackItem size="fill">
+          <VStack gap={0}>
+            <Text type="body" maxLines={1}>
+              {item.product}
+            </Text>
+            <Text type="supporting" color="secondary" maxLines={1}>
+              {item.category}
+            </Text>
+          </VStack>
+        </StackItem>
       </HStack>
     ),
   },
   {
     key: 'amount',
     header: 'Amount',
-    width: pixel(90),
+    width: pixel(88),
     renderCell: (item: OrderRow) => (
-      <Text type="body" hasTabularNumbers>
+      <Text type="body" hasTabularNumbers maxLines={1}>
         ${item.amount}
       </Text>
     ),
@@ -858,32 +890,41 @@ const columns: TableColumn<OrderRow>[] = [
   {
     key: 'customer',
     header: 'Customer',
-    width: proportional(2),
-    renderCell: (item: OrderRow) => <Text type="body">{item.customer}</Text>,
+    width: proportional(2, {minWidth: 120}),
+    renderCell: (item: OrderRow) => (
+      <Text type="body" maxLines={1}>
+        {item.customer}
+      </Text>
+    ),
   },
   {
     key: 'email',
     header: 'Email',
-    width: proportional(2),
-    renderCell: (item: OrderRow) => <Text type="body">{item.email}</Text>,
+    width: proportional(2, {minWidth: 120}),
+    renderCell: (item: OrderRow) => (
+      <Text type="body" maxLines={1}>
+        {item.email}
+      </Text>
+    ),
   },
   {
     key: 'status',
     header: 'Status',
     width: pixel(120),
     renderCell: (item: OrderRow) => (
-      <Badge
-        label={item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-        variant={statusColor[item.status]}
+      <Token
+        size="sm"
+        color={STATUS_TOKEN_COLOR[item.status]}
+        label={STATUS_LABEL[item.status]}
       />
     ),
   },
   {
     key: 'date',
     header: 'Date',
-    width: pixel(110),
+    width: pixel(112),
     renderCell: (item: OrderRow) => (
-      <Text type="body" hasTabularNumbers>
+      <Text type="body" hasTabularNumbers maxLines={1}>
         {item.date}
       </Text>
     ),
@@ -892,39 +933,44 @@ const columns: TableColumn<OrderRow>[] = [
 
 // ============= REVENUE CHART (hand SVG, Dracula ramp) =============
 
-const revenueLine = 'var(--dracula-cyan)';
-const SHOE_CHART_W = 540;
-const SHOE_CHART_H = 200;
-const SHOE_CHART_PAD_LEFT = 44;
-const SHOE_CHART_PAD_RIGHT = 12;
-const SHOE_CHART_PAD_TOP = 12;
-const SHOE_CHART_BASELINE = 164;
-const SHOE_CHART_MAX = 10000;
-const SHOE_CHART_PLOT_W = SHOE_CHART_W - SHOE_CHART_PAD_LEFT - SHOE_CHART_PAD_RIGHT;
-const SHOE_CHART_PLOT_H = SHOE_CHART_BASELINE - SHOE_CHART_PAD_TOP;
-const shoeRevenuePoints = revenueData.map((d, i) => ({
+const REVENUE_LINE = 'var(--dracula-cyan)';
+const CHART_W = 540;
+const CHART_H = 200;
+const CHART_PAD_LEFT = 44;
+const CHART_PAD_RIGHT = 12;
+const CHART_PAD_TOP = 12;
+const CHART_BASELINE = 164;
+const CHART_MAX = 10000;
+const CHART_PLOT_W = CHART_W - CHART_PAD_LEFT - CHART_PAD_RIGHT;
+const CHART_PLOT_H = CHART_BASELINE - CHART_PAD_TOP;
+const revenuePoints = revenueData.map((d, i) => ({
   ...d,
-  x: SHOE_CHART_PAD_LEFT + (i / (revenueData.length - 1)) * SHOE_CHART_PLOT_W,
-  y: SHOE_CHART_BASELINE - (d.revenue / SHOE_CHART_MAX) * SHOE_CHART_PLOT_H,
+  x: CHART_PAD_LEFT + (i / (revenueData.length - 1)) * CHART_PLOT_W,
+  y: CHART_BASELINE - (d.revenue / CHART_MAX) * CHART_PLOT_H,
 }));
-const shoeRevenueLinePath = shoeRevenuePoints
+const revenueLinePath = revenuePoints
   .map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`)
   .join(' ');
-const shoeRevenueAreaPath = `${shoeRevenueLinePath} L${shoeRevenuePoints[shoeRevenuePoints.length - 1].x.toFixed(1)},${SHOE_CHART_BASELINE} L${shoeRevenuePoints[0].x.toFixed(1)},${SHOE_CHART_BASELINE} Z`;
-const SHOE_REVENUE_GRID_TICKS = [0, 2000, 4000, 6000, 8000, 10000];
+const revenueAreaPath = `${revenueLinePath} L${revenuePoints[revenuePoints.length - 1].x.toFixed(1)},${CHART_BASELINE} L${revenuePoints[0].x.toFixed(1)},${CHART_BASELINE} Z`;
+const REVENUE_GRID_TICKS = [0, 2000, 4000, 6000, 8000, 10000];
+
+// Axis ticks switch to thousands once the scale leaves the hundreds.
+function formatRevenueTick(tick: number): string {
+  return tick >= 1000 ? `$${tick / 1000}k` : `$${tick}`;
+}
 
 function RevenueChart() {
-  const W = SHOE_CHART_W;
-  const H = SHOE_CHART_H;
-  const padLeft = SHOE_CHART_PAD_LEFT;
-  const padRight = SHOE_CHART_PAD_RIGHT;
-  const baseline = SHOE_CHART_BASELINE;
-  const max = SHOE_CHART_MAX;
-  const plotH = SHOE_CHART_PLOT_H;
-  const points = shoeRevenuePoints;
-  const linePath = shoeRevenueLinePath;
-  const areaPath = shoeRevenueAreaPath;
-  const gridTicks = SHOE_REVENUE_GRID_TICKS;
+  const W = CHART_W;
+  const H = CHART_H;
+  const padLeft = CHART_PAD_LEFT;
+  const padRight = CHART_PAD_RIGHT;
+  const baseline = CHART_BASELINE;
+  const max = CHART_MAX;
+  const plotH = CHART_PLOT_H;
+  const points = revenuePoints;
+  const linePath = revenueLinePath;
+  const areaPath = revenueAreaPath;
+  const gridTicks = REVENUE_GRID_TICKS;
   return (
     <VStack gap={3}>
       <Card
@@ -958,16 +1004,16 @@ function RevenueChart() {
                   fontSize={9}
                   fill="var(--color-text-paragraph)"
                   fontFamily="var(--font-family-mono)">
-                  {tick === 0 ? '$0' : `$${tick / 1000}k`}
+                  {formatRevenueTick(tick)}
                 </text>
               </g>
             );
           })}
-          <path d={areaPath} fill={revenueLine} opacity={0.25} />
+          <path d={areaPath} fill={REVENUE_LINE} opacity={0.25} />
           <path
             d={linePath}
             fill="none"
-            stroke={revenueLine}
+            stroke={REVENUE_LINE}
             strokeWidth={2}
             strokeLinejoin="round"
             strokeLinecap="round"
@@ -993,7 +1039,7 @@ function RevenueChart() {
         Daily revenue · Jan 1–15
       </Text>
       <HStack gap={2} vAlign="center">
-        <Icon icon={Square} size="xsm" style={{color: revenueLine}} />
+        <Icon icon={Square} size="xsm" style={{color: REVENUE_LINE}} />
         <Text type="supporting" color="secondary">
           Revenue
         </Text>
@@ -1045,6 +1091,7 @@ export default function ShoeStoreTable() {
               idKey="id"
               density="balanced"
               dividers="rows"
+              textOverflow="truncate"
               hasHover
             />
           </VStack>

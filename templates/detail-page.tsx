@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LH > V[g=4] > (H[j=between] > Lk"All orders" + (H[g=2] > B"Restock" + B"Edit")) + (H[g=2 a=center] > Hd"#1001"[level=1] + Bd.warning"Unfulfilled") + (H[j=between] > TL > Tab"Details"! + Tab"Invoices" + Tab"Timeline")) + (LC > V[g=4] > (C > V[g=4] > (H[j=between] > Hd"Items"[level=2] + B"Fulfill item") + UL) + (C > V[g=4] > (H[j=between] > Hd"Invoice"[level=2] + B"Send Invoice") + ML) + (S > V[g=4] > Hd"Timeline"[level=2] + UL)) + (LP[w=320] > V[g=4] > Col"Notes" + Col"Customer" + Col"Fraud Analysis")
+//   L > (LH[divider] > V[g=3] > ((H[g=4 a=start] > (SI > V[g=0] > (Lk"All orders" + (V[g=0] > Hd"#1001"[level=1] + (H[g=1 a=center] > Tx"5 ordered items"[t=supporting] + Av"Jane Doe" + SD"Unfulfilled" + Tx"02/23/2026"[t=supporting] + Lk"See all")))) + (H[g=2] > B"Restock" + B"Edit")) + (H[g=3 a=center] > (SI > TL > Tab"Details"! + Tab"Invoices" + Tab"Timeline" + TabMenu"More") + B.ghost))) + (LC > V[g=4] > ((S > V[g=4] > ((H[g=2 a=center] > Hd"Items"[level=2] + SD"Unfulfilled") + UL)) + (S > V[g=4] > ((H[g=2 a=center] > Hd"Invoice"[level=2] + SD"Paid") + ML)) + (S > V[g=4] > ((H[g=2 a=center] > Hd"Timeline"[level=2] + B.ghost) + UL)))) + (LP[w=320 p=4] > V[g=4] > Col"Notes" + Col"Customer" + Col"Fraud Analysis")
 
 import {useState} from 'react';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
@@ -16,7 +16,7 @@ import {
   Section,
 } from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
-import {Badge} from '@astryxdesign/core/Badge';
+import {StatusDot} from '@astryxdesign/core/StatusDot';
 import {Avatar} from '@astryxdesign/core/Avatar';
 import {Button} from '@astryxdesign/core/Button';
 import {TabList, Tab, TabMenu} from '@astryxdesign/core/TabList';
@@ -159,7 +159,7 @@ const ACTIVITY = [
   {
     type: 'comment' as const,
     user: 'Alex Rivera',
-    text: "Customer requested gift wrapping for the mug & plate set. I've added a note to the packing slip — warehouse team should wrap in recycled kraft paper.",
+    text: "Customer requested gift wrapping for the mug & plate set. I've added a note to the packing slip. Warehouse team should wrap in recycled kraft paper.",
     reactions: 3,
     time: 'Feb 23 at 10:45 AM',
   },
@@ -169,8 +169,8 @@ const ACTIVITY = [
     text: 'has several information changes',
     time: 'Feb 23 at 11:30 AM',
     changes: [
-      'Payment verified via Visa ...7482',
-      'Fraud check passed — low risk',
+      'Payment verified via Visa …7482',
+      'Fraud check passed, low risk',
     ],
   },
   {
@@ -236,7 +236,10 @@ function PageHeader({
                   </HStack>
                   <HStack gap={1} vAlign="center">
                     <Bullet />
-                    <Badge variant="orange" label="Unfulfilled" />
+                    <StatusDot variant="warning" label="Unfulfilled" />
+                    <Text type="supporting" color="secondary">
+                      Unfulfilled
+                    </Text>
                   </HStack>
                   <HStack gap={1} vAlign="center">
                     <Bullet />
@@ -330,7 +333,10 @@ function ItemsCard() {
           <StackItem size="fill">
             <HStack gap={2} vAlign="center">
               <Heading level={2}>Items</Heading>
-              <Badge variant="orange" label="Unfulfilled" />
+              <StatusDot variant="warning" label="Unfulfilled" />
+              <Text type="supporting" color="secondary">
+                Unfulfilled
+              </Text>
             </HStack>
           </StackItem>
           <HStack gap={2}>
@@ -346,9 +352,9 @@ function ItemsCard() {
               label={product.name}
               description={
                 <VStack gap={0}>
-                  {product.details.split('\n').map((line, j) => (
+                  {product.details.split('\n').map(line => (
                     <Text
-                      key={j}
+                      key={line}
                       type="supporting"
                       color="secondary"
                       hasTabularNumbers>
@@ -396,7 +402,10 @@ function InvoiceCard() {
           <StackItem size="fill">
             <HStack gap={2} vAlign="center">
               <Heading level={2}>Invoice</Heading>
-              <Badge variant="green" label="Paid" />
+              <StatusDot variant="success" label="Paid" />
+              <Text type="supporting" color="secondary">
+                Paid
+              </Text>
             </HStack>
           </StackItem>
           <HStack gap={2}>
@@ -469,7 +478,7 @@ function InvoiceCard() {
             <HStack>
               <StackItem size="fill">
                 <Text type="body" hasTabularNumbers>
-                  Visa ...7482
+                  Visa …7482
                 </Text>
               </StackItem>
               <Text type="body" hasTabularNumbers>
@@ -500,73 +509,58 @@ function TimelineSection() {
           />
         </HStack>
 
-        <VStack gap={4}>
-          {ACTIVITY.map((item) => (
-            <VStack key={`${item.user}-${item.time}`} gap={2}>
-              <HStack gap={3} vAlign="start">
-                <Avatar name={item.user} size="md" />
-                <StackItem size="fill">
-                  <VStack gap={2}>
-                    <Card variant="muted" padding={3}>
-                      <VStack gap={1}>
-                        <Text type="body" weight="semibold">
-                          {item.user}
-                        </Text>
-                        <Text type="body">{item.text}</Text>
-                        {item.changes && (
-                          <VStack gap={1}>
-                            {item.changes.map((change, j) => (
-                              <HStack key={j} gap={2} vAlign="center">
-                                <Icon
-                                  icon={SquarePen}
-                                  size="sm"
-                                  color="secondary"
-                                />
-                                <Text type="supporting" color="secondary">
-                                  {change}
-                                </Text>
-                              </HStack>
-                            ))}
-                          </VStack>
-                        )}
-                      </VStack>
-                    </Card>
-                    <HStack gap={3} vAlign="center">
-                      <HStack gap={1} vAlign="center">
-                        <Icon
-                          icon={ThumbsUp}
-                          size="xsm"
-                          color="secondary"
-                        />
-                        <Icon icon={Heart} size="xsm" color="secondary" />
-                        <Text
-                          type="supporting"
-                          color="secondary"
-                          hasTabularNumbers>
-                          {item.reactions}
-                        </Text>
-                      </HStack>
-                      <Text type="supporting" color="secondary">
-                        Like
-                      </Text>
-                      <Bullet />
-                      <Text type="supporting" color="secondary">
-                        Reply
-                      </Text>
-                      <Bullet />
+        <List density="spacious" style={itemsList}>
+          {ACTIVITY.map(item => (
+            <ListItem
+              key={`${item.user}-${item.time}`}
+              label={item.user}
+              description={
+                <VStack gap={2}>
+                  <Text type="body">{item.text}</Text>
+                  {item.changes && (
+                    <VStack gap={1}>
+                      {item.changes.map(change => (
+                        <HStack key={change} gap={2} vAlign="center">
+                          <Icon icon={SquarePen} size="sm" color="secondary" />
+                          <Text type="supporting" color="secondary">
+                            {change}
+                          </Text>
+                        </HStack>
+                      ))}
+                    </VStack>
+                  )}
+                  <HStack gap={3} vAlign="center">
+                    <HStack gap={1} vAlign="center">
+                      <Icon icon={ThumbsUp} size="xsm" color="secondary" />
+                      <Icon icon={Heart} size="xsm" color="secondary" />
                       <Text
                         type="supporting"
                         color="secondary"
                         hasTabularNumbers>
-                        {item.time}
+                        {item.reactions}
                       </Text>
                     </HStack>
-                  </VStack>
-                </StackItem>
-              </HStack>
-            </VStack>
+                    <Text type="supporting" color="secondary">
+                      Like
+                    </Text>
+                    <Bullet />
+                    <Text type="supporting" color="secondary">
+                      Reply
+                    </Text>
+                    <Bullet />
+                    <Text
+                      type="supporting"
+                      color="secondary"
+                      hasTabularNumbers>
+                      {item.time}
+                    </Text>
+                  </HStack>
+                </VStack>
+              }
+              startContent={<Avatar name={item.user} size="md" />}
+            />
           ))}
-        </VStack>
+        </List>
       </VStack>
     </Section>
   );
@@ -578,7 +572,7 @@ function TimelineSection() {
 function PanelContent() {
   return (
     <VStack gap={4}>
-      <Collapsible trigger={<Heading level={4}>Notes</Heading>}>
+      <Collapsible trigger={<Heading level={2}>Notes</Heading>}>
         <Text type="body">
           Customer is a repeat buyer, 3rd order this quarter. Prefers
           moonlight and sage glazes. Requested gift wrapping for the mug set.
@@ -588,7 +582,7 @@ function PanelContent() {
           </Link>
         </Text>
       </Collapsible>
-      <Collapsible trigger={<Heading level={4}>Customer</Heading>}>
+      <Collapsible trigger={<Heading level={2}>Customer</Heading>}>
         <MetadataList>
           <MetadataListItem label="Name">Jane Doe</MetadataListItem>
           <MetadataListItem label="Address">
@@ -601,7 +595,7 @@ function PanelContent() {
           </MetadataListItem>
         </MetadataList>
       </Collapsible>
-      <Collapsible trigger={<Heading level={4}>Fraud Analysis</Heading>}>
+      <Collapsible trigger={<Heading level={2}>Fraud Analysis</Heading>}>
         <VStack gap={1}>
           <ProgressBar
             label="Risk level"

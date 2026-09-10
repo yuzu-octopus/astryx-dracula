@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC[p=0] > Ctr > V[g=8] > (V[g=4 a=center] > (V[g=2 a=center] > Hd"Hung after dark"[level=1] + Tx"A coven-curated wall"[t=body]) + (TL > Tab"All"! + Tab"Lifestyle" + Tab"Scenery" + Tab"Home") + Tx"10 pieces on the wall"[t=supporting]) + (G[g=4] > (C[p=0] > AR)*6)
+//   L > LC[p=0] > Ctr > V[g=8] > (V[g=4 a=center] > (V[g=2 a=center] > Hd"Hung after dark"[level=1] + Tx"A coven-curated wall"[t=body]) + (TL > Tab"All"! + Tab"Lifestyle" + Tab"Scenery" + Tab"Home") + Tx"10 pieces on the wall"[t=supporting]) + (G[c={min:260} g=4] > (C[p=0] > AR[ratio=3/2])*10)
 
 import {useState, type CSSProperties} from 'react';
 import {VStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
@@ -139,8 +139,8 @@ export default function ClassicGallery() {
                       <Heading level={1}>Hung after dark</Heading>
                       <Text type="body" color="secondary">
                         A coven-curated wall of moonlit ridges, late portraits,
-                        and lamplit rooms. Filter by haunt and stay a while —
-                        the gallery never sleeps.
+                        and lamplit rooms. Filter by haunt and stay a while.
+                        The gallery never sleeps.
                       </Text>
                     </VStack>
 

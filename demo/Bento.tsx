@@ -81,6 +81,7 @@ function Stat({ value, label, tint }: { value: string; label: string; tint: stri
 export function Bento() {
   const [name, setName] = useState('octocat');
   const [alerts, setAlerts] = useState(true);
+  const [digest, setDigest] = useState(false);
 
   return (
     <Theme theme={astryxDraculaTheme} mode="dark">
@@ -92,10 +93,10 @@ export function Bento() {
           padding: '24px',
         }}
       >
-        <HStack justify="between" vAlign="center">
+        <HStack justify="between" vAlign="center" wrap="wrap" gap={3}>
           <HStack gap={2} vAlign="center">
             <StatusDot variant="accent" label="Dracula" isPulsing />
-            <Heading level={2}>Astryx Dracula</Heading>
+            <Text weight="semibold">Astryx Dracula</Text>
             <Badge label="dark-only" variant="purple" />
           </HStack>
           <HStack gap={2} vAlign="center">
@@ -126,11 +127,11 @@ export function Bento() {
           </HStack>
         </Card>
 
-        <Grid columns={4} gap={4}>
-          <Card padding={4} style={{ gridColumn: 'span 2' }}>
+        <Grid columns={{ minWidth: 260, max: 4 }} gap={4}>
+          <Card padding={4}>
             <VStack gap={3}>
               <HStack justify="between" vAlign="center">
-                <Heading level={3}>Traffic</Heading>
+                <Heading level={2}>Traffic</Heading>
                 <Badge label="6 mo" variant="neutral" />
               </HStack>
               <svg viewBox="0 0 460 150" width="100%" role="img" aria-label="Traffic bar chart">
@@ -160,8 +161,13 @@ export function Bento() {
           <Card padding={4} style={{ gridRow: 'span 2' }}>
             <VStack gap={3}>
               <HStack justify="between" vAlign="center">
-                <Heading level={3}>Routes</Heading>
-                <Badge label="live" variant="green" />
+                <Heading level={2}>Routes</Heading>
+                <HStack gap={1.5} vAlign="center">
+                  <StatusDot variant="success" label="Live" isPulsing />
+                  <Text type="supporting" color="secondary">
+                    Live
+                  </Text>
+                </HStack>
               </HStack>
               <Table
                 data={ROUTES}
@@ -198,7 +204,7 @@ export function Bento() {
 
           <Card padding={4}>
             <VStack gap={3}>
-              <Heading level={3}>Team</Heading>
+              <Heading level={2}>Team</Heading>
               <HStack gap={2} vAlign="center">
                 <Avatar name="Ada Lovelace" tooltip={false} />
                 <Avatar name="Alan Turing" tooltip={false} />
@@ -212,18 +218,18 @@ export function Bento() {
 
           <Card padding={4}>
             <VStack gap={3}>
-              <Heading level={3}>Inputs</Heading>
+              <Heading level={2}>Inputs</Heading>
               <TextInput label="Username" value={name} onChange={setName} />
               <HStack gap={3} vAlign="center">
                 <Switch label="Alerts" value={alerts} onChange={setAlerts} />
-                <Switch label="Digest" value={false} onChange={() => {}} />
+                <Switch label="Digest" value={digest} onChange={setDigest} />
               </HStack>
             </VStack>
           </Card>
 
           <Card padding={4}>
             <VStack gap={3}>
-              <Heading level={3}>Status</Heading>
+              <Heading level={2}>Status</Heading>
               <HStack gap={1.5} wrap="wrap">
                 <Badge label="purple" variant="purple" />
                 <Badge label="pink" variant="pink" />
@@ -243,17 +249,17 @@ export function Bento() {
 
           <Card padding={4}>
             <VStack gap={3}>
-              <Heading level={3}>Progress</Heading>
+              <Heading level={2}>Progress</Heading>
               <ProgressBar label="Build quota" value={62} variant="accent" hasValueLabel />
               <ProgressBar label="Error budget" value={91} variant="warning" hasValueLabel />
               <ProgressBar label="Uptime" value={99} variant="success" hasValueLabel />
             </VStack>
           </Card>
 
-          <Card padding={4} style={{ gridColumn: 'span 2' }}>
+          <Card padding={4}>
             <VStack gap={3}>
               <HStack justify="between" vAlign="center">
-                <Heading level={3}>Actions</Heading>
+                <Heading level={2}>Actions</Heading>
                 <Text type="supporting" color="secondary">
                   Dim on hover, 5px radii
                 </Text>
@@ -264,7 +270,7 @@ export function Bento() {
                 <Button label="Ghost" variant="ghost" />
                 <Button label="Delete" variant="destructive" />
                 <Button label="Small" size="sm" variant="primary" />
-                <Button label="Loading..." isLoading variant="secondary" />
+                <Button label="Loading…" isLoading variant="secondary" />
               </HStack>
               <CodeBlock code={SNIPPET} language="tsx" isWrapped width="100%" />
             </VStack>
@@ -272,7 +278,7 @@ export function Bento() {
 
           <Card padding={4}>
             <VStack gap={3}>
-              <Heading level={3}>Checks</Heading>
+              <Heading level={2}>Checks</Heading>
               <Banner
                 status="success"
                 title="All checks green"
@@ -286,13 +292,13 @@ export function Bento() {
             </VStack>
           </Card>
 
-          <Card padding={4} style={{ gridColumn: 'span 2' }}>
+          <Card padding={4}>
             <VStack gap={3}>
               <HStack justify="between" vAlign="center">
-                <Heading level={3}>Spec palette</Heading>
+                <Heading level={2}>Spec palette</Heading>
                 <Badge label="12 pinned" variant="purple" />
               </HStack>
-              <Grid columns={6} gap={2}>
+              <Grid columns={{ minWidth: 96, max: 6 }} gap={2}>
                 {SPEC.map((s) => (
                   <VStack key={s.name} gap={1}>
                     <Card
@@ -318,7 +324,7 @@ export function Bento() {
 
           <Card padding={4}>
             <VStack gap={2}>
-              <Heading level={3}>Type scale</Heading>
+              <Heading level={2}>Type scale</Heading>
               <Text weight="semibold" style={{ fontSize: '20px' }}>
                 Heading 20
               </Text>
@@ -334,7 +340,7 @@ export function Bento() {
 
           <Card padding={4}>
             <VStack gap={3}>
-              <Heading level={3}>Ship it</Heading>
+              <Heading level={2}>Ship it</Heading>
               <CodeBlock code="bun add astryx-dracula" language="bash" width="100%" />
               <Text type="supporting" color="secondary">
                 Zero runtime cost. Copy the skill, paste the prompt, ship dark.

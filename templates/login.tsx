@@ -25,6 +25,11 @@ const contentStyle: CSSProperties = {
   width: '100%',
   maxWidth: 400,
 };
+// WCAG 1.3.5 wants autocomplete on identity fields. TextInput forwards unknown
+// props to the <input>, but its prop type omits input-only attributes, so the
+// attribute is spread in through a widened record.
+const inputAutoComplete = (value: string) =>
+  ({autoComplete: value}) as Record<string, string>;
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -76,7 +81,9 @@ export default function LoginPage() {
               onChange={setEmail}
               placeholder="you@castle.dracula"
               type="email"
+              {...inputAutoComplete('email')}
               size="lg"
+              onEnter={handleSignIn}
             />
 
             <TextInput
@@ -85,7 +92,9 @@ export default function LoginPage() {
               onChange={setPassword}
               placeholder="Whisper your password"
               type="password"
+              {...inputAutoComplete('current-password')}
               size="lg"
+              onEnter={handleSignIn}
             />
 
             <Button

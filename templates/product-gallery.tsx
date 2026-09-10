@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC > V[g=6] > (G[c={min:280} g=4 a=start] > Hd"Small comforts for the midnight hours."[level=1] + (V[g=3 a=start] > Tx"Provisions from the castle workshops"[t=body] + B.primary"Browse the collection")) + (G[c={min:300} g=6] > (V[g=3] > (C[p=0] > AR[ratio=1]) + (V[g=1] > Hd"Nightfall Stoneware Mug"[level=3] + Tx"Description"[t=body color=secondary] + Tx.lg"$75.00"))*6)
+//   L > LC[p=6] > V[g=6] > (G[c={min:280} g=4 a=start] > Hd"Small comforts for the midnight hours."[level=1] + (V[g=3 a=start] > Tx"Provisions from the castle workshops"[t=body] + B.primary"Browse the collection")) + (V[g=4] > (V[g=2] > Hd"The collection"[level=2] + Tx"Each piece is made in small batches"[t=body]) + (G[c={min:280} g=6] > (V[g=3] > (C[p=0] > AR[ratio=1]) + (V[g=1] > Hd"Nightfall Stoneware Mug"[level=3] + Tx"Description"[t=supporting color=secondary] + Tx.lg"$75.00"))*6))
 
 import {VStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
@@ -116,7 +116,7 @@ function ProductCard({product}: {product: Product}) {
       </Card>
       <VStack gap={1}>
         <Heading level={3}>{product.name}</Heading>
-        <Text type="body" color="secondary" maxLines={2}>
+        <Text type="supporting" color="secondary" maxLines={2}>
           {product.description}
         </Text>
         <Text type="large" weight="bold" hasTabularNumbers>
@@ -145,8 +145,7 @@ export default function ProductGallery() {
               <VStack gap={3} hAlign="start">
                 <Text type="body">
                   Provisions from the castle workshops: kiln-fired, hand-poured,
-                  and stitched by the coven. Each piece is made in small batches
-                  and restocked with every full moon.
+                  and stitched by the coven.
                 </Text>
                 <Button
                   label="Browse the collection"
@@ -162,11 +161,20 @@ export default function ProductGallery() {
             </Grid>
 
             {/* Product Grid — reflows 3 → 2 → 1 columns as width narrows */}
-            <Grid columns={{minWidth: 300}} gap={6} id="products">
-              {PRODUCTS.map(product => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </Grid>
+            <VStack gap={4}>
+              <VStack gap={2}>
+                <Heading level={2}>The collection</Heading>
+                <Text type="body" color="secondary">
+                  Each piece is made in small batches and restocked with every
+                  full moon.
+                </Text>
+              </VStack>
+              <Grid columns={{minWidth: 280}} gap={6} id="products">
+                {PRODUCTS.map(product => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </Grid>
+            </VStack>
           </VStack>
         </LayoutContent>
       }

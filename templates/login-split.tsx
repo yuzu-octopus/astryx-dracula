@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   Ctr > V[g4] > (C[p0] > G[c{min:240} g8 a=stretch] > (S[p0] > V[g4] > (H[g2] > Ic + Tx"Castle Dracula"[t=body]) + (V[g4] > (V[g1] > Hd"Welcome back to the night"[level=2] + Tx"Sign in to your crypt"[t=body]) + (V[g2] > TI"Email"[t=email] + TI"Password"[t=password]) + B.primary"Enter the night" + D"Or continue with" + (G[c2 g3] > B.secondary"Apple" + B.secondary"Google")) + (Tx"New to the castle?"[t=supporting] > Lk"Sign up")) + (C[p0] > AR)) + (V[a=center] > Tx"Terms"[t=supporting])
+//   Ctr > V[g=4] > (Ctr.horizontal > C[p=0] > G[c={min:240} g=8 a=stretch] > (S[p=0] > V[g=4] > (H[g=2 a=center] > Ic + Tx"Castle Dracula"[t=body]) + (V[g=4] > (V[g=1] > Hd"Welcome back to the night"[level=2] + Tx"Sign in to your crypt"[t=body]) + (V[g=2] > TI"Email"[t=email] + (V[g=1] > TI"Password"[t=password] + Lk"Forgot your password?")) + B.primary"Enter the night" + D"Or continue with" + (G[c={min:200} g=3] > B.secondary"Login with Apple" + B.secondary"Login with Google")) + Tx"New to the castle?"[t=supporting]) + (C[p=0] > AR)) + (V[a=center] > Tx"By clicking continue, you agree to our Terms of Service and Privacy Policy"[t=supporting])
 
 import {useState, useTransition, type CSSProperties} from 'react';
 import {VStack, HStack, StackItem} from '@astryxdesign/core/Layout';
@@ -84,7 +84,7 @@ const nightCoverArt = (
         <rect x="270" y="228" width="110" height="72" />
         <path d="M270 228 L325 190 L380 228 Z" />
       </g>
-      <g fill="var(--dracula-purple)">
+      <g fill="var(--dracula-yellow)">
         <rect x="58" y="244" width="14" height="18" />
         <rect x="188" y="224" width="14" height="18" />
         <rect x="312" y="250" width="14" height="18" />
@@ -112,6 +112,11 @@ const cardWrap: CSSProperties = {
   maxWidth: 1000,
   marginInline: 'auto',
 };
+// WCAG 1.3.5 wants autocomplete on identity fields. TextInput forwards unknown
+// props to the <input>, but its prop type omits input-only attributes, so the
+// attribute is spread in through a widened record.
+const inputAutoComplete = (value: string) =>
+  ({autoComplete: value}) as Record<string, string>;
 
 // The container query lives in a plain <style> tag so it needs NO CSS compiler.
 // - Pad the grid, not the Card: the form's Section escapes Card's
@@ -165,7 +170,7 @@ export default function LoginSplit() {
     <Center axis="both" style={pageStyle}>
       <style>{LOGIN_SPLIT_CSS}</style>
       <VStack gap={4} width="100%">
-        <div style={cardWrap}>
+        <Center axis="horizontal" style={cardWrap}>
           <Card padding={0} width="100%">
             <Grid
               columns={{minWidth: COLUMN_MIN_WIDTH, repeat: 'fit'}}
@@ -206,10 +211,15 @@ export default function LoginSplit() {
                               label="Email"
                               isLabelHidden
                               type="email"
+                              {...inputAutoComplete('email')}
                               placeholder="you@castle.dracula"
                               value={email}
-                              onChange={setEmail}
+                              onChange={(v: string) => {
+                                setEmail(v);
+                                setLoginFailed(false);
+                              }}
                               size="lg"
+                              onEnter={handleLogin}
                             />
                             <VStack gap={1}>
                               <TextInput
@@ -217,12 +227,14 @@ export default function LoginSplit() {
                                 isLabelHidden
                                 placeholder="Whisper your password"
                                 type="password"
+                                {...inputAutoComplete('current-password')}
                                 value={password}
                                 onChange={(v: string) => {
                                   setPassword(v);
                                   setLoginFailed(false);
                                 }}
                                 size="lg"
+                                onEnter={handleLogin}
                                 status={
                                   loginFailed
                                     ? {
@@ -253,7 +265,13 @@ export default function LoginSplit() {
 
                           <Divider label="Or continue with" />
 
-                          <Grid columns={2} gap={3} justify="stretch">
+                          {/* minWidth (not a fixed 2-up) so the pair stacks inside
+                              the narrow single-column container instead of
+                              giving each button ~114px for an icon + label. */}
+                          <Grid
+                            columns={{minWidth: 200, repeat: 'fit'}}
+                            gap={3}
+                            justify="stretch">
                             <Button
                               label="Login with Apple"
                               variant="secondary"
@@ -285,18 +303,17 @@ export default function LoginSplit() {
 
               {/* Cover art — the transparent Card clips it to rounded
                   corners (overflow:clip + radius), so the art needs no radius. */}
-              <div className="login-split-image">
-                <Card
-                  variant="transparent"
-                  padding={0}
-                  width="100%"
-                  height="100%">
-                  {nightCoverArt}
-                </Card>
-              </div>
+              <Card
+                variant="transparent"
+                padding={0}
+                width="100%"
+                height="100%"
+                className="login-split-image">
+                {nightCoverArt}
+              </Card>
             </Grid>
           </Card>
-        </div>
+        </Center>
 
         <VStack hAlign="center">
           <Text type="supporting" color="secondary">

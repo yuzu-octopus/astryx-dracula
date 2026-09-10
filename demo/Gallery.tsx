@@ -28,7 +28,7 @@ export function Gallery() {
       {/* System Banners */}
       <VStack gap={3}>
         <Heading level={3}>System Banners</Heading>
-        <Grid columns={{ minWidth: 320, max: 2 }} gap={3}>
+        <Grid columns={{ minWidth: 280, max: 2 }} gap={3}>
           <Banner
             status="info"
             title="Deploy preview active"
@@ -53,7 +53,7 @@ export function Gallery() {
       </VStack>
 
       {/* Actions and Badges Grid */}
-      <Grid columns={{ minWidth: 320, max: 2 }} gap={4}>
+      <Grid columns={{ minWidth: 280, max: 2 }} gap={4}>
         {/* Buttons */}
         <Card padding={4}>
           <VStack gap={4}>
@@ -82,7 +82,7 @@ export function Gallery() {
               </Text>
               <HStack gap={2} wrap="wrap" vAlign="center">
                 <Button label="Small Primary" size="sm" variant="primary" />
-                <Button label="Loading..." isLoading variant="secondary" />
+                <Button label="Loading…" isLoading variant="secondary" />
                 <Button label="Disabled" isDisabled variant="ghost" />
               </HStack>
             </VStack>

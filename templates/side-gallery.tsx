@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC > G[c{min:360} g8 a=center] > (V[g6] > (V[g3] > Tx"AFTER DARK"[t=supporting] + Hd"Make every night"[level=1] + Tx"The smallest rituals"[t=body]) + B.primary"Explore the night" + (V[g4] > D + (H[g6] > (V > Tx"12k+"[t=large] + Tx"Night shots"[t=supporting])*3))) + (G[c3 g3] > AR*9)
+//   L > LC[p=6] > G[c={min:280} g8 a=center] > (V[g6] > (V[g3] > Tx"AFTER DARK"[t=supporting] + Hd"Make every night"[level=1] + Tx"The smallest rituals"[t=body]) + B.primary"Explore the night" + (V[g4] > D + (H[g6] > (V > Tx"12k+"[t=large] + Tx"Night shots"[t=supporting])*3))) + (G[c3 g3] > AR*9)
 
 import type {CSSProperties} from 'react';
 import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
@@ -138,7 +138,7 @@ export default function SideGallery() {
       contentWidth={1400}
       content={
         <LayoutContent padding={6}>
-          <Grid columns={{minWidth: 360, repeat: 'fit'}} gap={8} align="center">
+          <Grid columns={{minWidth: 280, repeat: 'fit'}} gap={8} align="center">
             {/* Left side: Text + CTA */}
             <VStack gap={6} vAlign="center">
               <VStack gap={3}>

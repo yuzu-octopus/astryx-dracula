@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   C[p4] > V[g3] > (Hd"Sign in"[level=3] + F > (TI"Email"[t=email req] + TI"Password"[t=password req]) + B.primary"Enter the night")
+//   Ctr > V[g=4 a=center] > (V[g=2 a=center] > Ic + Tx"Castle Dracula"[t=body]) + (C[p=8] > V[g=4] > (V[g=1 a=center] > Hd"Welcome back to the night"[level=2] + Tx"Sign in to your crypt"[t=body]) + (V[g=2] > TI"Email"[t=email] + (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?")) + B.primary"Enter the night" + D"Or continue with" + (V[g=3] > B.secondary"Login with Apple" + B.secondary"Login with Google") + (V[a=center] > Tx"New to the castle?"[t=supporting] + Lk"Sign up")) + (V[a=center] > Tx"By clicking continue, you agree to our Terms of Service and Privacy Policy"[t=supporting])
 
 import {useState, useTransition, type CSSProperties} from 'react';
 import {Moon} from 'lucide-react';
@@ -54,6 +54,11 @@ const contentStyle: CSSProperties = {
   width: '100%',
   maxWidth: 400,
 };
+// WCAG 1.3.5 wants autocomplete on identity fields. TextInput forwards unknown
+// props to the <input>, but its prop type omits input-only attributes, so the
+// attribute is spread in through a widened record.
+const inputAutoComplete = (value: string) =>
+  ({autoComplete: value}) as Record<string, string>;
 
 export default function LoginCard() {
   const [email, setEmail] = useState('');
@@ -103,10 +108,15 @@ export default function LoginCard() {
                 label="Email"
                 isLabelHidden
                 type="email"
+                {...inputAutoComplete('email')}
                 placeholder="you@castle.dracula"
                 value={email}
-                onChange={setEmail}
+                onChange={(v: string) => {
+                  setEmail(v);
+                  setLoginFailed(false);
+                }}
                 size="lg"
+                onEnter={handleLogin}
               />
               <VStack gap={1}>
                 <TextInput
@@ -114,12 +124,14 @@ export default function LoginCard() {
                   isLabelHidden
                   placeholder="Whisper your password"
                   type="password"
+                  {...inputAutoComplete('current-password')}
                   value={password}
                   onChange={(v: string) => {
                     setPassword(v);
                     setLoginFailed(false);
                   }}
                   size="lg"
+                  onEnter={handleLogin}
                   status={
                     loginFailed
                       ? {

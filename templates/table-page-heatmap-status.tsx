@@ -1,6 +1,23 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LH > H[g2 a=center] > Hd"Status"[level=1] + IB*2 + B"Refresh") + (LC[p3] > V[g4] > (V[g3] > C[p3] + Tx"Incidents by day and hour"[t=supporting] + (H[g4] > (H[g2] > Tx[t=supporting])*4)) + (T > (TR > THC*8) + (TR > TC*8)*5))
+//   L > (LH[divider] > H[g2 a=center] > Hd"Status"[level=1] + IB"Filter"[variant=ghost] + IB"Export"[variant=ghost] + B"Refresh") + (LC[p3] > V[g4] > (V[g3] > C[p3] + Tx"Incidents by day and hour"[t=supporting] + (H[g4] > (H[g2] > Tx[t=supporting])*4)) + (T[hover] > (TR > THC"Incident" + THC"Product" + THC"Description" + THC"Started" + THC"Duration" + THC"On-call" + THC"Status" + THC"Date") + (TR > TC"INC-4008" + TC"Business Suite" + TC"Notification delivery delays" + TC"09:15" + TC"ongoing" + TC"Carlos Mendez" + (TC > Tk.red"Ongoing") + TC"2025-01-15")*5))
+
+/**
+ * Status — the incident heatmap for the week plus the log behind it.
+ *
+ * Frame: page header (title + icon actions) | content column (heatmap, table).
+ *
+ * Container policy: the day/hour heatmap is a single Card widget; incidents
+ * render as dense rows in one edge-to-edge table. Every heat cell prints its
+ * count, so the green/orange/red ramp reinforces the numbers rather than
+ * carrying the reading on its own, and status is a Token instead of a badge.
+ *
+ * Responsive contract:
+ *   no media queries — the heatmap is an SVG that scales to its column, so it
+ *   reflows at any width. The table declares a ~910px floor across its eight
+ *   columns and truncates cells (description to two lines), so narrower
+ *   viewports scroll the table horizontally instead of widening the page.
+ */
 
 import {
   VStack,
@@ -15,7 +32,7 @@ import {Button} from '@astryxdesign/core/Button';
 import {IconButton} from '@astryxdesign/core/IconButton';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Avatar} from '@astryxdesign/core/Avatar';
-import {Badge} from '@astryxdesign/core/Badge';
+import {Token} from '@astryxdesign/core/Token';
 import {Card} from '@astryxdesign/core/Card';
 import {Link} from '@astryxdesign/core/Link';
 import {Table, proportional, pixel} from '@astryxdesign/core/Table';
@@ -58,7 +75,7 @@ const incidents: IncidentRow[] = [
     id: 'INC-4008',
     product: 'Business Suite',
     title:
-      'Notification delivery delays affecting mobile push and email channels — queue saturation under investigation',
+      'Notification delivery delays affecting mobile push and email channels, queue saturation under investigation',
     severity: 'major',
     oncall: 'Carlos Mendez',
     status: 'ongoing',
@@ -73,7 +90,7 @@ const incidents: IncidentRow[] = [
     id: 'INC-4001',
     product: 'Ads Manager',
     title:
-      'Campaign creation timing out for ~12% of advertisers in EMEA region — root caused to elevated DB write latency',
+      'Campaign creation timing out for ~12% of advertisers in EMEA region, root caused to elevated DB write latency',
     severity: 'critical',
     oncall: 'Sarah Chen',
     status: 'resolved',
@@ -160,7 +177,7 @@ const incidents: IncidentRow[] = [
     id: 'INC-4007',
     product: 'Messenger API',
     title:
-      'Webhook delivery failures for subscribed page events — retries succeeded but signaled false alerts',
+      'Webhook delivery failures for subscribed page events, retries succeeded but signaled false alerts',
     severity: 'minor',
     oncall: 'Mei Lin',
     status: 'resolved',
@@ -176,7 +193,7 @@ const incidents: IncidentRow[] = [
     id: 'INC-4009',
     product: 'Pages',
     title:
-      'Image upload timeouts for posts larger than 4MB — auto-recovered after CDN region failover',
+      'Image upload timeouts for posts larger than 4MB, auto-recovered after CDN region failover',
     severity: 'minor',
     oncall: 'Fatima Al-Rashid',
     status: 'resolved',
@@ -190,7 +207,7 @@ const incidents: IncidentRow[] = [
     id: 'INC-4010',
     product: 'Graph API',
     title:
-      'Intermittent 503 errors on a single load balancer in us-east-1 — auto-healed by health check rotation',
+      'Intermittent 503 errors on a single load balancer in us-east-1, auto-healed by health check rotation',
     severity: 'minor',
     oncall: 'Lucas Andersson',
     status: 'resolved',
@@ -246,7 +263,7 @@ const incidents: IncidentRow[] = [
     id: 'INC-4014',
     product: 'Business Suite',
     title:
-      'Slow inbox loading times (>3s p95) for accounts with large message histories — index rebuild in progress',
+      'Slow inbox loading times (>3s p95) for accounts with large message histories, index rebuild in progress',
     severity: 'minor',
     oncall: 'Andre Santos',
     status: 'resolved',
@@ -291,19 +308,28 @@ function buildHeatmapData(data: IncidentRow[]) {
   );
 }
 
-const statusVariant: Record<string, 'error' | 'warning' | 'info' | 'success'> =
-  {
-    ongoing: 'error',
-    identified: 'warning',
-    monitoring: 'info',
-    resolved: 'success',
-  };
+const STATUS_TOKEN_COLOR: Record<
+  IncidentRow['status'],
+  'red' | 'yellow' | 'cyan' | 'green'
+> = {
+  ongoing: 'red',
+  identified: 'yellow',
+  monitoring: 'cyan',
+  resolved: 'green',
+};
+
+const STATUS_LABEL: Record<IncidentRow['status'], string> = {
+  ongoing: 'Ongoing',
+  identified: 'Identified',
+  monitoring: 'Monitoring',
+  resolved: 'Resolved',
+};
 
 const columns: TableColumn<IncidentRow>[] = [
   {
     key: 'id',
     header: 'Incident',
-    width: pixel(110),
+    width: pixel(96),
     renderCell: (item: IncidentRow) => (
       <Link href="#/templates/table-page-heatmap-status" isStandalone>
         {item.id}
@@ -313,21 +339,29 @@ const columns: TableColumn<IncidentRow>[] = [
   {
     key: 'product',
     header: 'Product',
-    width: proportional(2),
-    renderCell: (item: IncidentRow) => <Text type="body">{item.product}</Text>,
+    width: proportional(2, {minWidth: 120}),
+    renderCell: (item: IncidentRow) => (
+      <Text type="body" maxLines={1}>
+        {item.product}
+      </Text>
+    ),
   },
   {
     key: 'title',
     header: 'Description',
-    width: proportional(5),
-    renderCell: (item: IncidentRow) => <Text type="body">{item.title}</Text>,
+    width: proportional(5, {minWidth: 160}),
+    renderCell: (item: IncidentRow) => (
+      <Text type="body" maxLines={2}>
+        {item.title}
+      </Text>
+    ),
   },
   {
     key: 'startTime',
     header: 'Started',
-    width: pixel(96),
+    width: pixel(88),
     renderCell: (item: IncidentRow) => (
-      <Text type="body" hasTabularNumbers>
+      <Text type="body" hasTabularNumbers maxLines={1}>
         {item.startTime}
       </Text>
     ),
@@ -335,9 +369,9 @@ const columns: TableColumn<IncidentRow>[] = [
   {
     key: 'duration',
     header: 'Duration',
-    width: pixel(100),
+    width: pixel(96),
     renderCell: (item: IncidentRow) => (
-      <Text type="body" hasTabularNumbers>
+      <Text type="body" hasTabularNumbers maxLines={1}>
         {item.duration}
       </Text>
     ),
@@ -345,11 +379,15 @@ const columns: TableColumn<IncidentRow>[] = [
   {
     key: 'oncall',
     header: 'On-call',
-    width: proportional(2),
+    width: proportional(2, {minWidth: 120}),
     renderCell: (item: IncidentRow) => (
       <HStack gap={2} vAlign="center">
         <Avatar name={item.oncall} size="sm" />
-        <Text type="body">{item.oncall}</Text>
+        <StackItem size="fill">
+          <Text type="body" maxLines={1}>
+            {item.oncall}
+          </Text>
+        </StackItem>
       </HStack>
     ),
   },
@@ -358,18 +396,19 @@ const columns: TableColumn<IncidentRow>[] = [
     header: 'Status',
     width: pixel(120),
     renderCell: (item: IncidentRow) => (
-      <Badge
-        label={item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-        variant={statusVariant[item.status]}
+      <Token
+        size="sm"
+        color={STATUS_TOKEN_COLOR[item.status]}
+        label={STATUS_LABEL[item.status]}
       />
     ),
   },
   {
     key: 'date',
     header: 'Date',
-    width: pixel(110),
+    width: pixel(112),
     renderCell: (item: IncidentRow) => (
-      <Text type="body" hasTabularNumbers>
+      <Text type="body" hasTabularNumbers maxLines={1}>
         {item.date}
       </Text>
     ),
@@ -459,17 +498,22 @@ function OutageHeatmap() {
                       rx={4}
                       fill={heatFill(count)}
                     />
-                    {count > 0 && (
-                      <text
-                        x={labelW + di * (cellW + gap) + cellW / 2}
-                        y={labelH + hi * (cellH + gap) + cellH / 2 + 3}
-                        textAnchor="middle"
-                        fontSize={9}
-                        fill="var(--dracula-bg-dark)"
-                        fontFamily="var(--font-family-mono)">
-                        {count}
-                      </text>
-                    )}
+                    {/* Every cell prints its count, empty ones included, so
+                        the ramp reinforces the number instead of carrying the
+                        reading on its own. */}
+                    <text
+                      x={labelW + di * (cellW + gap) + cellW / 2}
+                      y={labelH + hi * (cellH + gap) + cellH / 2 + 3}
+                      textAnchor="middle"
+                      fontSize={9}
+                      fill={
+                        count > 0
+                          ? 'var(--dracula-bg-dark)'
+                          : 'var(--color-text-paragraph)'
+                      }
+                      fontFamily="var(--font-family-mono)">
+                      {count}
+                    </text>
                   </g>
                 );
               })}
@@ -539,6 +583,7 @@ export default function HeatmapTable() {
               idKey="id"
               density="balanced"
               dividers="rows"
+              textOverflow="truncate"
               hasHover
             />
           </VStack>

@@ -40,7 +40,7 @@ export default function App() {
     >
             {/* HERO SECTION */}
             <section id="top">
-              <Grid columns={{ minWidth: 340, max: 2 }} gap={6} align="center">
+              <Grid columns={{ minWidth: 280, max: 2 }} gap={6} align="center">
                 <VStack gap={4}>
                   <HStack gap={2} vAlign="center" wrap="wrap">
                     <StatusDot variant="success" label="Active Spec" />

@@ -1,4 +1,4 @@
-import { Badge, Card, Grid, Heading, HStack, ProgressBar, StatusDot, Table, Text, VStack, proportional, pixel } from '@astryxdesign/core';
+import { Badge, Card, Grid, Heading, HStack, ProgressBar, StatusDot, Table, Text, VStack, proportional } from '@astryxdesign/core';
 
 const BARS = [
   { month: 'Jan', value: 42, color: 'var(--dracula-purple)', label: 'Purple' },
@@ -88,7 +88,7 @@ export function Dashboard() {
         <Kpi label="Design Adoption" value="72%" delta={21.0} hint="vs last week" />
       </Grid>
 
-      <Grid columns={{ minWidth: 320, max: 2 }} gap={4}>
+      <Grid columns={{ minWidth: 280, max: 2 }} gap={4}>
         <Card padding={4}>
           <VStack gap={4}>
             <HStack justify="between" vAlign="center">

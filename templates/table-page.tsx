@@ -2,6 +2,22 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   L > (LH[divider] > H[g=2 a=center] > (SI[fill] > Hd"Familiars"[level=1]) + IB"Filter" + IB"Download" + B.primary"Add") + (LC[p=3] > V[g=4] > PS + (T[hover] > (TR > THC*3) + (TR > TC*3)*3))
 
+/**
+ * Familiars — the full roster of the crypt's companions, with a PowerSearch
+ * field filter bar above one dense table.
+ *
+ * Frame: page header (title + actions) | search | table (38 rows).
+ *
+ * Container policy: one dense table, edge-to-edge, zero Cards. The name cell
+ * carries avatar + name + kind, the biography column wraps, age is tabular.
+ *
+ * Responsive contract:
+ *   no media queries — the frame is header | table at every width. The table
+ *   owns the only horizontal scroll (its minimum is ~920px across the three
+ *   columns), so below that the name/kind lines truncate and the biography
+ *   column stays readable rather than compressing the whole page.
+ */
+
 import {useState, useMemo} from 'react';
 import {
   VStack,
@@ -43,7 +59,7 @@ const allFamiliars: FamiliarRow[] = [
     name: 'Vlad',
     kind: 'Vampire Bat',
     biography:
-      'I love brooding in the belfry and hate garlic bread — you might wonder how well those things mix and the answer is "not that well."',
+      'I love brooding in the belfry and hate garlic bread, and you might wonder how well those things mix. The answer is "not that well."',
     age: 17,
   },
   {
@@ -123,7 +139,7 @@ const allFamiliars: FamiliarRow[] = [
     name: 'Bruno',
     kind: 'Gargoyle',
     biography:
-      "Bruno is a gargoyle. He's a stony fellow — I never needed more than a day to teach him to scowl.",
+      "Bruno is a gargoyle. He's a stony fellow. I never needed more than a day to teach him to scowl.",
     age: 5,
   },
   {

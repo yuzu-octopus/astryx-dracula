@@ -1,6 +1,23 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LH[divider] > H[a=center g=2] > (SI[size=fill] > Hd"Matcha Bar"[level=1]) + IB"Filter"[variant=ghost] + IB"Export"[variant=ghost] + B.primary"New order") + (LC[p=3] > V[g=4] > C[p=3] + (T[hover] > (TR > THC"Order" + THC"Product" + THC"Amount" + THC"Customer" + THC"Email" + THC"Status" + THC"Date") + (TR > TC"ORD-1001" + TC"Ceremonial Matcha Latte" + TC"$6" + TC"Sarah Chen" + TC"sarah.chen@acme.co" + (TC > Bd.green"Completed") + TC"2025-01-15")*6))
+//   L > (LH[divider] > H[a=center g=2] > (SI[size=fill] > Hd"Matcha Bar"[level=1]) + IB"Filter"[variant=ghost] + IB"Export"[variant=ghost] + B.primary"New order") + (LC[p=3] > V[g=4] > C[p=3] + (T[hover] > (TR > THC"Order" + THC"Product" + THC"Amount" + THC"Customer" + THC"Email" + THC"Status" + THC"Date") + (TR > TC"ORD-1001" + TC"Ceremonial Matcha Latte" + TC"$6" + TC"Sarah Chen" + TC"sarah.chen@acme.co" + (TC > Tk.green"Completed") + TC"2025-01-15")*6))
+
+/**
+ * Matcha Bar — order desk: a daily revenue line over the full order log.
+ *
+ * Frame: page header (title + icon actions) | content column (chart, table).
+ *
+ * Container policy: the chart is a single Card widget; the orders are dense
+ * rows in one edge-to-edge table (never card-wrapped). Status is a Token, and
+ * the numeric columns carry tabular figures. Shared swatch/chart helpers are
+ * kept byte-aligned with table-page-shoe-store-heatmap.
+ *
+ * Responsive contract:
+ *   no media queries — the chart is an SVG that scales to its column, so it
+ *   reflows at any width. The table declares a ~820px floor across its seven
+ *   columns and truncates each text cell (maxLines=1), so narrower viewports
+ *   scroll the table horizontally instead of widening the page.
+ */
 
 import type {CSSProperties} from 'react';
 import {
@@ -15,7 +32,7 @@ import {Text, Heading} from '@astryxdesign/core/Text';
 import {Button} from '@astryxdesign/core/Button';
 import {IconButton} from '@astryxdesign/core/IconButton';
 import {Icon} from '@astryxdesign/core/Icon';
-import {Badge} from '@astryxdesign/core/Badge';
+import {Token} from '@astryxdesign/core/Token';
 import {Card} from '@astryxdesign/core/Card';
 import {Link} from '@astryxdesign/core/Link';
 import {Table, proportional, pixel} from '@astryxdesign/core/Table';
@@ -25,16 +42,6 @@ import {Filter, Download, Plus, Square} from 'lucide-react';
 // ============= ICONS (verified lucide-react exports) =============
 // Filter ← FunnelIcon, Download ← ArrowDownTrayIcon, Plus ← PlusIcon.
 // Square marks the chart legend swatch.
-
-// Per-product Dracula accent for the order thumbnail swatches.
-const PRODUCT_ACCENTS = [
-  'var(--dracula-green)',
-  'var(--dracula-orange)',
-  'var(--dracula-cyan)',
-  'var(--dracula-pink)',
-  'var(--dracula-purple)',
-  'var(--dracula-yellow)',
-] as const;
 
 const swatchStyle: CSSProperties = {flexShrink: 0};
 
@@ -83,31 +90,37 @@ const PRODUCTS = [
   {
     name: 'Ceremonial Matcha Latte',
     category: 'Matcha' as ProductCategory,
+    accent: 'var(--dracula-green)',
     price: 6,
   },
   {
     name: 'Oat Milk Cappuccino',
     category: 'Coffee' as ProductCategory,
+    accent: 'var(--dracula-orange)',
     price: 5,
   },
   {
     name: 'Jasmine Green Tea',
     category: 'Tea' as ProductCategory,
+    accent: 'var(--dracula-cyan)',
     price: 4,
   },
   {
     name: 'Mango Matcha Smoothie',
     category: 'Smoothie' as ProductCategory,
+    accent: 'var(--dracula-pink)',
     price: 8,
   },
   {
     name: 'Hojicha Latte',
     category: 'Specialty' as ProductCategory,
+    accent: 'var(--dracula-purple)',
     price: 7,
   },
   {
     name: 'Iced Yuzu Matcha',
     category: 'Matcha' as ProductCategory,
+    accent: 'var(--dracula-yellow)',
     price: 7,
   },
 ];
@@ -463,18 +476,28 @@ const revenueData = [
   {date: 'Jan 15', revenue: 138},
 ];
 
-const statusColor: Record<string, 'green' | 'blue' | 'orange' | 'red'> = {
+const STATUS_TOKEN_COLOR: Record<
+  OrderRow['status'],
+  'green' | 'blue' | 'orange' | 'red'
+> = {
   completed: 'green',
   shipped: 'blue',
   processing: 'orange',
   refunded: 'red',
 };
 
+const STATUS_LABEL: Record<OrderRow['status'], string> = {
+  completed: 'Completed',
+  shipped: 'Shipped',
+  processing: 'Processing',
+  refunded: 'Refunded',
+};
+
 const columns: TableColumn<OrderRow>[] = [
   {
     key: 'id',
     header: 'Order',
-    width: pixel(110),
+    width: pixel(96),
     renderCell: (item: OrderRow) => (
       <Link href="#/templates/table-page-chart" isStandalone>
         {item.id}
@@ -484,28 +507,32 @@ const columns: TableColumn<OrderRow>[] = [
   {
     key: 'product',
     header: 'Product',
-    width: proportional(3),
+    width: proportional(3, {minWidth: 160}),
     renderCell: (item: OrderRow) => (
       <HStack gap={3} vAlign="center">
         <ProductSwatch
-          accent={PRODUCT_ACCENTS[item.imageIndex]}
+          accent={PRODUCTS[item.imageIndex].accent}
           label={item.product}
         />
-        <VStack gap={0}>
-          <Text type="body">{item.product}</Text>
-          <Text type="supporting" color="secondary">
-            {item.category}
-          </Text>
-        </VStack>
+        <StackItem size="fill">
+          <VStack gap={0}>
+            <Text type="body" maxLines={1}>
+              {item.product}
+            </Text>
+            <Text type="supporting" color="secondary" maxLines={1}>
+              {item.category}
+            </Text>
+          </VStack>
+        </StackItem>
       </HStack>
     ),
   },
   {
     key: 'amount',
     header: 'Amount',
-    width: pixel(90),
+    width: pixel(88),
     renderCell: (item: OrderRow) => (
-      <Text type="body" hasTabularNumbers>
+      <Text type="body" hasTabularNumbers maxLines={1}>
         ${item.amount}
       </Text>
     ),
@@ -513,32 +540,41 @@ const columns: TableColumn<OrderRow>[] = [
   {
     key: 'customer',
     header: 'Customer',
-    width: proportional(2),
-    renderCell: (item: OrderRow) => <Text type="body">{item.customer}</Text>,
+    width: proportional(2, {minWidth: 120}),
+    renderCell: (item: OrderRow) => (
+      <Text type="body" maxLines={1}>
+        {item.customer}
+      </Text>
+    ),
   },
   {
     key: 'email',
     header: 'Email',
-    width: proportional(2),
-    renderCell: (item: OrderRow) => <Text type="body">{item.email}</Text>,
+    width: proportional(2, {minWidth: 120}),
+    renderCell: (item: OrderRow) => (
+      <Text type="body" maxLines={1}>
+        {item.email}
+      </Text>
+    ),
   },
   {
     key: 'status',
     header: 'Status',
     width: pixel(120),
     renderCell: (item: OrderRow) => (
-      <Badge
-        label={item.status.charAt(0).toUpperCase() + item.status.slice(1)}
-        variant={statusColor[item.status]}
+      <Token
+        size="sm"
+        color={STATUS_TOKEN_COLOR[item.status]}
+        label={STATUS_LABEL[item.status]}
       />
     ),
   },
   {
     key: 'date',
     header: 'Date',
-    width: pixel(110),
+    width: pixel(112),
     renderCell: (item: OrderRow) => (
-      <Text type="body" hasTabularNumbers>
+      <Text type="body" hasTabularNumbers maxLines={1}>
         {item.date}
       </Text>
     ),
@@ -547,10 +583,10 @@ const columns: TableColumn<OrderRow>[] = [
 
 // ============= REVENUE CHART (hand SVG, Dracula ramp) =============
 
-const revenueLine = 'var(--dracula-purple)';
+const REVENUE_LINE = 'var(--dracula-purple)';
 const CHART_W = 540;
 const CHART_H = 200;
-const CHART_PAD_LEFT = 40;
+const CHART_PAD_LEFT = 44;
 const CHART_PAD_RIGHT = 12;
 const CHART_PAD_TOP = 12;
 const CHART_BASELINE = 164;
@@ -567,6 +603,11 @@ const revenueLinePath = revenuePoints
   .join(' ');
 const revenueAreaPath = `${revenueLinePath} L${revenuePoints[revenuePoints.length - 1].x.toFixed(1)},${CHART_BASELINE} L${revenuePoints[0].x.toFixed(1)},${CHART_BASELINE} Z`;
 const REVENUE_GRID_TICKS = [0, 50, 100, 150];
+
+// Axis ticks switch to thousands once the scale leaves the hundreds.
+function formatRevenueTick(tick: number): string {
+  return tick >= 1000 ? `$${tick / 1000}k` : `$${tick}`;
+}
 
 function RevenueChart() {
   const W = CHART_W;
@@ -613,16 +654,16 @@ function RevenueChart() {
                   fontSize={9}
                   fill="var(--color-text-paragraph)"
                   fontFamily="var(--font-family-mono)">
-                  ${tick}
+                  {formatRevenueTick(tick)}
                 </text>
               </g>
             );
           })}
-          <path d={areaPath} fill={revenueLine} opacity={0.25} />
+          <path d={areaPath} fill={REVENUE_LINE} opacity={0.25} />
           <path
             d={linePath}
             fill="none"
-            stroke={revenueLine}
+            stroke={REVENUE_LINE}
             strokeWidth={2}
             strokeLinejoin="round"
             strokeLinecap="round"
@@ -644,24 +685,16 @@ function RevenueChart() {
           )}
         </svg>
       </Card>
-      <RevenueChartCaption />
-    </VStack>
-  );
-}
-
-function RevenueChartCaption() {
-  return (
-    <>
       <Text type="supporting" color="secondary">
         Daily revenue · Jan 1–15
       </Text>
       <HStack gap={2} vAlign="center">
-        <Icon icon={Square} size="xsm" style={{color: revenueLine}} />
+        <Icon icon={Square} size="xsm" style={{color: REVENUE_LINE}} />
         <Text type="supporting" color="secondary">
           Revenue
         </Text>
       </HStack>
-    </>
+    </VStack>
   );
 }
 
@@ -708,6 +741,7 @@ export default function ChartTable() {
               idKey="id"
               density="balanced"
               dividers="rows"
+              textOverflow="truncate"
               hasHover
             />
           </VStack>

@@ -1,6 +1,21 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   TN"Nocturne" + (S[p6] > V[g10] > (Ctr > V[g4 a=center] > Tx"Little haunts"[t=display-2] + Tx"We believe"[t=body]) + (G[c{min:200,max:3} g4] > (C[p0] > AR + V[g2 a=center] > Bd + Hd"Product"[level=2] + Tx"Description"[t=body] + (H[g2] > NI + B"Add to cart"))*3)) + (V[g8] > (G[c{min:200} g4] > (GS[c1] > C > Hd"Checkout"[level=2]) + (GS[c2] > C > Hd"Night Owl AI"[level=2])) + (G[c{min:200} g4] > (GS[c3] > C > T) + (GS[c1] > C > Hd"Revenue"[level=2])))
+//   TN"Nocturne" + (S[p6] > V[g10] > (Ctr > V[g4 a=center] > Hd"Little haunts"[level=1 type=display-2] + Tx"We believe"[t=body]) + (G[c={min:200,max:3} g4] > (C[p0] > AR + V[g2 a=center] > Bd + Hd"Product"[level=2] + Tx"Description"[t=body] + (H[g2] > NI + B"Add to cart"))*3)) + (V[g8] > (G[c={min:200} g4] > (GS[c=1] > C > Hd"Checkout"[level=2]) + (GS[c=2] > C > Hd"Night Owl AI"[level=2])) + (G[c={min:200} g4] > (GS[c=3] > C > T) + (GS[c=1] > C > Hd"Revenue"[level=2])))
+
+/**
+ * Theme Showcase — the storefront page each theme is previewed against, and
+ * the only template that is deliberately shell-less: it paints its own TopNav
+ * and page surfaces so a preview covers the whole viewport (no AppShell, no
+ * Layout). Keep it that way.
+ *
+ * Responsive contract:
+ *   > 600px  the inventory table renders all six columns
+ *   <= 600px the table drops selection, location and tags, so a row fits the
+ *            card without being read sideways
+ * The card decks collapse to one column through Grid's minWidth, and
+ * `isMobile` (host AppShell context; false when rendered standalone) trims the
+ * top nav and switches the deck spans.
+ */
 
 import {type CSSProperties, type ReactNode} from 'react';
 import {
@@ -35,6 +50,9 @@ import {Divider} from '@astryxdesign/core/Divider';
 import {CheckboxInput} from '@astryxdesign/core/CheckboxInput';
 import {Item} from '@astryxdesign/core/Item';
 import {Table, proportional, pixel} from '@astryxdesign/core/Table';
+import type {TableColumn} from '@astryxdesign/core/Table';
+import {StatusDot} from '@astryxdesign/core/StatusDot';
+import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {Selector} from '@astryxdesign/core/Selector';
 import {RadioList, RadioListItem} from '@astryxdesign/core/RadioList';
@@ -100,6 +118,10 @@ const styles: Record<string, CSSProperties> = {
     minWidth: 0,
     maxWidth: 240,
   },
+  filterRowFill: {
+    flex: 1,
+    minWidth: 0,
+  },
   activityCard: {
     backgroundColor: 'var(--color-background-surface)',
     color: 'var(--color-text-primary)',
@@ -121,6 +143,9 @@ const styles: Record<string, CSSProperties> = {
   activityCardStack: {
     height: '100%',
   },
+  inventoryItemText: {
+    minWidth: 0,
+  },
   activityListFade: {
     flex: 1,
     minHeight: 0,
@@ -131,13 +156,11 @@ const styles: Record<string, CSSProperties> = {
       'linear-gradient(to bottom, black calc(100% - 48px), transparent)',
     marginInline: 'calc(var(--spacing-2) * -1)',
   },
-  content: {
-    maxWidth: 960,
-    marginInline: 'auto',
-    minWidth: 0,
-  },
+  // The hero column: centered, narrower than the grid below it.
   contentFluid: {
     maxWidth: 880,
+    marginInline: 'auto',
+    minWidth: 0,
   },
   heroText: {
     textAlign: 'center' as const,
@@ -151,6 +174,17 @@ const styles: Record<string, CSSProperties> = {
   },
   cardDescription: {
     flex: 1,
+    textAlign: 'center' as const,
+  },
+  // Store surfaces: the shell is intentionally absent, so the page paints its
+  // own body and card-showcase bands.
+  storeRoot: {
+    minHeight: '100%',
+    backgroundColor: 'var(--color-background-body)',
+  },
+  showcaseBand: {
+    padding: 'var(--spacing-6)',
+    backgroundColor: 'var(--color-background-surface)',
   },
   quantityInput: {
     // minWidth (not a hard width) so the field grows to fit the digit + the
@@ -175,7 +209,10 @@ const inlineStyles: Record<string, CSSProperties> = {
   chatBody: {
     flex: 1,
     minHeight: 0,
-    overflow: 'hidden',
+    // The message region is the scroll owner: the card is stretched to the
+    // grid row height, so longer conversations must scroll here rather than
+    // clip against the card.
+    overflowY: 'auto' as const,
   },
   chatSuggestions: {
     paddingInline: 'var(--spacing-4)',
@@ -185,22 +222,16 @@ const inlineStyles: Record<string, CSSProperties> = {
     paddingInline: 'var(--spacing-4)',
     paddingBottom: 'var(--spacing-4)',
   },
+  // Center supplies the 32px box and the centering; only the paint stays here.
   activityIcon: {
-    width: 32,
-    height: 32,
     borderRadius: 'var(--radius-full)',
     backgroundColor: 'var(--color-background-muted)',
     color: 'var(--color-text-secondary)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
     flexShrink: 0,
   },
   cardBody: {
     padding: 'var(--spacing-4)',
     flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
   },
 };
 
@@ -218,12 +249,21 @@ const thumbSwatch: CSSProperties = {
   display: 'block',
 };
 
-// One Dracula accent per hero product slot.
+// One Dracula accent per hero product slot. Purple stays off decorative art:
+// it reads as interactive, and nothing here is tappable.
 const PRODUCT_HUES = [
-  'var(--dracula-purple)',
+  'var(--dracula-green)',
   'var(--dracula-cyan)',
   'var(--dracula-yellow)',
 ];
+
+// Grid recipes the store renders at every width above the phone layout. Kept
+// at module scope: an object literal rebuilt per render is a new value prop
+// every time.
+const SHOWCASE_COLUMNS = {minWidth: 200, repeat: 'fit'} as const;
+const PRODUCT_COLUMNS = {minWidth: 200, max: 3} as const;
+const PAYMENT_COLUMNS = {minWidth: 70, max: 3} as const;
+const EXPIRY_COLUMNS = {minWidth: 90, max: 2} as const;
 
 /** Categorical badge variants usable for showcase product/inventory tags. */
 export type ShowcaseBadgeVariant =
@@ -353,20 +393,12 @@ export function ThemeShowcaseStore({
 }: ThemeShowcaseProps = {}) {
   const {isMobile} = useAppShellMobile();
   return (
-    <div
-      style={{
-        minHeight: '100%',
-        backgroundColor: 'var(--color-background-body)',
-      }}>
+    <VStack gap={0} style={styles.storeRoot}>
       <StorePreview products={products} isMobile={isMobile} />
-      <div
-        style={{
-          padding: 'var(--spacing-6)',
-          backgroundColor: 'var(--color-background-surface)',
-        }}>
+      <VStack gap={0} style={styles.showcaseBand}>
         <CardShowcase inventory={inventory} isMobile={isMobile} />
-      </div>
-    </div>
+      </VStack>
+    </VStack>
   );
 }
 
@@ -377,7 +409,7 @@ function CardShowcase({
   inventory: InventoryRow[];
   isMobile: boolean;
 }) {
-  const columns = isMobile ? 1 : ({minWidth: 200, repeat: 'fit'} as const);
+  const columns = isMobile ? 1 : SHOWCASE_COLUMNS;
 
   return (
     <VStack gap={8}>
@@ -409,7 +441,7 @@ function StorePreview({
   isMobile: boolean;
 }) {
   return (
-    <div data-theme-preview="true">
+    <VStack gap={0} data-theme-preview="true">
       <VStack gap={0}>
         <TopNav
           label="Theme preview navigation"
@@ -458,14 +490,14 @@ function StorePreview({
         />
 
         <Section padding={6} variant="transparent">
-          <VStack gap={10} style={{...styles.content, ...styles.contentFluid}}>
+          <VStack gap={10} style={styles.contentFluid}>
             <Center>
               <VStack gap={4} hAlign="center" style={styles.heroText}>
-                <Text type="display-2" color="accent">
+                <Heading level={1} type="display-2" color="accent">
                   Little haunts,
                   <br />
                   everywhere you roam
-                </Text>
+                </Heading>
                 <Text type="body" color="secondary">
                   We believe the smallest shadows are the ones that matter most.
                   Turn an ordinary evening into something worth remembering.
@@ -473,7 +505,7 @@ function StorePreview({
               </VStack>
             </Center>
 
-            <Grid columns={isMobile ? 1 : {minWidth: 200, max: 3}} gap={4}>
+            <Grid columns={isMobile ? 1 : PRODUCT_COLUMNS} gap={4}>
               {products.map((p, i) => (
                 <Card key={p.name} padding={0} height="100%">
                   <VStack gap={0} style={styles.cardStack}>
@@ -483,44 +515,42 @@ function StorePreview({
                         label={p.name}
                       />
                     </AspectRatio>
-                    <div style={inlineStyles.cardBody}>
-                      <VStack gap={2} hAlign="center" style={styles.cardStack}>
-                        <HStack>
-                          <Badge label={p.badge} variant={p.badgeVariant} />
-                        </HStack>
-                        <Heading level={2} style={styles.centerText}>
-                          {p.name}
-                        </Heading>
-                        <Text
-                          type="body"
-                          color="secondary"
-                          style={{
-                            ...styles.cardDescription,
-                            ...styles.centerText,
-                          }}>
-                          {p.description}
-                        </Text>
-                        <HStack gap={2} vAlign="center" hAlign="center">
-                          <NumberInput
-                            label="Quantity"
-                            isLabelHidden
-                            value={1}
-                            onChange={() => {}}
-                            min={1}
-                            max={99}
-                            size="sm"
-                            style={styles.quantityInput}
-                          />
-                          <Button
-                            label="Add to cart"
-                            variant="secondary"
-                            size="sm"
-                            href="#/templates/theme-showcase"
-                            style={styles.cartButton}
-                          />
-                        </HStack>
-                      </VStack>
-                    </div>
+                    <VStack
+                      gap={2}
+                      hAlign="center"
+                      style={inlineStyles.cardBody}>
+                      <HStack>
+                        <Badge label={p.badge} variant={p.badgeVariant} />
+                      </HStack>
+                      <Heading level={2} style={styles.centerText}>
+                        {p.name}
+                      </Heading>
+                      <Text
+                        type="body"
+                        color="secondary"
+                        style={styles.cardDescription}>
+                        {p.description}
+                      </Text>
+                      <HStack gap={2} vAlign="center" hAlign="center">
+                        <NumberInput
+                          label="Quantity"
+                          isLabelHidden
+                          value={1}
+                          onChange={() => {}}
+                          min={1}
+                          max={99}
+                          size="sm"
+                          style={styles.quantityInput}
+                        />
+                        <Button
+                          label="Add to cart"
+                          variant="secondary"
+                          size="sm"
+                          href="#/templates/theme-showcase"
+                          style={styles.cartButton}
+                        />
+                      </HStack>
+                    </VStack>
                   </VStack>
                 </Card>
               ))}
@@ -528,7 +558,7 @@ function StorePreview({
           </VStack>
         </Section>
       </VStack>
-    </div>
+    </VStack>
   );
 }
 
@@ -588,7 +618,7 @@ function CheckoutCard({isMobile}: {isMobile: boolean}) {
             <Text type="label" weight="semibold">
               Payment method
             </Text>
-            <Grid columns={isMobile ? 1 : {minWidth: 70, max: 3}} gap={2}>
+            <Grid columns={isMobile ? 1 : PAYMENT_COLUMNS} gap={2}>
               <SelectableCard
                 label="Pay with card"
                 isSelected={true}
@@ -646,7 +676,7 @@ function CheckoutCard({isMobile}: {isMobile: boolean}) {
             size="lg"
           />
 
-          <Grid columns={isMobile ? 1 : {minWidth: 90, max: 2}} gap={2}>
+          <Grid columns={isMobile ? 1 : EXPIRY_COLUMNS} gap={2}>
             <TextInput
               label="Expiry"
               placeholder="MM / YY"
@@ -735,7 +765,7 @@ function ChatCard() {
 
       <Divider variant="subtle" />
 
-      <div style={inlineStyles.chatBody}>
+      <VStack gap={0} style={inlineStyles.chatBody}>
         <ChatMessageList>
           <ChatSystemMessage>Today</ChatSystemMessage>
 
@@ -792,7 +822,14 @@ function ChatCard() {
                   <Item
                     label="Estimated arrival"
                     description="Tomorrow by 8pm"
-                    endContent={<Badge variant="green" label="On time" />}
+                    endContent={
+                      <HStack gap={1} vAlign="center">
+                        <StatusDot variant="success" label="On time" />
+                        <Text type="supporting" color="secondary">
+                          On time
+                        </Text>
+                      </HStack>
+                    }
                   />
                   <Item
                     label="Tracking"
@@ -804,9 +841,9 @@ function ChatCard() {
             </VStack>
           </ChatMessage>
         </ChatMessageList>
-      </div>
+      </VStack>
 
-      <div style={inlineStyles.chatSuggestions}>
+      <VStack gap={0} style={inlineStyles.chatSuggestions}>
         <HStack gap={1} hAlign="center" wrap="wrap">
           {SUGGESTED_QUESTIONS.map(question => (
             <Button
@@ -817,9 +854,9 @@ function ChatCard() {
             />
           ))}
         </HStack>
-      </div>
+      </VStack>
 
-      <div style={inlineStyles.chatComposer}>
+      <VStack gap={0} style={inlineStyles.chatComposer}>
         <ChatComposer
           value=""
           onChange={() => {}}
@@ -846,7 +883,7 @@ function ChatCard() {
             />
           }
         />
-      </div>
+      </VStack>
     </Card>
   );
 }
@@ -945,9 +982,13 @@ function LatestActivityCard({isMobile}: {isMobile: boolean}) {
             <Item
               key={item.id}
               startContent={
-                <div style={inlineStyles.activityIcon} aria-hidden="true">
+                <Center
+                  width={32}
+                  height={32}
+                  style={inlineStyles.activityIcon}
+                  aria-hidden="true">
                   {item.icon}
-                </div>
+                </Center>
               }
               label={item.label}
               description={item.detail}
@@ -990,7 +1031,7 @@ const DEFAULT_INVENTORY: InventoryRow[] = [
     available: 42,
     location: 'Aisle 3',
     tags: [{label: 'New', variant: 'blue'}],
-    hue: 'var(--dracula-purple)',
+    hue: 'var(--dracula-comment)',
     selected: false,
   },
   {
@@ -1062,7 +1103,7 @@ function ItemCell({row}: {row: InventoryRow}) {
   return (
     <HStack gap={3} vAlign="center">
       <ThumbSwatch hue={row.hue} label={row.name} />
-      <VStack gap={0} style={{minWidth: 0}}>
+      <VStack gap={0} style={styles.inventoryItemText}>
         <Text type="body" weight="semibold">
           {row.name}
         </Text>
@@ -1100,7 +1141,79 @@ function ActionsCell() {
   );
 }
 
+// The full column set needs 64+80+100+100+80+64 = 488px of grid and the card
+// insets cost 2 × --spacing-6 on top, so it stops fitting below ~600px. A 375px
+// phone leaves ~280px inside the card: the phone layout drops the selection
+// control (no bulk action bar acts on it) and the two metadata columns, which
+// needs 244px. Table keeps its own scroll wrapper either way; the point is that
+// a row should not have to be read sideways.
+const NARROW_TABLE_QUERY = '(max-width: 600px)';
+const NARROW_COLUMN_KEYS: Record<string, true> = {
+  select: true,
+  location: true,
+  tags: true,
+};
+
+const INVENTORY_COLUMNS: TableColumn<InventoryRow>[] = [
+  {
+    key: 'select',
+    header: '',
+    // Wide enough that the control + the theme's cell padding (up to
+    // --spacing-4 = 16px/side on spacious density) fit inside the cell,
+    // so the control's hover background doesn't overflow toward the
+    // card's clipped (rounded) edge on larger-padding themes.
+    width: pixel(64),
+    renderCell: row => <SelectCell row={row} />,
+  },
+  {
+    key: 'item',
+    header: 'Item',
+    // Lower min-width (default 120) so the table fits its container on
+    // larger-spacing themes instead of overflowing the actions column.
+    width: proportional(3, {minWidth: 80}),
+    renderCell: row => <ItemCell row={row} />,
+  },
+  {
+    key: 'available',
+    header: 'Available',
+    width: pixel(100),
+    renderCell: row => (
+      <Text type="body" hasTabularNumbers>
+        {row.available}
+      </Text>
+    ),
+  },
+  {
+    key: 'location',
+    header: 'Location',
+    width: pixel(100),
+    renderCell: row => <Text type="body">{row.location}</Text>,
+  },
+  {
+    key: 'tags',
+    header: 'Tags',
+    width: proportional(2, {minWidth: 80}),
+    align: 'end',
+    renderCell: row => <TagsCell row={row} />,
+  },
+  {
+    key: 'actions',
+    header: '',
+    // Match the select column: fit the sm more-menu button + cell
+    // padding so its hover background stays clear of the card's
+    // clipped rounded edge across themes.
+    width: pixel(64),
+    align: 'end',
+    renderCell: () => <ActionsCell />,
+  },
+];
+
+const NARROW_INVENTORY_COLUMNS = INVENTORY_COLUMNS.filter(
+  column => !NARROW_COLUMN_KEYS[column.key],
+);
+
 function InventoryCard({inventory}: {inventory: InventoryRow[]}) {
+  const isNarrow = useMediaQuery(NARROW_TABLE_QUERY);
   const lowStockCount = inventory.filter(
     row => row.available < LOW_STOCK_THRESHOLD,
   ).length;
@@ -1123,7 +1236,7 @@ function InventoryCard({inventory}: {inventory: InventoryRow[]}) {
         vAlign="center"
         hAlign="between"
         style={styles.inventoryFilterRow}>
-        <HStack gap={2} vAlign="center" style={{flex: 1, minWidth: 0}}>
+        <HStack gap={2} vAlign="center" style={styles.filterRowFill}>
           <TextInput
             label="Search inventory"
             isLabelHidden
@@ -1210,75 +1323,25 @@ function InventoryCard({inventory}: {inventory: InventoryRow[]}) {
       </HStack>
 
       {lowStockCount > 0 && (
-        <div style={inlineStyles.inventoryBannerWrap}>
+        <VStack gap={0} style={inlineStyles.inventoryBannerWrap}>
           <Banner
             status="warning"
             title={lowStockCount + ' items are running low'}
           />
-        </div>
+        </VStack>
       )}
 
-      <div style={styles.inventoryTableWrap}>
+      <VStack gap={0} style={styles.inventoryTableWrap}>
         <Table<InventoryRow>
           data={inventory}
-          columns={[
-            {
-              key: 'select',
-              header: '',
-              // Wide enough that the control + the theme's cell padding (up to
-              // --spacing-4 = 16px/side on spacious density) fit inside the cell,
-              // so the control's hover background doesn't overflow toward the
-              // card's clipped (rounded) edge on larger-padding themes.
-              width: pixel(64),
-              renderCell: row => <SelectCell row={row} />,
-            },
-            {
-              key: 'item',
-              header: 'Item',
-              // Lower min-width (default 120) so the table fits its container on
-              // larger-spacing themes instead of overflowing the actions column.
-              width: proportional(3, {minWidth: 80}),
-              renderCell: row => <ItemCell row={row} />,
-            },
-            {
-              key: 'available',
-              header: 'Available',
-              width: pixel(100),
-              renderCell: row => (
-                <Text type="body" hasTabularNumbers>
-                  {row.available}
-                </Text>
-              ),
-            },
-            {
-              key: 'location',
-              header: 'Location',
-              width: pixel(100),
-              renderCell: row => <Text type="body">{row.location}</Text>,
-            },
-            {
-              key: 'tags',
-              header: 'Tags',
-              width: proportional(2, {minWidth: 80}),
-              align: 'end',
-              renderCell: row => <TagsCell row={row} />,
-            },
-            {
-              key: 'actions',
-              header: '',
-              // Match the select column: fit the sm more-menu button + cell
-              // padding so its hover background stays clear of the card's
-              // clipped rounded edge across themes.
-              width: pixel(64),
-              align: 'end',
-              renderCell: () => <ActionsCell />,
-            },
-          ]}
+          columns={
+            isNarrow ? NARROW_INVENTORY_COLUMNS : INVENTORY_COLUMNS
+          }
           density="spacious"
           dividers="rows"
           hasHover
         />
-      </div>
+      </VStack>
     </Card>
   );
 }

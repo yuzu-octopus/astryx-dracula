@@ -1,6 +1,19 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC > Ctr[h=80vh] > B.primary"Open settings"[opens=#settings] ;; Dlg#settings > L > (LP[w=280 divider p=3] > V[g=4] > Hd"Account settings"[level=2] + (List > LI"Personal information"*8)) + (LC[p=6] > V[g=6] > DH"Account" + (V[g=4] > (H[j=between] > (V[g=0] > Tx"Legal name"[weight=semibold] + Tx"Vlad Dracul"[t=supporting color=secondary]) + Link"Edit")*4))
+//   L > LC > Ctr[h=80vh] > B.primary"Open settings"[opens=#settings] ;; Dlg#settings > L > (LP[w=280 divider p=3] > V[g=4] > Hd"Account settings"[level=2] + (UL > LI"Personal information"*8)) + (LC[p=6] > V[g=6] > DH"Account" + SE"Settings section" + (V[g=0] > TabList + (V[g=4] > Hd"Login"[level=3] + D + (H[j=between a=start] > (V[g=0] > Tx"Password"[weight=semibold] + Tx"Not created"[t=supporting]) + Lk"Create") + (H[g=3 a=start] > Ic + (V[g=0] > (H[g=2 a=center wrap] > Tx"OS X 10.15.7 Chrome"[weight=semibold] + SD) + Tx"March 30, 2026"[t=supporting])))))
+
+/**
+ * Settings Dialog — account sections inside one modal.
+ *
+ * Frame: the trigger page, then a Dialog that sizes to
+ * min(900px, 100vw - 32px): section panel (280px, spaced nav list) | scrolling
+ * content column with a sticky DialogHeader and one section at a time.
+ *
+ * Responsive contract:
+ *   > 640px  the section panel sits beside the content
+ *   <= 640px the panel is dropped and a section Selector renders above the
+ *            content; row actions stay nowrap while the info column wraps
+ */
 
 import React, {useState, type CSSProperties} from 'react';
 import {
@@ -22,7 +35,7 @@ import {Card} from '@astryxdesign/core/Card';
 import {Switch} from '@astryxdesign/core/Switch';
 import {Link} from '@astryxdesign/core/Link';
 import {TabList, Tab} from '@astryxdesign/core/TabList';
-import {Badge} from '@astryxdesign/core/Badge';
+import {StatusDot} from '@astryxdesign/core/StatusDot';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Center} from '@astryxdesign/core/Center';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
@@ -98,13 +111,13 @@ const SOCIAL_ROWS = [
 
 const DEVICE_ROWS: {
   label: string;
-  badge?: string;
+  isCurrent?: boolean;
   location: string;
   action?: string;
 }[] = [
   {
     label: 'OS X 10.15.7 · Chrome',
-    badge: 'CURRENT SESSION',
+    isCurrent: true,
     location: 'Brașov, Transylvania · March 30, 2026 at 19:31',
   },
   {label: 'Session', location: 'August 9, 2023 at 04:19', action: 'Log out'},
@@ -220,6 +233,7 @@ function ExpandableRowViewing({
       </VStack>
       <Link
         href={SELF_HASH}
+        style={actionNoWrap}
         onClick={(e: React.MouseEvent) => {
           e.preventDefault();
           onEdit();
@@ -301,7 +315,60 @@ function InfoRowItem({
             {value}
           </Text>
         </VStack>
-        {action && <Link href={SELF_HASH}>{action}</Link>}
+        {action && (
+          <Link href={SELF_HASH} style={actionNoWrap}>
+            {action}
+          </Link>
+        )}
+      </HStack>
+      <Divider />
+    </>
+  );
+}
+
+interface DeviceRow {
+  label: string;
+  isCurrent?: boolean;
+  location: string;
+  action?: string;
+}
+
+function DeviceRowItem({label, isCurrent, location, action}: DeviceRow) {
+  return (
+    <>
+      <HStack gap={3} vAlign="start">
+        <Icon icon={Monitor} />
+        <StackItem size="fill">
+          <VStack gap={0}>
+            {/* wrap: the label plus the session status exceed the compact
+                content width (~280px). */}
+            <HStack gap={2} vAlign="center" wrap="wrap">
+              <Text type="body" weight="semibold">
+                {label}
+              </Text>
+              {isCurrent && (
+                <HStack gap={1} vAlign="center">
+                  <StatusDot variant="success" label="Current session" />
+                  <Text type="supporting" color="secondary">
+                    Current session
+                  </Text>
+                </HStack>
+              )}
+            </HStack>
+            <Text
+              type="supporting"
+              color="secondary"
+              display="block"
+              hasTabularNumbers>
+              {location}
+            </Text>
+          </VStack>
+        </StackItem>
+        {action && (
+          <Link href={SELF_HASH} style={actionNoWrap}>
+            {action}
+          </Link>
+        )}
       </HStack>
       <Divider />
     </>
@@ -363,7 +430,9 @@ export default function SettingsDialog() {
       <Dialog
         isOpen={isOpen}
         onOpenChange={open => setIsOpen(open)}
-        width={isCompact ? 'calc(100vw - 32px)' : 900}
+        // One width for every viewport: below 932px the dialog shrinks with the
+        // window instead of clipping, so no compact branch is needed.
+        width="min(900px, calc(100vw - 32px))"
         maxHeight="85vh"
         padding={0}
         purpose="form"
@@ -577,37 +646,11 @@ export default function SettingsDialog() {
                           <VStack gap={4}>
                             <Heading level={3}>Device history</Heading>
                             <Divider />
-                            {DEVICE_ROWS.map((device) => (
-                              <React.Fragment key={device.location}>
-                                <HStack gap={3} vAlign="start">
-                                  <Icon icon={Monitor} />
-                                  <StackItem size="fill">
-                                    <VStack gap={0}>
-                                      <HStack gap={2} vAlign="center">
-                                        <Text type="body" weight="semibold">
-                                          {device.label}
-                                        </Text>
-                                        {device.badge && (
-                                          <Badge label={device.badge} />
-                                        )}
-                                      </HStack>
-                                      <Text
-                                        type="supporting"
-                                        color="secondary"
-                                        display="block"
-                                        hasTabularNumbers>
-                                        {device.location}
-                                      </Text>
-                                    </VStack>
-                                  </StackItem>
-                                  {device.action && (
-                                    <Link href={SELF_HASH} style={actionNoWrap}>
-                                      {device.action}
-                                    </Link>
-                                  )}
-                                </HStack>
-                                <Divider />
-                              </React.Fragment>
+                            {DEVICE_ROWS.map(device => (
+                              <DeviceRowItem
+                                key={device.location}
+                                {...device}
+                              />
                             ))}
                           </VStack>
 
@@ -641,7 +684,7 @@ export default function SettingsDialog() {
                           <VStack gap={2}>
                             <Heading level={3}>Shared access</Heading>
                             <Divider />
-                            <Text type="body" color="secondary">
+                            <Text type="supporting" color="secondary">
                               Review each request carefully before approving
                               access. We&apos;ll email your employee or
                               co-worker a 4-digit code that lets them log into

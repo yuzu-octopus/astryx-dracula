@@ -1,6 +1,20 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LP > V[g=4] > Hd"Account settings"[level=2] + (UL > LI*8) + D + LI) + (LC[p=4] > V[g=6] > Hd"Personal info"[level=2] + (V > (H[j=between a=center] > (V > Tx"Legal name" + Tx"Vlad Dracul"[t=supporting]) + Lk"Edit")*7) + (C.muted > V[g=4] > (H[g=3 a=start] > Ic + (V[g=1] > Tx"Why is info hidden" + Tx[t=supporting]))*3))
+//   L > (LP[p=0] > V[g=4] > Hd"Account settings"[level=2] + (UL > LI*8) + D + LI"Professional hosting tools") + (LC[p=4] > V[g=0] > (Tbar > B.ghost + Hd"Personal info"[level=2]) + Hd"Personal info"[level=2] + (V[g=0] > (H[j=between a=start] > (V[g=0] > Tx"Legal name"[weight=semibold] + Tx"Vlad Dracul"[t=supporting]) + Lk"Edit")*7) + (C.muted > V[g=4] > (H[g=3 a=start] > Ic + (V[g=1] > Tx"Why is info hidden?"[weight=semibold] + Tx[t=supporting]))*3))
+
+/**
+ * Settings Panels — account sections with a nav panel and divided rows.
+ *
+ * Frame: Layout nav panel (fill) | content column of section views. One
+ * section renders at a time; rows are [label + value][action] pairs divided
+ * edge-to-edge, never card-wrapped.
+ *
+ * Responsive contract:
+ *   > 768px  the nav panel sits beside the content and the selected nav row
+ *            carries the selection
+ *   <= 768px master to detail: the nav fills the page, and selecting a row
+ *            drills into the detail view behind a back button
+ */
 
 import {useState, type CSSProperties} from 'react';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
@@ -23,7 +37,7 @@ import {Card} from '@astryxdesign/core/Card';
 import {Switch} from '@astryxdesign/core/Switch';
 import {Divider} from '@astryxdesign/core/Divider';
 import {TabList, Tab} from '@astryxdesign/core/TabList';
-import {Badge} from '@astryxdesign/core/Badge';
+import {StatusDot} from '@astryxdesign/core/StatusDot';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Center} from '@astryxdesign/core/Center';
 import {
@@ -57,6 +71,13 @@ const iconBox: CSSProperties = {
 const rowPadding: CSSProperties = {
   paddingBlock: 'var(--spacing-4)',
 };
+// Keeps row actions ("Log out", "Deactivate") on one line: without this the
+// action column wraps mid-phrase at tablet widths while the info column still
+// has room to wrap instead.
+const actionNoWrap: CSSProperties = {
+  flexShrink: 0,
+  whiteSpace: 'nowrap',
+};
 const sideNavPadding: CSSProperties = {
   paddingBlock: 'var(--spacing-4)',
   paddingInline: 'var(--spacing-3)',
@@ -64,6 +85,10 @@ const sideNavPadding: CSSProperties = {
 const sideNavHeading: CSSProperties = {
   marginInline: 'var(--spacing-4)',
 };
+
+// Same-route hash: demo links stay focusable anchors without escaping the
+// template through the hash router (bare "#" would drop back to the home page).
+const SELF_HASH = '#/templates/settings-sidebar';
 
 const NAV_ITEMS = [
   {label: 'Personal information', icon: User},
@@ -116,13 +141,13 @@ const PAYOUT_ROWS: InfoRow[] = [
 
 const DEVICE_ROWS: {
   label: string;
-  badge?: string;
+  isCurrent?: boolean;
   location: string;
   action?: string;
 }[] = [
   {
     label: 'OS X 10.15.7 · Chrome',
-    badge: 'CURRENT SESSION',
+    isCurrent: true,
     location: 'Brașov, Transylvania · March 30, 2026 at 19:31',
   },
   {label: 'Session', location: 'August 9, 2023 at 04:19', action: 'Log out'},
@@ -145,7 +170,11 @@ function InfoRowItem({label, value, action}: InfoRow) {
             {value}
           </Text>
         </VStack>
-        {action && <Link href="#/templates/settings-sidebar">{action}</Link>}
+        {action && (
+          <Link href={SELF_HASH} style={actionNoWrap}>
+            {action}
+          </Link>
+        )}
       </HStack>
       <Divider />
     </>
@@ -207,7 +236,8 @@ function ExpandableRowViewing({
             </Text>
           </VStack>
           <Link
-            href="#/templates/settings-sidebar"
+            href={SELF_HASH}
+            style={actionNoWrap}
             onClick={(e: React.MouseEvent) => {
               e.preventDefault();
               onEdit();
@@ -427,11 +457,23 @@ export default function SettingsSidebar() {
                           <Icon icon={Monitor} />
                           <StackItem size="fill">
                             <VStack gap={0}>
-                              <HStack gap={2} vAlign="center">
+                              {/* wrap: the label plus the session status
+                                  exceed the content width on a phone. */}
+                              <HStack gap={2} vAlign="center" wrap="wrap">
                                 <Text type="body" weight="semibold">
                                   {device.label}
                                 </Text>
-                                {device.badge && <Badge label={device.badge} />}
+                                {device.isCurrent && (
+                                  <HStack gap={1} vAlign="center">
+                                    <StatusDot
+                                      variant="success"
+                                      label="Current session"
+                                    />
+                                    <Text type="supporting" color="secondary">
+                                      Current session
+                                    </Text>
+                                  </HStack>
+                                )}
                               </HStack>
                               <Text
                                 type="supporting"
@@ -443,7 +485,9 @@ export default function SettingsSidebar() {
                             </VStack>
                           </StackItem>
                           {device.action && (
-                            <Link href="#/templates/settings-sidebar">{device.action}</Link>
+                            <Link href={SELF_HASH} style={actionNoWrap}>
+                              {device.action}
+                            </Link>
                           )}
                         </HStack>
                       ))}
@@ -468,7 +512,9 @@ export default function SettingsSidebar() {
                             This action cannot be undone
                           </Text>
                         </VStack>
-                        <Link href="#/templates/settings-sidebar">Deactivate</Link>
+                        <Link href={SELF_HASH} style={actionNoWrap}>
+                          Deactivate
+                        </Link>
                       </HStack>
                       <Divider />
                     </VStack>
@@ -480,7 +526,7 @@ export default function SettingsSidebar() {
                     <VStack gap={2}>
                       <Heading level={3}>Shared access</Heading>
                       <Divider />
-                      <Text type="body" color="secondary">
+                      <Text type="supporting" color="secondary">
                         Review each request carefully before approving access.
                         We&apos;ll email your employee or co-worker a 4-digit
                         code that lets them log into your account with their
@@ -769,7 +815,7 @@ export default function SettingsSidebar() {
                       <Text type="body" weight="semibold">
                         Blocked people
                       </Text>
-                      <Link href="#/templates/settings-sidebar">View</Link>
+                      <Link href={SELF_HASH}>View</Link>
                     </HStack>
                     <Divider />
                   </VStack>
@@ -791,9 +837,9 @@ export default function SettingsSidebar() {
 
                   <VStack gap={4}>
                     <Heading level={3}>Reviews</Heading>
-                    <Text type="body" color="secondary">
+                    <Text type="supporting" color="secondary">
                       Choose what&apos;s shared when you write a review.{' '}
-                      <Link href="#/templates/settings-sidebar" type="supporting">
+                      <Link href={SELF_HASH} type="supporting">
                         Learn more
                       </Link>
                     </Text>
@@ -839,7 +885,7 @@ export default function SettingsSidebar() {
                     <Card>
                       <HStack hAlign="between" vAlign="center">
                         <Text type="body">Request my personal data</Text>
-                        <Link href="#/templates/settings-sidebar">Request</Link>
+                        <Link href={SELF_HASH}>Request</Link>
                       </HStack>
                     </Card>
                     <Switch
@@ -853,7 +899,7 @@ export default function SettingsSidebar() {
                     <Card>
                       <HStack hAlign="between" vAlign="center">
                         <Text type="body">Delete my account</Text>
-                        <Link href="#/templates/settings-sidebar">Delete</Link>
+                        <Link href={SELF_HASH}>Delete</Link>
                       </HStack>
                     </Card>
                     <Card variant="muted">
@@ -868,7 +914,7 @@ export default function SettingsSidebar() {
                           <Text type="supporting" color="secondary">
                             We&apos;re committed to keeping your data protected.
                             See details in our{' '}
-                            <Link href="#/templates/settings-sidebar" type="supporting">
+                            <Link href={SELF_HASH} type="supporting">
                               Privacy Policy
                             </Link>
                             .

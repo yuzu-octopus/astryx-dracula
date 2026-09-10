@@ -76,8 +76,11 @@ const chatLayout: CSSProperties = {
   flex: 1,
   minHeight: 0,
 };
+// ChatMessage already separates its children by --spacing-2, so this doubles
+// that step to set the attached document apart from its bubble. --space-gap
+// (24px) is a layout gutter, not an in-message rhythm.
 const artifactCard: CSSProperties = {
-  marginBlockStart: 'var(--space-gap)',
+  marginBlockStart: 'var(--spacing-2)',
 };
 const artifactScroll: CSSProperties = {
   flex: 1,
@@ -236,12 +239,14 @@ function MobileArtifactActions() {
   );
 }
 
-// Scrollable artifact body — the formatted document.
-function ArtifactBody() {
+// Scrollable artifact body — the formatted document. The mobile dialog renders
+// the title in its DialogHeader, so it drops the in-body heading rather than
+// announcing the same h1 twice.
+function ArtifactBody({hasOwnTitle = true}: {hasOwnTitle?: boolean}) {
   return (
     <Section variant="transparent" style={artifactScroll}>
       <VStack gap={2} style={articleBody}>
-        <Heading level={1}>{ARTIFACT_TITLE}</Heading>
+        {hasOwnTitle && <Heading level={1}>{ARTIFACT_TITLE}</Heading>}
         <Markdown>{ARTIFACT_CONTENT}</Markdown>
       </VStack>
     </Section>
@@ -756,7 +761,7 @@ The fix is to catch \`TokenExpiredError\` specifically and attempt a refresh bef
           }
           content={
             <LayoutContent padding={0}>
-              <ArtifactBody />
+              <ArtifactBody hasOwnTitle={false} />
             </LayoutContent>
           }
         />

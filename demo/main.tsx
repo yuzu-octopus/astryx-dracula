@@ -5,6 +5,7 @@ import { StrictMode, Suspense, lazy, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { BareTemplate, TemplateDetail, TemplatesIndex } from './Templates';
+import { TEMPLATE_IDS } from './templateRegistry';
 
 const Bento = lazy(() =>
   import('./Bento').then((m) => ({ default: m.Bento })),
@@ -26,12 +27,14 @@ function Router() {
   const shot = params.get('shot');
   // `?bare=<id>` renders a template with no viewer chrome. The templates index
   // loads each page through this so the template gets a frame of its own.
+  // Unknown and empty values render the index instead: a blank screen has no
+  // way back to the showcase.
   const bare = params.get('bare');
   const hash = useHash();
   if (bare != null) {
     return (
       <Suspense fallback={null}>
-        <BareTemplate id={bare} />
+        {TEMPLATE_IDS.includes(bare) ? <BareTemplate id={bare} /> : <TemplatesIndex />}
       </Suspense>
     );
   }

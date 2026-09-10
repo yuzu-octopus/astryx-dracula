@@ -1,6 +1,22 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LH[divider] > Hd"Library"[level=1]) + (LC[p=6] > V[g=6] > (V[g=4] > TI"Search the stacks..." + (H[a=center g=4] > (SI[fill] > TgG"Filter" > OFL > Tg"All"! + Tg"Layout" + Tg"Forms") + DM"Sort")) + D + (V[g=6] > (H[j=between a=center] > Hd"Layout"[level=2] + Tx"6 items"[t=supporting]) + (G[c={min:320} g=4] > (C[p=0] > AR + (S.transparent[p=4] > V[g=1] > Hd"Card"[level=3] + Tx"Description"[t=body]))*4)))
+//   L > (LH[divider] > Hd"Library"[level=1]) + (LC[p=6] > V[g=6] > (V[g=4] > TI"Search the stacks…" + (H[a=center g=4] > (SI[fill] > TgG"Filter" > OFL > Tg"All"! + Tg"Layout" + Tg"Forms") + DM"Sort")) + D + (V[g=6] > (H[j=between a=center] > Hd"Layout"[level=2] + Tx"6 items"[t=body]) + (G[c={min:280} g=4] > (C[p=0] > AR + (S.transparent[p=4] > V[g=1] > Hd"Card"[level=3] + Tx"Description"[t=supporting]))*4)))
+
+/**
+ * Library — a browsable grid of design-system entries grouped by category.
+ *
+ * Frame: page header (title) | content column (search, filter row, sections).
+ *
+ * Container policy: entries are Cards in a grid (gallery archetype); each
+ * card is a thumbnail plus a heading and description. Category hue is drawn
+ * from the Dracula accents, one per shelf, and only marks the thumbnail glyph.
+ *
+ * Responsive contract:
+ *   no media queries — sections are auto-fit grids. The entry grid collapses
+ *   from 3 columns to 1 as the content column narrows (280px track floor), and
+ *   the category filter buttons overflow into a "+N" DropdownMenu rather than
+ *   wrapping, so the filter row keeps a single line at every width.
+ */
 
 import {useState, useMemo, type CSSProperties} from 'react';
 import {Layout, LayoutHeader, LayoutContent} from '@astryxdesign/core/Layout';
@@ -28,9 +44,11 @@ interface LibraryItem {
   type: 'Component' | 'Pattern' | 'Utility';
 }
 
-// Dracula accent per category shelf, drawn from the fixed badge vocabulary.
+// One Dracula accent per category shelf. Purple stays out of the map: it is
+// reserved for interactive elements, and these hues only tint the thumbnail
+// dot, so each shelf takes a non-purple accent instead.
 const CATEGORY_HUES: Record<string, string> = {
-  Layout: 'var(--dracula-purple)',
+  Layout: 'var(--dracula-orange)',
   Forms: 'var(--dracula-cyan)',
   Navigation: 'var(--dracula-pink)',
   Feedback: 'var(--dracula-yellow)',
@@ -281,7 +299,7 @@ const thumbnailImage: CSSProperties = {
 // =============================================================================
 
 function LibraryCard({item}: {item: LibraryItem}) {
-  const hue = CATEGORY_HUES[item.category] ?? 'var(--dracula-purple)';
+  const hue = CATEGORY_HUES[item.category] ?? 'var(--dracula-comment)';
   return (
     <Card padding={0}>
       <AspectRatio ratio={16 / 9}>
@@ -308,7 +326,7 @@ function LibraryCard({item}: {item: LibraryItem}) {
       <Section variant="transparent" padding={4}>
         <VStack gap={1}>
           <Heading level={3}>{item.name}</Heading>
-          <Text type="body" color="secondary">
+          <Text type="supporting" color="secondary">
             {item.description}
           </Text>
         </VStack>
@@ -328,11 +346,11 @@ function LibrarySection({
     <VStack gap={6}>
       <HStack justify="between" vAlign="center">
         <Heading level={2}>{category}</Heading>
-        <Text type="supporting" color="secondary" hasTabularNumbers>
+        <Text type="body" color="secondary" hasTabularNumbers>
           {items.length} {items.length === 1 ? 'item' : 'items'}
         </Text>
       </HStack>
-      <Grid columns={{minWidth: 320}} gap={4}>
+      <Grid columns={{minWidth: 280}} gap={4}>
         {items.map(item => (
           <LibraryCard key={item.id} item={item} />
         ))}

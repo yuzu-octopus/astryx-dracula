@@ -55,7 +55,7 @@ New page from scratch: write XLE, expand, then brand-pass. `bunx astryx layout c
 
 ## Templates
 
-Forty-four themed pages ship in `templates/`, each leading with its canonical, validated XLE expression in a header comment (`// XLE (...)`). Also published as an Astryx integration pack (`astryx.integration.mjs`). Consumers with the package in `astryx.config` scaffold with `bunx astryx template <id> --package astryx-dracula`. Live at `#/templates` on the showcase, where each page is wrapped by `demo/Templates.tsx` in a `<Theme>` provider plus a `Templates / <name>` breadcrumb bar. That bar and the theme provider are viewer chrome, not page content: never copy them into a `templates/` file. Pack rules: templates import React plus `@astryxdesign/core` only, no chart or icon libraries; every template carries its `<id>.template.mjs` spec. IDs: dashboard, table-grouped, table-page, kanban-board, settings-sidebar, settings, payment-form, login-card, file-explorer, ai-chat-landing, library, centered-hero, ai-chat, classic-gallery, contact-form, dashboard-portfolio, detail-page, docu…mentation, documentation-design, documentation-technical, editor, form-two-column, gallery-hero, ide, login, mixed-gallery, product-detail, product-gallery, product-tour, settings-dialog, shell-nav, shell-side-nav, shell-top-nav, table, table-page-chart, table-page-heatmap-status, table-page-shoe-store-heatmap, blank, incident-console, login-split, login-sso, messaging-shell, side-gallery, theme-showcase.
+Forty-four themed pages ship in `templates/`, each leading with its canonical, validated XLE expression in a header comment (`// XLE (...)`). Also published as an Astryx integration pack (`astryx.integration.mjs`). Consumers with the package in `astryx.config` scaffold with `bunx astryx template <id> --package astryx-dracula`. Live at `#/templates` on the showcase, where `demo/Templates.tsx` renders each page bare inside a viewer iframe and keeps the `Templates / <name>` bar plus its `<Theme>` provider outside it. That bar, the provider, and the frame are viewer chrome, not page content: never copy them into a `templates/` file. Pack rules: templates import React plus `@astryxdesign/core` and `lucide-react`, no chart libraries; every template carries its `<id>.template.mjs` spec. IDs: dashboard, table-grouped, table-page, kanban-board, settings-sidebar, settings, payment-form, login-card, file-explorer, ai-chat-landing, library, centered-hero, ai-chat, classic-gallery, contact-form, dashboard-portfolio, detail-page, documentation, documentation-design, documentation-technical, editor, form-two-column, gallery-hero, ide, login, mixed-gallery, product-detail, product-gallery, product-tour, settings-dialog, shell-nav, shell-side-nav, shell-top-nav, table, table-page-chart, table-page-heatmap-status, table-page-shoe-store-heatmap, blank, incident-console, login-split, login-sso, messaging-shell, side-gallery, theme-showcase.
 
 ## Brand principles
 
@@ -72,7 +72,7 @@ These are decisions, not suggestions. Every one comes from the showcase that def
 
 ## Typography doctrine
 
-The theme scale is base 14, ratio 1.2: body and code 14, supporting 12, headings 24/20/17. Roles, not raw sizes:
+The theme scale is base 14, ratio 1.2: body and code 14, supporting 12, headings 24 / 20 / 17 / 14 / 12 / 10 by level. Roles, not raw sizes (the compat `--font-size-h*` pins read 24 / 20 / 16 / 14 / 13 / 12; `Heading` resolves the scale roles, so level 3 is the 17px `lg` step):
 
 - `body` — default UI text, table cells, card descriptions, section subtitles, anything the user must read to act.
 - `supporting` — metadata ONLY: timestamps, hints, captions, legend labels, KPI deltas. If the sentence carries meaning the page needs, it is `body`.
@@ -108,7 +108,7 @@ Map jobs to components, never to lookalikes: action goes to Button (never a nav-
 ## Exact token names (use these verbatim)
 
 Background `--color-background`, primary `--color-primary`, positive `--color-positive`,
-negative `--color-negative`, muted text `--color-text-subdue`, primary text `--color-text-primary`,
+negative `--color-negative`, muted text `--color-text-base-muted` (never `--color-text-subdue`: chrome only, never text), primary text `--color-text-primary`,
 border `--color-border`, accent `--color-accent`, success `--color-success`, error `--color-error`,
 warning `--color-warning`, info `--color-info`, icon `--color-icon-primary` / `--color-icon-secondary` / `--color-icon-disabled` / `--color-icon-accent`, radius `--radius-element` / `--border-radius`,
 spacing `--space-gap` / `--space-viewport`. Raw primitives: `--dracula-bg`, `--dracula-fg`,

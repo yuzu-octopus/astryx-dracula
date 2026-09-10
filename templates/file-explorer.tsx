@@ -264,12 +264,84 @@ const page: CSSProperties = {height: '100dvh'};
 const columnRow: CSSProperties = {overflowX: 'auto', overflowY: 'hidden'};
 const scrollable: CSSProperties = {overflowY: 'auto'};
 const fixedColumn: CSSProperties = {flexShrink: 0};
+// The column's 320px resting width rides on Section's `width` prop; grow
+// lets it absorb whatever the fixed columns leave. Inline styles are for
+// what props cannot express.
 const detailColumn: CSSProperties = {
   flexGrow: 1,
   flexShrink: 0,
-  flexBasis: 320,
 };
 const controlsScroll: CSSProperties = {overflowX: 'auto'};
+
+// Static toolbar content, hoisted out of the render path: neither element
+// reads component state, so rebuilding them per render buys nothing.
+const viewSwitcher = (
+  <SegmentedControl value="column" onChange={() => {}} label="View mode">
+    <SegmentedControlItem
+      value="grid"
+      label="Grid"
+      icon={<Icon icon={LayoutGrid} size="sm" />}
+      isLabelHidden
+    />
+    <SegmentedControlItem
+      value="list"
+      label="List"
+      icon={<Icon icon={Rows3} size="sm" />}
+      isLabelHidden
+    />
+    <SegmentedControlItem
+      value="column"
+      label="Column"
+      icon={<Icon icon={Columns} size="sm" />}
+      isLabelHidden
+    />
+    <SegmentedControlItem
+      value="gallery"
+      label="Gallery"
+      icon={<Icon icon={Table} size="sm" />}
+      isLabelHidden
+    />
+  </SegmentedControl>
+);
+const fileActions = (
+  <>
+    <IconButton
+      variant="ghost"
+      size="sm"
+      icon={<Icon icon={SlidersHorizontal} size="sm" />}
+      label="Group"
+      tooltip="Group"
+    />
+    <IconButton
+      variant="ghost"
+      size="sm"
+      icon={<Icon icon={Share2} size="sm" />}
+      label="Share"
+      tooltip="Share"
+    />
+    <IconButton
+      variant="ghost"
+      size="sm"
+      icon={<Icon icon={Tag} size="sm" />}
+      label="Tags"
+      tooltip="Tags"
+    />
+    <IconButton
+      variant="ghost"
+      size="sm"
+      icon={<Icon icon={Ellipsis} size="sm" />}
+      label="More"
+      tooltip="More"
+    />
+    <IconButton
+      variant="ghost"
+      size="sm"
+      icon={<Icon icon={Search} size="sm" />}
+      label="Search"
+      tooltip="Search"
+    />
+  </>
+);
 
 function findItem(items: FileSystemItem[], id: string): FileSystemItem | null {
   for (const item of items) {
@@ -302,13 +374,24 @@ export default function FileExplorer() {
   const isPhone = useMediaQuery('(max-width: 767px)');
 
   const columns = useMemo(() => {
-    const cols: {items: FileSystemItem[]; selectedId: string | null}[] = [];
-    cols.push({items: FILESYSTEM, selectedId: selectedPath[0] ?? null});
+    // `id` names the folder a column lists, so the React key stays put when
+    // narrow mode slices the row down to the last visible column.
+    const cols: {
+      id: string;
+      items: FileSystemItem[];
+      selectedId: string | null;
+    }[] = [];
+    cols.push({
+      id: 'root',
+      items: FILESYSTEM,
+      selectedId: selectedPath[0] ?? null,
+    });
     let currentItems: FileSystemItem[] = FILESYSTEM;
     for (let i = 0; i < selectedPath.length; i++) {
       const selected = currentItems.find(item => item.id === selectedPath[i]);
       if (selected?.children && selected.children.length > 0) {
         cols.push({
+          id: selectedPath[i],
           items: selected.children,
           selectedId: selectedPath[i + 1] ?? null,
         });
@@ -383,76 +466,6 @@ export default function FileExplorer() {
       </Text>
     </>
   );
-  const viewSwitcher = (
-    <SegmentedControl
-      value="column"
-      onChange={() => {}}
-      label="View mode">
-      <SegmentedControlItem
-        value="grid"
-        label="Grid"
-        icon={<Icon icon={LayoutGrid} size="sm" />}
-        isLabelHidden
-      />
-      <SegmentedControlItem
-        value="list"
-        label="List"
-        icon={<Icon icon={Rows3} size="sm" />}
-        isLabelHidden
-      />
-      <SegmentedControlItem
-        value="column"
-        label="Column"
-        icon={<Icon icon={Columns} size="sm" />}
-        isLabelHidden
-      />
-      <SegmentedControlItem
-        value="gallery"
-        label="Gallery"
-        icon={<Icon icon={Table} size="sm" />}
-        isLabelHidden
-      />
-    </SegmentedControl>
-  );
-  const fileActions = (
-    <>
-      <IconButton
-        variant="ghost"
-        size="sm"
-        icon={<Icon icon={SlidersHorizontal} size="sm" />}
-        label="Group"
-        tooltip="Group"
-      />
-      <IconButton
-        variant="ghost"
-        size="sm"
-        icon={<Icon icon={Share2} size="sm" />}
-        label="Share"
-        tooltip="Share"
-      />
-      <IconButton
-        variant="ghost"
-        size="sm"
-        icon={<Icon icon={Tag} size="sm" />}
-        label="Tags"
-        tooltip="Tags"
-      />
-      <IconButton
-        variant="ghost"
-        size="sm"
-        icon={<Icon icon={Ellipsis} size="sm" />}
-        label="More"
-        tooltip="More"
-      />
-      <IconButton
-        variant="ghost"
-        size="sm"
-        icon={<Icon icon={Search} size="sm" />}
-        label="Search"
-        tooltip="Search"
-      />
-    </>
-  );
 
   return (
     <Layout
@@ -490,7 +503,7 @@ export default function FileExplorer() {
                 trueIndex < columns.length - 1 || selectedFile != null;
               return (
                 <Section
-                  key={trueIndex}
+                  key={col.id}
                   width={240}
                   padding={2}
                   variant="transparent"
@@ -544,6 +557,7 @@ export default function FileExplorer() {
             })}
             {selectedFile && (
               <Section
+                width={320}
                 padding={6}
                 variant="transparent"
                 style={{...scrollable, ...detailColumn}}>

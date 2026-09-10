@@ -3,6 +3,11 @@
  * This file is the pre-theme paint fallback. Values follow the Dracula spec UI
  * palette (Background Light #343746 surfaces, Selection #44475A quiet edges,
  * Current Line #6272A4 visible edges). Do not add new hexes here.
+ * Deliberate spec deviations, mirrored in astryx-theme.ts: spec Comment
+ * #6272A4 fails the 4.5:1 WCAG floor for body text, so secondary #9AA1BC,
+ * paragraph #B0B3C4 and base-muted #8288A6 are same-hue lifts, #4C5067
+ * (subdue) is chrome only and never text, and theme.css adds #FFD5CC as the
+ * pale inverted error surface. Do not revert any of them to spec hexes.
  * Fonts: copy `fonts/` to your app's served static dir (Vite: `public/fonts/`). */
 
 @font-face {

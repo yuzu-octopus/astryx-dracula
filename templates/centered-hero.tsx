@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC > (V[g6 a=center] > Hd"Hero"[level=1] + Tx"Remit"[t=body] + (H[j=center g3] > B.primary"CTA" + B"Secondary"))
+//   L > LC[p=6] > V[g=10] > ((V[g=6 a=center] > (V[g=3 a=center] > Hd"Small joys for creatures of the night"[level=1 t=display-2] + Tx"Sometimes all it takes is one small ritual to turn the whole night around."[t=body]) + (H[j=center g=3] > B.primary"Embrace the night" + B.secondary"Read the lore")) + (S.transparent[p=0] > AR[ratio=16/9]))
 
 import type {CSSProperties} from 'react';
 import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';

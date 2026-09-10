@@ -1,10 +1,9 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   S > L > (LH[divider] > Tbar > (Hd"Sprint Board"[level=3] + Bd.neutral"8") + (H[g=2] > SE + D.strong + IB"Sort" + IB"Filter" + IB"Search" + B.primary"Add task")) + (LC[p=0] > G[c=4 g=4] > (C.muted[p=0] > L > (LH[divider] > H[j=between a=center] > (H[g=2 a=center] > SD + Hd"To-do"[level=4] + Ic) + Tx) + (LC[p=2] > V[g=2] > (C[p=3] > V[g=2] > (H[j=between] > (H[g=1] > Bd + Bd) + MM) + (V[g=1] > Hd[level=4] + Tx) + Tx)*2))*4)
+//   S > L > (LH[divider] > Tbar > (Hd"Sprint Board"[level=1] + Bd.neutral"8") + (H[g=2] > SE + D.strong + IB"Sort" + IB"Filter" + IB"Search" + B.primary"Add task")) + (LC[p=0] > G[c={min:280,max:4} g=4] > (C.muted[p=0] > L > (LH[divider] > H[j=between a=center] > (H[g=2 a=center] > SD + Hd"To-do"[level=2] + IB) + Tx) + (LC[p=2] > V[g=2] > (C[p=3] > V[g=2] > (H[j=between] > (H[g=2] > Tk + Bd) + MM) + (V[g=1] > Hd[level=3] + Tx) + Tx)*2))*4)
 
 import {
   useEffect,
-  useMemo,
   useRef,
   useState,
   type CSSProperties,
@@ -22,6 +21,7 @@ import {
 import {Text, Heading} from '@astryxdesign/core/Text';
 import {Card} from '@astryxdesign/core/Card';
 import {Badge} from '@astryxdesign/core/Badge';
+import {Token} from '@astryxdesign/core/Token';
 import {Button} from '@astryxdesign/core/Button';
 import {IconButton} from '@astryxdesign/core/IconButton';
 import {Icon} from '@astryxdesign/core/Icon';
@@ -29,7 +29,7 @@ import {StatusDot} from '@astryxdesign/core/StatusDot';
 import {EmptyState} from '@astryxdesign/core/EmptyState';
 import {MoreMenu} from '@astryxdesign/core/MoreMenu';
 import {Selector} from '@astryxdesign/core/Selector';
-import {Tooltip} from '@astryxdesign/core/Tooltip';
+import {Popover} from '@astryxdesign/core/Popover';
 import {Divider} from '@astryxdesign/core/Divider';
 import {Toolbar} from '@astryxdesign/core/Toolbar';
 import {Section} from '@astryxdesign/core/Section';
@@ -142,6 +142,19 @@ const PRIORITY_META: Record<
   low: {label: 'Low', variant: 'cyan'},
 };
 
+function groupByColumn(items: WorkItem[]): Record<ColumnId, WorkItem[]> {
+  const map: Record<ColumnId, WorkItem[]> = {
+    todo: [],
+    'in-progress': [],
+    'in-review': [],
+    done: [],
+  };
+  for (const item of items) {
+    map[item.column].push(item);
+  }
+  return map;
+}
+
 const INITIAL_ITEMS: WorkItem[] = [
   {
     id: 't1',
@@ -246,7 +259,7 @@ const boardColumnsStyle: CSSProperties = {
   overflowX: 'auto',
   overflowY: 'auto',
   height: '100%',
-  padding: 'var(--space-gap)',
+  padding: 'var(--spacing-6)',
 };
 const columnShellStyle: CSSProperties = {
   minWidth: 0,
@@ -260,14 +273,17 @@ const cardStyle: CSSProperties = {
   touchAction: 'none',
 };
 // The dragged card is lifted out of flow and follows the pointer. It ignores
-// pointer events so hit-testing reads the columns underneath it.
+// pointer events so hit-testing reads the columns underneath it. The clone
+// rides above shell chrome (layered 0-3) but stays under overlay surfaces
+// (menus, dialogs layer at 500+ plus the top layer), so an open menu wins.
+const DRAG_CLONE_LAYER = 100;
 const floatingStyle: CSSProperties = {
   position: 'fixed',
   insetBlockStart: 0,
   insetInlineStart: 0,
   pointerEvents: 'none',
   cursor: 'grabbing',
-  zIndex: 1000,
+  zIndex: DRAG_CLONE_LAYER,
 };
 // Placeholder marking the landing slot; matches the dragged card's height.
 const ghostStyle = (height: number): CSSProperties => ({
@@ -279,7 +295,7 @@ const toolbarDividerStyle: CSSProperties = {
   alignSelf: 'stretch',
 };
 const columnEmptyStateStyle: CSSProperties = {
-  paddingBlock: 'var(--space-gap)',
+  paddingBlock: 'var(--spacing-6)',
 };
 
 // ============= CARD BODY =============
@@ -302,8 +318,8 @@ function BoardCardBody({
   return (
     <VStack gap={2}>
       <HStack hAlign="between" vAlign="start">
-        <HStack gap={1} vAlign="center" wrap="wrap">
-          <Badge label={item.ref} variant="neutral" />
+        <HStack gap={2} vAlign="center" wrap="wrap">
+          <Token label={item.ref} size="sm" />
           <Badge label={priority.label} variant={priority.variant} />
         </HStack>
         <MoreMenu
@@ -319,8 +335,8 @@ function BoardCardBody({
       </HStack>
 
       <VStack gap={1}>
-        <Heading level={4}>{item.title}</Heading>
-        <Text type="body" color="secondary" maxLines={2}>
+        <Heading level={3}>{item.title}</Heading>
+        <Text type="supporting" color="secondary" maxLines={2}>
           {item.description}
         </Text>
       </VStack>
@@ -381,10 +397,23 @@ function BoardColumn({
                   variant={meta.variant}
                   label={`${meta.title} status`}
                 />
-                <Heading level={4}>{meta.title}</Heading>
-                <Tooltip content={meta.tooltip}>
-                  <Icon icon={Info} size="sm" color="secondary" />
-                </Tooltip>
+                <Heading level={2}>{meta.title}</Heading>
+                <Popover
+                  placement="below"
+                  width="min(20rem, calc(100vw - 2 * var(--space-viewport)))"
+                  label={`${meta.title} column help`}
+                  content={
+                    <Text type="body" color="secondary">
+                      {meta.tooltip}
+                    </Text>
+                  }>
+                  <IconButton
+                    label={`About the ${meta.title} column`}
+                    icon={<Icon icon={Info} size="sm" />}
+                    variant="ghost"
+                    size="sm"
+                  />
+                </Popover>
               </HStack>
               <Text type="supporting" color="secondary" hasTabularNumbers>
                 {count}
@@ -461,18 +490,7 @@ export default function KanbanBoard() {
     return cb;
   };
 
-  const itemsByColumn = useMemo(() => {
-    const map: Record<ColumnId, WorkItem[]> = {
-      todo: [],
-      'in-progress': [],
-      'in-review': [],
-      done: [],
-    };
-    for (const item of items) {
-      map[item.column].push(item);
-    }
-    return map;
-  }, [items]);
+  const itemsByColumn = groupByColumn(items);
 
   const moveItem = (id: string, to: ColumnId) => {
     setItems(prev =>
@@ -670,7 +688,7 @@ export default function KanbanBoard() {
               gap={2}
               startContent={
                 <>
-                  <Heading level={3}>Sprint Board</Heading>
+                  <Heading level={1}>Sprint Board</Heading>
                   <Badge label={items.length} variant="neutral" />
                 </>
               }

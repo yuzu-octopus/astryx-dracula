@@ -1,6 +1,19 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   V[g6] > (V[g1] > Hd"Settings"[level=2] + Tx"Profile"[t=body]) + (G[c2 g4] > C[p4] + C[p4])
+//   L > (LH[divider] > H[a=center wrap] > (SI[fill] > Hd"Settings"[level=1]) + TY"Search") + (LP[w=260 p=2] > UL > LI*6) + (LC[p=4] > V[g=4] > (V[a=center] > TabList) + ((G[c={min:280} g=10] > (V[g=1] > Hd"Basic information"[level=2] + Tx"View and update your details"[t=body]) + (V[g=4] > TI"Username" + TI"Email address" + (H > B.primary"Save"))) + D)*3)
+
+/**
+ * Settings — one scrolling page of account sections.
+ *
+ * Frame: Layout header (title + settings search) | optional 260px section nav |
+ * content column of three section grids, divided.
+ *
+ * Responsive contract:
+ *   > 768px  the section nav is a 260px LayoutPanel beside the content
+ *   <= 768px the panel is dropped, the nav collapses to a centered TabList
+ *            above the content, the header search wraps under the title, and
+ *            every section grid falls to one column (280px floor)
+ */
 
 import {useState} from 'react';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
@@ -33,6 +46,12 @@ const NAV_ITEMS = [
   'Invoices',
   'API',
 ];
+
+// WCAG 1.3.5 wants autocomplete on identity fields. TextInput forwards unknown
+// props to the <input>, but its prop type omits input-only attributes, so the
+// attribute is spread in through a widened record.
+const inputAutoComplete = (value: string) =>
+  ({autoComplete: value}) as Record<string, string>;
 
 const SETTINGS_ITEMS: SearchableItem[] = [
   {id: '1', label: 'Username'},
@@ -74,7 +93,7 @@ export default function SettingsTemplate() {
       contentWidth={1440}
       header={
         <LayoutHeader hasDivider>
-          <HStack vAlign="center">
+          <HStack vAlign="center" wrap="wrap">
             <StackItem size="fill">
               <Heading level={1}>Settings</Heading>
             </StackItem>
@@ -128,9 +147,9 @@ export default function SettingsTemplate() {
                 </TabList>
               </VStack>
             )}
-            <Grid columns={{minWidth: 320}} gap={10}>
+            <Grid columns={{minWidth: 280}} gap={10}>
               <VStack gap={1}>
-                <Heading level={3}>Basic information</Heading>
+                <Heading level={2}>Basic information</Heading>
                 <Text type="body" color="secondary">
                   View and update your crypt details and coven account information.
                 </Text>
@@ -153,6 +172,8 @@ export default function SettingsTemplate() {
                 />
                 <TextInput
                   label="Email address"
+                  type="email"
+                  {...inputAutoComplete('email')}
                   value={email}
                   onChange={setEmail}
                 />
@@ -164,9 +185,9 @@ export default function SettingsTemplate() {
 
             <Divider />
 
-            <Grid columns={{minWidth: 320}} gap={10}>
+            <Grid columns={{minWidth: 280}} gap={10}>
               <VStack gap={1}>
-                <Heading level={3}>Change password</Heading>
+                <Heading level={2}>Change password</Heading>
                 <Text type="body" color="secondary">
                   Update your password to keep your coffin sealed.
                 </Text>
@@ -175,18 +196,21 @@ export default function SettingsTemplate() {
                 <TextInput
                   label="Verify current password"
                   type="password"
+                  {...inputAutoComplete('current-password')}
                   value={currentPw}
                   onChange={setCurrentPw}
                 />
                 <TextInput
                   label="New password"
                   type="password"
+                  {...inputAutoComplete('new-password')}
                   value={newPw}
                   onChange={setNewPw}
                 />
                 <TextInput
                   label="Confirm password"
                   type="password"
+                  {...inputAutoComplete('new-password')}
                   value={confirmPw}
                   onChange={setConfirmPw}
                 />
@@ -198,9 +222,9 @@ export default function SettingsTemplate() {
 
             <Divider />
 
-            <Grid columns={{minWidth: 320}} gap={10}>
+            <Grid columns={{minWidth: 280}} gap={10}>
               <VStack gap={1}>
-                <Heading level={3}>Advanced settings</Heading>
+                <Heading level={2}>Advanced settings</Heading>
                 <Text type="body" color="secondary">
                   Configure detailed coven preferences and warding options.
                 </Text>

@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   A[cp=0 @topNav=(TN) @sideNav=(SN > TL)] > L > (LH[divider] > H[g=2] > C.muted[p=0]*3) + (LC[p=6] > V[g=2] > (H[g=3 a=center] > C.muted[p=0] + C.muted[p=0])*8)
+//   A[cp=0 @topNav=(TN) @sideNav=(SN > TL)] > L > (LH[divider] > H[g=2 wrap] > C.muted[p=0]*3) + (LC[p=6] > V[g=2] > (H[g=3 a=center] > C.muted[p=0] + C.muted[p=0])*3 + C.muted[p=0] + (H[g=3 a=center] > C.muted[p=0] + C.muted[p=0])*4 + C.muted[p=0] + (H[g=3 a=center] > C.muted[p=0] + C.muted[p=0])*5)
 
 import {Fragment, useState, useMemo, useEffect} from 'react';
 import {AppShell} from '@astryxdesign/core/AppShell';
@@ -77,9 +77,9 @@ const MENUS: {label: string; groups: MenuEntry[][]}[] = [
         ['New Window', '⇧⌘N'],
       ],
       [
-        ['Open...', '⌘O'],
+        ['Open…', '⌘O'],
         ['Save', '⌘S'],
-        ['Save As...', '⇧⌘S'],
+        ['Save As…', '⇧⌘S'],
       ],
       [['Close Editor', '⌘W']],
     ],
@@ -203,8 +203,11 @@ export default function ShellNav() {
                     button={{label: menu.label, variant: 'ghost', size: 'sm'}}
                     hasChevron={false}
                     menuWidth={MENU_WIDTH}>
+                    {/* Keyed by the group's first label, not its position:
+                        an index key remounts every group when the menu
+                        data shifts. `gi` only decides the divider. */}
                     {menu.groups.map((group, gi) => (
-                      <Fragment key={gi}>
+                      <Fragment key={group[0][0]}>
                         {gi > 0 && <Divider />}
                         {group.map(([label, shortcut]) => (
                           <DropdownMenuItem
@@ -249,7 +252,8 @@ export default function ShellNav() {
           height="fill"
           header={
             <LayoutHeader hasDivider padding={6}>
-              <HStack gap={2}>
+              {/* Wraps rather than clipping: three 132px tabs need ~410px. */}
+              <HStack gap={2} wrap="wrap">
                 {EDITOR_TABS.map(tab => (
                   <Card
                     key={tab}

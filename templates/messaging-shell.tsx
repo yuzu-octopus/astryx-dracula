@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LP[w68] > V > Av + (V > IB*4) + IB) + (LP[w260] > V > (H > Hd"Night Watch"[level=3] + IB) + TI"Jump to..." + (V > Tx"Channels"[t=label] + (List > (ListItem)*4)) + (V > Tx"Direct messages"[t=label] + (List > (ListItem)*3))) + (LC[p0] > ChL > ChML > (ChM > ChB)*6 + ChC) + (LP[w340] > V > (H > Hd"Thread"[level=3] + IB) + (ChL > ChML > (ChM > ChB)*3 + ChC))
+//   L > (LP[w=68] > V > Av + (V > IB*4) + IB) + (LP[w=260] > V > (H > Hd"Night Watch"[level=1] + IB) + TI"Jump to…" + (V > Tx"Channels"[t=label] + (List > (ListItem)*4)) + (V > Tx"Direct messages"[t=label] + (List > (ListItem)*3))) + (LC[p=0] > V > (H > Hd"design-systems"[level=2] + SD + IB) + (ChL > ChML > (ChM > ChB)*6 + ChC)) + (LP[w=340] > V > (H > Tx"Thread"[weight=semibold] + IB) + (ChL > ChML > (ChM > ChB)*3 + ChC))
 
 /**
  * Messaging Shell — Slack-style column frame for team messaging tools.
@@ -88,9 +88,6 @@ const styles: Record<string, CSSProperties> = {
     paddingTop: 'var(--spacing-3)',
     paddingBottom: 'var(--spacing-3)',
   },
-  railSpacer: {
-    flex: 1,
-  },
   sidebar: {
     height: '100%',
     minHeight: 0,
@@ -109,9 +106,6 @@ const styles: Record<string, CSSProperties> = {
     overflowY: 'auto',
     paddingInline: 'var(--spacing-2)',
     paddingBottom: 'var(--spacing-3)',
-  },
-  sectionGap: {
-    marginTop: 'var(--spacing-4)',
   },
   streamColumn: {
     height: '100%',
@@ -226,12 +220,18 @@ const PRESENCE_LABEL: Record<Presence, string> = {
   offline: 'Offline',
 };
 
+/** One bubble's copy. Ids key the bubble; its position only sets the grouping. */
+interface StreamBubble {
+  id: string;
+  text: string;
+}
+
 /** One message group: consecutive bubbles from the same sender. */
 interface StreamMessage {
   id: string;
   userId: string;
   time: string;
-  bubbles: string[];
+  bubbles: StreamBubble[];
 }
 
 const MESSAGES_BY_CHANNEL: Record<string, StreamMessage[]> = {
@@ -241,23 +241,40 @@ const MESSAGES_BY_CHANNEL: Record<string, StreamMessage[]> = {
       userId: 'mira',
       time: '2026-06-30T09:12:00',
       bubbles: [
-        'Morning! The Timestamp component now supports a `system_date` format — worth switching the audit log over.',
-        'I put the migration notes in the wiki under Decisions.',
+        {
+          id: 'm1-1',
+          text: 'Morning! The Timestamp component now supports a `system_date` format — worth switching the audit log over.',
+        },
+        {
+          id: 'm1-2',
+          text: 'I put the migration notes in the wiki under Decisions.',
+        },
       ],
     },
     {
       id: 'm2',
       userId: 'devon',
       time: '2026-06-30T09:15:00',
-      bubbles: ['Nice. Does that unblock the incident console timeline work?'],
+      bubbles: [
+        {
+          id: 'm2-1',
+          text: 'Nice. Does that unblock the incident console timeline work?',
+        },
+      ],
     },
     {
       id: 'm3',
       userId: 'you',
       time: '2026-06-30T09:17:00',
       bubbles: [
-        'It does — I will pick that up after the template review.',
-        'One question on the List density defaults, will start a thread.',
+        {
+          id: 'm3-1',
+          text: 'It does — I will pick that up after the template review.',
+        },
+        {
+          id: 'm3-2',
+          text: 'One question on the List density defaults, will start a thread.',
+        },
       ],
     },
     {
@@ -265,14 +282,17 @@ const MESSAGES_BY_CHANNEL: Record<string, StreamMessage[]> = {
       userId: 'sasha',
       time: '2026-06-30T09:24:00',
       bubbles: [
-        'Heads up: the token sync job ran clean overnight, no drift between core and the theme packages.',
+        {
+          id: 'm4-1',
+          text: 'Heads up: the token sync job ran clean overnight, no drift between core and the theme packages.',
+        },
       ],
     },
     {
       id: 'm5',
       userId: 'mira',
       time: '2026-06-30T09:26:00',
-      bubbles: ['Great — closing out the drift task then.'],
+      bubbles: [{id: 'm5-1', text: 'Great — closing out the drift task then.'}],
     },
   ],
   'frontend-guild': [
@@ -281,14 +301,17 @@ const MESSAGES_BY_CHANNEL: Record<string, StreamMessage[]> = {
       userId: 'devon',
       time: '2026-06-30T08:40:00',
       bubbles: [
-        'Guild sync moved to Thursday this week to avoid the release freeze.',
+        {
+          id: 'g1-1',
+          text: 'Guild sync moved to Thursday this week to avoid the release freeze.',
+        },
       ],
     },
     {
       id: 'g2',
       userId: 'you',
       time: '2026-06-30T08:44:00',
-      bubbles: ['Works for me — agenda doc is updated.'],
+      bubbles: [{id: 'g2-1', text: 'Works for me — agenda doc is updated.'}],
     },
   ],
 };
@@ -343,9 +366,9 @@ function StreamMessageGroup({message}: {message: StreamMessage}) {
     <ChatMessage
       sender={isSelf ? 'user' : 'assistant'}
       avatar={isSelf ? undefined : <Avatar name={user.name} size="md" />}>
-      {message.bubbles.map((text, index) => (
+      {message.bubbles.map((bubble, index) => (
         <ChatMessageBubble
-          key={`${message.id}-${index}`}
+          key={bubble.id}
           group={
             message.bubbles.length === 1
               ? undefined
@@ -363,7 +386,7 @@ function StreamMessageGroup({message}: {message: StreamMessage}) {
               />
             ) : undefined
           }>
-          {text}
+          {bubble.text}
         </ChatMessageBubble>
       ))}
     </ChatMessage>
@@ -411,7 +434,7 @@ export default function MessagingShell() {
           onClick={() => {}}
         />
       ))}
-      <div style={styles.railSpacer} />
+      <StackItem size="fill" />
       <IconButton
         label="Settings"
         tooltip="Settings"
@@ -431,7 +454,7 @@ export default function MessagingShell() {
     <Stack direction="vertical" style={styles.sidebar}>
       <HStack gap={2} style={styles.sidebarHeader}>
         <StackItem size="fill">
-          <Heading level={5}>Night Watch</Heading>
+          <Heading level={1}>Night Watch</Heading>
         </StackItem>
         <IconButton
           label="New message"
@@ -442,7 +465,7 @@ export default function MessagingShell() {
           onClick={() => {}}
         />
       </HStack>
-      <div style={styles.sidebarSearch}>
+      <VStack gap={0} style={styles.sidebarSearch}>
         <TextInput
           label="Jump to"
           isLabelHidden
@@ -452,7 +475,7 @@ export default function MessagingShell() {
           value={searchQuery}
           onChange={setSearchQuery}
         />
-      </div>
+      </VStack>
       <StackItem size="fill" style={styles.sidebarScroll}>
         <List
           density="compact"
@@ -482,42 +505,43 @@ export default function MessagingShell() {
             />
           ))}
         </List>
-        <div style={styles.sectionGap}>
-          <List
-            density="compact"
-            hasDividers={false}
-            header={
-              <Text type="label" size="sm" color="secondary">
-                Direct messages
-              </Text>
-            }>
-            {visibleDms.map(dm => (
-              <ListItem
-                key={dm.id}
-                label={USERS[dm.userId].name}
-                isSelected={selectedDmId === dm.id}
-                onClick={() => setSelectedDmId(dm.id)}
-                startContent={
-                  <Avatar
-                    name={USERS[dm.userId].name}
-                    size="sm"
-                    status={
-                      <AvatarStatusDot
-                        variant={PRESENCE_VARIANT[dm.presence]}
-                        label={PRESENCE_LABEL[dm.presence]}
-                      />
-                    }
-                  />
-                }
-                endContent={
-                  dm.unread > 0 ? (
-                    <Badge label={String(dm.unread)} variant="neutral" />
-                  ) : undefined
-                }
-              />
-            ))}
-          </List>
-        </div>
+        {/* The section gap rides on this List's own margin: List is the row
+            container, so no wrapper element is needed. */}
+        <List
+          density="compact"
+          hasDividers={false}
+          style={styles.sectionGap}
+          header={
+            <Text type="label" size="sm" color="secondary">
+              Direct messages
+            </Text>
+          }>
+          {visibleDms.map(dm => (
+            <ListItem
+              key={dm.id}
+              label={USERS[dm.userId].name}
+              isSelected={selectedDmId === dm.id}
+              onClick={() => setSelectedDmId(dm.id)}
+              startContent={
+                <Avatar
+                  name={USERS[dm.userId].name}
+                  size="sm"
+                  status={
+                    <AvatarStatusDot
+                      variant={PRESENCE_VARIANT[dm.presence]}
+                      label={PRESENCE_LABEL[dm.presence]}
+                    />
+                  }
+                />
+              }
+              endContent={
+                dm.unread > 0 ? (
+                  <Badge label={String(dm.unread)} variant="neutral" />
+                ) : undefined
+              }
+            />
+          ))}
+        </List>
       </StackItem>
     </Stack>
   );
@@ -526,7 +550,7 @@ export default function MessagingShell() {
     <Stack direction="vertical" style={styles.streamColumn}>
       <HStack gap={3} style={styles.streamHeader}>
         <Icon icon={Hash} size="sm" color="secondary" />
-        <Heading level={5}>{selectedChannel.name}</Heading>
+        <Heading level={2}>{selectedChannel.name}</Heading>
         <StackItem size="fill" style={styles.streamTopic}>
           <Text type="supporting" color="secondary" maxLines={1}>
             {selectedChannel.topic}
@@ -544,36 +568,35 @@ export default function MessagingShell() {
       </HStack>
       <Divider />
       <StackItem size="fill" style={styles.chatArea}>
-        <div style={styles.chatFill}>
-          <ChatLayout
-            composer={
-              <ChatComposer
-                placeholder={`Message #${selectedChannel.name}`}
-                onSubmit={() => {}}
-              />
-            }
-            emptyState={
-              <EmptyState
-                icon={<Icon icon={Inbox} size="lg" />}
-                title="No messages yet"
-                description="Start the conversation — messages posted here are visible to the whole channel."
-              />
-            }>
-            {messages.length > 0 ? (
-              <ChatMessageList density="balanced">
-                <ChatSystemMessage variant="divider">
-                  Tuesday, June 30
-                </ChatSystemMessage>
-                <ChatSystemMessage>
-                  Sasha Ortiz joined #{selectedChannel.name}
-                </ChatSystemMessage>
-                {messages.map(message => (
-                  <StreamMessageGroup key={message.id} message={message} />
-                ))}
-              </ChatMessageList>
-            ) : null}
-          </ChatLayout>
-        </div>
+        <ChatLayout
+          style={styles.chatFill}
+          composer={
+            <ChatComposer
+              placeholder={`Message #${selectedChannel.name}`}
+              onSubmit={() => {}}
+            />
+          }
+          emptyState={
+            <EmptyState
+              icon={<Icon icon={Inbox} size="lg" />}
+              title="No messages yet"
+              description="Start the conversation. Messages posted here are visible to the whole channel."
+            />
+          }>
+          {messages.length > 0 ? (
+            <ChatMessageList density="balanced">
+              <ChatSystemMessage variant="divider">
+                Tuesday, June 30
+              </ChatSystemMessage>
+              <ChatSystemMessage>
+                Sasha Ortiz joined #{selectedChannel.name}
+              </ChatSystemMessage>
+              {messages.map(message => (
+                <StreamMessageGroup key={message.id} message={message} />
+              ))}
+            </ChatMessageList>
+          ) : null}
+        </ChatLayout>
       </StackItem>
     </Stack>
   );
@@ -637,41 +660,40 @@ export default function MessagingShell() {
           ))}
         </ChatMessageList>
       </StackItem>
-      <div style={styles.threadComposer}>
+      <VStack gap={0} style={styles.threadComposer}>
         <ChatComposer
           density="compact"
           placeholder="Reply in thread…"
           onSubmit={() => {}}
         />
-      </div>
+      </VStack>
     </Stack>
   );
 
   return (
-    <div style={styles.root}>
-      <Layout
-        height="fill"
-        start={
-          <>
-            <LayoutPanel width={68} padding={0}>
-              {workspaceRail}
+    <Layout
+      height="fill"
+      style={styles.root}
+      start={
+        <>
+          <LayoutPanel width={68} padding={0}>
+            {workspaceRail}
+          </LayoutPanel>
+          {!isSidebarHidden && (
+            <LayoutPanel width={260} padding={0}>
+              {channelSidebar}
             </LayoutPanel>
-            {!isSidebarHidden && (
-              <LayoutPanel width={260} padding={0}>
-                {channelSidebar}
-              </LayoutPanel>
-            )}
-          </>
-        }
-        end={
-          showThreadPanel ? (
-            <LayoutPanel width={340} padding={0}>
-              {threadPanel}
-            </LayoutPanel>
-          ) : undefined
-        }
-        content={<LayoutContent padding={0}>{messageStream}</LayoutContent>}
-      />
-    </div>
+          )}
+        </>
+      }
+      end={
+        showThreadPanel ? (
+          <LayoutPanel width={340} padding={0}>
+            {threadPanel}
+          </LayoutPanel>
+        ) : undefined
+      }
+      content={<LayoutContent padding={0}>{messageStream}</LayoutContent>}
+    />
   );
 }

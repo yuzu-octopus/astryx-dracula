@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LH > H[g3 a=center] > (H[g2 a=center] > Hd"Night watch"[level=1] + Tx"3 investigating"[t=supporting]) + SegmentedControl"Filter by status" + B"Declare incident") + (LC[p0] > V[g0] > (H > PowerSearch"Search the night watch...") + (List > (ListItem)*6)) + (LayoutPanel[w380 p0] > V[g4] > (V[g2] > (H[g2 a=center] > StatusDot + Tx"INC-2417"[t=supporting] + Token"Investigating") + Hd"Checkout API elevated 5xx rate"[level=2]) + (H[g2] > B.primary"Mark mitigated" + B.secondary"Escalate") + Divider + MetadataList + Divider + (V[g2] > Hd"Timeline"[level=3] + List))
+//   L > (LH > H[g3 a=center] > (H[g2 a=center] > Hd"Night watch"[level=1] + Tx"3 investigating"[t=supporting]) + SegmentedControl"Filter by status" + B"Declare incident") + (LC[p0] > V[g0] > (H > PowerSearch"Search the night watch…") + (List > (ListItem)*7)) + (LayoutPanel[w380 p0] > V[g4] > (V[g2] > (H[g2 a=center] > StatusDot + Tx"INC-2417"[t=supporting] + Token"Investigating") + Hd"Checkout API elevated 5xx rate"[level=2]) + (H[g2] > B.primary"Mark mitigated" + B.secondary"Escalate") + Divider + MetadataList + Divider + (V[g2] > Hd"Timeline"[level=3] + List))
 
 /**
  * Incident Console — an on-call incident response tool for the night watch.
@@ -11,8 +11,10 @@
  *   Frame: header | grouped incident rows (fill) | inspector 380 (resizable)
  *
  * Responsive contract:
- *   > 1024px  header | rows | inspector 380
- *   <= 1024px inspector hidden; rows keep full width
+ *   > 1024px  header (single row) | rows | inspector 380
+ *   <= 1024px header stacks the filter and the action into a second,
+ *             horizontally scrollable row; inspector hidden, rows keep
+ *             full width
  *
  * Container policy (tracker archetype): dense data renders as rows —
  * edge-to-edge lists grouped by status, zero cards. Status is carried by
@@ -76,6 +78,11 @@ const styles: Record<string, CSSProperties> = {
     padding: 'var(--spacing-4)',
     height: '100%',
     overflowY: 'auto',
+  },
+  controlsRow: {
+    // The four-option filter plus the action never fit a phone header; the
+    // row scrolls instead of clipping options the pointer cannot reach.
+    overflowX: 'auto',
   },
 };
 
@@ -329,7 +336,7 @@ function IncidentRows({
     return (
       <EmptyState
         title="Quiet in the crypt"
-        description="No incidents match — adjust the status filter or clear search filters."
+        description="No incidents match. Adjust the status filter or clear search filters."
         icon={<Icon icon={BellRing} size="lg" />}
       />
     );
@@ -491,42 +498,56 @@ export default function IncidentConsole() {
     incident => incident.status === 'investigating',
   ).length;
 
+  // Extracted so a narrow header can drop them onto their own scrollable row
+  // instead of squeezing the title, the filter and the action into one line.
+  const statusFilterControl = (
+    <SegmentedControl
+      label="Filter by status"
+      value={statusFilter}
+      onChange={setStatusFilter}
+      size="sm">
+      <SegmentedControlItem label="All" value="all" />
+      <SegmentedControlItem label="Investigating" value="investigating" />
+      <SegmentedControlItem label="Mitigated" value="mitigated" />
+      <SegmentedControlItem label="Resolved" value="resolved" />
+    </SegmentedControl>
+  );
+  const declareButton = (
+    <Button
+      label="Declare incident"
+      icon={<Icon icon={Plus} size="sm" />}
+      size="sm"
+    />
+  );
+  const titleGroup = (
+    <HStack gap={2} vAlign="center">
+      <Heading level={1}>Night watch</Heading>
+      <Text type="supporting" color="secondary" hasTabularNumbers>
+        {openCount} investigating
+      </Text>
+    </HStack>
+  );
+
   return (
     <Layout
       height="fill"
       header={
         <LayoutHeader hasDivider>
-          <HStack gap={3} vAlign="center">
-            <StackItem size="fill">
-              <HStack gap={2} vAlign="center">
-                <Heading level={1}>Night watch</Heading>
-                <Text
-                  type="supporting"
-                  color="secondary"
-                  hasTabularNumbers>
-                  {openCount} investigating
-                </Text>
+          {isNarrow ? (
+            <VStack gap={2}>
+              {titleGroup}
+              <HStack gap={2} vAlign="center" style={styles.controlsRow}>
+                {statusFilterControl}
+                {declareButton}
               </HStack>
-            </StackItem>
-            <SegmentedControl
-              label="Filter by status"
-              value={statusFilter}
-              onChange={setStatusFilter}
-              size="sm">
-              <SegmentedControlItem label="All" value="all" />
-              <SegmentedControlItem
-                label="Investigating"
-                value="investigating"
-              />
-              <SegmentedControlItem label="Mitigated" value="mitigated" />
-              <SegmentedControlItem label="Resolved" value="resolved" />
-            </SegmentedControl>
-            <Button
-              label="Declare incident"
-              icon={<Icon icon={Plus} size="sm" />}
-              size="sm"
-            />
-          </HStack>
+            </VStack>
+          ) : (
+            <HStack gap={3} vAlign="center">
+              <StackItem size="fill">{titleGroup}</StackItem>
+              {statusFilterControl}
+              {declareButton}
+            </HStack>
+          )}
         </LayoutHeader>
       }
       content={

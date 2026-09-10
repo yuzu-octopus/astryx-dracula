@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   Ctr > V[a=center] > S.section[p=6] > V[g=6] > (V[g=2 a=center] > Hd"Let's brew after dark"[level=1] + Tx"Tell us a bit"[t=body]) + (G[c={min:200} g=4] > (C > V[g=3] > Ic + (V[g=1] > Tx"Title"[t=body] + Tx"Desc"[t=supporting]))*3) + (G[c={min:260} g=4] > TI"Full Name" + TI"Email") + (G[c={min:260} g=4] > TI"Company" + TI"Phone") + D + (V[g=5] > (V[g=2] > Tx"Goals"[t=label] + (H[g=2] > Tk"Goal"*3)) + SE"Timeline" + SE"Budget" + (RL"Source" > RLI*5) + TA"Notes" + CB"Decision maker") + (V[g=3] > B.primary"Submit" + (H[j=center g=1] > Tx[t=supporting] > Lk"Privacy Policy"))
+//   Ctr > V[a=center] > S.section[p=6] > V[g=6] > (V[g=2 a=center] > Hd"Let's brew after dark"[level=1] + Tx"Tell us a bit"[t=body]) + (V[g=4] > Hd"Why work with us"[level=2] + (G[c={min:200} g=4] > (C > V[g=3] > Ic + (V[g=1] > Hd"Title"[level=3] + Tx"Desc"[t=supporting]))*3)) + (V[g=5] > Hd"Your details"[level=2] + (G[c={min:260} g=4] > TI"Full Name" + TI"Email") + (G[c={min:260} g=4] > TI"Company" + TI"Phone")) + D + (V[g=5] > Hd"Your project"[level=2] + (Fd"Goals"[req] > (H[g=2] > Tk"Goal"*10)) + SE"Timeline" + SE"Budget" + (RL"Source" > RLI*5) + TA"Notes" + CB"Decision maker") + (V[g=3] > B.primary"Submit" + (H[j=center g=1] > Tx[t=supporting] > Lk"Privacy Policy"))
 
 import {useState} from 'react';
 import {VStack, HStack} from '@astryxdesign/core/Layout';
@@ -19,8 +19,8 @@ import {Token} from '@astryxdesign/core/Token';
 import {RadioList, RadioListItem} from '@astryxdesign/core/RadioList';
 import {TextArea} from '@astryxdesign/core/TextArea';
 import {Divider} from '@astryxdesign/core/Divider';
-import {Banner} from '@astryxdesign/core/Banner';
-import {Rocket, SlidersHorizontal, Hand} from 'lucide-react';
+import {Field} from '@astryxdesign/core/Field';
+import {Rocket, SlidersHorizontal, Hand, Check} from 'lucide-react';
 
 const CAMPAIGN_GOALS = [
   'Brand Awareness',
@@ -124,16 +124,15 @@ export default function ContactForm() {
             </VStack>
 
             {/* Why work with us */}
-            <VStack gap={5}>
+            <VStack gap={4}>
+              <Heading level={2}>Why work with us</Heading>
               <Grid columns={{minWidth: 200}} gap={4}>
                 {WHY_US.map(item => (
                   <Card key={item.title}>
                     <VStack gap={3}>
-                      <Icon icon={item.icon} size="lg" color="accent" />
+                      <Icon icon={item.icon} size="lg" color="yellow" />
                       <VStack gap={1}>
-                        <Text type="body" weight="bold">
-                          {item.title}
-                        </Text>
+                        <Heading level={3}>{item.title}</Heading>
                         <Text type="supporting" color="secondary">
                           {item.description}
                         </Text>
@@ -146,9 +145,11 @@ export default function ContactForm() {
 
             {/* Your details */}
             <VStack gap={5}>
+              <Heading level={2}>Your details</Heading>
               <Grid columns={{minWidth: 260}} gap={4}>
                 <TextInput
                   label="Full Name"
+                  isRequired
                   placeholder="Full Name"
                   value={fullName}
                   onChange={setFullName}
@@ -160,6 +161,7 @@ export default function ContactForm() {
                 />
                 <TextInput
                   label="Email"
+                  isRequired
                   placeholder="you@company.com"
                   value={email}
                   onChange={setEmail}
@@ -173,6 +175,7 @@ export default function ContactForm() {
               <Grid columns={{minWidth: 260}} gap={4}>
                 <TextInput
                   label="Company"
+                  isRequired
                   placeholder="Company"
                   value={company}
                   onChange={setCompany}
@@ -184,6 +187,7 @@ export default function ContactForm() {
                 />
                 <TextInput
                   label="Phone"
+                  isRequired
                   placeholder="Phone number"
                   value={phone}
                   onChange={setPhone}
@@ -200,25 +204,46 @@ export default function ContactForm() {
 
             {/* Your project */}
             <VStack gap={5}>
-              <VStack gap={2}>
-                <Text type="label" color="secondary">
-                  What are you going for?
-                </Text>
-                <HStack gap={2} wrap="wrap">
-                  {CAMPAIGN_GOALS.map(goal => (
-                    <Token
-                      key={goal}
-                      label={goal}
-                      color={goals.includes(goal) ? 'yellow' : 'default'}
-                      onClick={() => toggleGoal(goal)}
-                    />
-                  ))}
+              <Heading level={2}>Your project</Heading>
+              <Field
+                label="What are you going for?"
+                inputID="campaign-goals"
+                labelID="campaign-goals-label"
+                isGroupLabel
+                isRequired
+                status={
+                  errors.goals
+                    ? {type: 'error', message: errors.goals}
+                    : undefined
+                }>
+                <HStack
+                  gap={2}
+                  wrap="wrap"
+                  role="group"
+                  aria-labelledby="campaign-goals-label">
+                  {CAMPAIGN_GOALS.map(goal => {
+                    const isSelected = goals.includes(goal);
+                    return (
+                      <Token
+                        key={goal}
+                        label={goal}
+                        color={isSelected ? 'yellow' : 'default'}
+                        icon={
+                          isSelected ? (
+                            <Icon icon={Check} size="xsm" color="inherit" />
+                          ) : undefined
+                        }
+                        description={isSelected ? 'Selected' : undefined}
+                        onClick={() => toggleGoal(goal)}
+                      />
+                    );
+                  })}
                 </HStack>
-                {errors.goals && <Banner status="error" title={errors.goals} />}
-              </VStack>
+              </Field>
 
               <Selector
                 label="When are you thinking?"
+                isRequired
                 placeholder="When are you thinking of launching?"
                 options={LAUNCH_OPTIONS}
                 value={timeline}
@@ -232,6 +257,7 @@ export default function ContactForm() {
 
               <Selector
                 label="Ballpark budget?"
+                isRequired
                 placeholder="What's your rough monthly budget?"
                 options={BUDGET_OPTIONS}
                 value={budget}
