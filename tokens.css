@@ -126,3 +126,13 @@
   border: 2px solid transparent;
   background-clip: content-box;
 }
+
+/* A resizable SideNav reports exactly 1px of horizontal overflow: the resize
+ * handle renders 1px wider than its own box, and the side-nav panel scrolls
+ * both axes, so a permanent horizontal scrollbar paints under the rail even
+ * though nothing overflows visually. A navigation rail never scrolls
+ * sideways, so clip that axis on the shell's side-nav region. Needed until the
+ * resize handle stops reporting the extra pixel. */
+.astryx-app-shell-sidenav {
+  overflow-x: hidden;
+}
