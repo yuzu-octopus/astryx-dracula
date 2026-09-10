@@ -447,7 +447,7 @@ export default function MessagingShell() {
           label="Jump to"
           isLabelHidden
           size="sm"
-          placeholder="Jump to..."
+          placeholder="Jump to…"
           startIcon={Search}
           value={searchQuery}
           onChange={setSearchQuery}
@@ -640,7 +640,7 @@ export default function MessagingShell() {
       <div style={styles.threadComposer}>
         <ChatComposer
           density="compact"
-          placeholder="Reply in thread..."
+          placeholder="Reply in thread…"
           onSubmit={() => {}}
         />
       </div>

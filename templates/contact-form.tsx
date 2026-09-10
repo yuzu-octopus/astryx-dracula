@@ -118,7 +118,7 @@ export default function ContactForm() {
                 Let&apos;s brew after dark
               </Heading>
               <Text type="body" color="secondary">
-                Tell us a bit about what you&apos;re summoning — the coven
+                Tell us a bit about what you&apos;re summoning, and the coven
                 would love to help it take flight.
               </Text>
             </VStack>
@@ -256,7 +256,7 @@ export default function ContactForm() {
 
               <TextArea
                 label="Anything else?"
-                placeholder="Tell us whatever else is on your mind..."
+                placeholder="Tell us whatever else is on your mind…"
                 value={message}
                 onChange={setMessage}
               />

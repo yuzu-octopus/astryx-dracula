@@ -2,7 +2,7 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   Ctr > V[g=4 a=center] > (V[g=2 a=center] > Ic + Tx"Castle Dracula"[t=body]) + (C[p=8] > V[g=4] > (V[g=1 a=center] > Hd"Welcome back to the night"[level=2] + Tx"Sign in to your crypt"[t=body]) + TI"Email"[t=email] + TI"Password"[t=password] + B.primary"Enter the night")
 
-import {useState, type CSSProperties} from 'react';
+import {useState, useTransition, type CSSProperties} from 'react';
 import {Moon} from 'lucide-react';
 import {VStack} from '@astryxdesign/core/Layout';
 import {Center} from '@astryxdesign/core/Center';
@@ -29,7 +29,7 @@ const contentStyle: CSSProperties = {
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, startTransition] = useTransition();
   const [error, setError] = useState('');
 
   const handleSignIn = () => {
@@ -38,8 +38,11 @@ export default function LoginPage() {
       setError('Whisper both your email and password to enter the night.');
       return;
     }
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 2000);
+    startTransition(async () => {
+      const {promise, resolve} = Promise.withResolvers<void>();
+      setTimeout(resolve, 2000);
+      await promise;
+    });
   };
 
   return (

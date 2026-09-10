@@ -893,27 +893,38 @@ const columns: TableColumn<OrderRow>[] = [
 // ============= REVENUE CHART (hand SVG, Dracula ramp) =============
 
 const revenueLine = 'var(--dracula-cyan)';
+const SHOE_CHART_W = 540;
+const SHOE_CHART_H = 200;
+const SHOE_CHART_PAD_LEFT = 44;
+const SHOE_CHART_PAD_RIGHT = 12;
+const SHOE_CHART_PAD_TOP = 12;
+const SHOE_CHART_BASELINE = 164;
+const SHOE_CHART_MAX = 10000;
+const SHOE_CHART_PLOT_W = SHOE_CHART_W - SHOE_CHART_PAD_LEFT - SHOE_CHART_PAD_RIGHT;
+const SHOE_CHART_PLOT_H = SHOE_CHART_BASELINE - SHOE_CHART_PAD_TOP;
+const shoeRevenuePoints = revenueData.map((d, i) => ({
+  ...d,
+  x: SHOE_CHART_PAD_LEFT + (i / (revenueData.length - 1)) * SHOE_CHART_PLOT_W,
+  y: SHOE_CHART_BASELINE - (d.revenue / SHOE_CHART_MAX) * SHOE_CHART_PLOT_H,
+}));
+const shoeRevenueLinePath = shoeRevenuePoints
+  .map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`)
+  .join(' ');
+const shoeRevenueAreaPath = `${shoeRevenueLinePath} L${shoeRevenuePoints[shoeRevenuePoints.length - 1].x.toFixed(1)},${SHOE_CHART_BASELINE} L${shoeRevenuePoints[0].x.toFixed(1)},${SHOE_CHART_BASELINE} Z`;
+const SHOE_REVENUE_GRID_TICKS = [0, 2000, 4000, 6000, 8000, 10000];
 
 function RevenueChart() {
-  const W = 540;
-  const H = 200;
-  const padLeft = 44;
-  const padRight = 12;
-  const padTop = 12;
-  const baseline = 164;
-  const max = 10000;
-  const plotW = W - padLeft - padRight;
-  const plotH = baseline - padTop;
-  const points = revenueData.map((d, i) => ({
-    ...d,
-    x: padLeft + (i / (revenueData.length - 1)) * plotW,
-    y: baseline - (d.revenue / max) * plotH,
-  }));
-  const linePath = points
-    .map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`)
-    .join(' ');
-  const areaPath = `${linePath} L${points[points.length - 1].x.toFixed(1)},${baseline} L${points[0].x.toFixed(1)},${baseline} Z`;
-  const gridTicks = [0, 2000, 4000, 6000, 8000, 10000];
+  const W = SHOE_CHART_W;
+  const H = SHOE_CHART_H;
+  const padLeft = SHOE_CHART_PAD_LEFT;
+  const padRight = SHOE_CHART_PAD_RIGHT;
+  const baseline = SHOE_CHART_BASELINE;
+  const max = SHOE_CHART_MAX;
+  const plotH = SHOE_CHART_PLOT_H;
+  const points = shoeRevenuePoints;
+  const linePath = shoeRevenueLinePath;
+  const areaPath = shoeRevenueAreaPath;
+  const gridTicks = SHOE_REVENUE_GRID_TICKS;
   return (
     <VStack gap={3}>
       <Card

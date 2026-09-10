@@ -141,20 +141,20 @@ const MENUS: {label: string; groups: MenuEntry[][]}[] = [
 ];
 
 const CODE_LINES = [
-  '38%',
-  '62%',
-  '54%',
-  '0%',
-  '46%',
-  '70%',
-  '58%',
-  '34%',
-  '0%',
-  '50%',
-  '66%',
-  '42%',
-  '60%',
-  '28%',
+  {id: 'line-1', width: '38%'},
+  {id: 'line-2', width: '62%'},
+  {id: 'line-3', width: '54%'},
+  {id: 'line-4', width: '0%'},
+  {id: 'line-5', width: '46%'},
+  {id: 'line-6', width: '70%'},
+  {id: 'line-7', width: '58%'},
+  {id: 'line-8', width: '34%'},
+  {id: 'line-9', width: '0%'},
+  {id: 'line-10', width: '50%'},
+  {id: 'line-11', width: '66%'},
+  {id: 'line-12', width: '42%'},
+  {id: 'line-13', width: '60%'},
+  {id: 'line-14', width: '28%'},
 ];
 
 const EDITOR_TABS = ['AppShell.tsx', 'TopNav.tsx', 'theme.ts'];
@@ -265,17 +265,17 @@ export default function ShellNav() {
           content={
             <LayoutContent padding={6}>
               <VStack gap={2}>
-                {CODE_LINES.map((width, i) =>
-                  width === '0%' ? (
+                {CODE_LINES.map(line =>
+                  line.width === '0%' ? (
                     <Card
-                      key={i}
+                      key={line.id}
                       variant="muted"
                       padding={0}
                       width={1}
                       height={14}
                     />
                   ) : (
-                    <HStack key={i} gap={3} vAlign="center">
+                    <HStack key={line.id} gap={3} vAlign="center">
                       <Card
                         variant="muted"
                         padding={0}
@@ -285,7 +285,7 @@ export default function ShellNav() {
                       <Card
                         variant="muted"
                         padding={0}
-                        width={width}
+                        width={line.width}
                         height={14}
                       />
                     </HStack>

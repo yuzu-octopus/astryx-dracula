@@ -387,7 +387,7 @@ export default function AiChat() {
                         }>
                         <ChatTokenizedText tokens={MENTION_TOKENS}>
                           @agent Can you review these auth files? The JWT
-                          refresh logic seems broken — tokens expire but the
+                          refresh logic seems broken, tokens expire but the
                           middleware doesn't catch it.
                         </ChatTokenizedText>
                       </ChatMessageBubble>

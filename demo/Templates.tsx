@@ -21,7 +21,7 @@ export interface TemplateEntry {
   load: () => Promise<{ default: ComponentType }>;
 }
 
-export const TEMPLATES: TemplateEntry[] = [
+const TEMPLATES: TemplateEntry[] = [
   {
     id: 'dashboard',
     name: 'Analytics Dashboard',

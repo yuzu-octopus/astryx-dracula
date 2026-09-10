@@ -191,6 +191,205 @@ const cardLogo: CSSProperties = {
   backgroundColor: 'var(--color-background-surface)',
 };
 
+function OrderLineItem({
+  item,
+  qty,
+  onChangeQty,
+}: {
+  item: (typeof ORDER_ITEMS)[number];
+  qty: number;
+  onChangeQty: (v: number) => void;
+}) {
+  return (
+    <VStack gap={3}>
+      <HStack gap={3} vAlign="start">
+        <Thumbnail src={ITEM_IMAGES[item.id].src} alt={item.name} />
+        <StackItem size="fill">
+          <VStack gap={1}>
+            <HStack gap={2} hAlign="between" vAlign="start">
+              <HStack gap={2} vAlign="center" wrap="wrap">
+                <Text type="body" weight="medium">
+                  {item.name}
+                </Text>
+                {item.limited && (
+                  <Badge variant="yellow" label="LIMITED EDITION" />
+                )}
+              </HStack>
+              <Text type="body" weight="bold" hasTabularNumbers>
+                {fmt(item.price)}
+              </Text>
+            </HStack>
+            <Text type="supporting" color="secondary">
+              {item.variant}
+            </Text>
+            <HStack gap={2} vAlign="end" wrap="wrap">
+              <NumberInput
+                label="Qty"
+                value={qty}
+                onChange={onChangeQty}
+                min={1}
+                max={10}
+                isIntegerOnly
+              />
+              <Link href={SELF_HREF} type="supporting">
+                Remove
+              </Link>
+              <Link href={SELF_HREF} type="supporting">
+                Save
+              </Link>
+            </HStack>
+          </VStack>
+        </StackItem>
+      </HStack>
+      <Divider />
+    </VStack>
+  );
+}
+
+function OrderSummaryCard({
+  quantities,
+  onChangeQty,
+  subtotal,
+  shipping,
+  tax,
+  total,
+}: {
+  quantities: Record<string, number>;
+  onChangeQty: (id: string, v: number) => void;
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  total: number;
+}) {
+  return (
+    <Card padding={5}>
+      <VStack gap={4}>
+        {/* Accordion header — clickable on mobile only */}
+        <Collapsible trigger="Order Summary" defaultIsOpen={true}>
+          <VStack gap={4} style={summaryContent}>
+            {ORDER_ITEMS.map(item => (
+              <OrderLineItem
+                key={item.id}
+                item={item}
+                qty={quantities[item.id] ?? item.qty}
+                onChangeQty={v => onChangeQty(item.id, v)}
+              />
+            ))}
+            <OrderTotalSection
+              subtotal={subtotal}
+              shipping={shipping}
+              tax={tax}
+              total={total}
+            />
+          </VStack>
+        </Collapsible>
+      </VStack>
+    </Card>
+  );
+}
+
+function OrderTotalSection({
+  subtotal,
+  shipping,
+  tax,
+  total,
+}: {
+  subtotal: number;
+  shipping: number;
+  tax: number;
+  total: number;
+}) {
+  return (
+    <VStack gap={3}>
+      <Text type="large" weight="bold">
+        Order Total
+      </Text>
+      <VStack gap={2}>
+        <HStack hAlign="between" vAlign="center">
+          <Text type="body" color="secondary">
+            Subtotal
+          </Text>
+          <Text type="body" hasTabularNumbers>
+            {fmt(subtotal)}
+          </Text>
+        </HStack>
+        <HStack hAlign="between" vAlign="center">
+          <Text type="body" color="secondary">
+            Shipping
+          </Text>
+          <Text type="body" hasTabularNumbers>
+            {fmt(shipping)}
+          </Text>
+        </HStack>
+        <HStack hAlign="between" vAlign="center">
+          <Text type="body" color="secondary">
+            Tax
+          </Text>
+          <Text type="body" hasTabularNumbers>
+            {fmt(tax)}
+          </Text>
+        </HStack>
+      </VStack>
+      <Divider />
+      <HStack hAlign="between" vAlign="center">
+        <Text type="large" weight="bold">
+          Total
+        </Text>
+        <Text type="large" weight="bold" hasTabularNumbers>
+          {fmt(total)}
+        </Text>
+      </HStack>
+      <Banner
+        status="info"
+        icon={<Icon icon={Truck} size="sm" />}
+        title="Free shipping on orders over $300"
+      />
+    </VStack>
+  );
+}
+
+const TRUST_ITEMS: Array<{icon: typeof ShieldCheck; label: string}> = [
+  {icon: ShieldCheck, label: 'Secure Payment'},
+  {icon: Lock, label: 'SSL Encrypted'},
+  {icon: CircleCheck, label: 'Free Returns'},
+];
+
+const SELF_HREF = '#/templates/payment-form';
+
+const POLICY_LINKS = [
+  'Refund policy',
+  'Privacy policy',
+  'Terms of service',
+  'Cancellations',
+];
+
+function TrustBar() {
+  return (
+    <HStack gap={5} hAlign="center" wrap="wrap">
+      {TRUST_ITEMS.map(item => (
+        <HStack key={item.label} gap={1} vAlign="center">
+          <Icon icon={item.icon} size="sm" color="secondary" />
+          <Text type="supporting" color="secondary">
+            {item.label}
+          </Text>
+        </HStack>
+      ))}
+    </HStack>
+  );
+}
+
+function PolicyLinks() {
+  return (
+    <HStack gap={4} vAlign="center" wrap="wrap">
+      {POLICY_LINKS.map(label => (
+        <Link key={label} href={SELF_HREF} type="supporting">
+          {label}
+        </Link>
+      ))}
+    </HStack>
+  );
+}
+
 export default function PaymentForm() {
   const isMobile = useMediaQuery('(max-width: 767px)');
   const isStacked = useMediaQuery('(max-width: 1024px)');
@@ -784,38 +983,7 @@ export default function PaymentForm() {
 
                       {/* Trust bar + CTAs + policy links */}
                       <VStack gap={4}>
-                        <HStack gap={5} hAlign="center" wrap="wrap">
-                          <HStack gap={1} vAlign="center">
-                            <Icon
-                              icon={ShieldCheck}
-                              size="sm"
-                              color="secondary"
-                            />
-                            <Text type="supporting" color="secondary">
-                              Secure Payment
-                            </Text>
-                          </HStack>
-                          <HStack gap={1} vAlign="center">
-                            <Icon
-                              icon={Lock}
-                              size="sm"
-                              color="secondary"
-                            />
-                            <Text type="supporting" color="secondary">
-                              SSL Encrypted
-                            </Text>
-                          </HStack>
-                          <HStack gap={1} vAlign="center">
-                            <Icon
-                              icon={CircleCheck}
-                              size="sm"
-                              color="secondary"
-                            />
-                            <Text type="supporting" color="secondary">
-                              Free Returns
-                            </Text>
-                          </HStack>
-                        </HStack>
+                        <TrustBar />
                         <VStack gap={2}>
                           <Button
                             label="Place Order"
@@ -833,20 +1001,7 @@ export default function PaymentForm() {
                           />
                         </VStack>
                         <Divider />
-                        <HStack gap={4} vAlign="center" wrap="wrap">
-                          <Link href="#/templates/payment-form" type="supporting">
-                            Refund policy
-                          </Link>
-                          <Link href="#/templates/payment-form" type="supporting">
-                            Privacy policy
-                          </Link>
-                          <Link href="#/templates/payment-form" type="supporting">
-                            Terms of service
-                          </Link>
-                          <Link href="#/templates/payment-form" type="supporting">
-                            Cancellations
-                          </Link>
-                        </HStack>
+                        <PolicyLinks />
                       </VStack>
                     </VStack>
                   </StackItem>
@@ -854,132 +1009,16 @@ export default function PaymentForm() {
                   <StackItem
                     size="fill"
                     style={isStacked ? summaryMobileOrder : summarySticky}>
-                    <Card padding={5}>
-                      <VStack gap={4}>
-                        {/* Accordion header — clickable on mobile only */}
-                        <Collapsible
-                          trigger="Order Summary"
-                          defaultIsOpen={true}>
-                          <VStack gap={4} style={summaryContent}>
-                            {/* Line items */}
-                            {ORDER_ITEMS.map(item => (
-                              <VStack key={item.id} gap={3}>
-                                <HStack gap={3} vAlign="start">
-                                  <Thumbnail
-                                    src={ITEM_IMAGES[item.id].src}
-                                    alt={item.name}
-                                  />
-                                  <StackItem size="fill">
-                                    <VStack gap={1}>
-                                      <HStack
-                                        gap={2}
-                                        hAlign="between"
-                                        vAlign="start">
-                                        <HStack gap={2} vAlign="center" wrap="wrap">
-                                          <Text type="body" weight="medium">
-                                            {item.name}
-                                          </Text>
-                                          {item.limited && (
-                                            <Badge
-                                              variant="yellow"
-                                              label="LIMITED EDITION"
-                                            />
-                                          )}
-                                        </HStack>
-                                        <Text
-                                          type="body"
-                                          weight="bold"
-                                          hasTabularNumbers>
-                                          {fmt(item.price)}
-                                        </Text>
-                                      </HStack>
-                                      <Text type="supporting" color="secondary">
-                                        {item.variant}
-                                      </Text>
-                                      <HStack gap={2} vAlign="end" wrap="wrap">
-                                        <NumberInput
-                                          label="Qty"
-                                          value={
-                                            quantities[item.id] ?? item.qty
-                                          }
-                                          onChange={v =>
-                                            setQuantities(q => ({
-                                              ...q,
-                                              [item.id]: v,
-                                            }))
-                                          }
-                                          min={1}
-                                          max={10}
-                                          isIntegerOnly
-                                        />
-                                        <Link href="#/templates/payment-form" type="supporting">
-                                          Remove
-                                        </Link>
-                                        <Link href="#/templates/payment-form" type="supporting">
-                                          Save
-                                        </Link>
-                                      </HStack>
-                                    </VStack>
-                                  </StackItem>
-                                </HStack>
-                                <Divider />
-                              </VStack>
-                            ))}
-
-                            {/* Order total subsection */}
-                            <VStack gap={3}>
-                              <Text type="large" weight="bold">
-                                Order Total
-                              </Text>
-                              <VStack gap={2}>
-                                <HStack hAlign="between" vAlign="center">
-                                  <Text type="body" color="secondary">
-                                    Subtotal
-                                  </Text>
-                                  <Text type="body" hasTabularNumbers>
-                                    {fmt(subtotal)}
-                                  </Text>
-                                </HStack>
-                                <HStack hAlign="between" vAlign="center">
-                                  <Text type="body" color="secondary">
-                                    Shipping
-                                  </Text>
-                                  <Text type="body" hasTabularNumbers>
-                                    {fmt(shipping)}
-                                  </Text>
-                                </HStack>
-                                <HStack hAlign="between" vAlign="center">
-                                  <Text type="body" color="secondary">
-                                    Tax
-                                  </Text>
-                                  <Text type="body" hasTabularNumbers>
-                                    {fmt(tax)}
-                                  </Text>
-                                </HStack>
-                              </VStack>
-                              <Divider />
-                              <HStack hAlign="between" vAlign="center">
-                                <Text type="large" weight="bold">
-                                  Total
-                                </Text>
-                                <Text
-                                  type="large"
-                                  weight="bold"
-                                  hasTabularNumbers>
-                                  {fmt(total)}
-                                </Text>
-                              </HStack>
-                              <Banner
-                                status="info"
-                                icon={<Icon icon={Truck} size="sm" />}
-                                title="Free shipping on orders over $300"
-                              />
-                            </VStack>
-                          </VStack>
-                        </Collapsible>
-                      </VStack>
-                      {/* end outer card VStack gap={4} */}
-                    </Card>
+                    <OrderSummaryCard
+                      quantities={quantities}
+                      onChangeQty={(id, v) =>
+                        setQuantities(q => ({...q, [id]: v}))
+                      }
+                      subtotal={subtotal}
+                      shipping={shipping}
+                      tax={tax}
+                      total={total}
+                    />
                   </StackItem>
                 </Stack>
               </VStack>

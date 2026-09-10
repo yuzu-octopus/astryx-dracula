@@ -279,7 +279,7 @@ export default function DocumentationCatalog() {
                   <VStack gap={4}>
                     <Text type="display-1">The coven grimoire</Text>
                     <Text type="large" weight="normal" color="secondary">
-                      Every incantation in the Astryx spellbook — thirty-one
+                      Every incantation in the Astryx spellbook, with thirty-one
                       components for building beautiful, accessible products
                       after dark.
                     </Text>

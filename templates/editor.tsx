@@ -577,9 +577,9 @@ function BlockPreview({
             <Heading level={3}>Cards</Heading>
             <Divider />
             <List density="balanced" hasDividers={false}>
-              {cardItems.map((card, i) => (
+              {cardItems.map((card) => (
                 <ListItem
-                  key={i}
+                  key={card.title}
                   label={card.title}
                   description={card.description}
                 />

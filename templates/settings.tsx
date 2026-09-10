@@ -81,7 +81,7 @@ export default function SettingsTemplate() {
             <Typeahead
               label="Search"
               isLabelHidden
-              placeholder="Search coven settings..."
+              placeholder="Search coven settings…"
               searchSource={settingsSearchSource}
               value={searchValue}
               onChange={setSearchValue}

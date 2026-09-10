@@ -156,7 +156,7 @@ function ImageGallery({
       </AspectRatio>
       <Grid columns={3} gap={2}>
         {thumbnails.map((hue, i) => (
-          <AspectRatio key={i} ratio={1}>
+          <AspectRatio key={hue} ratio={1}>
             <SelectableCard
               label={`Product image ${i + 1}`}
               isSelected={selected === i}

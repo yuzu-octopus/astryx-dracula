@@ -548,27 +548,38 @@ const columns: TableColumn<OrderRow>[] = [
 // ============= REVENUE CHART (hand SVG, Dracula ramp) =============
 
 const revenueLine = 'var(--dracula-purple)';
+const CHART_W = 540;
+const CHART_H = 200;
+const CHART_PAD_LEFT = 40;
+const CHART_PAD_RIGHT = 12;
+const CHART_PAD_TOP = 12;
+const CHART_BASELINE = 164;
+const CHART_MAX = 160;
+const CHART_PLOT_W = CHART_W - CHART_PAD_LEFT - CHART_PAD_RIGHT;
+const CHART_PLOT_H = CHART_BASELINE - CHART_PAD_TOP;
+const revenuePoints = revenueData.map((d, i) => ({
+  ...d,
+  x: CHART_PAD_LEFT + (i / (revenueData.length - 1)) * CHART_PLOT_W,
+  y: CHART_BASELINE - (d.revenue / CHART_MAX) * CHART_PLOT_H,
+}));
+const revenueLinePath = revenuePoints
+  .map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`)
+  .join(' ');
+const revenueAreaPath = `${revenueLinePath} L${revenuePoints[revenuePoints.length - 1].x.toFixed(1)},${CHART_BASELINE} L${revenuePoints[0].x.toFixed(1)},${CHART_BASELINE} Z`;
+const REVENUE_GRID_TICKS = [0, 50, 100, 150];
 
 function RevenueChart() {
-  const W = 540;
-  const H = 200;
-  const padLeft = 40;
-  const padRight = 12;
-  const padTop = 12;
-  const baseline = 164;
-  const max = 160;
-  const plotW = W - padLeft - padRight;
-  const plotH = baseline - padTop;
-  const points = revenueData.map((d, i) => ({
-    ...d,
-    x: padLeft + (i / (revenueData.length - 1)) * plotW,
-    y: baseline - (d.revenue / max) * plotH,
-  }));
-  const linePath = points
-    .map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`)
-    .join(' ');
-  const areaPath = `${linePath} L${points[points.length - 1].x.toFixed(1)},${baseline} L${points[0].x.toFixed(1)},${baseline} Z`;
-  const gridTicks = [0, 50, 100, 150];
+  const W = CHART_W;
+  const H = CHART_H;
+  const padLeft = CHART_PAD_LEFT;
+  const padRight = CHART_PAD_RIGHT;
+  const baseline = CHART_BASELINE;
+  const max = CHART_MAX;
+  const plotH = CHART_PLOT_H;
+  const points = revenuePoints;
+  const linePath = revenueLinePath;
+  const areaPath = revenueAreaPath;
+  const gridTicks = REVENUE_GRID_TICKS;
   return (
     <VStack gap={3}>
       <Card
@@ -633,6 +644,14 @@ function RevenueChart() {
           )}
         </svg>
       </Card>
+      <RevenueChartCaption />
+    </VStack>
+  );
+}
+
+function RevenueChartCaption() {
+  return (
+    <>
       <Text type="supporting" color="secondary">
         Daily revenue · Jan 1–15
       </Text>
@@ -642,7 +661,7 @@ function RevenueChart() {
           Revenue
         </Text>
       </HStack>
-    </VStack>
+    </>
   );
 }
 

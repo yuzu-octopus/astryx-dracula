@@ -342,7 +342,7 @@ function ItemsCard() {
         <List density="spacious" style={itemsList}>
           {PRODUCTS.map((product, i) => (
             <ListItem
-              key={i}
+              key={product.name}
               label={product.name}
               description={
                 <VStack gap={0}>
@@ -501,8 +501,8 @@ function TimelineSection() {
         </HStack>
 
         <VStack gap={4}>
-          {ACTIVITY.map((item, i) => (
-            <VStack key={i} gap={2}>
+          {ACTIVITY.map((item) => (
+            <VStack key={`${item.user}-${item.time}`} gap={2}>
               <HStack gap={3} vAlign="start">
                 <Avatar name={item.user} size="md" />
                 <StackItem size="fill">
@@ -580,7 +580,7 @@ function PanelContent() {
     <VStack gap={4}>
       <Collapsible trigger={<Heading level={4}>Notes</Heading>}>
         <Text type="body">
-          Customer is a repeat buyer — 3rd order this quarter. Prefers
+          Customer is a repeat buyer, 3rd order this quarter. Prefers
           moonlight and sage glazes. Requested gift wrapping for the mug set.
           Ships to a residential address in CA.{' '}
           <Link href="#/templates/detail-page">

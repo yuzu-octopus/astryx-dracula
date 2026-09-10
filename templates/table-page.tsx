@@ -428,7 +428,7 @@ export default function TablePage() {
               onChange={newFilters => {
                 setFilters([...newFilters]);
               }}
-              placeholder="Search familiars..."
+              placeholder="Search familiars…"
               resultCount={filtered.length}
             />
             <Table<FamiliarRow>

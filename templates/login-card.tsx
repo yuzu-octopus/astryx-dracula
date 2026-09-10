@@ -2,7 +2,7 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   C[p4] > V[g3] > (Hd"Sign in"[level=3] + F > (TI"Email"[t=email req] + TI"Password"[t=password req]) + B.primary"Enter the night")
 
-import {useState, type CSSProperties} from 'react';
+import {useState, useTransition, type CSSProperties} from 'react';
 import {Moon} from 'lucide-react';
 import {VStack} from '@astryxdesign/core/Layout';
 import {Center} from '@astryxdesign/core/Center';
@@ -59,19 +59,20 @@ export default function LoginCard() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginFailed, setLoginFailed] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, startTransition] = useTransition();
 
   const handleLogin = () => {
     if (!email || !password) {
       setLoginFailed(true);
       return;
     }
-    setIsLoading(true);
     setLoginFailed(false);
-    setTimeout(() => {
-      setIsLoading(false);
+    startTransition(async () => {
+      const {promise, resolve} = Promise.withResolvers<void>();
+      setTimeout(resolve, 2000);
+      await promise;
       setLoginFailed(true);
-    }, 2000);
+    });
   };
 
   return (

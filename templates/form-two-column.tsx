@@ -266,7 +266,7 @@ export default function TwoColumnForm() {
                   options={BUDGET_OPTIONS}
                   value={budget}
                   onChange={setBudget}
-                  placeholder="Select a budget range..."
+                  placeholder="Select a budget range…"
                 />
                 <TextArea
                   label="Project details"

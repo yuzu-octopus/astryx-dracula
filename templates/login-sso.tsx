@@ -2,7 +2,7 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   Ctr > C[p8 mw400] > V[g4] > (V[g1 a=center] > Hd"Welcome back to the night"[level=2] + Tx"Whisper your details"[t=body]) + (V[g2] > TI"Work email"[t=email] + TI"Password"[t=password]) + Lk"Having trouble signing in?" + B.primary"Enter the night" + D"Or sign in with" + B.secondary"Continue with SSO" + (V[a=center] > Tx"New to the castle?"[t=supporting])
 
-import {useState, type CSSProperties} from 'react';
+import {useState, useTransition, type CSSProperties} from 'react';
 import {VStack, HStack} from '@astryxdesign/core/Layout';
 import {Center} from '@astryxdesign/core/Center';
 import {Text, Heading} from '@astryxdesign/core/Text';
@@ -62,7 +62,7 @@ export default function LoginSso() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginFailed, setLoginFailed] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, startTransition] = useTransition();
 
   const provider = getProvider(email);
   const emailValid = isValidEmail(email);
@@ -81,7 +81,6 @@ export default function LoginSso() {
   const handleBack = () => {
     setStep('email');
     setLoginFailed(false);
-    setIsLoading(false);
   };
 
   const handleSignIn = () => {
@@ -89,12 +88,13 @@ export default function LoginSso() {
       setLoginFailed(true);
       return;
     }
-    setIsLoading(true);
     setLoginFailed(false);
-    setTimeout(() => {
-      setIsLoading(false);
+    startTransition(async () => {
+      const {promise, resolve} = Promise.withResolvers<void>();
+      setTimeout(resolve, 2000);
+      await promise;
       setLoginFailed(true);
-    }, 2000);
+    });
   };
 
   return (
@@ -201,7 +201,13 @@ export default function LoginSso() {
                   variant="primary"
                   size="lg"
                   isLoading={isLoading}
-                  onClick={() => setIsLoading(true)}
+                  onClick={() => {
+                    startTransition(async () => {
+                      const {promise, resolve} = Promise.withResolvers<void>();
+                      setTimeout(resolve, 2000);
+                      await promise;
+                    });
+                  }}
                 />
                 <Button
                   label="Use a different email"

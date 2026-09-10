@@ -538,7 +538,7 @@ export default function IncidentConsole() {
                   config={config}
                   filters={filters}
                   onChange={newFilters => setFilters([...newFilters])}
-                  placeholder="Search the night watch..."
+                  placeholder="Search the night watch…"
                   resultCount={visible.length}
                 />
               </StackItem>

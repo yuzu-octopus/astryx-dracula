@@ -2,7 +2,7 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   Ctr > V[g4] > (C[p0] > G[c{min:240} g8 a=stretch] > (S[p0] > V[g4] > (H[g2] > Ic + Tx"Castle Dracula"[t=body]) + (V[g4] > (V[g1] > Hd"Welcome back to the night"[level=2] + Tx"Sign in to your crypt"[t=body]) + (V[g2] > TI"Email"[t=email] + TI"Password"[t=password]) + B.primary"Enter the night" + D"Or continue with" + (G[c2 g3] > B.secondary"Apple" + B.secondary"Google")) + (Tx"New to the castle?"[t=supporting] > Lk"Sign up")) + (C[p0] > AR)) + (V[a=center] > Tx"Terms"[t=supporting])
 
-import {useState, type CSSProperties} from 'react';
+import {useState, useTransition, type CSSProperties} from 'react';
 import {VStack, HStack, StackItem} from '@astryxdesign/core/Layout';
 import {Grid} from '@astryxdesign/core/Grid';
 import {Center} from '@astryxdesign/core/Center';
@@ -144,7 +144,7 @@ export default function LoginSplit() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginFailed, setLoginFailed] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, startTransition] = useTransition();
   const [isSuccess, setIsSuccess] = useState(false);
 
   const handleLogin = () => {
@@ -152,12 +152,13 @@ export default function LoginSplit() {
       setLoginFailed(true);
       return;
     }
-    setIsLoading(true);
     setLoginFailed(false);
-    setTimeout(() => {
-      setIsLoading(false);
+    startTransition(async () => {
+      const {promise, resolve} = Promise.withResolvers<void>();
+      setTimeout(resolve, 2000);
+      await promise;
       setIsSuccess(true);
-    }, 2000);
+    });
   };
 
   return (

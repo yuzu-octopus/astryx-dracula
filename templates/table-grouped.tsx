@@ -875,7 +875,7 @@ export default function TableGrouped() {
                     config={powerSearchConfig}
                     filters={powerSearchFilters}
                     onChange={newFilters => setPowerSearchFilters(newFilters)}
-                    placeholder="Filter issues..."
+                    placeholder="Filter issues…"
                     resultCount={`${filtered.length} issue${filtered.length !== 1 ? 's' : ''}`}
                   />
                 </StackItem>

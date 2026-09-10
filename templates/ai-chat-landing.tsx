@@ -232,6 +232,12 @@ const commandTrigger: ChatComposerTrigger = {
 
 const composerTriggers = [mentionTrigger, commandTrigger];
 
+// The composer's imperative insert methods mutate the DOM without emitting a
+// change, so dispatch an input event to sync its value and clear the placeholder.
+const syncComposerValue = () => {
+  document.activeElement?.dispatchEvent(new Event('input', {bubbles: true}));
+};
+
 // Main component
 
 export default function AiChatLanding() {
@@ -251,12 +257,6 @@ export default function AiChatLanding() {
 
   const activeMode = MODE_OPTIONS.find(m => m.key === mode) ?? MODE_OPTIONS[0];
   const suggestions = category ? CATEGORY_SUGGESTIONS[category] : null;
-
-  // The composer's imperative insert methods mutate the DOM without emitting a
-  // change, so dispatch an input event to sync its value and clear the placeholder.
-  const syncComposerValue = () => {
-    document.activeElement?.dispatchEvent(new Event('input', {bubbles: true}));
-  };
 
   const applySuggestion = (prompt: string) => {
     const input = composerInputRef.current;

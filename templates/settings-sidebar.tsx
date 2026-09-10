@@ -162,29 +162,41 @@ interface ExpandableRowProps {
   onSave: () => void;
 }
 
-function ExpandableRow({
+function ExpandableRowEditing({
   label,
-  value,
   children,
-  isExpanded,
-  onEdit,
   onCancel,
   onSave,
-}: ExpandableRowProps) {
+}: {
+  label: string;
+  children: React.ReactNode;
+  onCancel: () => void;
+  onSave: () => void;
+}) {
   return (
-    <>
-      {isExpanded ? (
-        <VStack gap={4} style={rowPadding}>
-          <Text type="body" weight="semibold" display="block">
-            {label}
-          </Text>
-          {children}
-          <HStack gap={2}>
-            <Button label="Save" variant="primary" onClick={onSave} />
-            <Button label="Cancel" variant="ghost" onClick={onCancel} />
-          </HStack>
-        </VStack>
-      ) : (
+    <VStack gap={4} style={rowPadding}>
+      <Text type="body" weight="semibold" display="block">
+        {label}
+      </Text>
+      {children}
+      <HStack gap={2}>
+        <Button label="Save" variant="primary" onClick={onSave} />
+        <Button label="Cancel" variant="ghost" onClick={onCancel} />
+      </HStack>
+    </VStack>
+  );
+}
+
+function ExpandableRowViewing({
+  label,
+  value,
+  onEdit,
+}: {
+  label: string;
+  value: string;
+  onEdit: () => void;
+}) {
+  return (
         <HStack hAlign="between" vAlign="start" style={rowPadding}>
           <VStack gap={0}>
             <Text type="body" weight="semibold" display="block">
@@ -203,6 +215,29 @@ function ExpandableRow({
             Edit
           </Link>
         </HStack>
+  );
+}
+
+function ExpandableRow({
+  label,
+  value,
+  children,
+  isExpanded,
+  onEdit,
+  onCancel,
+  onSave,
+}: ExpandableRowProps) {
+  return (
+    <>
+      {isExpanded ? (
+        <ExpandableRowEditing
+          label={label}
+          onCancel={onCancel}
+          onSave={onSave}>
+          {children}
+        </ExpandableRowEditing>
+      ) : (
+        <ExpandableRowViewing label={label} value={value} onEdit={onEdit} />
       )}
       <Divider />
     </>
@@ -383,9 +418,9 @@ export default function SettingsSidebar() {
                     <VStack gap={0}>
                       <Heading level={3}>Device history</Heading>
                       <Divider />
-                      {DEVICE_ROWS.map((device, i) => (
+                      {DEVICE_ROWS.map((device) => (
                         <HStack
-                          key={i}
+                          key={device.location}
                           gap={3}
                           vAlign="start"
                           style={rowPadding}>
@@ -687,7 +722,7 @@ export default function SettingsSidebar() {
                           Contact info and personal details can be edited. If
                           this info was used to verify your identity,
                           you&apos;ll need to get verified again the next time
-                          you book—or to continue hosting.
+                          you book, or to continue hosting.
                         </Text>
                       </VStack>
                     </HStack>

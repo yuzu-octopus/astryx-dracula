@@ -117,6 +117,11 @@ const metrics = [
   },
 ];
 
+const metricChunks = [
+  metrics.slice(0, 2),
+  metrics.slice(2, 4),
+];
+
 // Top holdings
 const topAssets = [
   {ticker: 'AAPL', name: 'Apple Inc.', value: '$87,200', change: '+18.4%'},
@@ -344,18 +349,20 @@ const trendingStocks: StockRow[] = [
 
 // ============= CHART COMPONENTS =============
 
+// Downsample the 407 daily points to one bar per week
+const portfolioBars = portfolioData.filter((_, i) => i % 7 === 0);
+const PORTFOLIO_MIN = 200000;
+const PORTFOLIO_MAX = 320000;
+const PORTFOLIO_BASE = 168;
+const PORTFOLIO_PLOT = 138;
+const PORTFOLIO_LEFT = 52;
+const PORTFOLIO_WIDTH = 500;
+const PORTFOLIO_STEP = PORTFOLIO_WIDTH / portfolioBars.length;
+const portfolioYFor = (v: number) =>
+  PORTFOLIO_BASE - ((v - PORTFOLIO_MIN) / (PORTFOLIO_MAX - PORTFOLIO_MIN)) * PORTFOLIO_PLOT;
+const PORTFOLIO_Y_TICKS = [200000, 240000, 280000, 320000];
+
 function PortfolioChart() {
-  // Downsample the 407 daily points to one bar per week
-  const bars = portfolioData.filter((_, i) => i % 7 === 0);
-  const min = 200000;
-  const max = 320000;
-  const base = 168;
-  const plot = 138;
-  const left = 52;
-  const width = 500;
-  const step = width / bars.length;
-  const yFor = (v: number) => base - ((v - min) / (max - min)) * plot;
-  const yTicks = [200000, 240000, 280000, 320000];
   return (
     <VStack gap={3}>
       <Card
@@ -369,20 +376,20 @@ function PortfolioChart() {
           width="100%"
           role="img"
           aria-label="Vault value by week, October to October">
-          {yTicks.map(t => (
+          {PORTFOLIO_Y_TICKS.map(t => (
             <g key={t}>
               <line
-                x1={left}
-                y1={yFor(t)}
-                x2={left + width}
-                y2={yFor(t)}
+                x1={PORTFOLIO_LEFT}
+                y1={portfolioYFor(t)}
+                x2={PORTFOLIO_LEFT + PORTFOLIO_WIDTH}
+                y2={portfolioYFor(t)}
                 stroke="var(--color-separator)"
                 strokeDasharray="3 3"
                 opacity={0.5}
               />
               <text
-                x={left - 8}
-                y={yFor(t) + 4}
+                x={PORTFOLIO_LEFT - 8}
+                y={portfolioYFor(t) + 4}
                 textAnchor="end"
                 fontSize={13}
                 fill="var(--color-text-paragraph)"
@@ -391,14 +398,14 @@ function PortfolioChart() {
               </text>
             </g>
           ))}
-          {bars.map((d, i) => {
-            const h = Math.max(3, base - yFor(d.value));
+          {portfolioBars.map((d, i) => {
+            const h = Math.max(3, PORTFOLIO_BASE - portfolioYFor(d.value));
             return (
               <rect
-                key={i}
-                x={left + i * step + 1}
-                y={base - h}
-                width={Math.max(2, step - 2)}
+                key={d.label}
+                x={PORTFOLIO_LEFT + i * PORTFOLIO_STEP + 1}
+                y={PORTFOLIO_BASE - h}
+                width={Math.max(2, PORTFOLIO_STEP - 2)}
                 height={h}
                 rx={4}
                 fill="var(--dracula-green)"
@@ -408,7 +415,7 @@ function PortfolioChart() {
           {xAxisTicks.map(m => (
             <text
               key={m}
-              x={left + (m / 12) * width}
+              x={PORTFOLIO_LEFT + (m / 12) * PORTFOLIO_WIDTH}
               y={192}
               textAnchor={m === 12 ? 'end' : 'middle'}
               fontSize={13}
@@ -418,8 +425,8 @@ function PortfolioChart() {
             </text>
           ))}
           <text
-            x={left + width - 4}
-            y={yFor(294200) - 8}
+            x={PORTFOLIO_LEFT + PORTFOLIO_WIDTH - 4}
+            y={portfolioYFor(294200) - 8}
             textAnchor="end"
             fontSize={13}
             fill="var(--color-text-highlight)"
@@ -722,9 +729,9 @@ export default function DashboardPortfolio() {
 
             {/* KPI metric cards */}
             <Grid columns={{minWidth: 280, repeat: 'fit'}} gap={4}>
-              {Array.from({length: Math.ceil(metrics.length / 2)}, (_, i) => (
-                <Grid key={i} columns={{minWidth: 280, repeat: 'fit'}} gap={4}>
-                  {metrics.slice(i * 2, i * 2 + 2).map(m => (
+              {metricChunks.map(chunk => (
+                <Grid key={chunk[0]?.label ?? 'chunk'} columns={{minWidth: 280, repeat: 'fit'}} gap={4}>
+                  {chunk.map(m => (
                     <MetricCard key={m.label} {...m} />
                   ))}
                 </Grid>

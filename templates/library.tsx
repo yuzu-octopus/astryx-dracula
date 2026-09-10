@@ -382,9 +382,14 @@ export default function LibraryGrid() {
       }
       group.push(item);
     }
-    return order
-      .filter(cat => map.has(cat))
-      .map(cat => ({category: cat, items: map.get(cat) ?? []}));
+    const result: Array<{category: string; items: LibraryItem[]}> = [];
+    for (const cat of order) {
+      const items = map.get(cat);
+      if (items) {
+        result.push({category: cat, items});
+      }
+    }
+    return result;
   }, [activeTab, filtered]);
 
   return (
@@ -401,7 +406,7 @@ export default function LibraryGrid() {
               <TextInput
                 label="Search"
                 isLabelHidden
-                placeholder="Search the stacks..."
+                placeholder="Search the stacks…"
                 value={search}
                 onChange={setSearch}
                 startIcon={Search}

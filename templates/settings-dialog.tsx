@@ -151,6 +151,110 @@ interface ExpandableRowProps {
   onSave: () => void;
 }
 
+const INFO_TILES: Array<{
+  icon: typeof Lock;
+  title: string;
+  body: string;
+}> = [
+  {
+    icon: Lock,
+    title: "Why isn't my info shown here?",
+    body: "We're hiding some account details to protect your identity.",
+  },
+  {
+    icon: SquarePen,
+    title: 'Which details can be edited?',
+    body: "Contact info and personal details can be edited. If this info was used to verify your identity, you'll need to get verified again the next time you book, or to continue hosting.",
+  },
+  {
+    icon: Share2,
+    title: 'What info is shared with others?',
+    body: 'We only release contact information after a reservation is confirmed.',
+  },
+];
+
+function InfoTile({
+  icon,
+  title,
+  body,
+}: {
+  icon: typeof Lock;
+  title: string;
+  body: string;
+}) {
+  return (
+    <HStack gap={3} vAlign="start">
+      <Center width={48} height={48} style={iconBox}>
+        <Icon icon={icon} />
+      </Center>
+      <VStack gap={0}>
+        <Text type="body" weight="semibold" display="block">
+          {title}
+        </Text>
+        <Text type="supporting" color="secondary" display="block">
+          {body}
+        </Text>
+      </VStack>
+    </HStack>
+  );
+}
+
+function ExpandableRowViewing({
+  label,
+  value,
+  onEdit,
+}: {
+  label: string;
+  value: string;
+  onEdit: () => void;
+}) {
+  return (
+    <HStack hAlign="between" vAlign="start">
+      <VStack gap={0}>
+        <Text type="body" weight="semibold" display="block">
+          {label}
+        </Text>
+        <Text type="supporting" color="secondary" display="block">
+          {value}
+        </Text>
+      </VStack>
+      <Link
+        href={SELF_HASH}
+        onClick={(e: React.MouseEvent) => {
+          e.preventDefault();
+          onEdit();
+        }}>
+        Edit
+      </Link>
+    </HStack>
+  );
+}
+
+function ExpandableRowEditing({
+  label,
+  children,
+  onCancel,
+  onSave,
+}: {
+  label: string;
+  children: React.ReactNode;
+  onCancel: () => void;
+  onSave: () => void;
+}) {
+  return (
+    <VStack gap={4}>
+      <Text type="body" weight="semibold" display="block">
+        {label}
+      </Text>
+      {children}
+      <HStack gap={2}>
+        <Button label="Save" variant="primary" onClick={onSave} />
+        <Button label="Cancel" variant="ghost" onClick={onCancel} />
+      </HStack>
+    </VStack>
+  );
+}
+
 function ExpandableRow({
   label,
   value,
@@ -163,35 +267,14 @@ function ExpandableRow({
   return (
     <>
       {isExpanded ? (
-        <VStack gap={4}>
-          <Text type="body" weight="semibold" display="block">
-            {label}
-          </Text>
+        <ExpandableRowEditing
+          label={label}
+          onCancel={onCancel}
+          onSave={onSave}>
           {children}
-          <HStack gap={2}>
-            <Button label="Save" variant="primary" onClick={onSave} />
-            <Button label="Cancel" variant="ghost" onClick={onCancel} />
-          </HStack>
-        </VStack>
+        </ExpandableRowEditing>
       ) : (
-        <HStack hAlign="between" vAlign="start">
-          <VStack gap={0}>
-            <Text type="body" weight="semibold" display="block">
-              {label}
-            </Text>
-            <Text type="supporting" color="secondary" display="block">
-              {value}
-            </Text>
-          </VStack>
-          <Link
-            href={SELF_HASH}
-            onClick={(e: React.MouseEvent) => {
-              e.preventDefault();
-              onEdit();
-            }}>
-            Edit
-          </Link>
-        </HStack>
+        <ExpandableRowViewing label={label} value={value} onEdit={onEdit} />
       )}
       <Divider />
     </>
@@ -452,70 +535,12 @@ export default function SettingsDialog() {
 
                       <Card padding={4}>
                         <VStack gap={4}>
-                          <HStack gap={3} vAlign="start">
-                            <Center width={48} height={48} style={iconBox}>
-                              <Icon icon={Lock} />
-                            </Center>
-                            <VStack gap={0}>
-                              <Text
-                                type="body"
-                                weight="semibold"
-                                display="block">
-                                Why isn&apos;t my info shown here?
-                              </Text>
-                              <Text
-                                type="supporting"
-                                color="secondary"
-                                display="block">
-                                We&apos;re hiding some account details to
-                                protect your identity.
-                              </Text>
-                            </VStack>
-                          </HStack>
-                          <Divider />
-                          <HStack gap={3} vAlign="start">
-                            <Center width={48} height={48} style={iconBox}>
-                              <Icon icon={SquarePen} />
-                            </Center>
-                            <VStack gap={0}>
-                              <Text
-                                type="body"
-                                weight="semibold"
-                                display="block">
-                                Which details can be edited?
-                              </Text>
-                              <Text
-                                type="supporting"
-                                color="secondary"
-                                display="block">
-                                Contact info and personal details can be edited.
-                                If this info was used to verify your identity,
-                                you&apos;ll need to get verified again the next
-                                time you book—or to continue hosting.
-                              </Text>
-                            </VStack>
-                          </HStack>
-                          <Divider />
-                          <HStack gap={3} vAlign="start">
-                            <Center width={48} height={48} style={iconBox}>
-                              <Icon icon={Share2} />
-                            </Center>
-                            <VStack gap={0}>
-                              <Text
-                                type="body"
-                                weight="semibold"
-                                display="block">
-                                What info is shared with others?
-                              </Text>
-                              <Text
-                                type="supporting"
-                                color="secondary"
-                                display="block">
-                                We only release contact information after a
-                                reservation is confirmed.
-                              </Text>
-                            </VStack>
-                          </HStack>
+                          {INFO_TILES.map((tile, i) => (
+                            <React.Fragment key={tile.title}>
+                              {i > 0 && <Divider />}
+                              <InfoTile {...tile} />
+                            </React.Fragment>
+                          ))}
                         </VStack>
                       </Card>
                     </VStack>
@@ -552,8 +577,8 @@ export default function SettingsDialog() {
                           <VStack gap={4}>
                             <Heading level={3}>Device history</Heading>
                             <Divider />
-                            {DEVICE_ROWS.map((device, i) => (
-                              <React.Fragment key={i}>
+                            {DEVICE_ROWS.map((device) => (
+                              <React.Fragment key={device.location}>
                                 <HStack gap={3} vAlign="start">
                                   <Icon icon={Monitor} />
                                   <StackItem size="fill">

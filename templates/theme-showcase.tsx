@@ -748,7 +748,7 @@ function ChatCard() {
           <ChatMessage sender="assistant">
             <VStack gap={3}>
               <Text type="body">
-                Your order #1043 — the Moonphase Watch and Belfry Throw —
+                Your order #1043 (the Moonphase Watch and Belfry Throw)
                 shipped this morning from the Aisle 3 warehouse and is currently
                 in transit with UPS. It’s on track to arrive at your address by
                 end of day tomorrow.

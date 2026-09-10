@@ -496,6 +496,55 @@ function getComponentDocs(key: string) {
   };
 }
 
+const EXAMPLE_PREVIEWS: Record<string, React.ReactNode[]> = {
+  button: [
+    <HStack key="semantics" gap={3} vAlign="center" wrap="wrap">
+      <Button label="Flat" variant="ghost" />
+      <Button label="Default" variant="secondary" />
+      <Button label="Primary" variant="primary" />
+      <Button label="Destructive" variant="destructive" />
+    </HStack>,
+    <Button key="badge" label="Button" variant="secondary" />,
+  ],
+};
+
+const COMPONENT_PREVIEWS: Record<string, React.ReactNode> = {
+  button: (
+    <Button
+      label="Button"
+      variant="secondary"
+      icon={<Icon icon={Plus} />}
+      endContent={<Badge label="New" variant="cyan" />}
+    />
+  ),
+  avatar: <Avatar name="Vlad" size="lg" />,
+  badge: <Badge label="Success" variant="green" />,
+  card: (
+    <Card>
+      <VStack gap={2}>
+        <Heading level={4}>Castle Card</Heading>
+        <Text type="body" color="secondary">
+          Cards group related content and actions.
+        </Text>
+      </VStack>
+    </Card>
+  ),
+  banner: (
+    <Banner status="info" title="Information">
+      <Text type="body">This is an informational banner message.</Text>
+    </Banner>
+  ),
+  dialog: <DialogPreview />,
+  text: <Text type="body">Body text</Text>,
+  divider: <Divider />,
+  token: <Token label="Dracula" />,
+  tooltip: (
+    <Tooltip content="Primary action">
+      <Button label="Hover me" variant="primary" />
+    </Tooltip>
+  ),
+};
+
 // ---------------------------------------------------------------------------
 // ComponentDetailView
 // ---------------------------------------------------------------------------
@@ -515,55 +564,6 @@ function ComponentDetailView({activeNav}: {activeNav: string}) {
       window.history.pushState(null, '', `#${id}`);
     }
   }, []);
-
-  const EXAMPLE_PREVIEWS: Record<string, React.ReactNode[]> = {
-    button: [
-      <HStack key="semantics" gap={3} vAlign="center" wrap="wrap">
-        <Button label="Flat" variant="ghost" />
-        <Button label="Default" variant="secondary" />
-        <Button label="Primary" variant="primary" />
-        <Button label="Destructive" variant="destructive" />
-      </HStack>,
-      <Button key="badge" label="Button" variant="secondary" />,
-    ],
-  };
-
-  const COMPONENT_PREVIEWS: Record<string, React.ReactNode> = {
-    button: (
-      <Button
-        label="Button"
-        variant="secondary"
-        icon={<Icon icon={Plus} />}
-        endContent={<Badge label="New" variant="cyan" />}
-      />
-    ),
-    avatar: <Avatar name="Vlad" size="lg" />,
-    badge: <Badge label="Success" variant="green" />,
-    card: (
-      <Card>
-        <VStack gap={2}>
-          <Heading level={4}>Castle Card</Heading>
-          <Text type="body" color="secondary">
-            Cards group related content and actions.
-          </Text>
-        </VStack>
-      </Card>
-    ),
-    banner: (
-      <Banner status="info" title="Information">
-        <Text type="body">This is an informational banner message.</Text>
-      </Banner>
-    ),
-    dialog: <DialogPreview />,
-    text: <Text type="body">Body text</Text>,
-    divider: <Divider />,
-    token: <Token label="Dracula" />,
-    tooltip: (
-      <Tooltip content="Primary action">
-        <Button label="Hover me" variant="primary" />
-      </Tooltip>
-    ),
-  };
 
   const docs = useMemo(() => getComponentDocs(activeNav), [activeNav]);
   const previews = EXAMPLE_PREVIEWS[activeNav] ?? [];
@@ -671,7 +671,7 @@ function ComponentDetailView({activeNav}: {activeNav: string}) {
                 const tabKey = `${activeNav}-${i}`;
                 const activeTab = exampleTabs[tabKey] ?? 'description';
                 return (
-                  <Card key={i} padding={0}>
+                  <Card key={example.title} padding={0}>
                     <Section padding={3} variant="transparent">
                       <HStack gap={3} vAlign="center" wrap="wrap">
                         <StackItem size="fill">

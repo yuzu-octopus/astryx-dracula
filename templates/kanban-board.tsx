@@ -493,9 +493,12 @@ export default function KanbanBoard() {
         continue;
       }
 
-      const ids = itemsByColumn[colId]
-        .filter(it => it.id !== draggedId)
-        .map(it => it.id);
+      const ids: string[] = [];
+      for (const it of itemsByColumn[colId]) {
+        if (it.id !== draggedId) {
+          ids.push(it.id);
+        }
+      }
 
       let index = ids.length;
       for (let i = 0; i < ids.length; i++) {
