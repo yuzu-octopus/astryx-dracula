@@ -96,7 +96,7 @@ Map jobs to components, never to lookalikes: action goes to Button (never a nav-
 - **Hover dims, never inverts.** Interactive surfaces darken 12% on hover, 20% on press, via the theme overlay tokens. A hover that goes transparent, dark-navy, or accent-colored means something overrode `--color-overlay-hover`.
 - **Focus is accent.** 2px accent ring, beat Functional Purple on contrast. Never remove it.
 - **Links underline always**, resolve to foreground on hover. Inline links inherit the surrounding text size; a link that renders larger than its sentence is the fixed external icon at small sizes, drop `isExternalLink` and keep `target="_blank"`.
-- **Table rows lift on hover.** Scrollbars are Dracula (Selection thumb, Current Line hover) via `tokens.css`. A visible scrollbar on a comfortable table means a redundant `overflowX` wrapper fighting Table's own scroll container; delete yours.
+- **Table rows lift on hover.** Scrollbars are Dracula (Current Line thumb, Purple hover) via `tokens.css`. A visible scrollbar on a comfortable table means a redundant `overflowX` wrapper fighting Table's own scroll container; delete yours.
 
 ## Migrating a codebase
 

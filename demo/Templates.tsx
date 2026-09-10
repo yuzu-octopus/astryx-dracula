@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import type { ComponentType } from 'react';
+import type { ComponentType, CSSProperties } from 'react';
 import {
   Badge,
   ClickableCard,
@@ -323,6 +323,30 @@ const LAZY_PAGES: Record<string, ComponentType> = Object.fromEntries(
   TEMPLATES.map((t) => [t.id, lazy(t.load)]),
 );
 
+// Templates assume they own the viewport: AppShell sizes itself to 100dvh and
+// sizes its side nav to calc(100dvh - header). Rendered inline under a
+// breadcrumb bar, every page ends up exactly one bar-height too tall, which
+// pushes its bottom edge, including the SideNav collapse button, below the
+// fold. So the viewer gives each template a frame of its own that matches the
+// space left over, and the template renders bare inside it.
+const bareHref = (id: string) => `${window.location.pathname}?bare=${id}`;
+
+const viewerFrame: CSSProperties = {
+  height: '100dvh',
+  backgroundColor: 'var(--color-background)',
+};
+const viewerBar: CSSProperties = {
+  padding: '12px 24px',
+};
+const viewerPage: CSSProperties = {
+  flex: 1,
+  minHeight: 0,
+  width: '100%',
+  border: 0,
+  display: 'block',
+  backgroundColor: 'var(--color-background)',
+};
+
 export function TemplateDetail({ id }: { id: string }) {
   const entry = TEMPLATES.find((t) => t.id === id);
   if (!entry) {
@@ -338,17 +362,27 @@ export function TemplateDetail({ id }: { id: string }) {
       </Theme>
     );
   }
-  const Page = LAZY_PAGES[entry.id];
   return (
     <Theme theme={astryxDraculaTheme} mode="dark">
-      <VStack gap={0} style={{ backgroundColor: 'var(--color-background)', minHeight: '100vh' }}>
-        <HStack gap={2} vAlign="center" style={{ padding: '12px 24px' }}>
+      <VStack gap={0} style={viewerFrame}>
+        <HStack gap={2} vAlign="center" style={viewerBar}>
           <Link href="#/templates">Templates</Link>
           <Text color="secondary">/</Text>
           <Text weight="semibold">{entry.name}</Text>
         </HStack>
-        <Page />
+        <iframe title={entry.name} src={bareHref(entry.id)} style={viewerPage} />
       </VStack>
+    </Theme>
+  );
+}
+
+// Renders a template with no viewer chrome, for the frame above.
+export function BareTemplate({ id }: { id: string }) {
+  const entry = TEMPLATES.find((t) => t.id === id);
+  const Page = entry ? LAZY_PAGES[entry.id] : undefined;
+  return (
+    <Theme theme={astryxDraculaTheme} mode="dark">
+      {Page ? <Page /> : null}
     </Theme>
   );
 }

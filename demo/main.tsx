@@ -4,7 +4,7 @@ import '../tokens.css';
 import { StrictMode, Suspense, lazy, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
-import { TemplateDetail, TemplatesIndex } from './Templates';
+import { BareTemplate, TemplateDetail, TemplatesIndex } from './Templates';
 
 const Bento = lazy(() =>
   import('./Bento').then((m) => ({ default: m.Bento })),
@@ -21,9 +21,20 @@ function useHash(): string {
 }
 
 function Router() {
+  const params = new URLSearchParams(window.location.search);
   // Screenshot harness: `?shot=bento` keeps rendering the bento page.
-  const shot = new URLSearchParams(window.location.search).get('shot');
+  const shot = params.get('shot');
+  // `?bare=<id>` renders a template with no viewer chrome. The templates index
+  // loads each page through this so the template gets a frame of its own.
+  const bare = params.get('bare');
   const hash = useHash();
+  if (bare != null) {
+    return (
+      <Suspense fallback={null}>
+        <BareTemplate id={bare} />
+      </Suspense>
+    );
+  }
   if (shot === 'bento' || hash === '#/bento') {
     return (
       <Suspense fallback={null}>

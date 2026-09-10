@@ -90,11 +90,18 @@
   --color-tag-pink: #FF79C6;
 }
 
-/* Dracula scrollbars: Selection thumb on transparent track, Current Line on
- * hover. Firefox uses the two properties; Chromium uses the pseudo-elements. */
+/* Dracula scrollbars. The spec defines no scrollbar token, so these follow its
+ * UI Design Guidelines instead: low-priority chrome harmonises with whatever
+ * surface it sits on (transparent track, so it reads on bg, card and muted
+ * alike), the resting thumb uses Current Line, which the spec designates for
+ * subtle borders and separators, and the hovered thumb promotes to Purple, the
+ * brand accent for anything interactive. Selection (#44475A) was the resting
+ * thumb before, at 1.5:1 against the background, which made the scrollbar
+ * effectively invisible.
+ * Firefox uses the two properties; Chromium uses the pseudo-elements. */
 :root {
   scrollbar-width: thin;
-  scrollbar-color: var(--dracula-selection) transparent;
+  scrollbar-color: var(--dracula-current-line) transparent;
 }
 
 *::-webkit-scrollbar {
@@ -108,14 +115,14 @@
 }
 
 *::-webkit-scrollbar-thumb {
-  background: var(--dracula-selection);
+  background: var(--dracula-current-line);
   border-radius: 5px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: var(--dracula-current-line);
+  background: var(--dracula-purple);
   border: 2px solid transparent;
   background-clip: content-box;
 }
