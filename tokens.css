@@ -140,3 +140,18 @@
 .astryx-app-shell-sidenav .astryx-resize-handle {
   overflow: hidden;
 }
+
+/* Astryx leaves the resize handle's drag surface translated -50% along the
+ * block axis without ever positioning it at top:50%, so it spans only the TOP
+ * HALF of the rail: the pointer reads col-resize and dragging works above the
+ * midpoint, and nothing at all happens below it, even though the pill is drawn
+ * straddling that boundary. The pill sibling carries a correct top:50%, which
+ * is exactly what the drag surface is missing. Upstream workaround; drop it if
+ * the component starts positioning its own hit area. */
+.astryx-app-shell-sidenav
+  .astryx-resize-handle
+  > :not(.astryx-resize-handle-pill) {
+  top: 50%;
+  bottom: auto;
+  height: 100%;
+}
