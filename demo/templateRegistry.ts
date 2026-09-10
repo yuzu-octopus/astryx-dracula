@@ -276,6 +276,12 @@ export const TEMPLATES: TemplateEntry[] = [
     description: 'Storefront theme switcher demo.',
     load: () => import('../templates/theme-showcase'),
   },
+  {
+    id: 'tech-report',
+    name: 'Technical Report',
+    description: 'Chapter rail, paper walkthrough, and outline.',
+    load: () => import('../templates/tech-report'),
+  },
 ];
 
 // Ids the bare frame accepts. The router checks `?bare=` against this list so
