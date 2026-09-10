@@ -251,10 +251,10 @@ const TEMPLATES: TemplateEntry[] = [
     load: () => import('../templates/incident-console'),
   },
   {
-    id: 'three-pane',
-    name: 'Three-Pane Workspace',
-    description: 'Sidebar rail, working pane, and results pane.',
-    load: () => import('../templates/three-pane'),
+    id: 'product-tour',
+    name: 'Product Tour',
+    description: 'Chapter rail, walkthrough content, and outline.',
+    load: () => import('../templates/product-tour'),
   },
   {
     id: 'login-split',
