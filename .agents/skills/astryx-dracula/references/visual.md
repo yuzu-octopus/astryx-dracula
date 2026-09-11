@@ -18,6 +18,20 @@ Custom spec-exact syntax theme (`draculaSyntax` in `astryx-theme.ts`): pink keyw
 
 Hover dims 12%, press dims 20%, via the theme overlay tokens. Focus is a 2px accent ring. Table rows lift on hover. Cards, banners, badges, and progress bars are static. No entrance choreography, no card hover lifts. Motion answers action: opening, expanding, confirming.
 
+## Surfaces and background doctrine
+
+Two backgrounds, never swapped. The page (`--color-background-body` `#282A36`,
+dark) is where reading happens; the shell (`--color-background-surface`
+`#343746`, lighter) is where navigation lives. Content darker than chrome is
+the rule, not an accident: Dracula is a dark editor theme — the editing
+surface recedes, chrome floats above it. Swapping them (light sidebar, dark
+main) inverts the hierarchy and breaks the editor metaphor; no Dracula
+surface does this. `variant="section"` is banned for the same reason: it
+paints the shell surface instead of body and collapses the two tiers into
+one. Document pages (product-tour, tech-report) use the default AppShell
+variant like every fill template. Depth comes from separator borders, not
+elevation.
+
 ## Scrollbars and surfaces
 
 Scrollbars are Dracula via `tokens.css`: Current Line thumb on a page-background track, Purple on hover, thin. The spec defines no scrollbar token, so this follows its UI Design Guidelines: the track pins `--color-background` so every scroller reads as one surface instead of borrowing whatever sits behind it (a transparent track showed the unpainted canvas as a black gutter, then picked up header/surface tints per page), subtle affordances use Current Line, which the spec reserves for borders and separators, and hovering is an interaction, so it takes the accent. Document pages (product-tour, tech-report) use the default AppShell variant like every other fill template — never `variant="section"`, which paints the shell surface instead of body and makes the same scrollbar read differently. Do not lower the resting thumb to Selection `#44475A`: that lands at 1.5:1 against the background and the scrollbar disappears. Surfaces come from the spec UI palette: Background Light `#343746` cards, Selection `#44475A` quiet edges, Background Lighter `#424450` popovers, Background Dark `#21222C` shadows. Depth comes from separator borders, not elevation.
