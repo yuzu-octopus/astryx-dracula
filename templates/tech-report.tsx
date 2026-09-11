@@ -1719,7 +1719,6 @@ export default function TechReport() {
     <AppShell
       height="auto"
       contentPadding={0}
-      variant="section"
       mobileNav={{hasToggle: false}}
       sideNav={<ChapterRail activeId={chapter.id} onSelect={openChapter} />}>
       <Layout

@@ -106,9 +106,10 @@ body {
 }
 
 /* Dracula scrollbars. The spec defines no scrollbar token, so these follow its
- * UI Design Guidelines instead: low-priority chrome harmonises with whatever
- * surface it sits on (transparent track, so it reads on bg, card and muted
- * alike), the resting thumb uses Current Line, which the spec designates for
+ * UI Design Guidelines instead: the track takes the page background
+ * (`--color-background`, same surface every scroller sits on), so the bar
+ * reads as one surface instead of borrowing whatever sits behind it. The
+ * resting thumb uses Current Line, which the spec designates for
  * subtle borders and separators, and the hovered thumb promotes to Purple, the
  * brand accent for anything interactive. Selection (#44475A) was the resting
  * thumb before, at 1.5:1 against the background, which made the scrollbar
@@ -130,7 +131,7 @@ body {
  * /templates and /bento: resting thumb Current Line, hover Purple. */
 @supports (scrollbar-color: auto) and (not (-webkit-hyphens: none)) {
   :root {
-    scrollbar-color: var(--dracula-current-line) transparent;
+    scrollbar-color: var(--dracula-current-line) var(--color-background);
   }
 }
 
@@ -138,12 +139,12 @@ body {
   *::-webkit-scrollbar {
     width: 10px;
     height: 10px;
-    background: transparent;
+    background: var(--color-background);
   }
 
   *::-webkit-scrollbar-track,
   *::-webkit-scrollbar-corner {
-    background: transparent;
+    background: var(--color-background);
   }
 
   *::-webkit-scrollbar-thumb {
