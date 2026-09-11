@@ -28,7 +28,15 @@ MORE CLI:
   search "<query>"   find any component / hook / doc / template / block
   component --list   155 components by category
   template --list    page + block recipes
-  docs <topic>       color, elevation, icons, illustrations, internationalization, layout, migration, motion, principles, shape, spacing, styling, theme, tokens, typography
+  docs <topic>       browser-support, cli-integrations, color, elevation, getting-started, icons, illustrations, internationalization, layout, migration, motion, principles, shape, spacing, styling, styling-libraries, theme, tokens, typography, working-with-ai
   swizzle <Name>     eject component source for deep customization
   upgrade --apply    run after any @astryxdesign/core bump
 <!-- ASTRYX:END -->
+
+## Astryx Dracula brand (this repo)
+
+Dark-only Dracula, no light mode exists or is planned. Never invent a color, token, font, or radius.
+Kit import order in the app entry: `@astryxdesign/core/reset.css`, then `@astryxdesign/core/astryx.css`,
+then `astryx-dracula/tokens.css`, then `astryx-dracula/theme.css` inside `<Theme theme={astryxDraculaTheme} mode="dark">`.
+Read `.agents/skills/astryx-dracula/SKILL.md` before styling anything (agent index: [AGENTS.snippet.md](AGENTS.snippet.md)).
+Scaffold pages with `bunx astryx template <id> --package astryx-dracula` — templates carry XLE headers.

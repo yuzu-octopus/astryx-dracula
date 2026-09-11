@@ -74,7 +74,7 @@ const bareViewport: CSSProperties = {
 const viewerFrame: CSSProperties = {
   height: '100dvh',
   overflow: 'hidden',
-  backgroundColor: 'var(--color-background)',
+  backgroundColor: 'var(--color-background-body)',
 };
 const viewerBar: CSSProperties = {
   padding: '12px 24px',
@@ -85,7 +85,7 @@ const viewerPage: CSSProperties = {
   width: '100%',
   border: 0,
   display: 'block',
-  backgroundColor: 'var(--color-background)',
+  backgroundColor: 'var(--color-background-body)',
 };
 
 export function TemplateDetail({ id }: { id: string }) {

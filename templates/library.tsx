@@ -18,7 +18,7 @@
  *   wrapping, so the filter row keeps a single line at every width.
  */
 
-import {useState, useMemo, type CSSProperties} from 'react';
+import {useState, useMemo} from 'react';
 import {Layout, LayoutHeader, LayoutContent} from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
 import {Card} from '@astryxdesign/core/Card';
@@ -35,6 +35,7 @@ import {Button} from '@astryxdesign/core/Button';
 import {EmptyState} from '@astryxdesign/core/EmptyState';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Search} from 'lucide-react';
+import {SceneTile} from 'astryx-dracula/shared/scene-tile';
 
 interface LibraryItem {
   id: string;
@@ -288,12 +289,6 @@ const ITEMS: LibraryItem[] = [
   },
 ];
 
-const thumbnailImage: CSSProperties = {
-  width: '100%',
-  height: '100%',
-  display: 'block',
-};
-
 // =============================================================================
 // Side Nav
 // =============================================================================
@@ -303,30 +298,12 @@ function LibraryCard({item}: {item: LibraryItem}) {
   return (
     <Card padding={0}>
       <AspectRatio ratio={16 / 9}>
-        <svg
-          viewBox="0 0 400 300"
-          preserveAspectRatio="xMidYMid slice"
-          style={thumbnailImage}
-          role="img"
-          aria-label={`${item.name} thumbnail`}>
-          <rect width="400" height="300" fill="var(--dracula-bg-light)" />
-          <g
-            transform="translate(200 150)"
-            fill="none"
-            stroke="var(--dracula-comment)"
-            strokeWidth="5"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <rect x="-44" y="-44" width="88" height="88" rx="5" />
-            <circle cx="18" cy="-18" r="2.5" fill={hue} stroke="none" />
-            <path d="M-34 30 L-8 0 L10 18 L20 8 L34 24" />
-          </g>
-        </svg>
+        <SceneTile label={`${item.name} thumbnail`} hue={hue} size="lg" />
       </AspectRatio>
       <Section variant="transparent" padding={4}>
         <VStack gap={1}>
           <Heading level={3}>{item.name}</Heading>
-          <Text type="supporting" color="secondary">
+          <Text type="body" color="secondary">
             {item.description}
           </Text>
         </VStack>
@@ -412,6 +389,7 @@ export default function LibraryGrid() {
 
   return (
     <Layout
+      height="fill"
       header={
         <LayoutHeader hasDivider padding={6}>
           <VStack gap={1}>

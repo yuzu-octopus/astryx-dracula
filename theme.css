@@ -447,6 +447,22 @@
     line-height: var(--text-display-3-leading);
   }
 
+  .astryx-app-shell.wash {
+    background-color: var(--color-background-body);
+  }
+
+  .astryx-app-shell.elevated {
+    background-color: var(--color-background-body);
+  }
+
+  .astryx-app-shell.surface {
+    background-color: var(--color-background-surface);
+  }
+
+  .astryx-app-shell.section {
+    background-color: var(--color-background-surface);
+  }
+
   .astryx-link {
     color: var(--color-text-accent);
     text-decoration: underline;

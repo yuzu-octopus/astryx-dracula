@@ -8,6 +8,7 @@ import {
   useState,
   type CSSProperties,
   type PointerEvent as ReactPointerEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode,
 } from 'react';
 
@@ -336,7 +337,7 @@ function BoardCardBody({
 
       <VStack gap={1}>
         <Heading level={3}>{item.title}</Heading>
-        <Text type="supporting" color="secondary" maxLines={2}>
+        <Text type="body" color="secondary" maxLines={2}>
           {item.description}
         </Text>
       </VStack>
@@ -361,12 +362,33 @@ function BoardCard({
   onPointerDown: (e: ReactPointerEvent, id: string) => void;
   onMove: (id: string, to: ColumnId) => void;
 }) {
+  // Keyboard-move path for the core drag interaction: arrow keys move the
+  // focused card across columns. The pointer DnD below stays quarantined and
+  // untouched; this only reuses its moveItem commit.
+  const onKeyDown = (e: ReactKeyboardEvent) => {
+    const at = COLUMNS.findIndex(c => c.id === item.column);
+    const to =
+      e.key === 'ArrowRight'
+        ? COLUMNS[Math.min(COLUMNS.length - 1, at + 1)]
+        : e.key === 'ArrowLeft'
+          ? COLUMNS[Math.max(0, at - 1)]
+          : undefined;
+    if (!to || to.id === item.column) {
+      return;
+    }
+    e.preventDefault();
+    onMove(item.id, to.id);
+  };
   return (
     <Card
       ref={cardRef}
       padding={3}
       style={cardStyle}
-      onPointerDown={e => onPointerDown(e, item.id)}>
+      tabIndex={0}
+      role="button"
+      aria-label={`${item.title}. In ${COLUMNS.find(c => c.id === item.column)?.title}. Press left or right arrow to move across columns.`}
+      onPointerDown={e => onPointerDown(e, item.id)}
+      onKeyDown={onKeyDown}>
       <BoardCardBody item={item} onMove={onMove} />
     </Card>
   );
@@ -739,7 +761,13 @@ export default function KanbanBoard() {
         }
         content={
           <LayoutContent padding={0} isScrollable={false}>
-            <Grid columns={{ minWidth: 280, max: 4 }} gap={4} style={boardColumnsStyle}>
+            <Grid
+              columns={{ minWidth: 280, max: 4 }}
+              gap={4}
+              style={boardColumnsStyle}
+              tabIndex={0}
+              role="region"
+              aria-label="Sprint board columns">
               {COLUMNS.map(meta => (
                 <BoardColumn
                   key={meta.id}

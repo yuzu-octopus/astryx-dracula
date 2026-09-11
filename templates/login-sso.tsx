@@ -1,8 +1,24 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   Ctr > C[p=8 mw=400] > V[g=4] > ((V[g=1 a=center] > Hd"Welcome back to the night"[level=1] + Tx"Whisper your details to enter the night"[t=body]) + TI"Work email"[t=email] + Lk"Having trouble signing in?" + B.primary"Continue" + D"Or sign in with" + B.secondary"Continue with SSO" + (V[a=center] > Tx"New to the castle?"[t=supporting] + Lk"Request access") + (V[g=2 a=center] > Av + Hd"Sign in with Google Workspace"[level=1] + Tx"You will be redirected back after signing in."[t=body]) + (C[p=0] > S[p=4 muted] > (H[g=2 a=center] > Ic + (V[g=0] > Tx"Google Workspace"[t=label] + Tx"vlad@castle.ro"[t=supporting]))) + (V[g=3] > B.primary"Continue with Google Workspace" + B.ghost"Use a different email") + (V[g=1 a=center] > Hd"Welcome back to the night"[level=1] + Tx"vlad@castle.ro"[t=body]) + (V[g=4] > (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?") + B.primary"Enter the night" + B.ghost"Use a different email") + (V[a=center] > Tx"By clicking continue, you agree to our Terms of service and Privacy policy"[t=supporting]))
+//   Ctr > C[p=8 mw=400] > V[g=4] > ((V[g=1 a=center] > Hd"Welcome back to the night"[level=1] + Tx"Whisper your details to enter the night"[t=body]) + TI"Work email"[t=email] + Lk"Having trouble signing in?" + B.primary"Continue" + D"Or continue with" + B.secondary"Continue with SSO" + (V[a=center] > Tx"New to the castle?"[t=supporting] + Lk"Request access") + (V[g=2 a=center] > Av + Hd"Sign in with Google Workspace"[level=1] + Tx"You will be redirected back after signing in."[t=body]) + (C[p=0] > S[p=4 muted] > (H[g=2 a=center] > Ic + (V[g=0] > Tx"Google Workspace"[t=label] + Tx"vlad@castle.ro"[t=supporting]))) + (V[g=3] > B.primary"Continue with Google Workspace" + B.ghost"Use a different email") + (V[g=1 a=center] > Hd"Welcome back to the night"[level=1] + Tx"vlad@castle.ro"[t=body]) + (V[g=4] > (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?") + B.primary"Enter the night" + B.ghost"Use a different email") + (V[a=center] > Tx"By clicking continue, you agree to our Terms of service and Privacy policy"[t=supporting]))
 
+//   Step-conditional h1: the email and SSO-confirm steps each render their own
+//   h1 (email entry vs provider confirm); the password fallback reuses the
+//   family heading, so exactly one h1 shows per step.
 import {useState, useTransition, type CSSProperties} from 'react';
+import {demoLogin} from 'astryx-dracula/shared/login-demo';
+import {
+  AUTH_HEADING,
+  AUTH_PRIMARY_CTA,
+  AUTH_SIGNUP_PROMPT,
+  AUTH_SSO_DIVIDER,
+  AUTH_FORGOT_PASSWORD,
+  AUTH_ERROR_MESSAGE,
+  AUTH_EMAIL_PLACEHOLDER,
+  AUTH_TERMS_PREFIX,
+  AUTH_TERMS_SERVICE,
+  AUTH_TERMS_PRIVACY,
+} from 'astryx-dracula/shared/auth-copy';
 import {VStack, HStack} from '@astryxdesign/core/Layout';
 import {Center} from '@astryxdesign/core/Center';
 import {Text, Heading} from '@astryxdesign/core/Text';
@@ -95,9 +111,7 @@ export default function LoginSso() {
     }
     setLoginFailed(false);
     startTransition(async () => {
-      const {promise, resolve} = Promise.withResolvers<void>();
-      setTimeout(resolve, 2000);
-      await promise;
+      await demoLogin();
       setLoginFailed(true);
     });
   };
@@ -112,7 +126,7 @@ export default function LoginSso() {
           {step === 'email' && (
             <>
               <VStack gap={1} hAlign="center">
-                <Heading level={1}>Welcome back to the night</Heading>
+                <Heading level={1}>{AUTH_HEADING}</Heading>
                 <Text type="body" color="secondary">
                   Whisper your details to enter the night
                 </Text>
@@ -123,7 +137,7 @@ export default function LoginSso() {
                 isLabelHidden
                 type="email"
                 {...inputAutoComplete('email')}
-                placeholder="you@castle.dracula"
+                placeholder={AUTH_EMAIL_PLACEHOLDER}
                 value={email}
                 onChange={(v: string) => {
                   setEmail(v);
@@ -149,7 +163,7 @@ export default function LoginSso() {
                 isDisabled={!emailValid}
               />
 
-              <Divider label="Or sign in with" />
+              <Divider label={AUTH_SSO_DIVIDER} />
 
               <Button
                 label="Continue with SSO"
@@ -161,7 +175,7 @@ export default function LoginSso() {
 
               <VStack hAlign="center">
                 <Text type="supporting" color="secondary">
-                  New to the castle?{' '}
+                  {AUTH_SIGNUP_PROMPT}{' '}
                   <Link href="#/templates/login-sso" type="supporting">
                     Request access
                   </Link>
@@ -203,9 +217,7 @@ export default function LoginSso() {
                   isLoading={isLoading}
                   onClick={() => {
                     startTransition(async () => {
-                      const {promise, resolve} = Promise.withResolvers<void>();
-                      setTimeout(resolve, 2000);
-                      await promise;
+                      await demoLogin();
                     });
                   }}
                 />
@@ -223,7 +235,7 @@ export default function LoginSso() {
           {step === 'password-fallback' && (
             <>
               <VStack gap={1} hAlign="center">
-                <Heading level={1}>Welcome back to the night</Heading>
+                <Heading level={1}>{AUTH_HEADING}</Heading>
                 <Text type="body" color="secondary">
                   {email}
                 </Text>
@@ -246,7 +258,7 @@ export default function LoginSso() {
                       loginFailed
                         ? {
                             type: 'error',
-                            message: 'Wrong incantation. Try again.',
+                            message: AUTH_ERROR_MESSAGE,
                           }
                         : undefined
                     }
@@ -254,14 +266,14 @@ export default function LoginSso() {
                   {loginFailed && (
                     <VStack hAlign="end">
                       <Link href="#/templates/login-sso">
-                        Forgot password?
+                        {AUTH_FORGOT_PASSWORD}
                       </Link>
                     </VStack>
                   )}
                 </VStack>
 
                 <Button
-                  label="Enter the night"
+                  label={AUTH_PRIMARY_CTA}
                   variant="primary"
                   size="lg"
                   isLoading={isLoading}
@@ -280,13 +292,13 @@ export default function LoginSso() {
           {/* Terms — family line, shown on every step */}
           <VStack hAlign="center" width="100%">
             <Text type="supporting" color="secondary" justify="center">
-              By clicking continue, you agree to our{' '}
+              {AUTH_TERMS_PREFIX}{' '}
               <Link href="#/templates/login-sso" type="supporting">
-                Terms of service
+                {AUTH_TERMS_SERVICE}
               </Link>{' '}
               and{' '}
               <Link href="#/templates/login-sso" type="supporting">
-                Privacy policy
+                {AUTH_TERMS_PRIVACY}
               </Link>
               .
             </Text>

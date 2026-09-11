@@ -7,7 +7,7 @@
  * technical report, from the KV cache bottleneck through architecture,
  * infrastructure, training, evaluation, and limitations.
  *
- * Frame-first layout (see `npx astryx docs layout`):
+ * Frame-first layout (see `bunx astryx docs layout`):
  *
  *   Frame: AppShell (SideNav rail, no toggle) | Layout content + sticky Outline
  *   Content: chapter header | intro | scene | level-2 sections | prev/next
@@ -30,41 +30,17 @@
  * Same shape on product-tour, same cause; revisit if chapters grow.
  */
 
-import {useState, type CSSProperties} from 'react';
-import {AppShell} from '@astryxdesign/core/AppShell';
-import {MobileNavToggle} from '@astryxdesign/core/MobileNav';
-import {
-  SideNav,
-  SideNavHeading,
-  SideNavItem,
-  SideNavSection,
-} from '@astryxdesign/core/SideNav';
-import {NavIcon} from '@astryxdesign/core/NavIcon';
-import {
-  HStack,
-  Layout,
-  LayoutContent,
-  LayoutPanel,
-  StackItem,
-  VStack,
-} from '@astryxdesign/core/Layout';
-import {Heading, Text} from '@astryxdesign/core/Text';
-import {Button} from '@astryxdesign/core/Button';
 import {Icon} from '@astryxdesign/core/Icon';
-import type {IconType} from '@astryxdesign/core/Icon';
-import {AspectRatio} from '@astryxdesign/core/AspectRatio';
-import {CodeBlock} from '@astryxdesign/core/CodeBlock';
-import {Divider} from '@astryxdesign/core/Divider';
-import {List, ListItem} from '@astryxdesign/core/List';
 import {Link} from '@astryxdesign/core/Link';
-import {Outline, type OutlineItem} from '@astryxdesign/core/Outline';
-import {Selector} from '@astryxdesign/core/Selector';
-import {useMediaQuery} from '@astryxdesign/core/hooks';
+import {Text} from '@astryxdesign/core/Text';
+import ChapteredDoc, {
+  ChapterArtFrame,
+  sceneFill,
+  type ChapterGroup,
+} from 'astryx-dracula/shared/chaptered-doc';
 
 import {
   Boxes,
-  ChevronLeft,
-  ChevronRight,
   Combine,
   Cpu,
   Database,
@@ -83,54 +59,13 @@ const SELF_HASH = '#/templates/tech-report';
 
 const REPORT_URL = 'https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash';
 
-// Astryx has no image primitive: AspectRatio exposes no objectFit or radius
-// props, so the scene fill and the corner clip live in these two styles.
-const sceneFill: CSSProperties = {
-  width: '100%',
-  height: '100%',
-  display: 'block',
-};
-const sceneClip: CSSProperties = {
-  borderRadius: 'var(--radius-container)',
-  overflow: 'clip',
-};
 
-// The outline is sticky so it tracks the chapter as the document scrolls.
-const outlinePanel: CSSProperties = {
-  position: 'sticky',
-  top: 'var(--spacing-6)',
-  alignSelf: 'start',
-  paddingBlockStart: 'var(--spacing-2)',
-};
-
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface DocSection {
-  // Unique within the chapter; the DOM id is derived from it so the outline
-  // links and the headings can never drift apart.
-  key: string;
-  heading: string;
-  body: string;
-  bullets?: string[];
-  code?: {language: string; title: string; source: string};
-}
-
-interface DocChapter {
-  id: string;
-  title: string;
-  icon: IconType;
-  intro: string;
-  hasArt?: boolean;
-  sections: DocSection[];
-}
-
-const sectionId = (chapterId: string, key: string) => `${chapterId}--${key}`;
 
 // ─── Content ─────────────────────────────────────────────────────────────────
 // Every figure below is quoted from the DeepSeek-V4.1-Flash technical report
 // (DeepSeek-AI, 2026). Nothing here is estimated.
 
-const CHAPTER_GROUPS: Array<{title: string; chapters: DocChapter[]}> = [
+const CHAPTER_GROUPS: ChapterGroup[] = [
   {
     title: 'Overview',
     chapters: [
@@ -750,22 +685,7 @@ thorough reasoning)`,
   },
 ];
 
-const CHAPTERS: DocChapter[] = CHAPTER_GROUPS.flatMap(group => group.chapters);
 
-// Derived once at module scope so the Outline receives a stable array identity
-// and does not re-register its scroll spy on every render.
-const OUTLINE_BY_CHAPTER: Record<string, OutlineItem[]> = Object.fromEntries(
-  CHAPTERS.map(chapter => [
-    chapter.id,
-    chapter.sections.map(section => ({
-      id: sectionId(chapter.id, section.key),
-      label: section.heading,
-      level: 2,
-    })),
-  ]),
-);
-
-const DEFAULT_CHAPTER = 'abstract';
 
 // ─── Scene: the KV cache by generation ───────────────────────────────────────
 // Drawn, not loaded. Inline SVG keeps a template dependency-free and paints in
@@ -841,6 +761,9 @@ function FootprintScene({alt}: {alt: string}) {
           </text>
         </g>
       ))}
+      {/* Intentional exception: 10px dense diagram annotation inside an SVG
+          figure (alt fallbacks on the wrapping role="img" carry the meaning),
+          not UI text — the 12px UI floor does not apply here. */}
       <g
         fontFamily="var(--font-family-mono)"
         fontSize="10"
@@ -1521,294 +1444,85 @@ function EvalScene({alt}: {alt: string}) {
 function ChapterArt({chapterId}: {chapterId: string}) {
   if (chapterId === 'abstract') {
     return (
-      <AspectRatio ratio={16 / 9} style={sceneClip}>
+      <ChapterArtFrame>
         <FootprintScene alt="Bars on a log scale showing the global KV cache per token falling from 437 times the DeepSeek-V4.1-Flash footprint at DeepSeek-V1, to 4 times at V4-Flash, to 890 bytes per token at V4.1-Flash" />
-      </AspectRatio>
+      </ChapterArtFrame>
     );
   }
   if (chapterId === 'at-a-glance') {
     return (
-      <AspectRatio ratio={16 / 9} style={sceneClip}>
+      <ChapterArtFrame>
         <ArchitectureScene alt="One tick per layer across the 40-layer backbone: two sliding-window-only layers, an 18-layer CSA2 encoder, and a 20-layer decoder, with global KV projected across the boundary from the last encoder layer" />
-      </AspectRatio>
+      </ChapterArtFrame>
     );
   }
   if (chapterId === 'csa2') {
     return (
-      <AspectRatio ratio={16 / 9} style={sceneClip}>
+      <ChapterArtFrame>
         <IndexerScene alt="A grid of block rows in the shared candidate pool, with the blocks kept by their top score highlighted and a few positions inside them marked as the Top-512 selection" />
-      </AspectRatio>
+      </ChapterArtFrame>
     );
   }
   if (chapterId === 'mhc') {
     return (
-      <AspectRatio ratio={16 / 9} style={sceneClip}>
+      <ChapterArtFrame>
         <MhcShiftScene alt="Two bars comparing residual memory traffic per block at expansion factor 4: twenty units of hidden size for the original three-kernel path against ten for Single-Pass mHC, annotated with the one-block coefficient shift" />
-      </AspectRatio>
+      </ChapterArtFrame>
     );
   }
   if (chapterId === 'auxiliary') {
     return (
-      <AspectRatio ratio={16 / 9} style={sceneClip}>
+      <ChapterArtFrame>
         <Fp4Scene alt="Two bars showing main KV storage per value halving from FP8 to four-bit FP4, annotated with a format ceiling of 2688 against the largest magnitude seen in training, about 10" />
-      </AspectRatio>
+      </ChapterArtFrame>
     );
   }
   if (chapterId === 'inference') {
     return (
-      <AspectRatio ratio={16 / 9} style={sceneClip}>
+      <ChapterArtFrame>
         <FlopsScene alt="Line chart of single-token decode FLOPs against context length: the DeepSeek-V4.1-Flash curve stays almost flat from 4K to 1M tokens while the DeepSeek-V4-Flash curve rises steeply" />
-      </AspectRatio>
+      </ChapterArtFrame>
     );
   }
   if (chapterId === 'swa-replay') {
     return (
-      <AspectRatio ratio={16 / 9} style={sceneClip}>
+      <ChapterArtFrame>
         <ReplayScene alt="A prompt strip split into cached prefix, the replayed window, and the uncached suffix, above two replay-work bars showing a full layer stack against a single window" />
-      </AspectRatio>
+      </ChapterArtFrame>
     );
   }
   if (chapterId === 'conclusion') {
     return (
-      <AspectRatio ratio={16 / 9} style={sceneClip}>
+      <ChapterArtFrame>
         <EvalScene alt="Bars comparing DeepSWE resolved rates: 54.4 percent for DeepSeek-V4-Flash, 74.2 for DeepSeek-V4.1-Flash, 74.0 for Opus-5" />
-      </AspectRatio>
+      </ChapterArtFrame>
     );
   }
   return null;
 }
 
-// ─── Rail ────────────────────────────────────────────────────────────────────
-
-function ChapterRail({
-  activeId,
-  onSelect,
-}: {
-  activeId: string;
-  onSelect: (id: string) => void;
-}) {
-  // Resizable like the shell-side-nav template: 264 default, 220-400 range.
-  // The AppShell drawer owns the rail below 1024px (see MobileNavToggle),
-  // so the handle only matters at desktop widths.
-  return (
-    <SideNav
-      collapsible
-      resizable={{defaultWidth: 264, minWidth: 220, maxWidth: 400}}
-      header={
-        <SideNavHeading
-          icon={<NavIcon icon={<Icon icon={ScrollText} size="sm" />} />}
-          heading="DeepSeek-V4.1-Flash"
-          subheading="Technical report tour"
-          headingHref={SELF_HASH}
-        />
-      }>
-      {CHAPTER_GROUPS.map(group => (
-        <SideNavSection key={group.title} title={group.title}>
-          {group.chapters.map(chapter => (
-            <SideNavItem
-              key={chapter.id}
-              label={chapter.title}
-              icon={chapter.icon}
-              isSelected={chapter.id === activeId}
-              onClick={() => onSelect(chapter.id)}
-            />
-          ))}
-        </SideNavSection>
-      ))}
-    </SideNav>
-  );
-}
-
-// ─── Chapter body ────────────────────────────────────────────────────────────
-
-function SectionBlock({
-  chapterId,
-  section,
-}: {
-  chapterId: string;
-  section: DocSection;
-}) {
-  return (
-    <VStack gap={3}>
-      <Heading level={2} id={sectionId(chapterId, section.key)}>
-        {section.heading}
-      </Heading>
-      <Text type="body" color="secondary" display="block">
-        {section.body}
-      </Text>
-      {section.bullets != null && (
-        <List listStyle="disc">
-          {section.bullets.map(bullet => (
-            <ListItem key={bullet} label={bullet} />
-          ))}
-        </List>
-      )}
-      {section.code != null && (
-        <CodeBlock
-          code={section.code.source}
-          language={section.code.language}
-          title={section.code.title}
-          width="100%"
-        />
-      )}
-    </VStack>
-  );
-}
-
-function ChapterNav({
-  chapter,
-  onSelect,
-}: {
-  chapter: DocChapter;
-  onSelect: (id: string) => void;
-}) {
-  const index = CHAPTERS.findIndex(entry => entry.id === chapter.id);
-  const previous = index > 0 ? CHAPTERS[index - 1] : undefined;
-  const next = index < CHAPTERS.length - 1 ? CHAPTERS[index + 1] : undefined;
-  return (
-    <HStack gap={3} hAlign="between" vAlign="center">
-      {previous != null ? (
-        <Button
-          label={previous.title}
-          variant="secondary"
-          icon={<Icon icon={ChevronLeft} size="sm" />}
-          onClick={() => onSelect(previous.id)}
-        />
-      ) : (
-        <StackItem size="fill" />
-      )}
-      {next != null ? (
-        <Button
-          label={next.title}
-          variant="secondary"
-          endContent={<Icon icon={ChevronRight} size="sm" />}
-          onClick={() => onSelect(next.id)}
-        />
-      ) : (
-        <StackItem size="fill" />
-      )}
-    </HStack>
-  );
-}
-
-// ─── Page ────────────────────────────────────────────────────────────────────
-
 export default function TechReport() {
-  const [chapterId, setChapterId] = useState(DEFAULT_CHAPTER);
-  const [activeSection, setActiveSection] = useState(
-    OUTLINE_BY_CHAPTER[DEFAULT_CHAPTER][0]?.id ?? '',
-  );
-
-  // Responsive contract: below 1024px the outline stops being a column, since
-  // a narrow viewport has nothing to outline against.
-  const isNarrow = useMediaQuery('(max-width: 1024px)');
-
-  const chapter = CHAPTERS.find(entry => entry.id === chapterId) ?? CHAPTERS[0];
-  const outlineItems = OUTLINE_BY_CHAPTER[chapter.id] ?? [];
-  const chapterNumber = CHAPTERS.findIndex(entry => entry.id === chapter.id) + 1;
-
-  const openChapter = (id: string) => {
-    setChapterId(id);
-    setActiveSection(OUTLINE_BY_CHAPTER[id]?.[0]?.id ?? '');
-    // A chapter reads as a new page, so the document goes back to the top
-    // instead of keeping the previous chapter's scroll offset.
-    window.scrollTo({top: 0});
-  };
-
   return (
-    <AppShell
-      height="auto"
-      contentPadding={0}
-      mobileNav={{hasToggle: false}}
-      sideNav={<ChapterRail activeId={chapter.id} onSelect={openChapter} />}>
-      <Layout
-        height="auto"
-        end={
-          isNarrow ? undefined : (
-            <LayoutPanel
-              isScrollable={false}
-              label="On this page"
-              role="complementary"
-              style={outlinePanel}>
-              <Outline
-                items={outlineItems}
-                onActiveIdChange={setActiveSection}
-              />
-            </LayoutPanel>
-          )
-        }
-        content={
-          <LayoutContent isScrollable={false} padding={8}>
-            <VStack gap={8}>
-              <VStack gap={2}>
-                <HStack gap={2} vAlign="center">
-                  <MobileNavToggle />
-                  <Text type="supporting" color="secondary">
-                    DeepSeek-V4.1-Flash technical report
-                  </Text>
-                </HStack>
-                <Heading level={1} type="display-2">
-                  {chapter.title}
-                </Heading>
-                <Text type="supporting" color="secondary" hasTabularNumbers>
-                  {`Chapter ${chapterNumber} of ${CHAPTERS.length} · DeepSeek-AI · research@deepseek.com`}
-                </Text>
-                {isNarrow && (
-                  <Selector
-                    label="On this page"
-                    isLabelHidden
-                    options={outlineItems.map(item => ({
-                      value: item.id,
-                      label: item.label,
-                    }))}
-                    value={activeSection}
-                    onChange={(id: string) => {
-                      setActiveSection(id);
-                      scrollToSection(id);
-                    }}
-                    width="100%"
-                  />
-                )}
-              </VStack>
-
-              <Text type="large" color="secondary" display="block">
-                {chapter.intro}
-              </Text>
-
-              <ChapterArt chapterId={chapter.id} />
-
-              <VStack gap={8}>
-                {chapter.sections.map(section => (
-                  <SectionBlock
-                    key={section.key}
-                    chapterId={chapter.id}
-                    section={section}
-                  />
-                ))}
-              </VStack>
-
-              <Divider />
-
-              <ChapterNav chapter={chapter} onSelect={openChapter} />
-
-              <Text type="supporting" color="secondary">
-                Checkpoints and the full report:{' '}
-                <Link href={REPORT_URL} isExternalLink type="supporting">
-                  huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash
-                </Link>
-              </Text>
-            </VStack>
-          </LayoutContent>
-        }
-      />
-    </AppShell>
+    <ChapteredDoc
+      groups={CHAPTER_GROUPS}
+      defaultChapter="abstract"
+      railHeading="DeepSeek-V4.1-Flash"
+      railSubheading="Technical report tour"
+      railHref={SELF_HASH}
+      railIcon={<Icon icon={ScrollText} size="sm" />}
+      eyebrow="DeepSeek-V4.1-Flash technical report"
+      badge={(chapter, index, total) =>
+        `Chapter ${index + 1} of ${total} · DeepSeek-AI · research@deepseek.com`
+      }
+      art={chapterId => <ChapterArt chapterId={chapterId} />}
+      footer={
+        <Text type="supporting" color="secondary">
+          Checkpoints and the full report:{' '}
+          <Link href={REPORT_URL} isExternalLink type="supporting">
+            huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash
+          </Link>
+        </Text>
+      }
+    />
   );
-}
-
-// Scrolls the document to a heading and records it as the active section.
-function scrollToSection(id: string) {
-  const target = document.getElementById(id);
-  if (target != null) {
-    target.scrollIntoView({behavior: 'smooth', block: 'start'});
-  }
 }

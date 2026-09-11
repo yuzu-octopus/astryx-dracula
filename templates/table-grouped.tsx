@@ -1131,6 +1131,7 @@ export default function TableGrouped() {
       />
       <Dialog isOpen={dialogOpen} onOpenChange={open => setDialogOpen(open)}>
         <Layout
+          height="auto"
           header={
             <DialogHeader
               title="Raise issue"

@@ -39,6 +39,7 @@ import {Table, proportional, pixel} from '@astryxdesign/core/Table';
 import type {TableColumn} from '@astryxdesign/core/Table';
 import {Filter, Download, RotateCw} from 'lucide-react';
 import {ChartLabel} from 'astryx-dracula/shared/chart-labels';
+import {CHART_PANEL_STYLE} from 'astryx-dracula/shared/revenue-chart';
 
 // ============= ICONS (verified lucide-react exports) =============
 // Filter ← FunnelIcon, Download ← ArrowDownTrayIcon, RotateCw ← ArrowPathIcon.
@@ -453,12 +454,7 @@ function OutageHeatmap() {
     heatmapData.find(d => d.day === day && d.hour === hour)?.incidents ?? 0;
   return (
     <VStack gap={3}>
-      <Card
-        padding={3}
-        style={{
-          backgroundColor: 'var(--color-background)',
-          border: 'var(--border-width) solid var(--color-separator)',
-        }}>
+      <Card padding={3} style={CHART_PANEL_STYLE}>
         <svg
           viewBox={`0 0 ${W} ${H}`}
           width="100%"

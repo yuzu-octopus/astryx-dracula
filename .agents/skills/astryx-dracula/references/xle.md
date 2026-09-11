@@ -47,8 +47,25 @@ Expansion emits stock Astryx. Then apply the brand, in order:
 1. Entry imports plus Theme wrapper, fonts copied.
 2. Every color to Exact-list tokens; section subtitles `body`, metadata `supporting`.
 3. Tabular numerals on quantities; status vocabulary; hover dim untouched.
-4. Recharts/WebGL/lab output replaced with hand SVG; heroicons to verified lucide.
+4. Recharts/WebGL/`@astryxdesign/lab` output replaced with hand SVG; heroicons to verified lucide.
+
+## XLO sample (same tree, indented)
+
+```text
+A[cp6 @topNav=TN @sideNav=SN]
+  L
+    LC
+      V[g6]
+        H[j=between a=center]
+          Hd"Analytics"[level=2]
+          H[g2]
+            B"Export"
+            B.primary"New report"
+```
+
+`bunx astryx layout check` echoes both forms; either validates. XLO suits
+multi-line prompts and outlines, XLE suits one-liners.
 
 ## Template headers
 
-All 44 templates carry their canonical structural XLE in a header comment (`// XLE (...)`), validated with `bunx astryx layout check`. When reading or modifying any template, read the header comment first to grasp the entire component tree at ~1/5th the token cost. XLE is canonical: for structural changes, update the XLE first, validate with `check`, expand, then apply the brand pass.
+All 45 templates carry their canonical structural XLE in a header comment (`// XLE (...)`), validated with `bunx astryx layout check`. When reading or modifying any template, read the header comment first to grasp the entire component tree at ~1/5th the token cost. XLE is canonical: for structural changes, update the XLE first, validate with `check`, expand, then apply the brand pass. Inverse pointer: structural edits start from the header XLE — see the Templates section in `SKILL.md`.

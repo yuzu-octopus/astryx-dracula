@@ -70,7 +70,8 @@ body {
   --radius-element: 5px;
   --font-family-mono: 'JetBrains Mono', ui-monospace, monospace;
 
-  --color-background: #282A36;
+  --color-background-body: #282A36;
+  --color-background: var(--color-background-body);
   --color-accent: #BD93F9;
   --color-success: #50FA7B;
   --color-error: #FF5555;
@@ -106,9 +107,10 @@ body {
 }
 
 /* Dracula scrollbars. The spec defines no scrollbar token, so these follow its
- * UI Design Guidelines instead: the track takes the page background
- * (`--color-background`, same surface every scroller sits on), so the bar
- * reads as one surface instead of borrowing whatever sits behind it. The
+ * UI Design Guidelines instead: the track is transparent, so the bar reads as
+ * a thumb only and picks up whatever tier it sits on — the document scroller
+ * shows the html/body paint, surface and card scrollers show their own
+ * surface instead of a page-background gutter inside the card. The
  * resting thumb uses Current Line, which the spec designates for
  * subtle borders and separators, and the hovered thumb promotes to Purple, the
  * brand accent for anything interactive. Selection (#44475A) was the resting
@@ -131,7 +133,7 @@ body {
  * /templates and /bento: resting thumb Current Line, hover Purple. */
 @supports (scrollbar-color: auto) and (not (-webkit-hyphens: none)) {
   :root {
-    scrollbar-color: var(--dracula-current-line) var(--color-background);
+    scrollbar-color: var(--dracula-current-line) transparent;
   }
 }
 
@@ -139,12 +141,12 @@ body {
   *::-webkit-scrollbar {
     width: 10px;
     height: 10px;
-    background: var(--color-background);
+    background: transparent;
   }
 
   *::-webkit-scrollbar-track,
   *::-webkit-scrollbar-corner {
-    background: var(--color-background);
+    background: transparent;
   }
 
   *::-webkit-scrollbar-thumb {

@@ -13,6 +13,9 @@
  *   <= 768px the panel is dropped, the nav collapses to a centered TabList
  *            above the content, the header search wraps under the title, and
  *            every section grid falls to one column (280px floor)
+ *
+ * Seam rule: nav/content whitespace pairs use hasDivider=false (LayoutPanel
+ * beside LayoutContent); dialog chrome and inset panels keep their divider.
  */
 
 import {useState} from 'react';
@@ -90,7 +93,7 @@ export default function SettingsTemplate() {
   return (
     <Layout
       height="fill"
-      contentWidth={1440}
+      contentWidth={1200}
       header={
         <LayoutHeader hasDivider>
           <HStack vAlign="center" wrap="wrap">

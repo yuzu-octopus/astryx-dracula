@@ -8,6 +8,7 @@ import {Layout, LayoutContent, LayoutPanel} from '@astryxdesign/core/Layout';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
 import {ResizeHandle, useResizable} from '@astryxdesign/core/Resizable';
 import {Text, Heading} from '@astryxdesign/core/Text';
+import {VisuallyHidden} from '@astryxdesign/core/VisuallyHidden';
 import {Center} from '@astryxdesign/core/Center';
 import {CodeBlock} from '@astryxdesign/core/CodeBlock';
 import {EmptyState} from '@astryxdesign/core/EmptyState';
@@ -63,13 +64,6 @@ const styles: Record<string, CSSProperties> = {
     flexShrink: 0,
     overflow: 'hidden',
   },
-  visuallyHidden: {
-    position: 'absolute',
-    width: 1,
-    height: 1,
-    overflow: 'clip',
-    whiteSpace: 'nowrap',
-  },
 };
 
 const EDITOR_CODE = `import {useState, useCallback} from 'react';
@@ -100,14 +94,14 @@ export default function NightCounter() {
   }, []);
 
   return (
-    <div style={containerStyle}>
+    <Stack direction="vertical" gap={2} style={containerStyle}>
       <Text type="label">Night counter</Text>
-      <span style={counterStyle}>
+      <Text style={counterStyle}>
         {count}
-      </span>
+      </Text>
       <Button label="Increment" onClick={increment} />
       <Button label="Reset" variant="secondary" onClick={reset} />
-    </div>
+    </Stack>
   );
 }`;
 
@@ -259,9 +253,9 @@ export default function IdeWorkspace() {
       height="fill"
       content={
         <LayoutContent padding={0}>
-          <Heading level={1} style={styles.visuallyHidden}>
+          <VisuallyHidden as="h1">
             Code editor
-          </Heading>
+          </VisuallyHidden>
           <Layout
             height="fill"
             start={

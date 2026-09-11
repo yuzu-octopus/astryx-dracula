@@ -5,7 +5,7 @@
 /**
  * Product Tour — a chaptered walkthrough of this theme.
  *
- * Frame-first layout (see `npx astryx docs layout`):
+ * Frame-first layout (see `bunx astryx docs layout`):
  *
  *   Frame: chapter rail 264 (SideNav) | chapter content (fill) | outline 240
  *
@@ -19,40 +19,14 @@
  * and status or metadata rides on Text.
  */
 
-import {useState, type CSSProperties} from 'react';
-
-import {AppShell} from '@astryxdesign/core/AppShell';
-import {MobileNavToggle} from '@astryxdesign/core/MobileNav';
-import {
-  SideNav,
-  SideNavHeading,
-  SideNavItem,
-  SideNavSection,
-} from '@astryxdesign/core/SideNav';
-import {NavIcon} from '@astryxdesign/core/NavIcon';
-import {
-  HStack,
-  Layout,
-  LayoutContent,
-  LayoutPanel,
-  StackItem,
-  VStack,
-} from '@astryxdesign/core/Layout';
-import {Heading, Text} from '@astryxdesign/core/Text';
-import {Button} from '@astryxdesign/core/Button';
 import {Icon} from '@astryxdesign/core/Icon';
-import type {IconType} from '@astryxdesign/core/Icon';
-import {AspectRatio} from '@astryxdesign/core/AspectRatio';
-import {CodeBlock} from '@astryxdesign/core/CodeBlock';
-import {Divider} from '@astryxdesign/core/Divider';
-import {List, ListItem} from '@astryxdesign/core/List';
-import {Outline, type OutlineItem} from '@astryxdesign/core/Outline';
-import {Selector} from '@astryxdesign/core/Selector';
-import {useMediaQuery} from '@astryxdesign/core/hooks';
+import ChapteredDoc, {
+  ChapterArtFrame,
+  sceneFill,
+  type ChapterGroup,
+} from 'astryx-dracula/shared/chaptered-doc';
 
 import {
-  ChevronLeft,
-  ChevronRight,
   Hash,
   LayoutGrid,
   Rocket,
@@ -65,52 +39,11 @@ import {
 
 const SELF_HASH = '#/templates/product-tour';
 
-// Astryx has no image primitive: AspectRatio exposes no objectFit or radius
-// props, so the scene fill and the corner clip live in these two styles.
-const sceneFill: CSSProperties = {
-  width: '100%',
-  height: '100%',
-  display: 'block',
-};
-const sceneClip: CSSProperties = {
-  borderRadius: 'var(--radius-container)',
-  overflow: 'clip',
-};
 
-// The outline is sticky so it tracks the chapter as the document scrolls.
-const outlinePanel: CSSProperties = {
-  position: 'sticky',
-  top: 'var(--spacing-6)',
-  alignSelf: 'start',
-  paddingBlockStart: 'var(--spacing-2)',
-};
-
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface DocSection {
-  // Unique within the chapter; the DOM id is derived from it so the outline
-  // links and the headings can never drift apart.
-  key: string;
-  heading: string;
-  body: string;
-  bullets?: string[];
-  code?: {language: string; title: string; source: string};
-}
-
-interface DocChapter {
-  id: string;
-  title: string;
-  icon: IconType;
-  intro: string;
-  hasArt?: boolean;
-  sections: DocSection[];
-}
-
-const sectionId = (chapterId: string, key: string) => `${chapterId}--${key}`;
 
 // ─── Content ─────────────────────────────────────────────────────────────────
 
-const CHAPTER_GROUPS: Array<{title: string; chapters: DocChapter[]}> = [
+const CHAPTER_GROUPS: ChapterGroup[] = [
   {
     title: 'Getting started',
     chapters: [
@@ -313,7 +246,7 @@ import {astryxDraculaTheme} from 'astryx-dracula';
         icon: LayoutGrid,
         hasArt: true,
         intro:
-          'Forty-four themed pages ship with the package as an Astryx integration pack. Each one is a real page, already retokened and structurally validated, and each one scaffolds in a single command.',
+          'Forty-five themed pages ship with the package as an Astryx integration pack. Each one is a real page, already retokened and structurally validated, and each one scaffolds in a single command.',
         sections: [
           {
             key: 'scaffold-a-page',
@@ -322,7 +255,7 @@ import {astryxDraculaTheme} from 'astryx-dracula';
             code: {
               language: 'bash',
               title: 'shell',
-              source: `# any of the 44 page ids
+              source: `# any of the 45 page ids
 bunx astryx template dashboard --package astryx-dracula
 bunx astryx template product-tour --package astryx-dracula`,
             },
@@ -428,22 +361,7 @@ bun run theme:check  # fails when compiled CSS is stale`,
   },
 ];
 
-const CHAPTERS: DocChapter[] = CHAPTER_GROUPS.flatMap(group => group.chapters);
 
-// Derived once at module scope so the Outline receives a stable array identity
-// and does not re-register its scroll spy on every render.
-const OUTLINE_BY_CHAPTER: Record<string, OutlineItem[]> = Object.fromEntries(
-  CHAPTERS.map(chapter => [
-    chapter.id,
-    chapter.sections.map(section => ({
-      id: sectionId(chapter.id, section.key),
-      label: section.heading,
-      level: 2,
-    })),
-  ]),
-);
-
-const DEFAULT_CHAPTER = 'introduction';
 
 // ─── Scene: the theme at night ───────────────────────────────────────────────
 // Drawn, not loaded. Inline SVG keeps a template dependency-free and paints in
@@ -955,258 +873,47 @@ function PagesScene({alt}: {alt: string}) {
 function ChapterArt({chapterId}: {chapterId: string}) {
   if (chapterId === 'introduction') {
     return (
-      <AspectRatio ratio={16 / 9} style={sceneClip}>
+      <ChapterArtFrame>
         <NightScene alt="A full moon over a castle on the ridge, with bats crossing a lit sky" />
-      </AspectRatio>
+      </ChapterArtFrame>
     );
   }
   if (chapterId === 'palette') {
     return (
-      <AspectRatio ratio={16 / 9} style={sceneClip}>
+      <ChapterArtFrame>
         <PaletteScene alt="Fifteen palette swatches: six surfaces and neutrals, then the accent colours" />
-      </AspectRatio>
+      </ChapterArtFrame>
     );
   }
   if (chapterId === 'type-shape') {
     return (
-      <AspectRatio ratio={16 / 9} style={sceneClip}>
+      <ChapterArtFrame>
         <TypeScene alt="A type specimen: monospace glyphs on a baseline grid beside the type scale ladder" />
-      </AspectRatio>
+      </ChapterArtFrame>
     );
   }
   if (chapterId === 'templates') {
     return (
-      <AspectRatio ratio={16 / 9} style={sceneClip}>
+      <ChapterArtFrame>
         <PagesScene alt="Eight page thumbnails in a grid, the first one highlighted" />
-      </AspectRatio>
+      </ChapterArtFrame>
     );
   }
   return null;
 }
 
-// ─── Rail ────────────────────────────────────────────────────────────────────
-
-function ChapterRail({
-  activeId,
-  onSelect,
-}: {
-  activeId: string;
-  onSelect: (id: string) => void;
-}) {
-  // Resizable like the shell-side-nav template: 264 default, 220-400 range.
-  // The AppShell drawer owns the rail below 1024px (see MobileNavToggle),
-  // so the handle only matters at desktop widths.
-  return (
-    <SideNav
-      collapsible
-      resizable={{defaultWidth: 264, minWidth: 220, maxWidth: 400}}
-      header={
-        <SideNavHeading
-          icon={<NavIcon icon={<Icon icon={Sparkles} size="sm" />} />}
-          heading="astryx-dracula"
-          subheading="Dracula theme for Astryx"
-          headingHref={SELF_HASH}
-        />
-      }>
-      {CHAPTER_GROUPS.map(group => (
-        <SideNavSection key={group.title} title={group.title}>
-          {group.chapters.map(chapter => (
-            <SideNavItem
-              key={chapter.id}
-              label={chapter.title}
-              icon={chapter.icon}
-              isSelected={chapter.id === activeId}
-              onClick={() => onSelect(chapter.id)}
-            />
-          ))}
-        </SideNavSection>
-      ))}
-    </SideNav>
-  );
-}
-
-// ─── Chapter body ────────────────────────────────────────────────────────────
-
-function SectionBlock({
-  chapterId,
-  section,
-}: {
-  chapterId: string;
-  section: DocSection;
-}) {
-  return (
-    <VStack gap={3}>
-      <Heading level={2} id={sectionId(chapterId, section.key)}>
-        {section.heading}
-      </Heading>
-      <Text type="body" color="secondary" display="block">
-        {section.body}
-      </Text>
-      {section.bullets != null && (
-        <List listStyle="disc">
-          {section.bullets.map(bullet => (
-            <ListItem key={bullet} label={bullet} />
-          ))}
-        </List>
-      )}
-      {section.code != null && (
-        <CodeBlock
-          code={section.code.source}
-          language={section.code.language}
-          title={section.code.title}
-          width="100%"
-        />
-      )}
-    </VStack>
-  );
-}
-
-function ChapterNav({
-  chapter,
-  onSelect,
-}: {
-  chapter: DocChapter;
-  onSelect: (id: string) => void;
-}) {
-  const index = CHAPTERS.findIndex(entry => entry.id === chapter.id);
-  const previous = index > 0 ? CHAPTERS[index - 1] : undefined;
-  const next = index < CHAPTERS.length - 1 ? CHAPTERS[index + 1] : undefined;
-  return (
-    <HStack gap={3} hAlign="between" vAlign="center">
-      {previous != null ? (
-        <Button
-          label={previous.title}
-          variant="secondary"
-          icon={<Icon icon={ChevronLeft} size="sm" />}
-          onClick={() => onSelect(previous.id)}
-        />
-      ) : (
-        <StackItem size="fill" />
-      )}
-      {next != null ? (
-        <Button
-          label={next.title}
-          variant="secondary"
-          endContent={<Icon icon={ChevronRight} size="sm" />}
-          onClick={() => onSelect(next.id)}
-        />
-      ) : (
-        <StackItem size="fill" />
-      )}
-    </HStack>
-  );
-}
-
-// ─── Page ────────────────────────────────────────────────────────────────────
-
 export default function ProductTour() {
-  const [chapterId, setChapterId] = useState(DEFAULT_CHAPTER);
-  const [activeSection, setActiveSection] = useState(
-    OUTLINE_BY_CHAPTER[DEFAULT_CHAPTER][0]?.id ?? '',
-  );
-
-  // Responsive contract: below 1024px the outline stops being a column, since
-  // a narrow viewport has nothing to outline against.
-  const isNarrow = useMediaQuery('(max-width: 1024px)');
-
-  const chapter = CHAPTERS.find(entry => entry.id === chapterId) ?? CHAPTERS[0];
-  const outlineItems = OUTLINE_BY_CHAPTER[chapter.id] ?? [];
-
-  const openChapter = (id: string) => {
-    setChapterId(id);
-    setActiveSection(OUTLINE_BY_CHAPTER[id]?.[0]?.id ?? '');
-    // A chapter reads as a new page, so the document goes back to the top
-    // instead of keeping the previous chapter's scroll offset.
-    window.scrollTo({top: 0});
-  };
-
   return (
-    <AppShell
-      height="auto"
-      contentPadding={0}
-      mobileNav={{hasToggle: false}}
-      sideNav={<ChapterRail activeId={chapter.id} onSelect={openChapter} />}>
-      <Layout
-        height="auto"
-        end={
-          isNarrow ? undefined : (
-            <LayoutPanel
-              isScrollable={false}
-              label="On this page"
-              role="complementary"
-              style={outlinePanel}>
-              <Outline
-                items={outlineItems}
-                onActiveIdChange={setActiveSection}
-              />
-            </LayoutPanel>
-          )
-        }
-        content={
-          <LayoutContent isScrollable={false} padding={8}>
-            <VStack gap={8}>
-              <VStack gap={2}>
-                <HStack gap={2} vAlign="center">
-                  <MobileNavToggle />
-                  <Text type="supporting" color="secondary">
-                    Documentation
-                  </Text>
-                </HStack>
-                <Heading level={1} type="display-2">
-                  {chapter.title}
-                </Heading>
-                <Text type="supporting" color="secondary" hasTabularNumbers>
-                  astryx-dracula v0.2.1
-                </Text>
-                {isNarrow && (
-                  <Selector
-                    label="On this page"
-                    isLabelHidden
-                    options={outlineItems.map(item => ({
-                      value: item.id,
-                      label: item.label,
-                    }))}
-                    value={activeSection}
-                    onChange={(id: string) => {
-                      setActiveSection(id);
-                      scrollToSection(id);
-                    }}
-                    width="100%"
-                  />
-                )}
-              </VStack>
-
-              <Text type="large" color="secondary" display="block">
-                {chapter.intro}
-              </Text>
-
-              <ChapterArt chapterId={chapter.id} />
-
-              <VStack gap={8}>
-                {chapter.sections.map(section => (
-                  <SectionBlock
-                    key={section.key}
-                    chapterId={chapter.id}
-                    section={section}
-                  />
-                ))}
-              </VStack>
-
-              <Divider />
-
-              <ChapterNav chapter={chapter} onSelect={openChapter} />
-            </VStack>
-          </LayoutContent>
-        }
-      />
-    </AppShell>
+    <ChapteredDoc
+      groups={CHAPTER_GROUPS}
+      defaultChapter="introduction"
+      railHeading="astryx-dracula"
+      railSubheading="Dracula theme for Astryx"
+      railHref={SELF_HASH}
+      railIcon={<Icon icon={Sparkles} size="sm" />}
+      eyebrow="Documentation"
+      badge={() => 'astryx-dracula v0.2.1'}
+      art={chapterId => <ChapterArt chapterId={chapterId} />}
+    />
   );
-}
-
-// Scrolls the document to a heading and records it as the active section.
-function scrollToSection(id: string) {
-  const target = document.getElementById(id);
-  if (target != null) {
-    target.scrollIntoView({behavior: 'smooth', block: 'start'});
-  }
 }

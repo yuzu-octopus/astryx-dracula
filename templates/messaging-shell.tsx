@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LP[w=68] > V > Av + (V > IB*4) + IB) + (LP[w=260] > V > (H > Hd"Night Watch"[level=1] + IB) + TI"Jump to…" + (V > Tx"Channels"[t=label] + (List > (ListItem)*4)) + (V > Tx"Direct messages"[t=label] + (List > (ListItem)*3))) + (LC[p=0] > V > (H > Hd"design-systems"[level=2] + SD + IB) + (ChL > ChML > (ChM > ChB)*6 + ChC)) + (LP[w=340] > V > (H > Tx"Thread"[weight=semibold] + IB) + (ChL > ChML > (ChM > ChB)*3 + ChC))
+//   L > (LP[w=68] > V > Av + (V > IB*4) + IB) + (LP[w=260] > V > (H > Hd"Night watch"[level=1] + IB) + TI"Jump to…" + (V > Tx"Channels"[t=label] + (List > (ListItem)*4)) + (V > Tx"Direct messages"[t=label] + (List > (ListItem)*3))) + (LC[p=0] > V > (H > Hd"design-systems"[level=2] + SD + IB) + (ChL > ChML > (ChM > ChB)*6 + ChC)) + (LP[w=340] > V > (H > Tx"Thread"[weight=semibold] + IB) + (ChL > ChML > (ChM > ChB)*3 + ChC))
 
 /**
  * Messaging Shell — Slack-style column frame for team messaging tools.
@@ -423,7 +423,7 @@ export default function MessagingShell() {
 
   const workspaceRail = (
     <VStack gap={2} style={styles.rail}>
-      <Avatar name="Night Watch" size="md" />
+      <Avatar name="Night watch" size="md" />
       {RAIL_ITEMS.map(item => (
         <IconButton
           key={item.id}
@@ -454,7 +454,7 @@ export default function MessagingShell() {
     <Stack direction="vertical" style={styles.sidebar}>
       <HStack gap={2} style={styles.sidebarHeader}>
         <StackItem size="fill">
-          <Heading level={1}>Night Watch</Heading>
+          <Heading level={1}>Night watch</Heading>
         </StackItem>
         <IconButton
           label="New message"
@@ -476,7 +476,12 @@ export default function MessagingShell() {
           onChange={setSearchQuery}
         />
       </VStack>
-      <StackItem size="fill" style={styles.sidebarScroll}>
+      <StackItem
+        size="fill"
+        style={styles.sidebarScroll}
+        role="region"
+        aria-label="Channels and direct messages"
+        tabIndex={0}>
         <List
           density="compact"
           hasDividers={false}
@@ -622,7 +627,12 @@ export default function MessagingShell() {
         />
       </HStack>
       <Divider />
-      <StackItem size="fill" style={styles.threadScroll}>
+      <StackItem
+        size="fill"
+        style={styles.threadScroll}
+        role="region"
+        aria-label="Thread messages"
+        tabIndex={0}>
         <ChatMessageList density="compact">
           <ChatMessage
             sender="assistant"

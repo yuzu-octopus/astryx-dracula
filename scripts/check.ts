@@ -107,5 +107,58 @@ for (const [name, fg, bg, floor] of pairs) {
   if (r < floor) fail(`FAIL ${name} ${r.toFixed(2)} (floor ${floor})`);
   else console.log(`PASS ${name} ${r.toFixed(2)}`);
 }
+
+// Template lint gates: background doctrine + type quietness + explicit
+// Layout height. Scans templates/ and demo/ source (never built output).
+// variant="section" paints the shell surface tier instead of body and
+// collapses the two tiers into one, so it is banned outside the allowlist
+// below (repo-relative paths; empty: no legitimate use today). weight="bold"
+// on large/body text fights the theme's semibold scale. A Layout without an
+// explicit height prop silently takes fill, which only resolves against a
+// definite ancestor height — hero/document pages need auto, app panes fill.
+const sectionAllowlist: string[] = [];
+const lintFiles: string[] = [];
+for (const dir of ['templates', 'demo']) {
+  const glob = new Bun.Glob(`${dir}/*.tsx`);
+  for await (const f of glob.scan('.')) lintFiles.push(f);
+}
+// Finds the `>` closing a JSX opening tag. Inside `{...}` expressions `>`
+// is a comparison or arrow token, never the tag end, so only a depth-0 `>`
+// counts. Quoted strings only matter at depth 0 (`a="a>b"`); inside braces
+// quote tracking would mistake apostrophes in text for string starts.
+const findTagEnd = (src: string, start: number): number => {
+  let depth = 0;
+  let quote: string | null = null;
+  for (let i = start; i < src.length; i++) {
+    const c = src[i];
+    if (depth > 0) {
+      if (c === '{') depth++;
+      else if (c === '}') depth--;
+      continue;
+    }
+    if (quote) {
+      if (c === quote && src[i - 1] !== '\\') quote = null;
+      continue;
+    }
+    if (c === '"' || c === "'" || c === '`') quote = c;
+    else if (c === '{') depth++;
+    else if (c === '>') return i;
+  }
+  return -1;
+};
+for (const f of lintFiles.sort()) {
+  const src = await Bun.file(f).text();
+  for (const m of src.matchAll(/variant=\{?["']section["']\}?/g)) {
+    if (!sectionAllowlist.includes(f)) fail(`${f}:${src.slice(0, m.index).split('\n').length} variant="section" outside allowlist`);
+  }
+  for (const m of src.matchAll(/weight=\{?["']bold["']\}?/g)) {
+    fail(`${f}:${src.slice(0, m.index).split('\n').length} weight="bold" (theme semibold owns large/body emphasis)`);
+  }
+  for (const m of src.matchAll(/<Layout(?=[\s>])/g)) {
+    const end = findTagEnd(src, m.index + '<Layout'.length);
+    const tag = end === -1 ? '' : src.slice(m.index, end + 1);
+    if (!/height\s*=/.test(tag)) fail(`${f}:${src.slice(0, m.index).split('\n').length} <Layout> missing explicit height (auto for hero/document pages, fill for app panes)`);
+  }
+}
 if (failed) process.exit(1);
 console.log('kit checks PASS');

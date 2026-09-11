@@ -21,9 +21,11 @@ import {Collapsible, CollapsibleGroup} from '@astryxdesign/core/Collapsible';
 import {AspectRatio} from '@astryxdesign/core/AspectRatio';
 import {SelectableCard} from '@astryxdesign/core/SelectableCard';
 import type {CSSProperties} from 'react';
+import {galleryImageClip} from 'astryx-dracula/shared/gallery-image';
+import {SceneTile} from 'astryx-dracula/shared/scene-tile';
 
 // Custom CSS here is limited to what Astryx components can't express today:
-// - image fill + corner radius (no Image primitive — #2582)
+// - image radius-clip (no Image primitive — #2582, see shared/gallery-image)
 // - the sticky info column (no sticky prop on Astryx layout primitives — #2613)
 // Keeps the info column in view while the gallery scrolls. No sticky prop on
 // Astryx layout primitives.
@@ -32,46 +34,12 @@ const stickyInfo: CSSProperties = {
   top: 'var(--spacing-8)',
   alignSelf: 'start',
 };
-// Product scenes are inline Dracula SVG — there is no Image primitive in
-// Astryx (#2582). Fills the AspectRatio box + rounds hero corners. No
-// objectFit/radius props on AspectRatio.
-const heroImage: CSSProperties = {
-  borderRadius: 'var(--radius-container)',
-  overflow: 'clip',
-};
-// Fills the thumbnail card. Corner radius + selection ring come from
-// SelectableCard; the scene only needs to fill the box (#2582).
-const thumbImage: CSSProperties = {
-  width: '100%',
-  height: '100%',
-  display: 'block',
-};
 
 // One Dracula placeholder scene per view, drawn from the fixed badge
-// vocabulary. Resolves to theme tokens so the gallery stays on-brand in the
-// dark-only theme.
+// vocabulary (shared/scene-tile large fork). Resolves to theme tokens so the
+// gallery stays on-brand in the dark-only theme.
 function ProductScene({hue, label}: {hue: string; label: string}) {
-  return (
-    <svg
-      viewBox="0 0 400 300"
-      preserveAspectRatio="xMidYMid slice"
-      style={thumbImage}
-      role="img"
-      aria-label={label}>
-      <rect width="400" height="300" fill="var(--dracula-bg-light)" />
-      <g
-        transform="translate(200 150)"
-        fill="none"
-        stroke="var(--dracula-comment)"
-        strokeWidth="5"
-        strokeLinecap="round"
-        strokeLinejoin="round">
-        <rect x="-44" y="-44" width="88" height="88" rx="5" />
-        <circle cx="18" cy="-18" r="2.5" fill={hue} stroke="none" />
-        <path d="M-34 30 L-8 0 L10 18 L20 8 L34 24" />
-      </g>
-    </svg>
-  );
+  return <SceneTile label={label} hue={hue} size="lg" />;
 }
 
 import {Minus, Plus, Star} from 'lucide-react';
@@ -151,7 +119,7 @@ function ImageGallery({
 
   return (
     <VStack gap={3}>
-      <AspectRatio ratio={4 / 5} style={heroImage}>
+      <AspectRatio ratio={4 / 5} style={galleryImageClip}>
         <ProductScene hue={heroHue} label={PRODUCT.name} />
       </AspectRatio>
       <Grid columns={3} gap={2}>
@@ -195,7 +163,7 @@ function ProductInfo() {
         </Heading>
         <StarRating rating={4.3} count={128} />
         <HStack gap={2} vAlign="center">
-          <Text type="large" weight="bold" hasTabularNumbers>
+          <Text type="large" hasTabularNumbers>
             {fmt(PRODUCT.price)}
           </Text>
           <Text type="body" color="secondary" hasStrikethrough hasTabularNumbers>

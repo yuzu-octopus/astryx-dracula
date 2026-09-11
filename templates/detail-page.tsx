@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LH[divider] > V[g=3] > ((H[g=4 a=start] > (SI > V[g=0] > (Lk"All orders" + (V[g=0] > Hd"#1001"[level=1] + (H[g=1 a=center] > Tx"5 ordered items"[t=supporting] + Av"Jane Doe" + SD"Unfulfilled" + Tx"02/23/2026"[t=supporting] + Lk"See all")))) + (H[g=2] > B"Restock" + B"Edit")) + (H[g=3 a=center] > (SI > TL > Tab"Details"! + Tab"Invoices" + Tab"Timeline" + TabMenu"More") + B.ghost))) + (LC > V[g=4] > ((S > V[g=4] > ((H[g=2 a=center] > Hd"Items"[level=2] + SD"Unfulfilled") + UL)) + (S > V[g=4] > ((H[g=2 a=center] > Hd"Invoice"[level=2] + SD"Paid") + ML)) + (S > V[g=4] > ((H[g=2 a=center] > Hd"Timeline"[level=2] + B.ghost) + UL)))) + (LP[w=320 p=4] > V[g=4] > Col"Notes" + Col"Customer" + Col"Fraud Analysis")
+//   L > (LH[divider] > V[g=3] > ((H[g=4 a=start] > (SI > V[g=0] > (Lk"All orders" + (V[g=0] > Hd"#1001"[level=1] + (H[g=1 a=center] > Tx"5 ordered items"[t=supporting] + Av"Vlad Dracul" + SD"Unfulfilled" + Tx"02/23/2026"[t=supporting] + Lk"See all")))) + (H[g=2] > B"Restock" + B"Edit")) + (H[g=3 a=center] > (SI > TL > Tab"Details"! + Tab"Invoices" + Tab"Timeline" + TabMenu"More") + B.ghost))) + (LC > V[g=4] > ((S > V[g=4] > ((H[g=2 a=center] > Hd"Items"[level=2] + SD"Unfulfilled") + UL)) + (S > V[g=4] > ((H[g=2 a=center] > Hd"Invoice"[level=2] + SD"Paid") + ML)) + (S > V[g=4] > ((H[g=2 a=center] > Hd"Timeline"[level=2] + B.ghost) + UL)))) + (LP[w=320 p=4] > V[g=4] > Col"Notes" + Col"Customer" + Col"Fraud analysis")
 
 import {useState} from 'react';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
@@ -111,7 +111,7 @@ const sigilClip: CSSProperties = {
   flexShrink: 0,
 };
 
-function ProductSigil({name, index}: {name: string; index: number}) {
+function ProductSigil({index}: {name: string; index: number}) {
   const hue = PRODUCT_HUES[index % PRODUCT_HUES.length];
   return (
     <Card padding={0} style={sigilClip}>
@@ -119,8 +119,7 @@ function ProductSigil({name, index}: {name: string; index: number}) {
         viewBox="0 0 40 40"
         width={40}
         height={40}
-        role="img"
-        aria-label={name}>
+        aria-hidden="true">
         <rect width="40" height="40" fill="var(--dracula-bg-light)" />
         <circle cx={28} cy={11} r={7} fill={hue} />
         <circle
@@ -151,7 +150,7 @@ const fmt = (n: number) => `$${n.toFixed(2)}`;
 const ACTIVITY = [
   {
     type: 'event' as const,
-    user: 'Jane Doe',
+    user: 'Vlad Dracul',
     text: 'placed order #1001',
     reactions: 2,
     time: 'Feb 23 at 9:12 AM',
@@ -229,9 +228,9 @@ function PageHeader({
                   </Text>
                   <HStack gap={1} vAlign="center">
                     <Bullet />
-                    <Avatar name="Jane Doe" size="sm" />
+                    <Avatar name="Vlad Dracul" size="sm" />
                     <Text type="supporting" color="secondary" maxLines={1}>
-                      Jane Doe
+                      Vlad Dracul
                     </Text>
                   </HStack>
                   <HStack gap={1} vAlign="center">
@@ -584,18 +583,18 @@ function PanelContent() {
       </Collapsible>
       <Collapsible trigger={<Heading level={3}>Customer</Heading>}>
         <MetadataList>
-          <MetadataListItem label="Name">Jane Doe</MetadataListItem>
+          <MetadataListItem label="Name">Vlad Dracul</MetadataListItem>
           <MetadataListItem label="Address">
             321 Smith Road, CA 38238
           </MetadataListItem>
           <MetadataListItem label="Phone">234-555-0134</MetadataListItem>
-          <MetadataListItem label="Email">janedoe@email.com</MetadataListItem>
+          <MetadataListItem label="Email">vlad@castle-dracula.transylvania</MetadataListItem>
           <MetadataListItem label="Billing Address">
             Same as shipping address
           </MetadataListItem>
         </MetadataList>
       </Collapsible>
-      <Collapsible trigger={<Heading level={3}>Fraud Analysis</Heading>}>
+      <Collapsible trigger={<Heading level={3}>Fraud analysis</Heading>}>
         <VStack gap={1}>
           <ProgressBar
             label="Risk level"
@@ -673,6 +672,7 @@ export default function DetailPage() {
         isOpen={isNarrow && isPanelDialogOpen}
         onOpenChange={setPanelDialogOpen}>
         <Layout
+          height="auto"
           header={
             <DialogHeader
               title="Order details"

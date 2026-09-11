@@ -56,6 +56,9 @@ import {
   SOCIAL_ROWS,
   DEVICE_ROWS,
   INFO_TILES,
+  iconBox,
+  actionNoWrap,
+  sideNavHeading,
 } from 'astryx-dracula/shared/settings-rows';
 import type {InfoRow} from 'astryx-dracula/shared/settings-rows';
 
@@ -65,27 +68,12 @@ import type {InfoRow} from 'astryx-dracula/shared/settings-rows';
 const fillViewport: CSSProperties = {
   minHeight: '100dvh',
 };
-const iconBox: CSSProperties = {
-  borderRadius: 'var(--radius-container)',
-  backgroundColor: 'var(--color-background-surface)',
-  flexShrink: 0,
-};
 const rowPadding: CSSProperties = {
   paddingBlock: 'var(--spacing-4)',
-};
-// Keeps row actions ("Log out", "Deactivate") on one line: without this the
-// action column wraps mid-phrase at tablet widths while the info column still
-// has room to wrap instead.
-const actionNoWrap: CSSProperties = {
-  flexShrink: 0,
-  whiteSpace: 'nowrap',
 };
 const sideNavPadding: CSSProperties = {
   paddingBlock: 'var(--spacing-4)',
   paddingInline: 'var(--spacing-3)',
-};
-const sideNavHeading: CSSProperties = {
-  marginInline: 'var(--spacing-4)',
 };
 
 // Same-route hash: demo links stay focusable anchors without escaping the
@@ -107,13 +95,13 @@ const SECTION_TITLES: Record<string, string> = {
 };
 
 const TAX_ROWS: InfoRow[] = [
-  {label: 'Tithe information', value: 'Not provided', action: 'Add'},
-  {label: 'Tithe scrolls', value: 'No scrolls yet', action: 'View'},
+  {label: 'Tax scrolls', value: 'Not provided', action: 'Add'},
+  {label: 'Past scrolls', value: 'No scrolls yet', action: 'View'},
 ];
 
 const PAYOUT_ROWS: InfoRow[] = [
-  {label: 'Tribute method', value: 'Not set up', action: 'Add'},
-  {label: 'Past tributes', value: 'No tributes yet', action: 'View'},
+  {label: 'Payout crypt', value: 'Not set up', action: 'Add'},
+  {label: 'Past payouts', value: 'No tributes yet', action: 'View'},
 ];
 
 function InfoRowItem({label, value, action}: InfoRow) {
@@ -124,7 +112,7 @@ function InfoRowItem({label, value, action}: InfoRow) {
           <Text type="body" weight="semibold" display="block">
             {label}
           </Text>
-          <Text type="supporting" color="secondary" display="block">
+          <Text type="body" color="secondary" display="block">
             {value}
           </Text>
         </VStack>
@@ -189,7 +177,7 @@ function ExpandableRowViewing({
             <Text type="body" weight="semibold" display="block">
               {label}
             </Text>
-            <Text type="supporting" color="secondary" display="block">
+            <Text type="body" color="secondary" display="block">
               {value}
             </Text>
           </VStack>
@@ -498,7 +486,7 @@ export default function SettingsSidebar() {
                           <Icon icon={Lock} />
                         </Center>
                         <VStack gap={1}>
-                          <Text type="body" weight="bold">
+                          <Text type="body">
                             Adding devices from people you trust
                           </Text>
                           <Text type="body" color="secondary">
@@ -705,7 +693,7 @@ export default function SettingsSidebar() {
                               {tile.title}
                             </Text>
                             <Text
-                              type="supporting"
+                              type="body"
                               color="secondary"
                               display="block">
                               {tile.body}
@@ -832,10 +820,10 @@ export default function SettingsSidebar() {
                           <Icon icon={ShieldCheck} />
                         </Center>
                         <VStack gap={1}>
-                          <Text type="body" weight="bold">
+                          <Text type="body">
                             Committed to privacy
                           </Text>
-                          <Text type="supporting" color="secondary">
+                          <Text type="body" color="secondary">
                             We&apos;re committed to keeping your data protected.
                             See details in our{' '}
                             <Link href={SELF_HASH} type="supporting">
@@ -886,7 +874,7 @@ export default function SettingsSidebar() {
               <VStack gap={6}>
                 {!isNarrow && <Heading level={1}>Taxes</Heading>}
                 <VStack gap={0}>
-                  <Heading level={3}>Tax documents</Heading>
+                  <Heading level={3}>Tax scrolls</Heading>
                   <Divider />
                   {TAX_ROWS.map(row => (
                     <InfoRowItem key={row.label} {...row} />
@@ -899,7 +887,7 @@ export default function SettingsSidebar() {
               <VStack gap={6}>
                 {!isNarrow && <Heading level={1}>Payments</Heading>}
                 <VStack gap={0}>
-                  <Heading level={3}>Payouts</Heading>
+                  <Heading level={3}>Payout crypt</Heading>
                   <Divider />
                   {PAYOUT_ROWS.map(row => (
                     <InfoRowItem key={row.label} {...row} />
@@ -912,7 +900,7 @@ export default function SettingsSidebar() {
               <VStack gap={6}>
                 {!isNarrow && <Heading level={1}>Travel for work</Heading>}
                 <VStack gap={0}>
-                  <Heading level={3}>Work trips</Heading>
+                  <Heading level={3}>Work haunts</Heading>
                   <VStack style={rowPadding}>
                     <Switch
                       label="Show night-errand options at checkout"
@@ -939,10 +927,10 @@ export default function SettingsSidebar() {
                       <Icon icon={Wrench} />
                     </Center>
                     <VStack gap={1}>
-                      <Text type="body" weight="bold">
-                        Tools for professional hosts
+                      <Text type="body">
+                        Hosting grimoire
                       </Text>
-                      <Text type="supporting" color="secondary">
+                      <Text type="body" color="secondary">
                         Manage multiple listings, route tasks to co-hosts, and
                         review consolidated payouts from one place.
                       </Text>

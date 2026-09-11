@@ -20,6 +20,7 @@ import {
   Share2,
 } from 'lucide-react';
 import type {LucideIcon} from 'lucide-react';
+import type {CSSProperties} from 'react';
 
 export interface SettingsNavItem {
   label: string;
@@ -95,3 +96,25 @@ export const INFO_TILES: InfoTileData[] = [
     body: 'We only release contact runes after a booking is sealed.',
   },
 ];
+
+// Shared row chrome: the icon chip, nowrap action column, and sidebar heading
+// offset duplicated across settings-dialog and settings-sidebar. Tokens only,
+// no layout opinions — templates keep their own padding/dividers.
+export const iconBox: CSSProperties = {
+  borderRadius: 'var(--radius-container)',
+  backgroundColor: 'var(--color-background-surface)',
+  flexShrink: 0,
+};
+
+// Keeps row actions ("Log out", "Deactivate") on one line: without this the
+// action column wraps mid-phrase at tablet widths while the info column still
+// has room to wrap instead.
+export const actionNoWrap: CSSProperties = {
+  flexShrink: 0,
+  whiteSpace: 'nowrap',
+};
+
+// Aligns the sidebar heading with list-item label text. No heading margin prop.
+export const sideNavHeading: CSSProperties = {
+  marginInline: 'var(--spacing-4)',
+};

@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   Ctr > V[a=center] > S.section[p=6] > V[g=6] > (V[g=2 a=center] > Hd"Let's brew after dark"[level=1] + Tx"Tell us a bit"[t=body]) + (V[g=4] > Hd"Why work with us"[level=2] + (G[c={min:200} g=4] > (C > V[g=3] > Ic + (V[g=1] > Hd"Title"[level=3] + Tx"Desc"[t=supporting]))*3)) + (V[g=4] > Hd"Your details"[level=2] + (G[c={min:260} g=4] > TI"Full Name" + TI"Email") + (G[c={min:260} g=4] > TI"Company" + TI"Phone")) + D + (V[g=4] > Hd"Your project"[level=2] + (Fd"Goals"[req] > (H[g=2] > Tk"Goal"*10)) + SE"Timeline" + SE"Budget" + (RL"Source" > RLI*5) + TA"Notes" + CB"Decision maker") + (V[g=3] > B.primary"Send to the coven" + (H[j=center g=1] > Tx[t=supporting] > Lk"Privacy Policy"))
+//   Ctr > V[a=center] > S.transparent[p=6] > V[g=6] > (V[g=2 a=center] > Hd"Let's brew after dark"[level=1] + Tx"Tell us a bit"[t=body]) + (V[g=4] > Hd"Why work with us"[level=2] + (G[c={min:200} g=4] > (C > V[g=3] > Ic + (V[g=1] > Hd"Title"[level=3] + Tx"Desc"[t=supporting]))*3)) + (V[g=4] > Hd"Your details"[level=2] + (G[c={min:260} g=4] > TI"Full name" + TI"Email") + (G[c={min:260} g=4] > TI"Company" + TI"Phone")) + D + (V[g=4] > Hd"Your project"[level=2] + (Fd"Goals"[req] > (H[g=2] > Tk"Goal"*10)) + SE"Timeline" + SE"Budget" + (RL"Source" > RLI*5) + TA"Notes" + CB"Decision maker") + (V[g=3] > B.primary"Send it into the night" + (H[j=center g=1] > Tx[t=supporting] > Lk"Privacy Policy"))
 
 import {useState} from 'react';
 import {VStack, HStack} from '@astryxdesign/core/Layout';
@@ -105,7 +105,7 @@ export default function ContactForm() {
   return (
     <Center axis="horizontal">
       <VStack hAlign="center" width="100%">
-        <Section maxWidth={800} width="100%" padding={6} variant="section">
+        <Section maxWidth={800} width="100%" padding={6} variant="transparent">
           <VStack gap={6}>
             {/* Header */}
             <VStack gap={2} hAlign="center" style={{textAlign: 'center'}}>
@@ -128,7 +128,7 @@ export default function ContactForm() {
                       <Icon icon={item.icon} size="lg" color="accent" />
                       <VStack gap={1}>
                         <Heading level={3}>{item.title}</Heading>
-                        <Text type="supporting" color="secondary">
+                        <Text type="body" color="secondary">
                           {item.description}
                         </Text>
                       </VStack>
@@ -143,9 +143,9 @@ export default function ContactForm() {
               <Heading level={2}>Your details</Heading>
               <Grid columns={{minWidth: 260}} gap={4}>
                 <TextInput
-                  label="Full Name"
+                  label="Full name"
                   isRequired
-                  placeholder="Full Name"
+                  placeholder="Full name"
                   value={fullName}
                   onChange={setFullName}
                   status={
@@ -292,7 +292,7 @@ export default function ContactForm() {
             {/* Submit */}
             <VStack gap={3}>
               <Button
-                label="Send to the coven"
+                label="Send it into the night"
                 variant="primary"
                 onClick={() => setSubmitted(true)}
               />

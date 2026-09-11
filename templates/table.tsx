@@ -83,6 +83,7 @@ export default function SimpleTable() {
 
   return (
     <Layout
+      height="auto"
       header={
         <LayoutHeader hasDivider>
           <HStack vAlign="center" hAlign="between">

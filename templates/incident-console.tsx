@@ -5,7 +5,7 @@
 /**
  * Incident Console — an on-call incident response tool for the night watch.
  *
- * Frame-first layout (see `npx astryx docs layout`), distilled from
+ * Frame-first layout (see `bunx astryx docs layout`), distilled from
  * product-scale apps built with the design system:
  *
  *   Frame: header | grouped incident rows (fill) | inspector 380 (resizable)
@@ -535,7 +535,13 @@ export default function IncidentConsole() {
           {isNarrow ? (
             <VStack gap={2}>
               {titleGroup}
-              <HStack gap={2} vAlign="center" style={styles.controlsRow}>
+              <HStack
+                gap={2}
+                vAlign="center"
+                style={styles.controlsRow}
+                tabIndex={0}
+                role="region"
+                aria-label="Incident filter actions">
                 {statusFilterControl}
                 {declareButton}
               </HStack>
@@ -563,7 +569,12 @@ export default function IncidentConsole() {
                 />
               </StackItem>
             </HStack>
-            <StackItem size="fill" style={styles.rows}>
+            <StackItem
+              size="fill"
+              style={styles.rows}
+              tabIndex={0}
+              role="region"
+              aria-label="Incident rows">
               <IncidentRows
                 incidents={visible}
                 selectedId={selected?.id ?? null}

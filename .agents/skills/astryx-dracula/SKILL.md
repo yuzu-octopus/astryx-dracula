@@ -1,6 +1,6 @@
 ---
 name: astryx-dracula
-description: Use when styling an Astryx React app with the shared Dracula brand, starting a new brand site, migrating a codebase to the brand theme, or when UI styling looks inconsistent, text looks too small, hover states look wrong, or scrollbars clash across brand sites
+description: Use when styling an Astryx React app with the shared Dracula brand, starting a new brand site, scaffolding a page from a template or XLE layout expression, migrating a codebase to the brand theme, or when UI styling looks inconsistent, text roles look wrong, status colors look off, text looks too small, hover states look wrong, or scrollbars clash across brand sites. Always use this skill whenever Dracula branding, Astryx templates, XLE, status vocabulary, or text roles come up, even if not explicitly requested.
 ---
 
 # Astryx Dracula Brand
@@ -27,7 +27,7 @@ Fallback: clone `https://github.com/yuzu-octopus/astryx-dracula.git`, copy the s
 ## New site
 
 ```bash
-bun add react react-dom @stylexjs/stylex @astryxdesign/core lucide-react astryx-dracula
+bun add react react-dom @astryxdesign/core lucide-react astryx-dracula
 bun add -d typescript vite @vitejs/plugin-react @astryxdesign/cli @types/react @types/react-dom
 cp -r node_modules/astryx-dracula/fonts public/fonts
 ```
@@ -47,15 +47,25 @@ import { astryxDraculaTheme } from 'astryx-dracula';
 </Theme>;
 ```
 
-Stock Vite config plus the layer-order snippet in USAGE.md. Discover components with `bunx astryx component <Name>` before use. Never guess a prop (`label` on Button, `level` on Heading, `columns` on Grid).
+Stock Vite config plus the layer-order snippet in USAGE.md. Verify every prop with `bunx astryx component <Name>` before use — never guess. Button `label` is REQUIRED, Heading `level` is REQUIRED, Grid `columns` is optional.
 
 ## Layout expressions
 
-New page from scratch: write XLE, expand, then brand-pass. `bunx astryx layout check "<expr>"` validates; `bunx astryx layout expand "<expr>" ./path.tsx` emits TSX. Full grammar lives in the tool (`bunx astryx layout grammar`), details in `references/xle.md`. All 44 templates lead with their canonical XLE in a header comment (`// XLE (...)`); read that header first to inspect or adapt the layout at ~1/5th token cost instead of reading hundreds of lines of TSX. Expansion emits stock Astryx, so the brand pass in `references/xle.md` still applies after. Never hand-write full TSX first; never use XLE for small edits.
+New page from scratch: write XLE, expand, then brand-pass. `bunx astryx layout check "<expr>"` validates; `bunx astryx layout expand "<expr>" ./path.tsx` emits TSX. Full grammar lives in the tool (`bunx astryx layout grammar`), details in `references/xle.md`. All 45 templates lead with their canonical XLE in a header comment (`// XLE (...)`); read that header first to inspect or adapt the layout at ~1/5th token cost instead of reading hundreds of lines of TSX. Expansion emits stock Astryx, so the brand pass in `references/xle.md` still applies after. Never hand-write full TSX first; never use XLE for small edits.
 
 ## Templates
 
-Forty-four themed pages ship in `templates/`, each leading with its canonical, validated XLE expression in a header comment (`// XLE (...)`). Also published as an Astryx integration pack (`astryx.integration.mjs`). Consumers with the package in `astryx.config` scaffold with `bunx astryx template <id> --package astryx-dracula`. Live at `#/templates` on the showcase, where `demo/Templates.tsx` renders each page bare inside a viewer iframe and keeps the `Templates / <name>` bar plus its `<Theme>` provider outside it. That bar, the provider, and the frame are viewer chrome, not page content: never copy them into a `templates/` file. Pack rules: templates import React plus `@astryxdesign/core`, `lucide-react`, and the kit's own shared modules (`astryx-dracula/shared/*`: chart labels/hues, MetricDelta, settings rows), no chart libraries; every template carries its `<id>.template.mjs` spec. IDs: dashboard, table-grouped, table-page, kanban-board, settings-sidebar, settings, payment-form, login-card, file-explorer, ai-chat-landing, library, centered-hero, ai-chat, classic-gallery, contact-form, dashboard-portfolio, detail-page, documentation, documentation-design, documentation-technical, editor, form-two-column, gallery-hero, ide, login, mixed-gallery, product-detail, product-gallery, product-tour, settings-dialog, shell-nav, shell-side-nav, shell-top-nav, table, table-page-chart, table-page-heatmap-status, table-page-shoe-store-heatmap, blank, incident-console, login-split, login-sso, messaging-shell, side-gallery, theme-showcase.
+Forty-five themed pages ship in `templates/`,
+each leading with its canonical, validated XLE expression
+in a header comment (`// XLE (...)`).
+Also published as an Astryx integration pack (`astryx.integration.mjs`).
+Consumers with the package in `astryx.config` scaffold
+with `bunx astryx template <id> --package astryx-dracula`.
+Live at `/astryx-dracula/#/templates` on the showcase,
+where `demo/Templates.tsx` renders each page bare inside a viewer iframe
+and keeps the `Templates / <name>` bar plus its `<Theme>` provider outside it.
+That bar, the provider, and the frame are viewer chrome, not page content:
+never copy them into a `templates/` file. Pack rules: templates import React plus `@astryxdesign/core`, `lucide-react`, and the kit's own shared modules (`astryx-dracula/shared/*`: chart labels/hues, MetricDelta, settings rows), no chart libraries; every template carries its `<id>.template.mjs` spec. IDs: dashboard, table-grouped, table-page, kanban-board, settings-sidebar, settings, payment-form, login-card, file-explorer, ai-chat-landing, library, centered-hero, ai-chat, classic-gallery, contact-form, dashboard-portfolio, detail-page, documentation, documentation-design, documentation-technical, editor, form-two-column, gallery-hero, ide, login, mixed-gallery, product-detail, product-gallery, product-tour, settings-dialog, shell-nav, shell-side-nav, shell-top-nav, table, table-page-chart, table-page-heatmap-status, table-page-shoe-store-heatmap, blank, incident-console, login-split, login-sso, messaging-shell, side-gallery, tech-report, theme-showcase.
 
 ## Brand principles
 
@@ -118,7 +128,11 @@ spacing `--space-gap` / `--space-viewport`. Raw primitives: `--dracula-bg`, `--d
 `--color-widget-content-border`, `--color-widget-background-highlight`, `--color-separator`,
 `--color-popover-background`, `--color-popover-border`, `--color-progress-border`,
 `--color-progress-value`, `--color-graph-gridlines`, `--color-text-highlight`,
-`--color-text-paragraph`, `--color-text-base`, `--color-text-base-muted`. Status tints:
+`--color-text-paragraph`, `--color-text-base`, `--color-text-base-muted`.
+Surface tiers: `--color-background-body` (page), `--color-background-surface`
+and `--color-background-card` (chrome/cards), `--color-background-popover` (floaters),
+`--color-background-muted` (quiet edges). Never use `variant="section"` for a band:
+see `references/visual.md` Surfaces. Status tints:
 `--color-background-<blue|cyan|gray|green|orange|pink|purple|red|teal|yellow>` (10% washes),
 `--color-functional-<red|orange|green|cyan|purple>`. Charts:
 `--color-data-categorical-*` and ramp tokens per `BRAND.md`. Nothing else exists.

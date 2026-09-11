@@ -1,11 +1,11 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC > V[g=10] > (C[p=10] > (H[g=8 a=center] > (V[g=4] > Hd"The coven grimoire"[level=1 t=display-1] + Tx.lg"Every incantation in the Astryx spellbook"[t=large] + (H > B.primary"Enter the grimoire")))) + (V[g=4] > (H[j=between a=center] > Hd"Category"[level=2] + Tx"18 spells"[t=supporting]) + (G[c={min:260} g=2] > (CC[p=2] > V[g=3] > C[p=0] + (V[g=1] > Tx"AppShell"[t=body] + Tx"Description"[t=body]))*4))*4
+//   L > LC > V[g=10] > (C[p=10] > (H[g=8 a=center] > (V[g=4] > Hd"The coven grimoire"[level=1 t=display-1] + Tx.lg"Every incantation in the Astryx spellbook"[t=large] + (H > B.primary"Enter the grimoire")))) + (V[g=4] > (H[j=between a=center] > Hd"Core"[level=2] + Tx"15 spells"[t=supporting]) + (H[j=between a=center] > Hd"Layout"[level=2] + Tx"4 spells"[t=supporting]) + (H[j=between a=center] > Hd"Navigation"[level=2] + Tx"4 spells"[t=supporting]) + (H[j=between a=center] > Hd"Form"[level=2] + Tx"5 spells"[t=supporting]) + (G[c={min:260} g=2] > (CC[p=2] > V[g=3] > C[p=0] + (V[g=1] > Tx"Avatar"[t=body] + Tx"Avatars represent"[t=body]))*4))
 
 /**
  * Documentation catalog — every component shelf in the grimoire.
  *
- * Frame-first layout (see `npx astryx docs layout`):
+ * Frame-first layout (see `bunx astryx docs layout`):
  *
  *   Frame: hero card | category shelves (heading + card grid)
  *
@@ -27,16 +27,9 @@ import {ClickableCard} from '@astryxdesign/core/ClickableCard';
 import {HStack, VStack, StackItem} from '@astryxdesign/core/Stack';
 import {Layout, LayoutContent} from '@astryxdesign/core/Layout';
 import {Grid} from '@astryxdesign/core/Grid';
+import {SceneTile} from 'astryx-dracula/shared/scene-tile';
+import {galleryImageClip} from 'astryx-dracula/shared/gallery-image';
 
-const previewArt: CSSProperties = {
-  width: '100%',
-  height: '100%',
-  display: 'block',
-};
-const previewClip: CSSProperties = {
-  borderRadius: 'var(--radius-element)',
-  overflow: 'clip',
-};
 // Negative margin offsets each card's 8px padding so the grid content stays
 // visually aligned while giving every card a padded hover/click target.
 const cardGrid: CSSProperties = {
@@ -48,7 +41,8 @@ const cardGrid: CSSProperties = {
 const SELF_HASH = '#/templates/documentation';
 
 // Decorative accent per grimoire shelf. None of them is purple: the sigils
-// are not interactive, and purple belongs to the things that are.
+// are not interactive, and purple belongs to the things that are. Art lives
+// in shared/scene-tile (lg fork: centered glyph on a flat field).
 const SHELF_HUES: Record<string, string> = {
   Core: 'var(--dracula-pink)',
   Layout: 'var(--dracula-cyan)',
@@ -239,51 +233,6 @@ const COMPONENT_CATEGORIES = [
 ];
 
 // ---------------------------------------------------------------------------
-// Preview art
-// ---------------------------------------------------------------------------
-
-function PreviewArt({name, shelf}: {name: string; shelf: string}) {
-  const hue = SHELF_HUES[shelf] ?? 'var(--dracula-comment)';
-  return (
-    <svg
-      viewBox="0 0 400 300"
-      preserveAspectRatio="xMidYMid slice"
-      style={previewArt}
-      role="img"
-      aria-label={`${name} sigil`}>
-      <rect width="400" height="300" fill="var(--dracula-bg-light)" />
-      <circle cx="316" cy="66" r="26" fill={hue} opacity={0.85} />
-      <circle
-        cx="306"
-        cy="60"
-        r="21"
-        fill="var(--dracula-bg-light)"
-        opacity={0.5}
-      />
-      <path
-        d="M0 208 Q110 168 210 198 T400 184 V300 H0 Z"
-        fill="var(--dracula-current-line)"
-      />
-      <path
-        d="M0 236 Q130 206 260 230 T400 222 V300 H0 Z"
-        fill="var(--dracula-bg)"
-      />
-      <g
-        transform="translate(140 150)"
-        fill="none"
-        stroke="var(--dracula-comment)"
-        strokeWidth="5"
-        strokeLinecap="round"
-        strokeLinejoin="round">
-        <rect x="-44" y="-44" width="88" height="88" rx="5" />
-        <circle cx="18" cy="-18" r="2.5" fill={hue} stroke="none" />
-        <path d="M-34 30 L-8 0 L10 18 L20 8 L34 24" />
-      </g>
-    </svg>
-  );
-}
-
-// ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
 
@@ -303,9 +252,9 @@ export default function DocumentationCatalog() {
                       The coven grimoire
                     </Heading>
                     <Text type="large" weight="normal" color="secondary">
-                      Every incantation in the Astryx spellbook, with thirty-one
-                      components for building beautiful, accessible products
-                      after dark.
+                      Every incantation in the Astryx spellbook, with
+                      twenty-eight components for building beautiful,
+                      accessible products after dark.
                     </Text>
                     <HStack>
                       <Button
@@ -343,10 +292,14 @@ export default function DocumentationCatalog() {
                           variant="muted"
                           padding={0}
                           minHeight={160}
-                          style={previewClip}>
-                          <PreviewArt
-                            name={item.name}
-                            shelf={category.label}
+                          style={galleryImageClip}>
+                          <SceneTile
+                            label={`${item.name} sigil`}
+                            hue={
+                              SHELF_HUES[category.label] ??
+                              'var(--dracula-comment)'
+                            }
+                            size="lg"
                           />
                         </Card>
                         <VStack gap={1}>

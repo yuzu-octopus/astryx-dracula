@@ -20,7 +20,6 @@
  *   scroll the table horizontally instead of widening the page.
  */
 
-import type {CSSProperties} from 'react';
 import {
   VStack,
   HStack,
@@ -34,43 +33,14 @@ import {Button} from '@astryxdesign/core/Button';
 import {IconButton} from '@astryxdesign/core/IconButton';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Token} from '@astryxdesign/core/Token';
-import {Card} from '@astryxdesign/core/Card';
 import {Link} from '@astryxdesign/core/Link';
 import {Table, proportional, pixel} from '@astryxdesign/core/Table';
 import type {TableColumn} from '@astryxdesign/core/Table';
-import {Filter, Download, Plus, Square} from 'lucide-react';
-import {ChartLabel} from 'astryx-dracula/shared/chart-labels';
+import {Filter, Download, Plus} from 'lucide-react';
+import {RevenueChart, ProductSwatch} from 'astryx-dracula/shared/revenue-chart';
 
 // ============= ICONS (verified lucide-react exports) =============
 // Filter ← FunnelIcon, Download ← ArrowDownTrayIcon, Plus ← PlusIcon.
-// Square marks the chart legend swatch.
-
-const swatchStyle: CSSProperties = {flexShrink: 0};
-
-// Rounded product swatch: Dracula surface with a per-product accent glyph.
-function ProductSwatch({accent, label}: {accent: string; label: string}) {
-  return (
-    <svg
-      viewBox="0 0 36 36"
-      width={36}
-      height={36}
-      style={swatchStyle}
-      role="img"
-      aria-label={`${label} swatch`}>
-      <rect width={36} height={36} rx={5} fill="var(--dracula-bg-light)" />
-      <rect
-        x={1}
-        y={1}
-        width={34}
-        height={34}
-        rx={4}
-        fill="none"
-        stroke="var(--color-widget-content-border)"
-      />
-      <circle cx={18} cy={18} r={7} fill="none" stroke={accent} strokeWidth={3} />
-    </svg>
-  );
-}
 
 // ============= DATA =============
 
@@ -932,114 +902,6 @@ const columns: TableColumn<OrderRow>[] = [
   },
 ];
 
-// ============= REVENUE CHART (hand SVG, Dracula ramp) =============
-
-const REVENUE_LINE = 'var(--dracula-cyan)';
-const CHART_W = 540;
-const CHART_H = 200;
-const CHART_PAD_LEFT = 44;
-const CHART_PAD_RIGHT = 12;
-const CHART_PAD_TOP = 12;
-const CHART_BASELINE = 164;
-const CHART_MAX = 10000;
-const CHART_PLOT_W = CHART_W - CHART_PAD_LEFT - CHART_PAD_RIGHT;
-const CHART_PLOT_H = CHART_BASELINE - CHART_PAD_TOP;
-const revenuePoints = revenueData.map((d, i) => ({
-  ...d,
-  x: CHART_PAD_LEFT + (i / (revenueData.length - 1)) * CHART_PLOT_W,
-  y: CHART_BASELINE - (d.revenue / CHART_MAX) * CHART_PLOT_H,
-}));
-const revenueLinePath = revenuePoints
-  .map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`)
-  .join(' ');
-const revenueAreaPath = `${revenueLinePath} L${revenuePoints[revenuePoints.length - 1].x.toFixed(1)},${CHART_BASELINE} L${revenuePoints[0].x.toFixed(1)},${CHART_BASELINE} Z`;
-const REVENUE_GRID_TICKS = [0, 2000, 4000, 6000, 8000, 10000];
-
-// Axis ticks switch to thousands once the scale leaves the hundreds.
-function formatRevenueTick(tick: number): string {
-  return tick >= 1000 ? `$${tick / 1000}k` : `$${tick}`;
-}
-
-function RevenueChart() {
-  const W = CHART_W;
-  const H = CHART_H;
-  const padLeft = CHART_PAD_LEFT;
-  const padRight = CHART_PAD_RIGHT;
-  const baseline = CHART_BASELINE;
-  const max = CHART_MAX;
-  const plotH = CHART_PLOT_H;
-  const points = revenuePoints;
-  const linePath = revenueLinePath;
-  const areaPath = revenueAreaPath;
-  const gridTicks = REVENUE_GRID_TICKS;
-  return (
-    <VStack gap={3}>
-      <Card
-        padding={3}
-        style={{
-          backgroundColor: 'var(--color-background)',
-          border: 'var(--border-width) solid var(--color-separator)',
-        }}>
-        <svg
-          viewBox={`0 0 ${W} ${H}`}
-          width="100%"
-          role="img"
-          aria-label="Daily revenue, January 1 to 15">
-          {gridTicks.map(tick => {
-            const y = baseline - (tick / max) * plotH;
-            return (
-              <g key={tick}>
-                <line
-                  x1={padLeft}
-                  y1={y}
-                  x2={W - padRight}
-                  y2={y}
-                  stroke="var(--color-separator)"
-                  strokeDasharray={tick === 0 ? undefined : '3 3'}
-                  opacity={tick === 0 ? 1 : 0.5}
-                />
-                <ChartLabel x={padLeft - 6} y={y + 3} textAnchor="end">
-                  {formatRevenueTick(tick)}
-                </ChartLabel>
-              </g>
-            );
-          })}
-          <path d={areaPath} fill={REVENUE_LINE} opacity={0.25} />
-          <path
-            d={linePath}
-            fill="none"
-            stroke={REVENUE_LINE}
-            strokeWidth={2}
-            strokeLinejoin="round"
-            strokeLinecap="round"
-          />
-          {points.map(
-            (p, i) =>
-              (i % 3 === 0 || i === points.length - 1) && (
-                <ChartLabel
-                  key={p.date}
-                  x={i === points.length - 1 ? W - padRight - 2 : p.x}
-                  y={H - 8}
-                  textAnchor={i === points.length - 1 ? 'end' : 'middle'}>
-                  {p.date}
-                </ChartLabel>
-              ),
-          )}
-        </svg>
-      </Card>
-      <Text type="supporting" color="secondary">
-        Daily revenue · Jan 1–15
-      </Text>
-      <HStack gap={2} vAlign="center">
-        <Icon icon={Square} size="xsm" style={{color: REVENUE_LINE}} />
-        <Text type="supporting" color="secondary">
-          Revenue
-        </Text>
-      </HStack>
-    </VStack>
-  );
-}
-
 // ============= PAGE =============
 
 export default function ShoeStoreTable() {
@@ -1075,7 +937,11 @@ export default function ShoeStoreTable() {
       content={
         <LayoutContent padding={3}>
           <VStack gap={4}>
-            <RevenueChart />
+            <RevenueChart
+              data={revenueData}
+              chartMax={10000}
+              gridTicks={[0, 2000, 4000, 6000, 8000, 10000]}
+            />
 
             <Table<OrderRow>
               data={orders}

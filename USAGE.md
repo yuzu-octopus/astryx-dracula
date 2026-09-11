@@ -73,7 +73,7 @@ Then use `var(--color-primary)`, `var(--dracula-purple)`, `var(--space-gap)`.
 
 ## Templates
 
-44 themed pages ship in `templates/`, each with a `<id>.template.mjs` spec, published
+Around 45 themed pages ship in `templates/`, each with a `<id>.template.mjs` spec, published
 as an Astryx integration pack (`astryx.integration.mjs`). List this package in your
 `astryx.config`, then scaffold any of them:
 
@@ -81,7 +81,7 @@ as an Astryx integration pack (`astryx.integration.mjs`). List this package in y
 bunx astryx template dashboard --package astryx-dracula
 ```
 
-View all 44 live at `/astryx-dracula/#/templates` on the showcase. Pack rules: templates
+View them all live at `/astryx-dracula/#/templates` on the showcase (agent index: [AGENTS.snippet.md](AGENTS.snippet.md)). Pack rules: templates
 import React plus `@astryxdesign/core` and `lucide-react`, no chart libraries.
 
 ## Fonts
@@ -141,3 +141,11 @@ README. Not required for this kit.
 - Never override `--color-*` in app `:root`. Brand changes live in `astryx-theme.ts` via `defineTheme`, then `bun run theme:build`.
 - Tokens for every value: `var(--color-*|--space-*|--radius-*)`. No raw hex or px in components.
 - Component styling: props first, then theme `components` overrides in `astryx-theme.ts`. No per-app CSS wars.
+
+## Release checklist
+
+Before tagging a release:
+
+1. Pin versions: `@astryxdesign/core` / `@astryxdesign/cli` in `package.json` match the showcase and CI.
+2. Refresh the approximate template counts in `README.md` / `USAGE.md` (no gate asserts them).
+3. Rebuild and gate: `bun run theme:build`, then `bun run theme:check`, then `bun run audit`.

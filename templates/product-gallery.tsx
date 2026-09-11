@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC[p=6] > V[g=8] > (G[c={min:280} g=4 a=start] > Hd"Small comforts for the midnight hours."[level=1 t=display-2] + (V[g=3 a=start] > Tx"Provisions from the castle workshops"[t=body] + B.primary"Browse the collection")) + (V[g=8] > (V[g=2] > Hd"The collection"[level=2] + Tx"Each piece is made in small batches"[t=body]) + (G[c={min:280} g=8] > (V[g=3] > (C[p=0] > AR[ratio=1]) + (V[g=1] > Hd"Nightfall Stoneware Mug"[level=3] + Tx"Description"[t=body color=secondary] + Tx.lg"$75.00"))*6))
+//   L > LC[p=6] > V[g=8] > (G[c={min:280} g=4 a=start] > Hd"Small comforts for the midnight hours."[level=1 t=display-2] + (V[g=3 a=start] > Tx"Provisions from the castle workshops"[t=body] + B.primary"Browse the collection")) + (V[g=8] > (V[g=2] > Hd"The collection"[level=2] + Tx"Each piece is made in small batches"[t=body]) + (G[c={min:280} g=8] > (V[g=3] > (C[p=0] > AR[ratio=1]) + (V[g=1] > Hd"Nightfall Stoneware Mug"[level=3] + Tx"A hand-thrown mug that sits easy"[t=body color=secondary] + Tx.lg"$75.00"))*6))
 
 import {VStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
@@ -10,17 +10,11 @@ import {AspectRatio} from '@astryxdesign/core/AspectRatio';
 import {Card} from '@astryxdesign/core/Card';
 import {Icon} from '@astryxdesign/core/Icon';
 import {ArrowRight} from 'lucide-react';
-import type {CSSProperties} from 'react';
+import {SceneTile} from 'astryx-dracula/shared/scene-tile';
 
 // ─── Styles ─────────────────────────────────────────────────────────────────
-// Product tiles are inline Dracula SVG — there is no Image primitive to fill
-// the AspectRatio box with `object-fit` (#2582).
-
-const svgImage: CSSProperties = {
-  width: '100%',
-  height: '100%',
-  display: 'block',
-};
+// Product tile art lives in shared/scene-tile (large fork); there is no Image
+// primitive to fill the AspectRatio box with `object-fit` (#2582).
 
 // ─── Product Data ───────────────────────────────────────────────────────────
 
@@ -93,25 +87,11 @@ function ProductCard({product}: {product: Product}) {
     <VStack gap={3}>
       <Card padding={0}>
         <AspectRatio ratio={1}>
-          <svg
-            viewBox="0 0 400 300"
-            preserveAspectRatio="xMidYMid slice"
-            style={svgImage}
-            role="img"
-            aria-label={`${product.name} thumbnail`}>
-            <rect width="400" height="300" fill="var(--dracula-bg-light)" />
-            <g
-              transform="translate(200 150)"
-              fill="none"
-              stroke="var(--dracula-comment)"
-              strokeWidth="5"
-              strokeLinecap="round"
-              strokeLinejoin="round">
-              <rect x="-44" y="-44" width="88" height="88" rx="5" />
-              <circle cx="18" cy="-18" r="2.5" fill={product.hue} stroke="none" />
-              <path d="M-34 30 L-8 0 L10 18 L20 8 L34 24" />
-            </g>
-          </svg>
+          <SceneTile
+            label={`${product.name} thumbnail`}
+            hue={product.hue}
+            size="lg"
+          />
         </AspectRatio>
       </Card>
       <VStack gap={1}>
@@ -119,7 +99,7 @@ function ProductCard({product}: {product: Product}) {
         <Text type="body" color="secondary" maxLines={2}>
           {product.description}
         </Text>
-        <Text type="large" weight="bold" hasTabularNumbers>
+        <Text type="large" hasTabularNumbers>
           {fmt(product.price)}
         </Text>
       </VStack>

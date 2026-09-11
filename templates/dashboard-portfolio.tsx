@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L[h=fill] > LC[p=6] > V[g=6] > (H[j=between a=center] > Hd"The night vault"[level=1] + DM"1 year") + (G[c={min:280} g=4] > (C > V[g=2] > Tx"Total value"[t=supporting] + (H[g=2] > Tx"$294,200"[t=display-3] + Tx"+14.8%"[t=body]))*4) + (G[c={min:280} g=4] > (C > V[g=4] > (H[j=between] > Hd"Vault value"[level=2] + Lk"View details") + (C > V[g=3] > Tx"Weekly closes"[t=supporting])) + (V[g=4] > (H[j=between] > Hd"Top holdings"[level=2] + Lk"View all") + UL)) + D + (H[j=between a=start] > (V[g=1] > Hd"Market at midnight"[level=2] + Tx"Past 24 hours under moonlight"[t=body]) + B"View more") + (G[c={min:280} g=4] > (C > V[g=3] > Hd"Index"[level=3] + Tx"$5,200"[t=body])*8) + (C > V[g=4] > Hd"Trending Stocks"[level=3] + T)
+//   L[h=fill] > LC[p=6] > V[g=6] > (H[j=between a=center] > Hd"The night vault"[level=1] + DM"1 year") + (G[c={min:280} g=4] > (C > V[g=2] > Tx"Total value"[t=supporting] + (H[g=2] > Tx"$294,200"[t=display-3] + Tx"+14.8%"[t=body]))*4) + (G[c={min:280} g=4] > (C > V[g=4] > (H[j=between] > Hd"Vault value"[level=2] + Lk"View details") + (C > V[g=3] > Tx"Weekly closes"[t=supporting])) + (V[g=4] > (H[j=between] > Hd"Top holdings"[level=2] + Lk"View all") + UL)) + D + (H[j=between a=start] > (V[g=1] > Hd"Market at midnight"[level=2] + Tx"Past 24 hours under moonlight"[t=body]) + B"View more") + (G[c={min:280} g=4] > (C > V[g=3] > Hd"Index"[level=3] + Tx"$5,200"[t=body])*8) + (C > V[g=4] > Hd"Trending stocks"[level=3] + T)
 
 /**
  * Portfolio Dashboard — the night vault: KPI tiles, a weekly value chart, the
@@ -35,6 +35,8 @@ import {Table, proportional, pixel} from '@astryxdesign/core/Table';
 import type {TableColumn} from '@astryxdesign/core/Table';
 import {Divider} from '@astryxdesign/core/Divider';
 import {MetricDelta} from 'astryx-dracula/shared/metric-delta';
+import {Sparkline, type SparkPoint} from 'astryx-dracula/shared/sparkline';
+import {CHART_PANEL_STYLE} from 'astryx-dracula/shared/revenue-chart';
 
 // ============= DATA =============
 
@@ -151,11 +153,6 @@ const topAssets = [
     change: '+4.2%',
   },
 ];
-
-interface SparkPoint {
-  id: string;
-  value: number;
-}
 
 // 96 points per series = one tick every 15 minutes across a 24h window.
 // Deterministic LCG so the sparklines are stable across renders. Each point
@@ -383,12 +380,7 @@ const PORTFOLIO_Y_TICKS = [200000, 240000, 280000, 320000];
 function PortfolioChart() {
   return (
     <VStack gap={3}>
-      <Card
-        padding={3}
-        style={{
-          backgroundColor: 'var(--color-background)',
-          border: 'var(--border-width) solid var(--color-separator)',
-        }}>
+      <Card padding={3} style={CHART_PANEL_STYLE}>
         <svg
           viewBox="0 0 560 210"
           width="100%"
@@ -462,52 +454,6 @@ function PortfolioChart() {
 
 // ============= CARD COMPONENTS =============
 
-// 24h trend bars, shared by the market cards (40px) and the trending table
-// rows (24px). The variant drives the bar geometry; the direction of the move
-// picks the hue.
-function Sparkline({
-  data,
-  positive,
-  isCompact = false,
-}: {
-  data: SparkPoint[];
-  positive: boolean;
-  isCompact?: boolean;
-}) {
-  const values = data.map(point => point.value);
-  const max = Math.max(...values);
-  const min = Math.min(...values);
-  const range = Math.max(1, max - min);
-  const step = 300 / data.length;
-  const height = isCompact ? 24 : 40;
-  const baseline = isCompact ? 21 : 36;
-  const plot = isCompact ? 18 : 32;
-  const floor = isCompact ? 2 : 3;
-  return (
-    <svg
-      viewBox={`0 0 300 ${height}`}
-      width="100%"
-      height={height}
-      role="img"
-      aria-label="Twenty-four hour trend">
-      {data.map((point, slot) => {
-        const barHeight = Math.max(floor, ((point.value - min) / range) * plot);
-        return (
-          <rect
-            key={point.id}
-            x={slot * step}
-            y={baseline - barHeight}
-            width={Math.max(1.5, step - 1)}
-            height={barHeight}
-            rx={4}
-            fill={positive ? 'var(--dracula-green)' : 'var(--dracula-red)'}
-          />
-        );
-      })}
-    </svg>
-  );
-}
-
 function MarketCard({
   name,
   ticker,
@@ -532,7 +478,12 @@ function MarketCard({
             {ticker}
           </Text>
         </VStack>
-        <Sparkline data={spark} positive={positive} />
+        <Sparkline
+          data={spark}
+          label={`${name} 24-hour trend`}
+          positive={positive}
+          mode="range"
+        />
         <HStack gap={3} vAlign="center">
           <Text type="display-3" weight="semibold" hasTabularNumbers>
             {price}
@@ -608,7 +559,13 @@ const trendingColumns: TableColumn<StockRow>[] = [
     header: '24h Trend',
     width: proportional(1, {minWidth: 96}),
     renderCell: (row: StockRow) => (
-      <Sparkline data={row.spark} positive={row.dailyPct >= 0} isCompact />
+      <Sparkline
+        data={row.spark}
+        label={`${row.ticker} 24-hour trend`}
+        positive={row.dailyPct >= 0}
+        mode="range"
+        isCompact
+      />
     ),
   },
 ];
@@ -764,7 +721,7 @@ export default function DashboardPortfolio() {
             {/* Trending stocks table */}
             <Card>
               <VStack gap={4}>
-                <Heading level={3}>Trending Stocks</Heading>
+                <Heading level={3}>Trending stocks</Heading>
                 <Table<StockRow>
                   data={trendingStocks}
                   columns={trendingColumns}

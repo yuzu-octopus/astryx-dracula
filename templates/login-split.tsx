@@ -3,6 +3,25 @@
 //   Ctr > V[g=4] > (Ctr.horizontal > C[p=0] > G[c={min:240} g=8 a=stretch] > (S[p=0] > V[g=4] > (H[g=2 a=center] > Ic + Tx"Castle Dracula"[t=body]) + (V[g=4] > (V[g=1] > Hd"Welcome back to the night"[level=1] + Tx"Sign in to your crypt"[t=body]) + (V[g=2] > TI"Email"[t=email] + (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?")) + B.primary"Enter the night" + D"Or continue with" + (G[c={min:200} g=3] > B.secondary"Login with Apple" + B.secondary"Login with Google")) + Tx"New to the castle?"[t=supporting]) + (C[p=0] > AR)) + (V[a=center] > Tx"By clicking continue, you agree to our Terms of service and Privacy policy"[t=supporting])
 
 import {useState, useTransition, type CSSProperties} from 'react';
+import {demoLogin} from 'astryx-dracula/shared/login-demo';
+import {AppleIcon, GoogleIcon} from 'astryx-dracula/shared/sso-icons';
+import {
+  AUTH_HEADING,
+  AUTH_SUBTITLE,
+  AUTH_PRIMARY_CTA,
+  AUTH_SIGNUP_PROMPT,
+  AUTH_SIGNUP_LINK,
+  AUTH_SSO_DIVIDER,
+  AUTH_FORGOT_PASSWORD,
+  AUTH_ERROR_MESSAGE,
+  AUTH_EMAIL_PLACEHOLDER,
+  AUTH_PASSWORD_PLACEHOLDER,
+  AUTH_BRAND_NAME,
+  AUTH_TERMS_PREFIX,
+  AUTH_TERMS_SERVICE,
+  AUTH_TERMS_PRIVACY,
+} from 'astryx-dracula/shared/auth-copy';
+import {SceneCastle} from 'astryx-dracula/shared/scene-castle';
 import {VStack, HStack, StackItem} from '@astryxdesign/core/Layout';
 import {Grid} from '@astryxdesign/core/Grid';
 import {Center} from '@astryxdesign/core/Center';
@@ -21,77 +40,9 @@ import {Divider} from '@astryxdesign/core/Divider';
 // CheckCircleIcon. The SquaresPlusIcon brand mark has no place here.
 import {Moon, CircleCheck} from 'lucide-react';
 
-// Brand sign-in marks — bespoke inline glyphs, no icon-library equivalent.
-const AppleIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    width={16}
-    height={16}
-    aria-hidden="true"
-    {...props}>
-    <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z" />
-  </svg>
-);
-
-const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    width={16}
-    height={16}
-    aria-hidden="true"
-    {...props}>
-    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
-    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-  </svg>
-);
-
-// Cover art is inline Dracula SVG — moonlit rooftops in brand tokens, no
-// external image. Fills the panel via slice, like the placeholder before it.
-const coverArt: CSSProperties = {
-  width: '100%',
-  height: '100%',
-  display: 'block',
-};
-
-const nightCoverArt = (
-  <svg
-      viewBox="0 0 400 300"
-      preserveAspectRatio="xMidYMid slice"
-      style={coverArt}
-      role="img"
-      aria-label="Harvest moon over the castle rooftops">
-      <rect width="400" height="300" fill="var(--dracula-bg)" />
-      <circle cx="68" cy="52" r="2" fill="var(--dracula-fg)" />
-      <circle cx="140" cy="36" r="1.5" fill="var(--dracula-comment)" />
-      <circle cx="330" cy="70" r="2" fill="var(--dracula-fg)" />
-      <circle cx="292" cy="34" r="1.5" fill="var(--dracula-comment)" />
-      <circle cx="360" cy="140" r="1.5" fill="var(--dracula-comment)" />
-      <circle cx="200" cy="118" r="52" fill="var(--dracula-yellow)" />
-      <circle cx="182" cy="104" r="44" fill="var(--dracula-bg)" />
-      <g
-        fill="var(--dracula-current-line)"
-        stroke="var(--dracula-comment)"
-        strokeWidth="3"
-        strokeLinejoin="round">
-        <rect x="20" y="220" width="110" height="80" />
-        <path d="M20 220 L75 178 L130 220 Z" />
-        <rect x="150" y="200" width="100" height="100" />
-        <path d="M150 200 L200 162 L250 200 Z" />
-        <rect x="270" y="228" width="110" height="72" />
-        <path d="M270 228 L325 190 L380 228 Z" />
-      </g>
-      <g fill="var(--dracula-yellow)">
-        <rect x="58" y="244" width="14" height="18" />
-        <rect x="188" y="224" width="14" height="18" />
-        <rect x="312" y="250" width="14" height="18" />
-      </g>
-  </svg>
-);
-
+// Cover art lives in shared/scene-castle (`rooftops` variant:
+// crescent-overlay moon over a rooftop skyline). The transparent Card clips
+// it to rounded corners (overflow:clip + radius), so the art needs no radius.
 // Grid emits minmax(MIN, 1fr) where MIN is a hard floor, so MIN plus the
 // grid inset and page padding must fit the narrowest phone or the column is
 // clipped. 320 − 2×24 (page) − 2×16 (stacked inset) = 240.
@@ -159,9 +110,7 @@ export default function LoginSplit() {
     }
     setLoginFailed(false);
     startTransition(async () => {
-      const {promise, resolve} = Promise.withResolvers<void>();
-      setTimeout(resolve, 2000);
-      await promise;
+      await demoLogin();
       setIsSuccess(true);
     });
   };
@@ -183,7 +132,7 @@ export default function LoginSplit() {
                   <HStack gap={2} vAlign="center">
                     <Icon icon={Moon} color="accent" size="lg" />
                     <Text type="body" weight="semibold">
-                      Castle Dracula
+                      {AUTH_BRAND_NAME}
                     </Text>
                   </HStack>
 
@@ -205,10 +154,10 @@ export default function LoginSplit() {
                         <VStack gap={4} hAlign="stretch" width="100%">
                           <VStack gap={1}>
                             <Heading level={1}>
-                              Welcome back to the night
+                              {AUTH_HEADING}
                             </Heading>
                             <Text type="body" color="secondary">
-                              Sign in to your crypt
+                              {AUTH_SUBTITLE}
                             </Text>
                           </VStack>
 
@@ -218,7 +167,7 @@ export default function LoginSplit() {
                               isLabelHidden
                               type="email"
                               {...inputAutoComplete('email')}
-                              placeholder="you@castle.dracula"
+                              placeholder={AUTH_EMAIL_PLACEHOLDER}
                               value={email}
                               onChange={(v: string) => {
                                 setEmail(v);
@@ -231,7 +180,7 @@ export default function LoginSplit() {
                               <TextInput
                                 label="Password"
                                 isLabelHidden
-                                placeholder="Whisper your password"
+                                placeholder={AUTH_PASSWORD_PLACEHOLDER}
                                 type="password"
                                 {...inputAutoComplete('current-password')}
                                 value={password}
@@ -246,7 +195,7 @@ export default function LoginSplit() {
                                     ? {
                                         type: 'error',
                                         message:
-                                          'Wrong incantation. Try again.',
+                                          AUTH_ERROR_MESSAGE,
                                       }
                                     : undefined
                                 }
@@ -254,7 +203,7 @@ export default function LoginSplit() {
                               {loginFailed && (
                                 <VStack hAlign="end">
                                   <Link href="#/templates/login-split">
-                                    Forgot password?
+                                    {AUTH_FORGOT_PASSWORD}
                                   </Link>
                                 </VStack>
                               )}
@@ -262,14 +211,14 @@ export default function LoginSplit() {
                           </VStack>
 
                           <Button
-                            label="Enter the night"
+                            label={AUTH_PRIMARY_CTA}
                             variant="primary"
                             size="lg"
                             isLoading={isLoading}
                             onClick={handleLogin}
                           />
 
-                          <Divider label="Or continue with" />
+                          <Divider label={AUTH_SSO_DIVIDER} />
 
                           {/* minWidth (not a fixed 2-up) so the pair stacks inside
                               the narrow single-column container instead of
@@ -298,9 +247,9 @@ export default function LoginSplit() {
 
                   {!isSuccess && (
                     <Text type="supporting" color="secondary">
-                      New to the castle?{' '}
+                      {AUTH_SIGNUP_PROMPT}{' '}
                       <Link href="#/templates/login-split" type="supporting">
-                        Sign up
+                        {AUTH_SIGNUP_LINK}
                       </Link>
                     </Text>
                   )}
@@ -315,7 +264,7 @@ export default function LoginSplit() {
                 width="100%"
                 height="100%"
                 className="login-split-image">
-                {nightCoverArt}
+                <SceneCastle variant="rooftops" />
               </Card>
             </Grid>
           </Card>
@@ -323,13 +272,13 @@ export default function LoginSplit() {
 
         <VStack hAlign="center">
           <Text type="supporting" color="secondary">
-            By clicking continue, you agree to our{' '}
+            {AUTH_TERMS_PREFIX}{' '}
             <Link href="#/templates/login-split" type="supporting">
-              Terms of service
+              {AUTH_TERMS_SERVICE}
             </Link>{' '}
             and{' '}
             <Link href="#/templates/login-split" type="supporting">
-              Privacy policy
+              {AUTH_TERMS_PRIVACY}
             </Link>
             .
           </Text>

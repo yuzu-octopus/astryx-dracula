@@ -8,6 +8,7 @@ import {Center} from '@astryxdesign/core/Center';
 import {Section} from '@astryxdesign/core/Section';
 import {Grid} from '@astryxdesign/core/Grid';
 import {AspectRatio} from '@astryxdesign/core/AspectRatio';
+import {galleryImageClip} from 'astryx-dracula/shared/gallery-image';
 import {Button} from '@astryxdesign/core/Button';
 import {Text, Heading} from '@astryxdesign/core/Text';
 import {TextInput} from '@astryxdesign/core/TextInput';
@@ -20,91 +21,7 @@ import {Selector} from '@astryxdesign/core/Selector';
 import {Banner} from '@astryxdesign/core/Banner';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Check} from 'lucide-react';
-
-function CastleIllustration() {
-  return (
-    <svg
-      style={illustrationImg}
-      viewBox="0 0 400 300"
-      role="img"
-      aria-label="Moonlit castle where the night crew works">
-      <title>Castle office after dark</title>
-      <rect width="400" height="300" fill="var(--dracula-bg-dark)" />
-      <g fill="var(--dracula-comment)">
-        <circle cx="40" cy="40" r="2.5" />
-        <circle cx="120" cy="70" r="2" />
-        <circle cx="210" cy="36" r="2.5" />
-        <circle cx="330" cy="60" r="2" />
-      </g>
-      <g fill="var(--dracula-cyan)">
-        <circle cx="80" cy="55" r="2" />
-        <circle cx="170" cy="60" r="2" />
-        <circle cx="290" cy="36" r="2.5" />
-      </g>
-      <circle cx="315" cy="70" r="34" fill="var(--dracula-yellow)" />
-      <circle
-        cx="304"
-        cy="61"
-        r="6"
-        fill="var(--dracula-orange)"
-        opacity={0.5}
-      />
-      <g
-        fill="none"
-        stroke="var(--dracula-fg)"
-        strokeWidth={3}
-        strokeLinecap="round">
-        <path d="M90 100 q9 -9 18 0 q9 -9 18 0" />
-        <path d="M180 84 q9 -9 18 0 q9 -9 18 0" />
-      </g>
-      <path
-        d="M0 220 Q140 180 260 210 T400 200 V300 H0 Z"
-        fill="var(--dracula-selection)"
-      />
-      <path
-        d="M0 255 Q160 225 320 250 T400 245 V300 H0 Z"
-        fill="var(--dracula-bg-light)"
-      />
-      <g>
-        <rect
-          x="140"
-          y="150"
-          width="120"
-          height="100"
-          rx={4}
-          fill="var(--dracula-bg-lighter)"
-        />
-        <rect
-          x="122"
-          y="122"
-          width="38"
-          height="128"
-          rx={4}
-          fill="var(--dracula-bg-lighter)"
-        />
-        <rect
-          x="240"
-          y="122"
-          width="38"
-          height="128"
-          rx={4}
-          fill="var(--dracula-bg-lighter)"
-        />
-        <g fill="var(--dracula-yellow)">
-          <rect x="156" y="172" width="12" height="18" rx={2} />
-          <rect x="186" y="172" width="12" height="18" rx={2} />
-          <rect x="216" y="172" width="12" height="18" rx={2} />
-          <rect x="132" y="146" width="9" height="12" rx={2} />
-          <rect x="251" y="146" width="9" height="12" rx={2} />
-        </g>
-        <path
-          d="M185 250 v-24 a15 15 0 0 1 30 0 v24 Z"
-          fill="var(--dracula-bg-dark)"
-        />
-      </g>
-    </svg>
-  );
-}
+import {SceneCastle} from 'astryx-dracula/shared/scene-castle';
 
 const INQUIRY_REASONS = [
   'New business',
@@ -131,16 +48,11 @@ const CONTACT_COLUMNS = [
   {label: 'Press & partnerships', email: 'press@castle.dracula'},
 ];
 
-// AspectRatio has no radius prop and there's no Image primitive (#2582), so
-// the illustration carries its own corner radius directly.
+// Castle illustration lives in shared/scene-castle (`card` variant:
+// harvest-yellow moon, fg-stroke bats). Fill + radius-clip live in
+// shared/gallery-image (no Image primitive, #2582).
 const pageStyle: CSSProperties = {
   minHeight: '100%',
-};
-const illustrationImg: CSSProperties = {
-  width: '100%',
-  height: '100%',
-  display: 'block',
-  borderRadius: 'var(--radius-container)',
 };
 
 /**
@@ -198,8 +110,8 @@ export default function TwoColumnForm() {
                   the best path through the night.
                 </Text>
               </VStack>
-              <AspectRatio ratio={4 / 3}>
-                <CastleIllustration />
+              <AspectRatio ratio={4 / 3} style={galleryImageClip}>
+                <SceneCastle variant="card" />
               </AspectRatio>
             </VStack>
 

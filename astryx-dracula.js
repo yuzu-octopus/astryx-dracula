@@ -4,86 +4,15 @@
  * Command: astryx theme build astryx-theme.ts --out theme.css
  * CLI: @astryxdesign/cli@0.3.0
  * Core: @astryxdesign/core@0.3.0
- *
- * Regenerating overwrites this file; two publish edits are re-applied by hand
- * afterwards: the icon registry is inlined from icons.tsx (plain Node ESM
- * cannot resolve the generated extensionless `./icons` import), and the usage
- * comment names the specifiers this package actually ships.
  */
 
-import {createElement} from 'react';
-import {
-  X,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  Check,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  Info,
-  Calendar,
-  Clock,
-  ExternalLink,
-  Menu,
-  MoreHorizontal,
-  Search,
-  ArrowUp,
-  ArrowDown,
-  ArrowUpDown,
-  Filter,
-  EyeOff,
-  Columns,
-  Copy,
-  CheckCheck,
-  Wrench,
-  Square,
-  Mic,
-} from 'lucide-react';
-
-// Same map as icons.tsx, the registry astryx-theme.ts imports, built here with
-// createElement because this module ships as plain JS.
-const iconProps = {size: '1em', 'aria-hidden': true};
-
-const draculaIconRegistry = {
-  close: createElement(X, iconProps),
-  chevronDown: createElement(ChevronDown, iconProps),
-  chevronLeft: createElement(ChevronLeft, iconProps),
-  chevronRight: createElement(ChevronRight, iconProps),
-  chevronsLeft: createElement(ChevronsLeft, iconProps),
-  chevronsRight: createElement(ChevronsRight, iconProps),
-  check: createElement(Check, iconProps),
-  success: createElement(CheckCircle, iconProps),
-  error: createElement(XCircle, iconProps),
-  warning: createElement(AlertTriangle, iconProps),
-  info: createElement(Info, iconProps),
-  calendar: createElement(Calendar, iconProps),
-  clock: createElement(Clock, iconProps),
-  externalLink: createElement(ExternalLink, iconProps),
-  menu: createElement(Menu, iconProps),
-  moreHorizontal: createElement(MoreHorizontal, iconProps),
-  search: createElement(Search, iconProps),
-  arrowUp: createElement(ArrowUp, iconProps),
-  arrowDown: createElement(ArrowDown, iconProps),
-  arrowsUpDown: createElement(ArrowUpDown, iconProps),
-  funnel: createElement(Filter, iconProps),
-  eyeSlash: createElement(EyeOff, iconProps),
-  viewColumns: createElement(Columns, iconProps),
-  copy: createElement(Copy, iconProps),
-  checkDouble: createElement(CheckCheck, iconProps),
-  wrench: createElement(Wrench, iconProps),
-  stop: createElement(Square, iconProps),
-  microphone: createElement(Mic, iconProps),
-};
-
+import { draculaIconRegistry } from './icons';
 /**
  * astryx-dracula theme — built by `bunx astryx theme build`
  * Import the CSS file alongside this module:
  *
- *   import { astryxDraculaTheme } from 'astryx-dracula';
- *   import 'astryx-dracula/theme.css';
+ *   import { astryxDraculaTheme } from './astryx-dracula';
+ *   import './astryx-dracula.css';
  */
 export const astryxDraculaTheme = {
   name: 'astryx-dracula',

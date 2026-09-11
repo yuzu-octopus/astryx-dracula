@@ -8,7 +8,8 @@ import {Toolbar} from '@astryxdesign/core/Toolbar';
 import {List, ListItem} from '@astryxdesign/core/List';
 import {HStack, VStack} from '@astryxdesign/core/Layout';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
-import {Heading, Text} from '@astryxdesign/core/Text';
+import {Text} from '@astryxdesign/core/Text';
+import {VisuallyHidden} from '@astryxdesign/core/VisuallyHidden';
 import {Icon} from '@astryxdesign/core/Icon';
 import {IconButton} from '@astryxdesign/core/IconButton';
 import {Section} from '@astryxdesign/core/Section';
@@ -273,15 +274,6 @@ const detailColumn: CSSProperties = {
   flexShrink: 0,
 };
 const controlsScroll: CSSProperties = {overflowX: 'auto'};
-// Screen-reader heading: the page identity lives in the Toolbar label,
-// so the h1 stays out of the visual column rhythm entirely.
-const visuallyHidden: CSSProperties = {
-  position: 'absolute',
-  width: 1,
-  height: 1,
-  overflow: 'clip',
-  whiteSpace: 'nowrap',
-};
 
 // Static toolbar content, hoisted out of the render path: neither element
 // reads component state, so rebuilding them per render buys nothing.
@@ -381,7 +373,7 @@ export default function FileExplorer() {
   ]);
 
   const isNarrow = useMediaQuery('(max-width: 768px)');
-  const isPhone = useMediaQuery('(max-width: 767px)');
+  const isPhone = isNarrow;
 
   const columns = useMemo(() => {
     // `id` names the folder a column lists, so the React key stays put when
@@ -496,7 +488,13 @@ export default function FileExplorer() {
               variant="transparent"
               padding={2}
               dividers={['bottom']}>
-              <HStack gap={2} vAlign="center" style={controlsScroll}>
+              <HStack
+                gap={2}
+                vAlign="center"
+                style={controlsScroll}
+                role="region"
+                aria-label="View and file actions"
+                tabIndex={0}>
                 {viewSwitcher}
                 {fileActions}
               </HStack>
@@ -506,9 +504,9 @@ export default function FileExplorer() {
       }
       content={
         <LayoutContent padding={0} isScrollable={false}>
-          <Heading level={1} style={visuallyHidden}>
+          <VisuallyHidden as="h1">
             File Explorer
-          </Heading>
+          </VisuallyHidden>
           <HStack height="100%" style={columnRow}>
             {visibleColumns.map((col, colIndex) => {
               const trueIndex = columnOffset + colIndex;
@@ -521,7 +519,10 @@ export default function FileExplorer() {
                   padding={2}
                   variant="transparent"
                   dividers={showDivider ? ['end'] : undefined}
-                  style={{...scrollable, ...fixedColumn}}>
+                  style={{...scrollable, ...fixedColumn}}
+                  role="region"
+                  aria-label={`Folder column ${trueIndex + 1}`}
+                  tabIndex={0}>
                   {col.items.length === 0 ? (
                     <EmptyState
                       title="Quiet in the crypt"
@@ -581,7 +582,10 @@ export default function FileExplorer() {
                 width={320}
                 padding={6}
                 variant="transparent"
-                style={{...scrollable, ...detailColumn}}>
+                style={{...scrollable, ...detailColumn}}
+                role="region"
+                aria-label={`Details for ${selectedFile.name}`}
+                tabIndex={0}>
                 <VStack gap={4} hAlign="center">
                   <Avatar name={selectedFile.name} size={96} />
                   <VStack gap={1} hAlign="center">

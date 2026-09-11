@@ -52,6 +52,7 @@ import {Item} from '@astryxdesign/core/Item';
 import {Table, proportional, pixel} from '@astryxdesign/core/Table';
 import type {TableColumn} from '@astryxdesign/core/Table';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
+import {ProductSwatch} from 'astryx-dracula/shared/revenue-chart';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {Selector} from '@astryxdesign/core/Selector';
@@ -242,12 +243,6 @@ const artImage: CSSProperties = {
   height: '100%',
   display: 'block',
 };
-// Rounded inventory swatch. No radius prop where the swatch renders, so the
-// SVG carries its own rounded corners (rx=4).
-const thumbSwatch: CSSProperties = {
-  flexShrink: 0,
-  display: 'block',
-};
 
 // One Dracula accent per hero product slot. Purple stays off decorative art:
 // it reads as interactive, and nothing here is tappable.
@@ -343,31 +338,6 @@ function ProductArt({hue, label}: {hue: string; label: string}) {
         <circle cx="13" cy="-13" r="2.5" fill={hue} stroke="none" />
         <path d="M-22 20 L-5 2 L7 12 L14 5 L23 15" />
       </g>
-    </svg>
-  );
-}
-
-// Rounded inventory swatch: Dracula surface with a per-row accent ring.
-function ThumbSwatch({hue, label}: {hue: string; label: string}) {
-  return (
-    <svg
-      viewBox="0 0 40 40"
-      width={40}
-      height={40}
-      style={thumbSwatch}
-      role="img"
-      aria-label={`${label} swatch`}>
-      <rect width={40} height={40} rx={5} fill="var(--dracula-bg-light)" />
-      <rect
-        x={1}
-        y={1}
-        width={38}
-        height={38}
-        rx={4}
-        fill="none"
-        stroke="var(--color-widget-content-border)"
-      />
-      <circle cx={20} cy={20} r={8} fill="none" stroke={hue} strokeWidth={3} />
     </svg>
   );
 }
@@ -780,13 +750,19 @@ function ChatCard() {
 
       <Divider variant="subtle" />
 
-      <VStack gap={0} style={inlineStyles.chatBody} isScrollable={false}>
+      <VStack
+        gap={0}
+        style={inlineStyles.chatBody}
+        isScrollable={false}
+        tabIndex={0}
+        role="region"
+        aria-label="Night Owl chat messages">
         <ChatMessageList>
           <ChatSystemMessage>Today</ChatSystemMessage>
 
           <ChatMessage sender="user">
             <ChatMessageBubble variant="filled">
-              Where’s my order?
+              Where's my order?
             </ChatMessageBubble>
           </ChatMessage>
 
@@ -794,12 +770,12 @@ function ChatCard() {
             <VStack gap={3}>
               <Text type="body">
                 Your order #1043 (the Moonphase Watch and Belfry Throw)
-                shipped this morning from the Aisle 3 warehouse and is currently
-                in transit with UPS. It’s on track to arrive at your address by
+                shipped this morning from the courier-raven roost and is currently
+                in transit with courier-raven. It's on track to arrive at your address by
                 end of day tomorrow.
               </Text>
               <Text type="body">
-                Let me know if you’d like to reschedule the delivery, redirect
+                Let me know if you'd like to reschedule the delivery, redirect
                 it to a pickup point, or start a return once it arrives.
               </Text>
             </VStack>
@@ -813,7 +789,7 @@ function ChatCard() {
 
           <ChatMessage sender="assistant">
             <VStack gap={3}>
-              <Text type="body">Here’s everything I have on order #1043:</Text>
+              <Text type="body">Here's everything I have on order #1043:</Text>
               <Card padding={3}>
                 <VStack gap={1}>
                   <Item
@@ -827,7 +803,7 @@ function ChatCard() {
                   />
                   <Item
                     label="Shipping"
-                    description="UPS Ground"
+                    description="Courier-raven ground"
                     endContent={
                       <Text type="body" weight="semibold" hasTabularNumbers>
                         $12
@@ -848,8 +824,8 @@ function ChatCard() {
                   />
                   <Item
                     label="Tracking"
-                    description="UPS 1Z 999 AA1 0123 4567 84"
-                    endContent={<Link href="#/templates/theme-showcase">Track →</Link>}
+                    description="RVN 1Z 999 AA1 0123 4567 84"
+                    endContent={<Link href="#/templates/theme-showcase">Track</Link>}
                   />
                 </VStack>
               </Card>
@@ -876,7 +852,7 @@ function ChatCard() {
           value=""
           onChange={() => {}}
           onSubmit={() => {}}
-          placeholder="Ask Night Owl…"
+          placeholder="Ask Night Owl..."
           footerActions={
             <Button
               variant="ghost"
@@ -1044,7 +1020,7 @@ const DEFAULT_INVENTORY: InventoryRow[] = [
     name: 'Moonphase Watch',
     meta: 'Steel case, moonphase dial',
     available: 42,
-    location: 'Aisle 3',
+    location: 'Roost 3',
     tags: [{label: 'New', variant: 'cyan'}],
     hue: 'var(--dracula-comment)',
     selected: false,
@@ -1054,7 +1030,7 @@ const DEFAULT_INVENTORY: InventoryRow[] = [
     name: 'Night-Owl Headphones',
     meta: 'ANC, 30hr battery',
     available: 128,
-    location: 'Aisle 1',
+    location: 'Roost 1',
     tags: [{label: 'Popular', variant: 'green'}],
     hue: 'var(--dracula-cyan)',
     selected: true,
@@ -1064,7 +1040,7 @@ const DEFAULT_INVENTORY: InventoryRow[] = [
     name: 'Coven Canvas Backpack',
     meta: 'Waxed canvas, 25L',
     available: 63,
-    location: 'Aisle 2',
+    location: 'Roost 2',
     tags: [{label: 'Limited', variant: 'yellow'}],
     hue: 'var(--dracula-yellow)',
     selected: false,
@@ -1074,7 +1050,7 @@ const DEFAULT_INVENTORY: InventoryRow[] = [
     name: 'Night Market Wallet',
     meta: 'Full-grain, RFID blocking',
     available: 15,
-    location: 'Aisle 4',
+    location: 'Roost 4',
     tags: [{label: 'Leather', variant: 'yellow'}],
     hue: 'var(--dracula-orange)',
     selected: true,
@@ -1084,7 +1060,7 @@ const DEFAULT_INVENTORY: InventoryRow[] = [
     name: 'Midnight Tumbler',
     meta: 'Vacuum insulated, 16oz',
     available: 87,
-    location: 'Aisle 5',
+    location: 'Roost 5',
     tags: [{label: 'Drinkware', variant: 'yellow'}],
     hue: 'var(--dracula-pink)',
     selected: false,
@@ -1094,7 +1070,7 @@ const DEFAULT_INVENTORY: InventoryRow[] = [
     name: 'Belfry Throw',
     meta: 'Heavyweight, oat',
     available: 24,
-    location: 'Aisle 6',
+    location: 'Roost 6',
     tags: [{label: 'Home', variant: 'yellow'}],
     hue: 'var(--dracula-green)',
     selected: true,
@@ -1117,7 +1093,7 @@ function SelectCell({row}: {row: InventoryRow}) {
 function ItemCell({row}: {row: InventoryRow}) {
   return (
     <HStack gap={3} vAlign="center">
-      <ThumbSwatch hue={row.hue} label={row.name} />
+      <ProductSwatch accent={row.hue} label={row.name} size={40} />
       <VStack gap={0} style={styles.inventoryItemText}>
         <Text type="body" weight="semibold">
           {row.name}
@@ -1290,12 +1266,12 @@ function InventoryCard({inventory}: {inventory: InventoryRow[]}) {
               value={undefined}
               onChange={() => {}}
               options={[
-                'Aisle 1',
-                'Aisle 2',
-                'Aisle 3',
-                'Aisle 4',
-                'Aisle 5',
-                'Aisle 6',
+                'Roost 1',
+                'Roost 2',
+                'Roost 3',
+                'Roost 4',
+                'Roost 5',
+                'Roost 6',
               ]}
             />
             <Selector

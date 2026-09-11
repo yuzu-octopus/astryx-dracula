@@ -23,6 +23,7 @@ import {TextArea} from '@astryxdesign/core/TextArea';
 import {Divider} from '@astryxdesign/core/Divider';
 import {Banner} from '@astryxdesign/core/Banner';
 import {Card} from '@astryxdesign/core/Card';
+import {SceneTile} from 'astryx-dracula/shared/scene-tile';
 import {Collapsible} from '@astryxdesign/core/Collapsible';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
 import {NumberInput} from '@astryxdesign/core/NumberInput';
@@ -104,6 +105,7 @@ const US_STATES = [
 ];
 
 // One Dracula accent per line item, from the fixed categorical vocabulary.
+// Art lives in shared/scene-tile (lg fork: centered glyph on a flat field).
 const ITEM_HUES: Record<string, string> = {
   '1': 'var(--dracula-cyan)',
   '2': 'var(--dracula-pink)',
@@ -159,19 +161,14 @@ const summarySticky: CSSProperties = {
 };
 // On mobile the summary moves above the form.
 const summaryMobileOrder: CSSProperties = {order: -1};
-// Line-item photo: a fixed square frame that clips the inline scene.
-// Astryx has no Image primitive (#2582), so the placeholder is inline SVG on
-// brand tokens instead of a data-URI bitmap with baked-in hex.
+// Line-item photo: fixed square frame; art lives in shared/scene-tile
+// (lg fork). Astryx has no Image primitive (#2582), so the tile is inline
+// SVG on brand tokens instead of a data-URI bitmap with baked-in hex.
 const itemPhotoFrame: CSSProperties = {
   width: 'var(--spacing-10)',
   height: 'var(--spacing-10)',
   overflow: 'clip',
   flexShrink: 0,
-};
-const itemPhoto: CSSProperties = {
-  width: '100%',
-  height: '100%',
-  display: 'block',
 };
 // Accepted card-network marks (Visa/Mastercard/Amex), shared style.
 const cardLogo: CSSProperties = {
@@ -187,31 +184,7 @@ const cardLogo: CSSProperties = {
 function OrderItemPhoto({item}: {item: (typeof ORDER_ITEMS)[number]}) {
   return (
     <Card padding={0} style={itemPhotoFrame}>
-      <svg
-        viewBox="0 0 400 300"
-        preserveAspectRatio="xMidYMid slice"
-        style={itemPhoto}
-        role="img"
-        aria-label={item.name}>
-        <rect width="400" height="300" fill="var(--dracula-bg-light)" />
-        <g
-          transform="translate(200 150)"
-          fill="none"
-          stroke="var(--dracula-comment)"
-          strokeWidth="5"
-          strokeLinecap="round"
-          strokeLinejoin="round">
-          <rect x="-44" y="-44" width="88" height="88" rx="5" />
-          <circle
-            cx="18"
-            cy="-18"
-            r="2.5"
-            fill={ITEM_HUES[item.id]}
-            stroke="none"
-          />
-          <path d="M-34 30 L-8 0 L10 18 L20 8 L34 24" />
-        </g>
-      </svg>
+      <SceneTile label={item.name} hue={ITEM_HUES[item.id]} size="lg" />
     </Card>
   );
 }
@@ -245,7 +218,7 @@ function OrderLineItem({
                   </HStack>
                 )}
               </HStack>
-              <Text type="body" weight="bold" hasTabularNumbers>
+              <Text type="body" hasTabularNumbers>
                 {fmt(item.price)}
               </Text>
             </HStack>
@@ -360,10 +333,10 @@ function OrderTotalSection({
       </VStack>
       <Divider />
       <HStack hAlign="between" vAlign="center">
-        <Text type="large" weight="bold">
+        <Text type="large">
           Total
         </Text>
-        <Text type="large" weight="bold" hasTabularNumbers>
+        <Text type="large" hasTabularNumbers>
           {fmt(total)}
         </Text>
       </HStack>
@@ -588,7 +561,7 @@ export default function PaymentForm() {
                             size="lg"
                             label="First Name"
                             isRequired
-                            placeholder="John"
+                            placeholder="Vlad"
                             value={firstName}
                             onChange={setFirstName}
                             status={
@@ -601,7 +574,7 @@ export default function PaymentForm() {
                             size="lg"
                             label="Last Name"
                             isRequired
-                            placeholder="Doe"
+                            placeholder="Dracul"
                             value={lastName}
                             onChange={setLastName}
                             status={
@@ -615,7 +588,7 @@ export default function PaymentForm() {
                           size="lg"
                           label="Address"
                           isRequired
-                          placeholder="123 Main Street"
+                          placeholder="666 Castle Way"
                           value={address}
                           onChange={setAddress}
                           status={
@@ -629,7 +602,7 @@ export default function PaymentForm() {
                             size="lg"
                             label="City"
                             isRequired
-                            placeholder="New York"
+                            placeholder="Transylvania"
                             value={city}
                             onChange={setCity}
                             status={
@@ -642,7 +615,7 @@ export default function PaymentForm() {
                             size="lg"
                             label="ZIP Code"
                             isRequired
-                            placeholder="10001"
+                            placeholder="40000"
                             value={zip}
                             onChange={setZip}
                             status={
@@ -760,23 +733,72 @@ export default function PaymentForm() {
 
                         {/* Credit card fields */}
                         <VStack gap={3}>
-                          {/* Card type icons */}
+                          {/* Card type icons — inline Dracula marks on
+                              brand tokens; no vendor hotlinks. */}
                           <HStack gap={1.5} vAlign="center">
-                            <img
-                              src="https://raw.githubusercontent.com/aaronfagan/svg-credit-card-payment-icons/main/flat/visa.svg"
-                              alt="Visa"
-                              style={cardLogo}
-                            />
-                            <img
-                              src="https://raw.githubusercontent.com/aaronfagan/svg-credit-card-payment-icons/main/flat/mastercard.svg"
-                              alt="Mastercard"
-                              style={cardLogo}
-                            />
-                            <img
-                              src="https://raw.githubusercontent.com/aaronfagan/svg-credit-card-payment-icons/main/flat/amex.svg"
-                              alt="Amex"
-                              style={cardLogo}
-                            />
+                            <svg
+                              viewBox="0 0 48 32"
+                              role="img"
+                              aria-label="Visa"
+                              style={cardLogo}>
+                              <rect
+                                width="48"
+                                height="32"
+                                fill="var(--color-background-surface)"
+                              />
+                              <text
+                                x="24"
+                                y="21"
+                                textAnchor="middle"
+                                fontSize="10"
+                                fontStyle="italic"
+                                fill="var(--dracula-purple)">
+                                VISA
+                              </text>
+                            </svg>
+                            <svg
+                              viewBox="0 0 48 32"
+                              role="img"
+                              aria-label="Mastercard"
+                              style={cardLogo}>
+                              <rect
+                                width="48"
+                                height="32"
+                                fill="var(--color-background-surface)"
+                              />
+                              <circle
+                                cx="19"
+                                cy="16"
+                                r="8"
+                                fill="var(--dracula-red)"
+                              />
+                              <circle
+                                cx="29"
+                                cy="16"
+                                r="8"
+                                fill="var(--dracula-orange)"
+                                opacity={0.85}
+                              />
+                            </svg>
+                            <svg
+                              viewBox="0 0 48 32"
+                              role="img"
+                              aria-label="Amex"
+                              style={cardLogo}>
+                              <rect
+                                width="48"
+                                height="32"
+                                fill="var(--color-background-surface)"
+                              />
+                              <text
+                                x="24"
+                                y="21"
+                                textAnchor="middle"
+                                fontSize="10"
+                                fill="var(--dracula-cyan)">
+                                AMEX
+                              </text>
+                            </svg>
                           </HStack>
                           <TextInput
                             size="lg"
@@ -839,7 +861,7 @@ export default function PaymentForm() {
                             size="lg"
                             label="Name on Card"
                             isRequired
-                            placeholder="John Doe"
+                            placeholder="Vlad Dracul"
                             value={cardName}
                             onChange={setCardName}
                             status={
@@ -859,7 +881,7 @@ export default function PaymentForm() {
                                 size="lg"
                                 label="Address"
                                 isRequired
-                                placeholder="123 Main Street"
+                                placeholder="666 Castle Way"
                                 value={billingAddress}
                                 onChange={setBillingAddress}
                                 status={
@@ -876,7 +898,7 @@ export default function PaymentForm() {
                                   size="lg"
                                   label="City"
                                   isRequired
-                                  placeholder="New York"
+                                  placeholder="Transylvania"
                                   value={billingCity}
                                   onChange={setBillingCity}
                                   status={
@@ -892,7 +914,7 @@ export default function PaymentForm() {
                                   size="lg"
                                   label="ZIP Code"
                                   isRequired
-                                  placeholder="10001"
+                                  placeholder="40000"
                                   value={billingZip}
                                   onChange={setBillingZip}
                                   status={

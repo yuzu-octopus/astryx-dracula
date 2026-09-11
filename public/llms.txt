@@ -7,8 +7,21 @@ Use the links below to style a site with this theme or migrate a codebase to it.
 ## Start here
 
 - [Agent skill](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/.agents/skills/astryx-dracula/SKILL.md): Exact token names, new-site steps, migration steps, common mistakes.
+- [Agent index](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/AGENTS.snippet.md): One-paragraph brand source of truth for agent indexes.
 - [Usage guide](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/USAGE.md): Prebuilt, runtime, and plain-CSS paths plus Vite setup.
 - [Brand reference](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/BRAND.md): Frozen palette, semantic map, charts, code highlighting, deliberate neutrals.
+
+## Skill references
+
+- [Layout expressions](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/.agents/skills/astryx-dracula/references/xle.md): XLE/XLO workflow, node anatomy, example, brand pass.
+- [Scaffolds](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/.agents/skills/astryx-dracula/references/scaffolds.md): Showcase shell, hero, bento, dashboard, steps, spec grid, responsive rules.
+- [Spacing](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/.agents/skills/astryx-dracula/references/spacing.md): Canonical spacing values, card insets, type floors, touch targets.
+- [Visual design](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/.agents/skills/astryx-dracula/references/visual.md): Color semantics, charts, code highlighting, motion, scrollbars, surfaces.
+
+## Templates
+
+- [Template gallery](https://yuzu-octopus.github.io/astryx-dracula/#/templates): Live viewer for all templates.
+- [Integration spec](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/astryx.integration.mjs): Published Astryx integration pack (`./templates`).
 
 ## Theme source
 

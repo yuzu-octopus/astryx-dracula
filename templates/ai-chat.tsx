@@ -59,10 +59,9 @@ import {
 const MOBILE_MAX_WIDTH = 1023;
 
 const root: CSSProperties = {
-  // The showcase renders a 44px breadcrumb row above the template, so a full
-  // 100dvh root always spills exactly that far into page-level scroll. Subtract
-  // it so scrolling stays inside the message list and artifact body.
-  height: 'calc(100dvh - 44px)',
+  // The viewer owns its chrome: the root fills the viewport and the message
+  // list plus artifact body scroll inside it (editor pattern).
+  height: '100dvh',
   width: '100%',
   containerType: 'inline-size',
   containerName: 'artifact',
@@ -245,7 +244,12 @@ function MobileArtifactActions() {
 // announcing the same h1 twice.
 function ArtifactBody({hasOwnTitle = true}: {hasOwnTitle?: boolean}) {
   return (
-    <Section variant="transparent" style={artifactScroll}>
+    <Section
+      variant="transparent"
+      style={artifactScroll}
+      role="region"
+      aria-label={ARTIFACT_TITLE}
+      tabIndex={0}>
       <VStack gap={2} style={articleBody}>
         {hasOwnTitle && (
           <Heading level={1} type="display-2">
@@ -756,6 +760,7 @@ The fix is to catch \`TokenExpiredError\` specifically and attempt a refresh bef
         purpose="info"
         variant="fullscreen">
         <Layout
+          height="auto"
           header={
             <DialogHeader
               title={ARTIFACT_TITLE}

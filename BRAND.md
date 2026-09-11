@@ -8,7 +8,7 @@ Source of truth is `astryx-theme.ts`. Do not add hexes; `bun run audit` enforces
 | Role | Hex | Use |
 |---|---|---|
 | Background | #282A36 | page bg |
-| Current line | #6272A4 | line highlight, subtle borders (doubles as comment) |
+| Current line | #6272A4 | line highlight, subtle borders (doubles as comment)[^current-line] |
 | Selection | #44475A | selected rows, quiet surfaces |
 | Background Light | #343746 | cards, surfaces |
 | Background Lighter | #424450 | popovers, floating elements |
@@ -22,6 +22,8 @@ Source of truth is `astryx-theme.ts`. Do not add hexes; `bun run audit` enforces
 | Purple | #BD93F9 | primary, links and titles unvisited |
 | Red | #FF5555 | negative, error |
 | Yellow | #F1FA8C | tags, chips |
+
+[^current-line]: Upstream pins both Current Line and Comment to #6272A4. This kit follows suit for line affordances, including scrollbar thumbs in `tokens.css`. Do not "correct" one of them to #44475A.
 
 ## Semantic map (glimpse)
 

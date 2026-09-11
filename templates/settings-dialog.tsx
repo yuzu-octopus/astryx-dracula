@@ -46,14 +46,12 @@ import {
   SOCIAL_ROWS,
   DEVICE_ROWS,
   INFO_TILES,
+  iconBox,
+  actionNoWrap,
+  sideNavHeading,
 } from 'astryx-dracula/shared/settings-rows';
 import type {DeviceRow, InfoTileData} from 'astryx-dracula/shared/settings-rows';
 
-const iconBox: CSSProperties = {
-  borderRadius: 'var(--radius-container)',
-  backgroundColor: 'var(--color-background-surface)',
-  flexShrink: 0,
-};
 // Sticky dialog header bar — no Astryx prop for sticky/background/z-index.
 // Inline + block padding comes from the parent LayoutContent `padding`.
 const headerSticky: CSSProperties = {
@@ -67,19 +65,8 @@ const headerSticky: CSSProperties = {
 const contentMaxWidth: CSSProperties = {
   maxWidth: 680,
 };
-// Aligns the sidebar heading with list-item label text. No heading margin prop.
-const sideNavHeading: CSSProperties = {
-  marginInline: 'var(--spacing-4)',
-};
 const dialogHeight: CSSProperties = {
   height: '85vh',
-};
-// Keeps row actions ("Log out", "Deactivate") on one line: without this the
-// action column wraps mid-phrase at tablet widths while the info column still
-// has room to wrap instead.
-const actionNoWrap: CSSProperties = {
-  flexShrink: 0,
-  whiteSpace: 'nowrap',
 };
 
 // Same-route hash: demo links stay focusable anchors without escaping the
@@ -132,7 +119,7 @@ function InfoTile({icon, title, body}: InfoTileData) {
         <Text type="body" weight="semibold" display="block">
           {title}
         </Text>
-        <Text type="supporting" color="secondary" display="block">
+        <Text type="body" color="secondary" display="block">
           {body}
         </Text>
       </VStack>
@@ -155,7 +142,7 @@ function ExpandableRowViewing({
         <Text type="body" weight="semibold" display="block">
           {label}
         </Text>
-        <Text type="supporting" color="secondary" display="block">
+        <Text type="body" color="secondary" display="block">
           {value}
         </Text>
       </VStack>
@@ -239,7 +226,7 @@ function InfoRowItem({
           <Text type="body" weight="semibold" display="block">
             {label}
           </Text>
-          <Text type="supporting" color="secondary" display="block">
+          <Text type="body" color="secondary" display="block">
             {value}
           </Text>
         </VStack>
@@ -335,6 +322,7 @@ export default function SettingsDialog() {
   return (
     <>
       <Layout
+        height="auto"
         content={
           <LayoutContent padding={0}>
             <Center height="80vh">
@@ -619,7 +607,7 @@ export default function SettingsDialog() {
                                 <Icon icon={Lock} />
                               </Center>
                               <VStack gap={1}>
-                                <Text type="body" weight="bold">
+                                <Text type="body">
                                   Adding devices for your trusted coven
                                 </Text>
                                 <Text type="body" color="secondary">
@@ -732,12 +720,12 @@ export default function SettingsDialog() {
                         <Heading level={3}>Payments</Heading>
                         <Divider />
                         <InfoRowItem
-                          label="Tribute method"
+                          label="Payout crypt"
                           value="Visa ending in 4821"
                           action=""
                         />
                         <InfoRowItem
-                          label="Tribute ledger"
+                          label="Past payouts"
                           value="No tributes yet"
                           action=""
                         />
@@ -751,12 +739,12 @@ export default function SettingsDialog() {
                         <Heading level={3}>Taxes</Heading>
                         <Divider />
                         <InfoRowItem
-                          label="Tithe profile"
+                          label="Tax scrolls"
                           value="Not submitted"
                           action=""
                         />
                         <InfoRowItem
-                          label="Tithe scrolls"
+                          label="Past scrolls"
                           value="Available after your first tribute"
                           action=""
                         />
@@ -886,10 +874,10 @@ export default function SettingsDialog() {
                                 <Icon icon={ShieldCheck} />
                               </Center>
                               <VStack gap={1}>
-                                <Text type="body" weight="bold">
+                                <Text type="body">
                                   Committed to privacy
                                 </Text>
-                                <Text type="supporting" color="secondary">
+                                <Text type="body" color="secondary">
                                   We&apos;re committed to keeping your data
                                   protected. See details in our{' '}
                                   <Link href={SELF_HASH}>

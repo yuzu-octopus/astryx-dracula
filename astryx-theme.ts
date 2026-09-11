@@ -283,6 +283,16 @@ export const astryxDraculaTheme: DefinedTheme = defineTheme({
   },
   motion: { fast: 175, medium: 410, slow: 975, ratio: 0.75 },
   components: {
+    'app-shell': {
+      // Shell paint pinned at theme level so template variant props stay
+      // frozen: wash/elevated chrome resolves to body #282A36, surface/section
+      // chrome to surface #343746. Matches core's elevated-default mapping
+      // today, so zero visual change — drift protection only.
+      'variant:wash': { backgroundColor: 'var(--color-background-body)' },
+      'variant:elevated': { backgroundColor: 'var(--color-background-body)' },
+      'variant:surface': { backgroundColor: 'var(--color-background-surface)' },
+      'variant:section': { backgroundColor: 'var(--color-background-surface)' },
+    },
     link: {
       base: {
         color: 'var(--color-text-accent)',

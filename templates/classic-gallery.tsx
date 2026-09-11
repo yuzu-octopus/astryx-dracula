@@ -11,6 +11,7 @@ import {Text, Heading} from '@astryxdesign/core/Text';
 import {Grid} from '@astryxdesign/core/Grid';
 import {Section} from '@astryxdesign/core/Section';
 import {TabList, Tab} from '@astryxdesign/core/TabList';
+import {SceneTile, SCENE_TILE_ALTS} from 'astryx-dracula/shared/scene-tile';
 
 // ─── Styles ─────────────────────────────────────────────────────────────────
 
@@ -22,11 +23,6 @@ const outer: CSSProperties = {
 };
 const frameClip: CSSProperties = {
   overflow: 'clip',
-};
-const artImage: CSSProperties = {
-  width: '100%',
-  height: '100%',
-  display: 'block',
 };
 const textCenter: CSSProperties = {
   textAlign: 'center',
@@ -49,69 +45,25 @@ const CATEGORY_HUES: Record<Exclude<Category, 'all'>, string> = {
 };
 
 const GALLERY_IMAGES: GalleryImage[] = [
-  {alt: 'Moonlit ridge trail under a harvest moon', category: 'scene'},
-  {alt: 'Late portrait in violet lamplight', category: 'lifestyle'},
-  {alt: 'Lamplit reading nook after midnight', category: 'home'},
-  {alt: 'Fog rolling over the night pines', category: 'scene'},
-  {alt: 'Dancer caught mid-step in stage pink', category: 'lifestyle'},
-  {alt: 'Kitchen table set for a midnight feast', category: 'lifestyle'},
-  {alt: 'Castle silhouette over sleeping hills', category: 'scene'},
-  {alt: 'Attic window glowing amber at 2am', category: 'home'},
-  {alt: 'Cellar shelves lined with bottled dusk', category: 'home'},
+  {alt: SCENE_TILE_ALTS[0], category: 'scene'},
+  {alt: SCENE_TILE_ALTS[1], category: 'lifestyle'},
+  {alt: SCENE_TILE_ALTS[2], category: 'home'},
+  {alt: SCENE_TILE_ALTS[3], category: 'scene'},
+  {alt: SCENE_TILE_ALTS[4], category: 'lifestyle'},
+  {alt: SCENE_TILE_ALTS[5], category: 'lifestyle'},
+  {alt: SCENE_TILE_ALTS[6], category: 'scene'},
+  {alt: SCENE_TILE_ALTS[7], category: 'home'},
+  {alt: SCENE_TILE_ALTS[8], category: 'home'},
   {alt: 'Bats crossing a violet harvest moon', category: 'scene'},
 ];
 
 // ─── Gallery Art ────────────────────────────────────────────────────────────
+// Small mountain-glyph fork lives in shared/scene-tile; decorative stars
+// resolve to comment here (never purple — purple means tappable).
 
 function GalleryArt({image, index}: {image: GalleryImage; index: number}) {
   const hue = CATEGORY_HUES[image.category];
-  const moonX = 90 + ((index * 53) % 220);
-  const moonY = 62 + ((index * 29) % 60);
-  const hillA = 190 + ((index * 13) % 40);
-  const hillB = 215 + ((index * 17) % 40);
-  return (
-    <svg
-      viewBox="0 0 400 300"
-      preserveAspectRatio="xMidYMid slice"
-      style={artImage}
-      role="img"
-      aria-label={image.alt}>
-      <rect width="400" height="300" fill="var(--dracula-bg-light)" />
-      <g fill="var(--dracula-purple)" opacity={0.55}>
-        <circle cx={40 + ((index * 37) % 320)} cy={30} r={2} />
-        <circle cx={120 + ((index * 23) % 200)} cy={52} r={1.6} />
-        <circle cx={260 + ((index * 11) % 110)} cy={26} r={2.2} />
-        <circle cx={330} cy={70 + ((index * 7) % 30)} r={1.6} />
-      </g>
-      <circle cx={moonX} cy={moonY} r={34} fill={hue} opacity={0.9} />
-      <circle
-        cx={moonX - 12}
-        cy={moonY - 8}
-        r={28}
-        fill="var(--dracula-bg-light)"
-        opacity={0.55}
-      />
-      <path
-        d={`M0 ${hillA} Q100 ${hillA - 50} 200 ${hillA - 10} T400 ${hillA - 30} V300 H0 Z`}
-        fill="var(--dracula-current-line)"
-      />
-      <path
-        d={`M0 ${hillB} Q120 ${hillB - 40} 240 ${hillB} T400 ${hillB - 20} V300 H0 Z`}
-        fill="var(--dracula-bg)"
-      />
-      <g
-        transform={`translate(${60 + ((index * 41) % 280)} ${hillB - 34})`}
-        fill="none"
-        stroke={hue}
-        strokeWidth="4"
-        strokeLinecap="round"
-        strokeLinejoin="round">
-        <rect x="-22" y="-22" width="44" height="44" rx="5" />
-        <circle cx="9" cy="-9" r="2" fill={hue} stroke="none" />
-        <path d="M-17 15 L-4 0 L5 9 L10 4 L17 12" />
-      </g>
-    </svg>
-  );
+  return <SceneTile label={image.alt} hue={hue} size="sm" index={index} />;
 }
 
 // ─── Main Page ──────────────────────────────────────────────────────────────

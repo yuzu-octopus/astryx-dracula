@@ -4,6 +4,21 @@
 
 import {useState, useTransition, type CSSProperties} from 'react';
 import {Moon} from 'lucide-react';
+import {demoLogin} from 'astryx-dracula/shared/login-demo';
+import {
+  AUTH_HEADING,
+  AUTH_SUBTITLE,
+  AUTH_PRIMARY_CTA,
+  AUTH_SIGNUP_PROMPT,
+  AUTH_SIGNUP_LINK,
+  AUTH_FORGOT_PASSWORD,
+  AUTH_EMAIL_PLACEHOLDER,
+  AUTH_PASSWORD_PLACEHOLDER,
+  AUTH_BRAND_NAME,
+  AUTH_TERMS_PREFIX,
+  AUTH_TERMS_SERVICE,
+  AUTH_TERMS_PRIVACY,
+} from 'astryx-dracula/shared/auth-copy';
 import {VStack} from '@astryxdesign/core/Layout';
 import {Center} from '@astryxdesign/core/Center';
 import {Text, Heading} from '@astryxdesign/core/Text';
@@ -44,9 +59,7 @@ export default function LoginPage() {
       return;
     }
     startTransition(async () => {
-      const {promise, resolve} = Promise.withResolvers<void>();
-      setTimeout(resolve, 2000);
-      await promise;
+      await demoLogin();
     });
   };
 
@@ -57,7 +70,7 @@ export default function LoginPage() {
         <VStack gap={2} hAlign="center">
           <Icon icon={Moon} size="lg" color="accent" />
           <Text type="body" weight="semibold" size="lg">
-            Castle Dracula
+            {AUTH_BRAND_NAME}
           </Text>
         </VStack>
 
@@ -66,10 +79,10 @@ export default function LoginPage() {
           <VStack gap={4} hAlign="stretch">
             <VStack gap={1} hAlign="center">
               <Heading level={1} justify="center">
-                Welcome back to the night
+                {AUTH_HEADING}
               </Heading>
               <Text type="body" color="secondary">
-                Sign in to your crypt
+                {AUTH_SUBTITLE}
               </Text>
             </VStack>
 
@@ -78,7 +91,7 @@ export default function LoginPage() {
               isLabelHidden
               value={email}
               onChange={setEmail}
-              placeholder="you@castle.dracula"
+              placeholder={AUTH_EMAIL_PLACEHOLDER}
               type="email"
               {...inputAutoComplete('email')}
               size="lg"
@@ -91,7 +104,7 @@ export default function LoginPage() {
                 isLabelHidden
                 value={password}
                 onChange={setPassword}
-                placeholder="Whisper your password"
+                placeholder={AUTH_PASSWORD_PLACEHOLDER}
                 type="password"
                 {...inputAutoComplete('current-password')}
                 size="lg"
@@ -112,14 +125,14 @@ export default function LoginPage() {
                     size="sm"
                     color="secondary"
                     type="supporting">
-                    Forgot password?
+                    {AUTH_FORGOT_PASSWORD}
                   </Link>
                 </VStack>
               )}
             </VStack>
 
             <Button
-              label="Enter the night"
+              label={AUTH_PRIMARY_CTA}
               variant="primary"
               size="lg"
               isLoading={isLoading}
@@ -129,9 +142,9 @@ export default function LoginPage() {
             {/* Sign up link */}
             <VStack hAlign="center">
               <Text type="supporting" color="secondary">
-                New to the castle?{' '}
+                {AUTH_SIGNUP_PROMPT}{' '}
                 <Link href="#/templates/login" type="supporting">
-                  Sign up
+                  {AUTH_SIGNUP_LINK}
                 </Link>
               </Text>
             </VStack>
@@ -141,13 +154,13 @@ export default function LoginPage() {
         {/* Terms */}
         <VStack hAlign="center" width="100%">
           <Text type="supporting" color="secondary" justify="center">
-            By clicking continue, you agree to our{' '}
+            {AUTH_TERMS_PREFIX}{' '}
             <Link href="#/templates/login" type="supporting">
-              Terms of service
+              {AUTH_TERMS_SERVICE}
             </Link>{' '}
             and{' '}
             <Link href="#/templates/login" type="supporting">
-              Privacy policy
+              {AUTH_TERMS_PRIVACY}
             </Link>
             .
           </Text>

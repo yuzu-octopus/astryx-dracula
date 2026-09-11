@@ -26,7 +26,7 @@ import {Sparkles, ClipboardCopy, ChevronDown} from 'lucide-react';
  * Documentation technical — the getting-started guide: prerequisites, install
  * steps, theming, and next steps.
  *
- * Frame-first layout (see `npx astryx docs layout`):
+ * Frame-first layout (see `bunx astryx docs layout`):
  *
  *   Frame: guide column (fill) | on-this-page outline
  *

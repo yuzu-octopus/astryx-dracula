@@ -38,6 +38,8 @@ import {Icon} from '@astryxdesign/core/Icon';
 import {RefreshCw, Square} from 'lucide-react';
 import {CHART_HUES} from 'astryx-dracula/shared/chart-hues';
 import {MetricDelta} from 'astryx-dracula/shared/metric-delta';
+import {Sparkline, type SparkPoint} from 'astryx-dracula/shared/sparkline';
+import {CHART_PANEL_STYLE} from 'astryx-dracula/shared/revenue-chart';
 
 // ============= DATA =============
 
@@ -193,11 +195,6 @@ const metrics = [
     positive: true,
   },
 ];
-
-interface SparkPoint {
-  id: string;
-  value: number;
-}
 
 // Sparkline data for each metric card (30 days, weekends at indices 5-6, 12-13,
 // 19-20, 26-27). Every sample carries its day, so the bars key off the series
@@ -494,12 +491,7 @@ function ActiveUsersChart() {
   // SVG type scales up with the viewBox, so unit sizes stay small
   return (
     <VStack gap={3}>
-      <Card
-        padding={3}
-        style={{
-          backgroundColor: 'var(--color-background)',
-          border: 'var(--border-width) solid var(--color-separator)',
-        }}>
+      <Card padding={3} style={CHART_PANEL_STYLE}>
         <svg
           viewBox="0 0 540 180"
           width="100%"
@@ -568,43 +560,6 @@ function ActiveUsersChart() {
   );
 }
 
-// Thirty-day trend bars. The tone follows the metric's direction; purple stays
-// out of the chart so it keeps meaning "interactive".
-function Sparkline({
-  data,
-  label,
-  positive,
-}: {
-  data: SparkPoint[];
-  label: string;
-  positive: boolean;
-}) {
-  const max = Math.max(...data.map(point => point.value));
-  return (
-    <svg
-      viewBox="0 0 300 40"
-      width="100%"
-      height={40}
-      role="img"
-      aria-label={`${label} thirty-day trend`}>
-      {data.map((point, day) => {
-        const barHeight = Math.max(3, (point.value / max) * 32);
-        return (
-          <rect
-            key={point.id}
-            x={day * 10}
-            y={36 - barHeight}
-            width={7}
-            height={barHeight}
-            rx={4}
-            fill={positive ? 'var(--dracula-green)' : 'var(--dracula-red)'}
-          />
-        );
-      })}
-    </svg>
-  );
-}
-
 // ============= CARD COMPONENTS =============
 
 function MetricCard({
@@ -635,7 +590,11 @@ function MetricCard({
         <Text type="supporting" color="secondary">
           Last 30 days vs. Previous
         </Text>
-        <Sparkline data={sparkline} label={label} positive={positive} />
+        <Sparkline
+          data={sparkline}
+          label={`${label} thirty-day trend`}
+          positive={positive}
+        />
       </VStack>
     </Card>
   );

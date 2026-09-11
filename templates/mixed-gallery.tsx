@@ -1,29 +1,17 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC[p=6] > V[g=8] > ((V[g=2 a=center] > Hd"Every corner of the castle, caught after dark."[level=1] + Tx"Relics, sketches, and moonlit views from the coven archives, collected over one long Transylvanian night."[t=body]) + (V[g=3] > (V[g=2] > AR[ratio=3/1] + Tx"Title"[t=supporting]) + (G[c={min:280} g=4] > (V[g=2] > AR[ratio=3/2] + Tx"Title"[t=supporting])*4)))
+//   L > LC[p=6] > V[g=8] > ((V[g=2 a=center] > Hd"Every corner of the castle, caught after dark."[level=1] + Tx"Relics, sketches, and moonlit views from the coven archives, collected over one long Transylvanian night."[t=body]) + (V[g=3] > (V[g=2] > AR[ratio=3/1] + Tx"The castle at moonrise"[t=body]) + (G[c={min:280} g=4] > (V[g=2] > AR[ratio=3/2] + Tx"Coven gathering"[t=body]) + (V[g=2] > AR[ratio=3/2] + Tx"Belfry view"[t=body]) + (V[g=2] > AR[ratio=3/2] + Tx"Crypt archives"[t=body]) + (V[g=2] > AR[ratio=3/2] + Tx"Midnight garden"[t=body]))))
 
-import type {CSSProperties} from 'react';
 import {VStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
 import {AspectRatio} from '@astryxdesign/core/AspectRatio';
 import {Grid} from '@astryxdesign/core/Grid';
+import {galleryImageClip} from 'astryx-dracula/shared/gallery-image';
+import {SceneTile} from 'astryx-dracula/shared/scene-tile';
 
 // ─── Styles ────────────────────────────────────────────────────────────────
-// Image fill + radius are custom because Astryx has no image primitive
-// (#2582). Both are local to the tiles below.
-
-// Fills the AspectRatio box with a Dracula placeholder scene. No Image
-// primitive in Astryx (#2582), so gallery tiles are inline SVG on brand
-// tokens instead of light-mode data-URI bitmaps.
-const svgStyle: CSSProperties = {
-  width: '100%',
-  height: '100%',
-  display: 'block',
-};
-// Rounds the image corners. No radius prop on AspectRatio (#2582).
-const clipStyle: CSSProperties = {
-  borderRadius: 'var(--radius-element)',
-};
+// Image fill + radius live in shared/gallery-image (no Image primitive in
+// Astryx, #2582). Tile art lives in shared/scene-tile (large fork).
 
 // ─── Gallery Data ───────────────────────────────────────────────────────────
 
@@ -51,28 +39,10 @@ const IMAGES: GalleryImage[] = [
 function GalleryCard({image, ratio}: {image: GalleryImage; ratio: number}) {
   return (
     <VStack gap={2}>
-      <AspectRatio ratio={ratio} style={clipStyle}>
-        <svg
-          viewBox="0 0 400 300"
-          preserveAspectRatio="xMidYMid slice"
-          style={svgStyle}
-          role="img"
-          aria-label={image.title}>
-          <rect width="400" height="300" fill="var(--dracula-bg-light)" />
-          <g
-            transform="translate(200 150)"
-            fill="none"
-            stroke="var(--dracula-comment)"
-            strokeWidth="5"
-            strokeLinecap="round"
-            strokeLinejoin="round">
-            <rect x="-44" y="-44" width="88" height="88" rx="5" />
-            <circle cx="18" cy="-18" r="2.5" fill={image.hue} stroke="none" />
-            <path d="M-34 30 L-8 0 L10 18 L20 8 L34 24" />
-          </g>
-        </svg>
+      <AspectRatio ratio={ratio} style={galleryImageClip}>
+        <SceneTile label={image.title} hue={image.hue} size="lg" />
       </AspectRatio>
-      <Text type="supporting" justify="center">
+      <Text type="body" color="secondary" justify="center">
         {image.title}
       </Text>
     </VStack>
