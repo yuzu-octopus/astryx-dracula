@@ -26,8 +26,18 @@
   src: url('/fonts/JetBrainsMono-SemiBold.woff2') format('woff2');
 }
 
+/* Canvas: the document scroller's track is transparent, so the unpainted
+ * canvas (black in dark color-scheme) shows through as a gutter behind the
+ * thumb in Chrome and Safari. Paint html/body the brand bg so track and
+ * page read as one surface. */
+html,
+body {
+  background-color: #282A36;
+}
+
 :root {
   color-scheme: dark;
+  background-color: #282A36;
 
   --dracula-bg: #282A36;
   --dracula-current-line: #6272A4;
