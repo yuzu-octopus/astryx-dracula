@@ -993,8 +993,13 @@ function ChapterRail({
   activeId: string;
   onSelect: (id: string) => void;
 }) {
+  // Resizable like the shell-side-nav template: 264 default, 220-400 range.
+  // The AppShell drawer owns the rail below 1024px (see MobileNavToggle),
+  // so the handle only matters at desktop widths.
   return (
     <SideNav
+      collapsible
+      resizable={{defaultWidth: 264, minWidth: 220, maxWidth: 400}}
       header={
         <SideNavHeading
           icon={<NavIcon icon={<Icon icon={Sparkles} size="sm" />} />}

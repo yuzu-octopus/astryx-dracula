@@ -135,7 +135,7 @@ const ARTIFACT_SUBTITLE = 'Grimoire · Sealed just now';
 
 const ARTIFACT_CONTENT = `## Overview
 
-Our API gateway authenticates every request with a short-lived JWT access token. Until now, an expired token meant an immediate \`401\` — even when the user still held a valid refresh token. This document describes the silent-refresh flow we just shipped and how we're rolling it out.
+Our API gateway authenticates every request with a short-lived JWT access token. Until now, an expired token meant an immediate \`401\`, even when the user still held a valid refresh token. This document describes the silent-refresh flow we just shipped and how we're rolling it out.
 
 ## The Problem
 
@@ -143,7 +143,7 @@ Token validation ran **before** any refresh logic, so the middleware rejected ex
 
 1. A request arrives with an expired access token
 2. \`validateToken()\` throws \`TokenExpiredError\`
-3. The catch block returns \`401\` — \`refreshToken()\` is never reached
+3. The catch block returns \`401\`: \`refreshToken()\` is never reached
 
 The result was users getting logged out whenever an access token lapsed mid-session.
 
@@ -151,9 +151,9 @@ The result was users getting logged out whenever an access token lapsed mid-sess
 
 The middleware now catches \`TokenExpiredError\` specifically and attempts a silent refresh before rejecting. On success it reissues an access token and continues the request; on failure it falls back to \`401\`.
 
-- **Transparent** — valid sessions never see an interruption
-- **Safe** — a missing or invalid refresh token still returns \`401\`
-- **Cheap** — refresh only runs on the expiry path, not on every request
+- **Transparent**: valid sessions never see an interruption
+- **Safe**: a missing or invalid refresh token still returns \`401\`
+- **Cheap**: refresh only runs on the expiry path, not on every request
 
 ## Testing
 
@@ -438,7 +438,7 @@ Here's the problematic sequence:
 
 1. Request arrives with an expired access token
 2. \`validateToken()\` throws \`TokenExpiredError\`
-3. The catch block returns \`401\` — never reaching \`refreshToken()\`
+3. The catch block returns \`401\`, never reaching \`refreshToken()\`
 
 The fix is to catch \`TokenExpiredError\` specifically and attempt a refresh before rejecting:`}</Markdown>
                       </ChatMessageBubble>
@@ -624,7 +624,7 @@ The fix is to catch \`TokenExpiredError\` specifically and attempt a refresh bef
                       avatar={<Avatar name="Agent" size="md" />}>
                       <ChatMessageBubble variant="ghost">
                         <Markdown density="compact">
-                          {`I've drafted a design doc covering the problem, the fix, and the test matrix — pulling straight from the changes we just made.\n\nOpen the document below to review it. Want me to expand any section?`}
+                          {`I've drafted a design doc covering the problem, the fix, and the test matrix, pulling straight from the changes we just made.\n\nOpen the document below to review it. Want me to expand any section?`}
                         </Markdown>
                       </ChatMessageBubble>
                       <ArtifactCard onOpen={openArtifact} />
@@ -663,7 +663,7 @@ The fix is to catch \`TokenExpiredError\` specifically and attempt a refresh bef
                       avatar={<Avatar name="Agent" size="md" />}>
                       <ChatMessageBubble variant="ghost">
                         <Markdown density="compact">
-                          {`On it — adding a **Rollout & Monitoring** section with a staged flag ramp and the alert thresholds. Updating the document now.`}
+                          {`On it: adding a **Rollout & Monitoring** section with a staged flag ramp and the alert thresholds. Updating the document now.`}
                         </Markdown>
                       </ChatMessageBubble>
                       <ChatToolCalls

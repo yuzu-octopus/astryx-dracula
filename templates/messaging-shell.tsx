@@ -243,7 +243,7 @@ const MESSAGES_BY_CHANNEL: Record<string, StreamMessage[]> = {
       bubbles: [
         {
           id: 'm1-1',
-          text: 'Morning! The Timestamp component now supports a `system_date` format — worth switching the audit log over.',
+          text: 'Morning! The Timestamp component now supports a `system_date` format, worth switching the audit log over.',
         },
         {
           id: 'm1-2',
@@ -269,7 +269,7 @@ const MESSAGES_BY_CHANNEL: Record<string, StreamMessage[]> = {
       bubbles: [
         {
           id: 'm3-1',
-          text: 'It does — I will pick that up after the template review.',
+          text: 'It does. I will pick that up after the template review.',
         },
         {
           id: 'm3-2',
@@ -292,7 +292,7 @@ const MESSAGES_BY_CHANNEL: Record<string, StreamMessage[]> = {
       id: 'm5',
       userId: 'mira',
       time: '2026-06-30T09:26:00',
-      bubbles: [{id: 'm5-1', text: 'Great — closing out the drift task then.'}],
+      bubbles: [{id: 'm5-1', text: 'Great, closing out the drift task then.'}],
     },
   ],
   'frontend-guild': [
@@ -311,7 +311,7 @@ const MESSAGES_BY_CHANNEL: Record<string, StreamMessage[]> = {
       id: 'g2',
       userId: 'you',
       time: '2026-06-30T08:44:00',
-      bubbles: [{id: 'g2-1', text: 'Works for me — agenda doc is updated.'}],
+      bubbles: [{id: 'g2-1', text: 'Works for me, agenda doc is updated.'}],
     },
   ],
 };
@@ -327,7 +327,7 @@ const THREAD_ROOT: ThreadReply = {
   id: 't0',
   userId: 'you',
   time: '2026-06-30T09:17:30',
-  text: 'One question on the List density defaults — should channel sidebars use compact or balanced? The spec shows both.',
+  text: 'One question on the List density defaults: should channel sidebars use compact or balanced? The spec shows both.',
 };
 
 const THREAD_REPLIES: ThreadReply[] = [
@@ -341,7 +341,7 @@ const THREAD_REPLIES: ThreadReply[] = [
     id: 't2',
     userId: 'devon',
     time: '2026-06-30T09:21:00',
-    text: 'Agreed — the sidebar rows here are a good reference implementation.',
+    text: 'Agreed, the sidebar rows here are a good reference implementation.',
   },
 ];
 

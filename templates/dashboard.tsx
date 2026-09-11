@@ -758,6 +758,9 @@ export default function DashboardTemplate() {
       content={
         <LayoutContent padding={6}>
           <VStack gap={6}>
+            {/* Page header — the only h1; section titles sit at level 2 */}
+            <Heading level={1}>Analytics Dashboard</Heading>
+
             {/* Active Users Chart */}
             <VStack gap={6}>
               <HStack hAlign="between" vAlign="center">

@@ -401,7 +401,7 @@ export default function SettingsSidebar() {
                 flush with the content edge. */}
             {isNarrow && (
               <Toolbar
-                label={`Back to Account settings — ${SECTION_TITLES[activeNav]}`}
+                label={`Back to Account settings: ${SECTION_TITLES[activeNav]}`}
                 gap={2}
                 startContent={
                   <>

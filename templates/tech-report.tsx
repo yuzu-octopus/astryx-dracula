@@ -21,53 +21,13 @@
  *   chapter id and the section key, so the Outline and the headings cannot
  *   drift apart.
  *
- * ─── Handoff ledger (paused mid-verification; resume here) ───────────────────
- * Status: page, spec, and registry entry are written and wired.
- *
- * Done:
- *   [x] templates/tech-report.tsx, templates/tech-report.template.mjs
- *   [x] registered in demo/templateRegistry.ts (id `tech-report`).
- *       demo/Templates.tsx was NOT touched: it must stay components-only, or
- *       the react-doctor `only-export-components` rule fires.
- *   [x] `bunx astryx layout check` on the XLE above: [ok] Valid
- *   [x] `bunx tsc --noEmit` clean, `bun run build` succeeds
- *   [x] `bunx react-doctor@latest --verbose`: 100/100, zero findings
- *   [x] live at 1440x900: all 12 chapters switch, every chapter's Outline
- *       hrefs match its `h2` ids exactly, all 5 scenes render, and a
- *       getBBox sweep of every scene found zero text overflow and zero
- *       label collisions inside the 400x225 viewBox.
- *   [x] no raw hex, no em dash, no "..." in rendered text, no index keys,
- *       no raw div/span, only React + @astryxdesign/core + lucide-react.
- *
- * TODO (tomorrow):
- *   [ ] 390x844 pass, still unmeasured: page-level horizontal scroll must be
- *       0, the "On this page" Selector must replace the Outline, and the rail
- *       must collapse into the AppShell drawer behind a working hamburger.
- *   [ ] Screenshots: 1440x900 (top of Abstract) and 390x844, plus one per
- *       scene, for the report.
- *   [ ] Scroll-spy: see the environment note below before chasing this.
- *
- * Environment note (cost an hour today, do not re-derive):
- *   The shared headless browser reports `document.visibilityState === 'hidden'`,
- *   so Chromium suspends requestAnimationFrame (~0 ticks/1.2s), scroll event
- *   delivery, and IntersectionObserver callbacks. The Outline's built-in
- *   scroll-spy therefore never advances in that browser, and the unmodified
- *   templates/product-tour.tsx reference behaves identically, so this is the
- *   harness and not this page. Fix that made the page render again, run once
- *   per CDP session BEFORE evaluating:
- *     const client = await page.createCDPSession();
- *     await client.send('Emulation.setFocusEmulationEnabled', {enabled: true});
- *     await client.send('Page.setWebLifecycleState', {state: 'active'});
- *   After that `visibilityState` is 'visible' and rAF ticks normally, so
- *   scroll-spy can be checked for real: scroll past each `h2` and read
- *   `nav[aria-label="Table of contents"] a[aria-current]`.
- *   Related: Vite HMR reloads this page whenever a sibling agent touches
- *   demo/ or another template, which kills an in-flight evaluate with
- *   "Execution context was destroyed". Wrap each step in a retry.
- *
- * Verified URLs: http://localhost:5199/astryx-dracula/#/templates/tech-report
- *   (viewer chrome, needs iframe.contentDocument)
- *   http://localhost:5199/astryx-dracula/?bare=tech-report (the page itself)
+ * Known limitation: chapters are short (1350-2200px against a 900px
+ * viewport), so mid-chapter headings cannot scroll to the activation line.
+ * The Outline's scroll-spy marks the last heading above that line, which
+ * means a middle section can be skipped over: scrolling the Abstract to
+ * "Three levers" lights "What it adds up to" instead. Long chapters
+ * (csa2 at 2189px) track better than short ones (ced, mhc at 1350px).
+ * Same shape on product-tour, same cause; revisit if chapters grow.
  */
 
 import {useState, type CSSProperties} from 'react';
@@ -1312,8 +1272,13 @@ function ChapterRail({
   activeId: string;
   onSelect: (id: string) => void;
 }) {
+  // Resizable like the shell-side-nav template: 264 default, 220-400 range.
+  // The AppShell drawer owns the rail below 1024px (see MobileNavToggle),
+  // so the handle only matters at desktop widths.
   return (
     <SideNav
+      collapsible
+      resizable={{defaultWidth: 264, minWidth: 220, maxWidth: 400}}
       header={
         <SideNavHeading
           icon={<NavIcon icon={<Icon icon={ScrollText} size="sm" />} />}
@@ -1514,7 +1479,7 @@ export default function TechReport() {
 
               <Text type="supporting" color="secondary">
                 Checkpoints and the full report:{' '}
-                <Link href={REPORT_URL} isExternalLink>
+                <Link href={REPORT_URL} isExternalLink type="supporting">
                   huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash
                 </Link>
               </Text>
