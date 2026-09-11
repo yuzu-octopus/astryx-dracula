@@ -440,6 +440,10 @@ function StorePreview({
   products: ProductSpec[];
   isMobile: boolean;
 }) {
+  // Shell-less preview: no AppShell above means the host context always
+  // reports desktop, so the nav reads the real viewport instead.
+  const isNarrowViewport = useMediaQuery('(max-width: 640px)');
+  const collapseNav = isMobile || isNarrowViewport;
   return (
     <VStack gap={0} data-theme-preview="true">
       <VStack gap={0}>
@@ -447,7 +451,7 @@ function StorePreview({
           label="Theme preview navigation"
           heading={<TopNavHeading heading="Nocturne" />}
           centerContent={
-            isMobile ? undefined : (
+            collapseNav ? undefined : (
               <>
                 <TopNavItem label="Shop" href="#/templates/theme-showcase" isSelected />
                 <TopNavItem label="New In" href="#/templates/theme-showcase" />
@@ -457,35 +461,46 @@ function StorePreview({
             )
           }
           endContent={
-            <HStack gap={2} vAlign="center">
-              <HStack gap={0.5}>
-                <Button
-                  label="Search"
-                  tooltip="Search"
-                  variant="ghost"
-                  isIconOnly
-                  icon={<Search size={20} />}
-                  href="#/templates/theme-showcase"
-                />
-                <Button
-                  label="Account"
-                  tooltip="Account"
-                  variant="ghost"
-                  isIconOnly
-                  icon={<User size={20} />}
-                  href="#/templates/theme-showcase"
-                />
-                <Button
-                  label="Cart"
-                  tooltip="Cart"
-                  variant="ghost"
-                  isIconOnly
-                  icon={<ShoppingBag size={20} />}
-                  href="#/templates/theme-showcase"
-                />
+            collapseNav ? (
+              <Button
+                label="Cart"
+                tooltip="Cart"
+                variant="ghost"
+                isIconOnly
+                icon={<ShoppingBag size={20} />}
+                href="#/templates/theme-showcase"
+              />
+            ) : (
+              <HStack gap={2} vAlign="center">
+                <HStack gap={0.5}>
+                  <Button
+                    label="Search"
+                    tooltip="Search"
+                    variant="ghost"
+                    isIconOnly
+                    icon={<Search size={20} />}
+                    href="#/templates/theme-showcase"
+                  />
+                  <Button
+                    label="Account"
+                    tooltip="Account"
+                    variant="ghost"
+                    isIconOnly
+                    icon={<User size={20} />}
+                    href="#/templates/theme-showcase"
+                  />
+                  <Button
+                    label="Cart"
+                    tooltip="Cart"
+                    variant="ghost"
+                    isIconOnly
+                    icon={<ShoppingBag size={20} />}
+                    href="#/templates/theme-showcase"
+                  />
+                </HStack>
+                <Button label="Sign in" variant="primary" href="#/templates/theme-showcase" />
               </HStack>
-              <Button label="Sign in" variant="primary" href="#/templates/theme-showcase" />
-            </HStack>
+            )
           }
         />
 
