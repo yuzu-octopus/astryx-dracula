@@ -117,6 +117,7 @@
 *::-webkit-scrollbar {
   width: 10px;
   height: 10px;
+  background: transparent;
 }
 
 *::-webkit-scrollbar-track,
@@ -125,14 +126,14 @@
 }
 
 *::-webkit-scrollbar-thumb {
-  background: var(--dracula-current-line);
+  background-color: var(--dracula-current-line);
   border-radius: 5px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: var(--dracula-purple);
+  background-color: var(--dracula-purple);
   border: 2px solid transparent;
   background-clip: content-box;
 }
