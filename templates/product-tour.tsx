@@ -330,7 +330,7 @@ bunx astryx template product-tour --package astryx-dracula`,
           {
             key: 'pack-rules',
             heading: 'What the pages may import',
-            body: 'Each template is self-contained: React, the Astryx core, and Lucide icons. No chart library, no CSS framework, no shared internal module. Every chart is a hand-drawn inline SVG, which is why a scaffolded page has no dependency surprises.',
+            body: 'Each template is self-contained: React, the Astryx core, Lucide icons, and the kit shared modules (astryx-dracula/shared/*). No chart library, no CSS framework, no other internal module. Every chart is a hand-drawn inline SVG, which is why a scaffolded page has no dependency surprises.',
           },
           {
             key: 'xle-headers',

@@ -26,7 +26,6 @@ import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
 import {Card} from '@astryxdesign/core/Card';
 import {Grid} from '@astryxdesign/core/Grid';
-import {Icon} from '@astryxdesign/core/Icon';
 import {Link} from '@astryxdesign/core/Link';
 import {Avatar} from '@astryxdesign/core/Avatar';
 import {List, ListItem} from '@astryxdesign/core/List';
@@ -35,7 +34,7 @@ import {Button} from '@astryxdesign/core/Button';
 import {Table, proportional, pixel} from '@astryxdesign/core/Table';
 import type {TableColumn} from '@astryxdesign/core/Table';
 import {Divider} from '@astryxdesign/core/Divider';
-import {ArrowUp, ArrowDown} from 'lucide-react';
+import {MetricDelta} from 'astryx-dracula/shared/metric-delta';
 
 // ============= DATA =============
 
@@ -538,24 +537,7 @@ function MarketCard({
           <Text type="display-3" weight="semibold" hasTabularNumbers>
             {price}
           </Text>
-          <HStack gap={1} vAlign="center">
-            <Icon
-              icon={positive ? ArrowUp : ArrowDown}
-              size="xsm"
-              color={positive ? 'success' : 'error'}
-            />
-            <Text
-              type="body"
-              weight="semibold"
-              hasTabularNumbers
-              style={{
-                color: positive
-                  ? 'var(--color-positive)'
-                  : 'var(--color-negative)',
-              }}>
-              {change}
-            </Text>
-          </HStack>
+          <MetricDelta value={change} positive={positive} />
         </HStack>
       </VStack>
     </Card>
@@ -566,37 +548,6 @@ function MarketCard({
 // even before the tone does.
 const formatSigned = (value: number, digits: number, suffix = '') =>
   `${value >= 0 ? '+' : ''}${value.toFixed(digits)}${suffix}`;
-
-// The sign and the arrow carry the direction; the tone only reinforces it.
-function ColoredValue({
-  value,
-  isPositive,
-}: {
-  value: string;
-  isPositive: boolean;
-}) {
-  return (
-    <HStack gap={1} vAlign="center">
-      <Icon
-        icon={isPositive ? ArrowUp : ArrowDown}
-        size="xsm"
-        color={isPositive ? 'success' : 'error'}
-      />
-      <Text
-        type="body"
-        weight="semibold"
-        hasTabularNumbers
-        maxLines={1}
-        style={{
-          color: isPositive
-            ? 'var(--color-positive)'
-            : 'var(--color-negative)',
-        }}>
-        {value}
-      </Text>
-    </HStack>
-  );
-}
 
 const trendingColumns: TableColumn<StockRow>[] = [
   {
@@ -624,9 +575,9 @@ const trendingColumns: TableColumn<StockRow>[] = [
     header: 'Chg (pts)',
     width: pixel(104),
     renderCell: (row: StockRow) => (
-      <ColoredValue
+      <MetricDelta
         value={formatSigned(row.dailyPts, 2)}
-        isPositive={row.dailyPts >= 0}
+        positive={row.dailyPts >= 0}
       />
     ),
   },
@@ -635,9 +586,9 @@ const trendingColumns: TableColumn<StockRow>[] = [
     header: 'Chg (%)',
     width: pixel(96),
     renderCell: (row: StockRow) => (
-      <ColoredValue
+      <MetricDelta
         value={formatSigned(row.dailyPct, 2, '%')}
-        isPositive={row.dailyPct >= 0}
+        positive={row.dailyPct >= 0}
       />
     ),
   },
@@ -646,9 +597,9 @@ const trendingColumns: TableColumn<StockRow>[] = [
     header: '52W (%)',
     width: pixel(96),
     renderCell: (row: StockRow) => (
-      <ColoredValue
+      <MetricDelta
         value={formatSigned(row.weekChg, 1, '%')}
-        isPositive={row.weekChg >= 0}
+        positive={row.weekChg >= 0}
       />
     ),
   },
@@ -684,7 +635,7 @@ function MetricCard({
           <Text type="display-3" weight="semibold" hasTabularNumbers>
             {value}
           </Text>
-          <ColoredValue value={change} isPositive={positive} />
+          <MetricDelta value={change} positive={positive} />
         </HStack>
         <Text type="supporting" color="secondary">
           {caption}
@@ -716,7 +667,7 @@ function AssetRow({
           <Text type="body" hasTabularNumbers>
             {value}
           </Text>
-          <ColoredValue value={change} isPositive={!change.startsWith('-')} />
+          <MetricDelta value={change} positive={!change.startsWith('-')} />
         </VStack>
       }
     />

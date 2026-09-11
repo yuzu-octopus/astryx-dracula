@@ -489,7 +489,7 @@ function BlockPreview({
             <EmptyState
               title={props.heading as string}
               description={props.description as string}
-              icon={<Icon icon={FileText} />}
+              icon={<Icon icon={FileText} color="secondary" />}
               actions={
                 (props.buttonLabel as string) ? (
                   <Button
@@ -516,7 +516,7 @@ function BlockPreview({
           <EmptyState
             title="Image Block"
             description="Drop an image or enter a URL"
-            icon={<Icon icon={Image} />}
+            icon={<Icon icon={Image} color="secondary" />}
             isCompact
           />
         </Card>
@@ -924,7 +924,7 @@ export default function PageEditor() {
                 <EmptyState
                   title="No blocks yet"
                   description="Add blocks from the sidebar to start building your page"
-                  icon={<Icon icon={CirclePlus} />}
+                  icon={<Icon icon={CirclePlus} color="secondary" />}
                 />
               )}
             </VStack>

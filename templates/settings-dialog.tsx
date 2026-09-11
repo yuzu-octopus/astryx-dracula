@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC > Ctr[h=80vh] > B.primary"Open settings"[opens=#settings] ;; Dlg#settings > L > (LP[w=280 divider p=3] > V[g=4] > Hd"Account settings"[level=2] + (UL > LI"Personal information"*8)) + (LC[p=6] > V[g=6] > DH"Account" + SE"Settings section" + (V[g=0] > TabList + (V[g=0] > Hd"Login"[level=3] + D + (H[j=between a=start] > (V[g=0] > Tx"Password"[weight=semibold] + Tx"Not created"[t=supporting]) + Lk"Create") + (H[g=3 a=start] > Ic + (V[g=0] > (H[g=2 a=center wrap] > Tx"OS X 10.15.7 Chrome"[weight=semibold] + SD) + Tx"March 30, 2026"[t=supporting])))))
+//   L > LC > Ctr[h=80vh] > B.primary"Open settings"[opens=#settings] ;; Dlg#settings > L > (LP[w=280 divider p=3] > V[g=4] > Tx"Account settings"[t=label] + (UL > LI"Personal information"*8)) + (LC[p=6] > V[g=6] > DH"Account" + SE"Settings section" + (V[g=0] > TabList + (V[g=0] > Hd"Login"[level=3] + D + (H[j=between a=start] > (V[g=0] > Tx"Password"[weight=semibold] + Tx"Not created"[t=supporting]) + Lk"Create") + (H[g=3 a=start] > Ic + (V[g=0] > (H[g=2 a=center wrap] > Tx"OS X 10.15.7 Chrome"[weight=semibold] + SD) + Tx"March 30, 2026"[t=supporting])))))
 
 /**
  * Settings Dialog — account sections inside one modal.
@@ -39,19 +39,15 @@ import {StatusDot} from '@astryxdesign/core/StatusDot';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Center} from '@astryxdesign/core/Center';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
+import {Lock, ShieldCheck, Monitor} from 'lucide-react';
 import {
-  User,
-  Lock,
-  Globe,
-  ShieldCheck,
-  Monitor,
-  Bell,
-  FileText,
-  CreditCard,
-  Briefcase,
-  SquarePen,
-  Share2,
-} from 'lucide-react';
+  NAV_ITEMS,
+  LOGIN_ROWS,
+  SOCIAL_ROWS,
+  DEVICE_ROWS,
+  INFO_TILES,
+} from 'astryx-dracula/shared/settings-rows';
+import type {DeviceRow, InfoTileData} from 'astryx-dracula/shared/settings-rows';
 
 const iconBox: CSSProperties = {
   borderRadius: 'var(--radius-container)',
@@ -90,44 +86,6 @@ const actionNoWrap: CSSProperties = {
 // template through the hash router (bare "#" would drop back to the home page).
 const SELF_HASH = '#/templates/settings-dialog';
 
-const NAV_ITEMS = [
-  {label: 'Personal information', icon: User},
-  {label: 'Login & security', icon: Lock},
-  {label: 'Privacy', icon: ShieldCheck},
-  {label: 'Notifications', icon: Bell},
-  {label: 'Taxes', icon: FileText},
-  {label: 'Payments', icon: CreditCard},
-  {label: 'Languages & currency', icon: Globe},
-  {label: 'Travel for work', icon: Briefcase},
-];
-
-const LOGIN_ROWS = [
-  {label: 'Password', value: 'Not created', action: 'Create'},
-];
-
-const SOCIAL_ROWS = [
-  {label: 'Google', value: 'Connected', action: 'Disconnect'},
-];
-
-const DEVICE_ROWS: {
-  label: string;
-  isCurrent?: boolean;
-  location: string;
-  action?: string;
-}[] = [
-  {
-    label: 'OS X 10.15.7 · Chrome',
-    isCurrent: true,
-    location: 'Brașov, Transylvania · March 30, 2026 at 19:31',
-  },
-  {label: 'Session', location: 'August 9, 2023 at 04:19', action: 'Log out'},
-  {
-    label: 'OS X 10.15.7 · unknown',
-    location: 'Whitby, England · April 14, 2023 at 17:47',
-    action: 'Log out',
-  },
-];
-
 const LANGUAGES = [
   {label: 'English (Canada)', value: 'en-CA'},
   {label: 'English (US)', value: 'en-US'},
@@ -164,37 +122,7 @@ interface ExpandableRowProps {
   onSave: () => void;
 }
 
-const INFO_TILES: Array<{
-  icon: typeof Lock;
-  title: string;
-  body: string;
-}> = [
-  {
-    icon: Lock,
-    title: "Why isn't my info shown here?",
-    body: "We're hiding some account details to protect your identity.",
-  },
-  {
-    icon: SquarePen,
-    title: 'Which details can be edited?',
-    body: "Contact info and personal details can be edited. If this info was used to verify your identity, you'll need to get verified again the next time you book, or to continue hosting.",
-  },
-  {
-    icon: Share2,
-    title: 'What info is shared with others?',
-    body: 'We only release contact information after a reservation is confirmed.',
-  },
-];
-
-function InfoTile({
-  icon,
-  title,
-  body,
-}: {
-  icon: typeof Lock;
-  title: string;
-  body: string;
-}) {
+function InfoTile({icon, title, body}: InfoTileData) {
   return (
     <HStack gap={3} vAlign="start">
       <Center width={48} height={48} style={iconBox}>
@@ -326,13 +254,6 @@ function InfoRowItem({
   );
 }
 
-interface DeviceRow {
-  label: string;
-  isCurrent?: boolean;
-  location: string;
-  action?: string;
-}
-
 function DeviceRowItem({label, isCurrent, location, action}: DeviceRow) {
   return (
     <>
@@ -443,9 +364,9 @@ export default function SettingsDialog() {
             isCompact ? undefined : (
               <LayoutPanel width={280} hasDivider role="navigation" padding={3}>
               <VStack gap={4}>
-                <Heading level={2} style={sideNavHeading}>
+                <Text type="label" style={sideNavHeading}>
                   Account settings
-                </Heading>
+                </Text>
                 <List density="spacious">
                   {NAV_ITEMS.map(item => (
                     <ListItem

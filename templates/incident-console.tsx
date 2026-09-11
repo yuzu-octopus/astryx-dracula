@@ -337,7 +337,7 @@ function IncidentRows({
       <EmptyState
         title="Quiet in the crypt"
         description="No incidents match. Adjust the status filter or clear search filters."
-        icon={<Icon icon={BellRing} size="lg" />}
+        icon={<Icon icon={BellRing} size="lg" color="secondary" />}
       />
     );
   }
@@ -594,7 +594,7 @@ export default function IncidentConsole() {
                 <EmptyState
                   title="No incident under the lens"
                   description="Select an incident from the rows to inspect its timeline."
-                  icon={<Icon icon={BellRing} size="lg" />}
+                  icon={<Icon icon={BellRing} size="lg" color="secondary" />}
                   isCompact
                 />
               )}

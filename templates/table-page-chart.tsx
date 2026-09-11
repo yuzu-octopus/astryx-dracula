@@ -38,6 +38,7 @@ import {Link} from '@astryxdesign/core/Link';
 import {Table, proportional, pixel} from '@astryxdesign/core/Table';
 import type {TableColumn} from '@astryxdesign/core/Table';
 import {Filter, Download, Plus, Square} from 'lucide-react';
+import {ChartLabel} from 'astryx-dracula/shared/chart-labels';
 
 // ============= ICONS (verified lucide-react exports) =============
 // Filter ← FunnelIcon, Download ← ArrowDownTrayIcon, Plus ← PlusIcon.
@@ -647,15 +648,9 @@ function RevenueChart() {
                   strokeDasharray={tick === 0 ? undefined : '3 3'}
                   opacity={tick === 0 ? 1 : 0.5}
                 />
-                <text
-                  x={padLeft - 6}
-                  y={y + 3}
-                  textAnchor="end"
-                  fontSize={13}
-                  fill="var(--color-text-paragraph)"
-                  fontFamily="var(--font-family-mono)">
+                <ChartLabel x={padLeft - 6} y={y + 3} textAnchor="end">
                   {formatRevenueTick(tick)}
-                </text>
+                </ChartLabel>
               </g>
             );
           })}
@@ -671,16 +666,13 @@ function RevenueChart() {
           {points.map(
             (p, i) =>
               (i % 3 === 0 || i === points.length - 1) && (
-                <text
+                <ChartLabel
                   key={p.date}
                   x={i === points.length - 1 ? W - padRight - 2 : p.x}
                   y={H - 8}
-                  textAnchor={i === points.length - 1 ? 'end' : 'middle'}
-                  fontSize={13}
-                  fill="var(--color-text-paragraph)"
-                  fontFamily="var(--font-family-mono)">
+                  textAnchor={i === points.length - 1 ? 'end' : 'middle'}>
                   {p.date}
-                </text>
+                </ChartLabel>
               ),
           )}
         </svg>

@@ -16,7 +16,7 @@
  *            drills into the detail view behind a back button
  */
 
-import {useState, type CSSProperties} from 'react';
+import {Fragment, useState, type CSSProperties} from 'react';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {
   VStack,
@@ -41,14 +41,8 @@ import {StatusDot} from '@astryxdesign/core/StatusDot';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Center} from '@astryxdesign/core/Center';
 import {
-  User,
   Lock,
   ShieldCheck,
-  Bell,
-  FileText,
-  CreditCard,
-  Globe,
-  Briefcase,
   Wrench,
   Monitor,
   SquarePen,
@@ -56,6 +50,14 @@ import {
   ArrowLeft,
   ChevronRight,
 } from 'lucide-react';
+import {
+  NAV_ITEMS,
+  LOGIN_ROWS,
+  SOCIAL_ROWS,
+  DEVICE_ROWS,
+  INFO_TILES,
+} from 'astryx-dracula/shared/settings-rows';
+import type {InfoRow} from 'astryx-dracula/shared/settings-rows';
 
 // Anchor the page to the viewport height so the sidebar + content fill the
 // screen. Layout height="fill" is min-height:100% which collapses when the
@@ -90,17 +92,6 @@ const sideNavHeading: CSSProperties = {
 // template through the hash router (bare "#" would drop back to the home page).
 const SELF_HASH = '#/templates/settings-sidebar';
 
-const NAV_ITEMS = [
-  {label: 'Personal information', icon: User},
-  {label: 'Login & security', icon: Lock},
-  {label: 'Privacy', icon: ShieldCheck},
-  {label: 'Notifications', icon: Bell},
-  {label: 'Taxes', icon: FileText},
-  {label: 'Payments', icon: CreditCard},
-  {label: 'Languages & currency', icon: Globe},
-  {label: 'Travel for work', icon: Briefcase},
-];
-
 // Section title shown beside the mobile back button (matches each section's
 // in-content heading, which is hidden on mobile to avoid a duplicate).
 const SECTION_TITLES: Record<string, string> = {
@@ -115,20 +106,6 @@ const SECTION_TITLES: Record<string, string> = {
   'Professional hosting tools': 'Hosting tools',
 };
 
-interface InfoRow {
-  label: string;
-  value: string;
-  action: string;
-}
-
-const LOGIN_ROWS: InfoRow[] = [
-  {label: 'Password', value: 'Not created', action: 'Create'},
-];
-
-const SOCIAL_ROWS: InfoRow[] = [
-  {label: 'Google', value: 'Connected', action: 'Disconnect'},
-];
-
 const TAX_ROWS: InfoRow[] = [
   {label: 'Tithe information', value: 'Not provided', action: 'Add'},
   {label: 'Tithe scrolls', value: 'No scrolls yet', action: 'View'},
@@ -137,25 +114,6 @@ const TAX_ROWS: InfoRow[] = [
 const PAYOUT_ROWS: InfoRow[] = [
   {label: 'Tribute method', value: 'Not set up', action: 'Add'},
   {label: 'Past tributes', value: 'No tributes yet', action: 'View'},
-];
-
-const DEVICE_ROWS: {
-  label: string;
-  isCurrent?: boolean;
-  location: string;
-  action?: string;
-}[] = [
-  {
-    label: 'OS X 10.15.7 · Chrome',
-    isCurrent: true,
-    location: 'Brașov, Transylvania · March 30, 2026 at 19:31',
-  },
-  {label: 'Session', location: 'August 9, 2023 at 04:19', action: 'Log out'},
-  {
-    label: 'OS X 10.15.7 · unknown',
-    location: 'Whitby, England · April 14, 2023 at 17:47',
-    action: 'Log out',
-  },
 ];
 
 function InfoRowItem({label, value, action}: InfoRow) {
@@ -735,61 +693,27 @@ export default function SettingsSidebar() {
 
                 <Card padding={4}>
                   <VStack gap={4}>
-                    <HStack gap={3} vAlign="start">
-                      <Center width={48} height={48} style={iconBox}>
-                        <Icon icon={Lock} />
-                      </Center>
-                      <VStack gap={0}>
-                        <Text type="body" weight="semibold" display="block">
-                          Why isn&apos;t my info shown here?
-                        </Text>
-                        <Text
-                          type="supporting"
-                          color="secondary"
-                          display="block">
-                          We&apos;re veiling some crypt details to protect your
-                          identity.
-                        </Text>
-                      </VStack>
-                    </HStack>
-                    <Divider />
-                    <HStack gap={3} vAlign="start">
-                      <Center width={48} height={48} style={iconBox}>
-                        <Icon icon={SquarePen} />
-                      </Center>
-                      <VStack gap={0}>
-                        <Text type="body" weight="semibold" display="block">
-                          Which details can be edited?
-                        </Text>
-                        <Text
-                          type="supporting"
-                          color="secondary"
-                          display="block">
-                          Contact runes and personal details can be edited. If
-                          these were used to verify your identity,
-                          you&apos;ll need to be verified anew before your
-                          next stay, or to keep hosting your crypt.
-                        </Text>
-                      </VStack>
-                    </HStack>
-                    <Divider />
-                    <HStack gap={3} vAlign="start">
-                      <Center width={48} height={48} style={iconBox}>
-                        <Icon icon={Share2} />
-                      </Center>
-                      <VStack gap={0}>
-                        <Text type="body" weight="semibold" display="block">
-                          What info is shared with others?
-                        </Text>
-                        <Text
-                          type="supporting"
-                          color="secondary"
-                          display="block">
-                          We only release contact runes after a booking is
-                          sealed.
-                        </Text>
-                      </VStack>
-                    </HStack>
+                    {INFO_TILES.map((tile, i) => (
+                      <Fragment key={tile.title}>
+                        {i > 0 && <Divider />}
+                        <HStack gap={3} vAlign="start">
+                          <Center width={48} height={48} style={iconBox}>
+                            <Icon icon={tile.icon} />
+                          </Center>
+                          <VStack gap={0}>
+                            <Text type="body" weight="semibold" display="block">
+                              {tile.title}
+                            </Text>
+                            <Text
+                              type="supporting"
+                              color="secondary"
+                              display="block">
+                              {tile.body}
+                            </Text>
+                          </VStack>
+                        </HStack>
+                      </Fragment>
+                    ))}
                   </VStack>
                 </Card>
               </VStack>

@@ -25,6 +25,10 @@
     "./astryx.integration.mjs": "./astryx.integration.mjs",
     "./package.json": "./package.json",
     "./templates/*": "./templates/*",
+    "./shared/chart-hues": "./shared/chart-hues.ts",
+    "./shared/chart-labels": "./shared/chart-labels.tsx",
+    "./shared/metric-delta": "./shared/metric-delta.tsx",
+    "./shared/settings-rows": "./shared/settings-rows.ts",
     "./theme.css": "./theme.css",
     "./tokens.css": "./tokens.css"
   },
@@ -38,6 +42,7 @@
     "astryx-dracula.variants.d.ts",
     "fonts/",
     "icons.tsx",
+    "shared/",
     "theme.css",
     "tokens.css",
     "templates/",

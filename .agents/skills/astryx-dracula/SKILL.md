@@ -55,7 +55,7 @@ New page from scratch: write XLE, expand, then brand-pass. `bunx astryx layout c
 
 ## Templates
 
-Forty-four themed pages ship in `templates/`, each leading with its canonical, validated XLE expression in a header comment (`// XLE (...)`). Also published as an Astryx integration pack (`astryx.integration.mjs`). Consumers with the package in `astryx.config` scaffold with `bunx astryx template <id> --package astryx-dracula`. Live at `#/templates` on the showcase, where `demo/Templates.tsx` renders each page bare inside a viewer iframe and keeps the `Templates / <name>` bar plus its `<Theme>` provider outside it. That bar, the provider, and the frame are viewer chrome, not page content: never copy them into a `templates/` file. Pack rules: templates import React plus `@astryxdesign/core` and `lucide-react`, no chart libraries; every template carries its `<id>.template.mjs` spec. IDs: dashboard, table-grouped, table-page, kanban-board, settings-sidebar, settings, payment-form, login-card, file-explorer, ai-chat-landing, library, centered-hero, ai-chat, classic-gallery, contact-form, dashboard-portfolio, detail-page, documentation, documentation-design, documentation-technical, editor, form-two-column, gallery-hero, ide, login, mixed-gallery, product-detail, product-gallery, product-tour, settings-dialog, shell-nav, shell-side-nav, shell-top-nav, table, table-page-chart, table-page-heatmap-status, table-page-shoe-store-heatmap, blank, incident-console, login-split, login-sso, messaging-shell, side-gallery, theme-showcase.
+Forty-four themed pages ship in `templates/`, each leading with its canonical, validated XLE expression in a header comment (`// XLE (...)`). Also published as an Astryx integration pack (`astryx.integration.mjs`). Consumers with the package in `astryx.config` scaffold with `bunx astryx template <id> --package astryx-dracula`. Live at `#/templates` on the showcase, where `demo/Templates.tsx` renders each page bare inside a viewer iframe and keeps the `Templates / <name>` bar plus its `<Theme>` provider outside it. That bar, the provider, and the frame are viewer chrome, not page content: never copy them into a `templates/` file. Pack rules: templates import React plus `@astryxdesign/core`, `lucide-react`, and the kit's own shared modules (`astryx-dracula/shared/*`: chart labels/hues, MetricDelta, settings rows), no chart libraries; every template carries its `<id>.template.mjs` spec. IDs: dashboard, table-grouped, table-page, kanban-board, settings-sidebar, settings, payment-form, login-card, file-explorer, ai-chat-landing, library, centered-hero, ai-chat, classic-gallery, contact-form, dashboard-portfolio, detail-page, documentation, documentation-design, documentation-technical, editor, form-two-column, gallery-hero, ide, login, mixed-gallery, product-detail, product-gallery, product-tour, settings-dialog, shell-nav, shell-side-nav, shell-top-nav, table, table-page-chart, table-page-heatmap-status, table-page-shoe-store-heatmap, blank, incident-console, login-split, login-sso, messaging-shell, side-gallery, theme-showcase.
 
 ## Brand principles
 
@@ -63,7 +63,7 @@ These are decisions, not suggestions. Every one comes from the showcase that def
 
 1. **Dark is the brand, not a mode.** Every surface resolves to the Dracula ramp. No light tokens, no light-mode branches, no `prefers-color-scheme` forks. A component that looks wrong dark is a wrong token, never a missing light theme.
 2. **Purple means tappable.** Links, titles, and primary actions are purple; visited falls back to text, hover resolves to foreground plus underline. Users learn this in seconds. Nothing decorative is purple.
-3. **Status has a fixed vocabulary.** Green positive, red negative, yellow tags, cyan info, pink flair, orange warning. Status surfaces use 10% categorical washes with semantic borders, never direct fills. Text on fills is always `#21222C`.
+3. **Status has a fixed vocabulary.** Green positive, red negative, yellow tags, cyan info, pink flair, orange warning. Status surfaces use 10% categorical washes with semantic borders, never direct fills. Text on fills is always `#21222C`. In-progress/activity is `StatusDot variant="info"` (cyan) with `isPulsing`; the purple `accent` StatusDot is never a status — purple means tappable, no exceptions. Info states are always cyan, never blue: blue tendency goes to comment (categorical charts) and blue Badge/Token variants are not status vocabulary.
 4. **Mono everywhere, on purpose.** JetBrains Mono for body, heading, and code alike. One family, clearly distinct from every sans-serif product. Copy `fonts/` to served `public/fonts/`; monospace fallback means the copy step was skipped.
 5. **Dense, not cramped.** The bento reference packs 12 cells with zero dead space: hero strip with live stats, wide chart, tall table spanning two rows, palette strip, type specimen, install command. Size equals importance (hero 2x, feature wide, metrics small). Information-heavy beats airy on every brand surface.
 6. **Hierarchy is two-tier.** Section headers pair `Heading level={2}` with `Text type="body"`. Widget headers pair `Heading level={3}` with `Text type="supporting"`. Never two same-size tiers stacked, never a subtitle larger than its heading.
@@ -96,7 +96,7 @@ Map jobs to components, never to lookalikes: action goes to Button (never a nav-
 - **Hover dims, never inverts.** Interactive surfaces darken 12% on hover, 20% on press, via the theme overlay tokens. A hover that goes transparent, dark-navy, or accent-colored means something overrode `--color-overlay-hover`.
 - **Focus is accent.** 2px accent ring, beat Functional Purple on contrast. Never remove it.
 - **Links underline always**, resolve to foreground on hover. Inline links inherit the surrounding text size; a link that renders larger than its sentence is the fixed external icon at small sizes, drop `isExternalLink` and keep `target="_blank"`.
-- **Table rows lift on hover.** Scrollbars are Dracula (Current Line thumb, Purple hover) via `tokens.css`. A visible scrollbar on a comfortable table means a redundant `overflowX` wrapper fighting Table's own scroll container; delete yours.
+- **Table rows lift on hover.** Scrollbars are Dracula (Current Line thumb, Purple hover) via `tokens.css`. A visible scrollbar on a comfortable table means a redundant `overflowX` wrapper fighting Table's own scroll container; delete yours. A document-level scrollbar on a `height="fill"` page means no definite-height ancestor (`height: 100%` resolves to content height); wrap the page in a `height: 100dvh` ancestor instead of styling the scrollbar.
 
 ## Migrating a codebase
 
@@ -157,3 +157,13 @@ For Astryx tokens beyond the kit, `bunx astryx docs tokens`.
 - Source-compile StyleX plugin from the example-vite README → unneeded; kit ships prebuilt CSS.
 - Section subtitle in `supporting` → `body`. Widget caption in `body` → `supporting`.
 - Mixed Card insets (2 vs 3) → outer 4, nested 3.
+- EmptyState icon without `color="secondary"` → `Icon` defaults to `inherit`, so the icon tints with surrounding text; always pass `color="secondary"` explicitly.
+- Purple StatusDot for a status, or a blue Badge/Token for info → `info` + `isPulsing` for in-progress, cyan for info, yellow for tags.
+
+## Heading ladder
+
+Exactly one h1 per routed page, sections at h2, cards at h3. Two structural exceptions, decided once:
+
+- **Dialogs are page fragments.** `DialogHeader` renders h2 by core API (there is no title-as-h1 prop, by design — the host page owns the h1). Never hack an h1 into a dialog template; panel labels inside dialogs are `Text type="label"`, never Headings.
+- **Skeleton shells are exempt.** The shell-nav/shell-side-nav/shell-top-nav placeholder cards carry no headings by construction; routed pages supply the h1. Their XLE headers record this with a `skeleton-shell exemption` note instead of an Hd node.
+- Tool-chrome pages with no visible title (file-explorer, ide) use a visually-hidden h1 so the outline survives.

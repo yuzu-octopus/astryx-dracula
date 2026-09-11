@@ -66,7 +66,7 @@ interface WorkItem {
 interface ColumnMeta {
   id: ColumnId;
   title: string;
-  variant: 'neutral' | 'accent' | 'warning' | 'success';
+  variant: 'neutral' | 'info' | 'warning' | 'success';
   tooltip: string;
   emptyTitle: string;
   emptyDescription: string;
@@ -107,7 +107,7 @@ const COLUMNS: ColumnMeta[] = [
   {
     id: 'in-progress',
     title: 'In progress',
-    variant: 'accent',
+    variant: 'info',
     tooltip: 'Theme work currently on the easel.',
     emptyTitle: 'Nothing in progress',
     emptyDescription: 'Tasks being worked on appear here.',
@@ -396,6 +396,7 @@ function BoardColumn({
                 <StatusDot
                   variant={meta.variant}
                   label={`${meta.title} status`}
+                  isPulsing={meta.id === 'in-progress'}
                 />
                 <Heading level={2}>{meta.title}</Heading>
                 <Popover

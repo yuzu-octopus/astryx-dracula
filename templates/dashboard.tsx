@@ -35,7 +35,9 @@ import {Icon} from '@astryxdesign/core/Icon';
 
 // ============= ICONS =============
 
-import {RefreshCw, ArrowUp, ArrowDown, Square} from 'lucide-react';
+import {RefreshCw, Square} from 'lucide-react';
+import {CHART_HUES} from 'astryx-dracula/shared/chart-hues';
+import {MetricDelta} from 'astryx-dracula/shared/metric-delta';
 
 // ============= DATA =============
 
@@ -224,48 +226,48 @@ const regionData = [
   {
     label: 'NORAM',
     value: 38,
-    color: 'var(--dracula-cyan)',
+    color: CHART_HUES.cyan,
   },
   {
     label: 'EMEA',
     value: 28,
-    color: 'var(--dracula-orange)',
+    color: CHART_HUES.orange,
   },
   {
     label: 'APAC',
     value: 22,
-    color: 'var(--dracula-green)',
+    color: CHART_HUES.green,
   },
   {
     label: 'LATAM',
     value: 8,
-    color: 'var(--dracula-pink)',
+    color: CHART_HUES.pink,
   },
-  {label: 'Other', value: 4, color: 'var(--dracula-comment)'},
+  {label: 'Other', value: 4, color: CHART_HUES.muted},
 ];
 
 const roleData = [
   {
     label: 'Engineer',
     value: 45,
-    color: 'var(--dracula-cyan)',
+    color: CHART_HUES.cyan,
   },
   {
     label: 'Manager',
     value: 20,
-    color: 'var(--dracula-orange)',
+    color: CHART_HUES.orange,
   },
   {
     label: 'Designer',
     value: 15,
-    color: 'var(--dracula-green)',
+    color: CHART_HUES.green,
   },
   {
     label: 'Data Scientist',
     value: 12,
-    color: 'var(--dracula-pink)',
+    color: CHART_HUES.pink,
   },
-  {label: 'Other', value: 8, color: 'var(--dracula-comment)'},
+  {label: 'Other', value: 8, color: CHART_HUES.muted},
 ];
 
 // Engagement — Top pages
@@ -465,10 +467,11 @@ const topEventsColumns: TableColumn<EventRow>[] = [
 
 // ============= CHART COMPONENTS =============
 
-// Chart series colors: desktop glows orange, mobile glows cyan
+// Chart series colors: desktop glows orange, mobile glows cyan. Sourced from
+// the shared categorical hues so data encoding can never reach for purple.
 const chartColors = {
-  desktop: 'var(--dracula-orange)',
-  mobile: 'var(--dracula-cyan)',
+  desktop: CHART_HUES.orange,
+  mobile: CHART_HUES.cyan,
 };
 
 function ChartLegendItem({color, label}: {color: string; label: string}) {
@@ -617,7 +620,6 @@ function MetricCard({
   positive: boolean;
   sparkline: SparkPoint[];
 }) {
-  const isUp = !change.trim().startsWith('-');
   return (
     <Card>
       <VStack gap={2}>
@@ -628,24 +630,7 @@ function MetricCard({
           <Text type="display-3" weight="semibold" hasTabularNumbers>
             {value}
           </Text>
-          <HStack gap={1} vAlign="center">
-            <Icon
-              icon={isUp ? ArrowUp : ArrowDown}
-              size="xsm"
-              color={positive ? 'success' : 'error'}
-            />
-            <Text
-              type="body"
-              weight="semibold"
-              hasTabularNumbers
-              style={{
-                color: positive
-                  ? 'var(--color-positive)'
-                  : 'var(--color-negative)',
-              }}>
-              {change}
-            </Text>
-          </HStack>
+          <MetricDelta value={change} positive={positive} />
         </HStack>
         <Text type="supporting" color="secondary">
           Last 30 days vs. Previous

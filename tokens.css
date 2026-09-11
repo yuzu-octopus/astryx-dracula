@@ -146,7 +146,11 @@
  * root happens to be position:fixed. Clipping the panel would break them the
  * day an ancestor gains a transform. The handle contains nothing but its pill,
  * which sits inside its box, so clipping it costs nothing. Needed until the
- * resize handle stops reporting the extra pixel. */
+ * resize handle stops reporting the extra pixel. Re-verified against
+ * @astryxdesign/core 0.3.0: without the clip the hit area's half-pixel inline
+ * shift leaves content at 300.5px in a 300px rail, and the LayoutPanel
+ * (overflow:auto on both axes) reports scrollWidth 301 > 300 — the permanent
+ * bar is back. Keep. */
 .astryx-app-shell-sidenav .astryx-resize-handle {
   overflow: hidden;
 }
@@ -156,7 +160,11 @@
  * HALF of the rail: the pointer reads col-resize and dragging works above the
  * midpoint, and nothing at all happens below it, even though the pill is drawn
  * straddling that boundary. The pill sibling carries a correct top:50%, which
- * is exactly what the drag surface is missing. Upstream workaround; drop it if
+ * is exactly what the drag surface is missing. Re-verified against
+ * @astryxdesign/core 0.3.0: hitAreaHorizontal is still top:0/bottom:0 while
+ * hitAreaOffsetX translates Y by -50%, so without this the drag surface spans
+ * [-50%,+50%] of the rail and the bottom half is dead (elementFromPoint hits
+ * the handle, which has no pointer handler). Upstream workaround; drop it if
  * the component starts positioning its own hit area. */
 .astryx-app-shell-sidenav
   .astryx-resize-handle

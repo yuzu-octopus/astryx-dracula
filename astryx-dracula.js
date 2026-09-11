@@ -173,6 +173,7 @@ export const astryxDraculaTheme = {
     "--radius-element": "5px",
     "--radius-container": "5px",
     "--radius-page": "5px",
+    "--font-family-mono": "'JetBrains Mono', monospace",
     "--font-size-h1": "24px",
     "--font-size-h2": "20px",
     "--font-size-h3": "16px",

@@ -58,6 +58,19 @@ const LAZY_PAGES: Record<string, ComponentType> = Object.fromEntries(
 // space left over, and the template renders bare inside it.
 const bareHref = (id: string) => `${window.location.pathname}?bare=${id}`;
 
+// The bare document owns the viewport height. Layout height="fill" is
+// height:100%, which only resolves against a definite ancestor height —
+// <html>/<body> don't set one, so without this an unconstrained Layout grows
+// to its content height and the *document* scrolls instead of the template's
+// own LayoutContent/Table scroll containers (a redundant outer scrollbar that
+// shouldn't be there). height="auto" pages are unaffected: taller content
+// still overflows visibly and the document scrolls as designed. Consumers
+// scaffolding a template into their own app must provide the same
+// definite-height ancestor (the editor template's pageStyle is the pattern).
+const bareViewport: CSSProperties = {
+  height: '100dvh',
+};
+
 const viewerFrame: CSSProperties = {
   height: '100dvh',
   overflow: 'hidden',
@@ -122,7 +135,9 @@ export function BareTemplate({ id }: { id: string }) {
   if (!Page) return <TemplatesIndex />;
   return (
     <Theme theme={astryxDraculaTheme} mode="dark">
-      <Page />
+      <div style={bareViewport}>
+        <Page />
+      </div>
     </Theme>
   );
 }

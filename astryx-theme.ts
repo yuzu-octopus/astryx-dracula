@@ -61,6 +61,7 @@ const tokens: Record<string, TokenValue> = {
   '--radius-element': '5px',
   '--radius-container': '5px',
   '--radius-page': '5px',
+  '--font-family-mono': "'JetBrains Mono', monospace",
   '--font-size-h1': '24px',
   '--font-size-h2': '20px',
   '--font-size-h3': '16px',
@@ -324,6 +325,17 @@ export const astryxDraculaTheme: DefinedTheme = defineTheme({
       'status:error': {
         '--color-error-muted': 'var(--color-background-red)',
         borderColor: 'var(--color-error)',
+      },
+    },
+    statusdot: {
+      // Cyan info dot: the status vocabulary's info hue. New variant values
+      // are picked up by `astryx theme build`, which generates both the CSS
+      // and the StatusDotVariantMap augmentation (see
+      // astryx-dracula.variants.d.ts). Core renders unknown variants without
+      // a fill, so this rule is the fill — do not delete it while
+      // variant:info call sites exist.
+      'variant:info': {
+        backgroundColor: DRA.cyan,
       },
     },
     'progressbar-fill': {

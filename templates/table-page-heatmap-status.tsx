@@ -38,6 +38,7 @@ import {Link} from '@astryxdesign/core/Link';
 import {Table, proportional, pixel} from '@astryxdesign/core/Table';
 import type {TableColumn} from '@astryxdesign/core/Table';
 import {Filter, Download, RotateCw} from 'lucide-react';
+import {ChartLabel} from 'astryx-dracula/shared/chart-labels';
 
 // ============= ICONS (verified lucide-react exports) =============
 // Filter ← FunnelIcon, Download ← ArrowDownTrayIcon, RotateCw ← ArrowPathIcon.
@@ -464,28 +465,21 @@ function OutageHeatmap() {
           role="img"
           aria-label="Incidents by day and hour, January 12 to 18">
           {DAYS.map((day, di) => (
-            <text
+            <ChartLabel
               key={day}
               x={labelW + di * (cellW + gap) + cellW / 2}
-              y={14}
-              textAnchor="middle"
-              fontSize={13}
-              fill="var(--color-text-paragraph)"
-              fontFamily="var(--font-family-mono)">
+              y={14}>
               {day}
-            </text>
+            </ChartLabel>
           ))}
           {HOURS.map((hour, hi) => (
             <g key={hour}>
-              <text
+              <ChartLabel
                 x={labelW - 6}
                 y={labelH + hi * (cellH + gap) + cellH / 2 + 3}
-                textAnchor="end"
-                fontSize={13}
-                fill="var(--color-text-paragraph)"
-                fontFamily="var(--font-family-mono)">
+                textAnchor="end">
                 {hour}
-              </text>
+              </ChartLabel>
               {DAYS.map((day, di) => {
                 const count = countFor(day, hour);
                 return (
@@ -501,19 +495,16 @@ function OutageHeatmap() {
                     {/* Every cell prints its count, empty ones included, so
                         the ramp reinforces the number instead of carrying the
                         reading on its own. */}
-                    <text
+                    <ChartLabel
                       x={labelW + di * (cellW + gap) + cellW / 2}
                       y={labelH + hi * (cellH + gap) + cellH / 2 + 3}
-                      textAnchor="middle"
-                      fontSize={13}
                       fill={
                         count > 0
                           ? 'var(--dracula-bg-dark)'
-                          : 'var(--color-text-paragraph)'
-                      }
-                      fontFamily="var(--font-family-mono)">
+                          : undefined
+                      }>
                       {count}
-                    </text>
+                    </ChartLabel>
                   </g>
                 );
               })}

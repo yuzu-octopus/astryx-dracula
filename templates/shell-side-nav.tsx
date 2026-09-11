@@ -1,6 +1,8 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   A[cp=0 @sideNav=(SN > SNI"New chat" + SNI"Search" + SNI"Library" + D + (SNI"Personal" > SNI"Full-moon rite planning")*3)] > L > (LC[p=6] > V[g=5] > (H > C.muted[p=0])*4) + (LF > TI"Message Night Owl")
+// Note: skeleton placeholders carry no Hd by design (skill skeleton-shell
+// exemption) — routed pages supply the h1.
 
 import {useState} from 'react';
 import {AppShell} from '@astryxdesign/core/AppShell';
@@ -73,7 +75,7 @@ const WORKSPACES: Workspace[] = [
     chats: [
       {
         label: 'Crypt expansion draft',
-        status: 'accent',
+        status: 'info',
         statusLabel: 'In progress',
       },
       {
@@ -95,7 +97,7 @@ const WORKSPACES: Workspace[] = [
     chats: [
       {
         label: 'Coven theme migration notes',
-        status: 'accent',
+        status: 'info',
         statusLabel: 'In progress',
       },
       {
