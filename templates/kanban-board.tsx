@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   S > L > (LH[divider] > Tbar > (Hd"Sprint Board"[level=1] + Bd.neutral"8") + (H[g=2] > SE + D.strong + IB"Sort" + IB"Filter" + IB"Search" + B.primary"Add task")) + (LC[p=0] > G[c={min:280,max:4} g=4] > (C.muted[p=0] > L > (LH[divider] > H[j=between a=center] > (H[g=2 a=center] > SD + Hd"To-do"[level=2] + IB) + Tx) + (LC[p=2] > V[g=2] > (C[p=3] > V[g=2] > (H[j=between] > (H[g=2] > Tk + Bd) + MM) + (V[g=1] > Hd[level=3] + Tx) + Tx)*2))*4)
+//   S > L > (LH[divider] > Tbar > (Hd"Sprint Board"[level=1] + Bd.neutral"8") + (H[g=2] > SE + D.strong + IB"Sort" + IB"Filter" + IB"Search" + B.primary"Add task")) + (LC[p=0] > G[c={min:280,max:4} g=4] > (C.muted[p=0] > L > (LH[divider] > H[j=between a=center] > (H[g=2 a=center] > SD + Hd"To-do"[level=2] + IB) + Tx) + (LC[p=4] > V[g=2] > (C[p=3] > V[g=2] > (H[j=between] > (H[g=2] > Tk + Bd) + MM) + (V[g=1] > Hd[level=3] + Tx) + Tx)*2))*4)
 
 import {
   useEffect,
@@ -422,7 +422,7 @@ function BoardColumn({
           </LayoutHeader>
         }
         content={
-          <LayoutContent ref={contentRef} padding={2}>
+          <LayoutContent ref={contentRef} padding={4}>
             {children ?? (
               <EmptyState
                 isCompact
@@ -682,7 +682,7 @@ export default function KanbanBoard() {
       <Layout
         height="fill"
         header={
-          <LayoutHeader hasDivider padding={4}>
+          <LayoutHeader hasDivider padding={6}>
             <Toolbar
               label="Board actions"
               gap={2}

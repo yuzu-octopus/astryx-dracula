@@ -35,6 +35,7 @@ import {Token} from '@astryxdesign/core/Token';
 import {Button} from '@astryxdesign/core/Button';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Dialog, DialogHeader} from '@astryxdesign/core/Dialog';
+import {VisuallyHidden} from '@astryxdesign/core/VisuallyHidden';
 import {DropdownMenu} from '@astryxdesign/core/DropdownMenu';
 import {MoreMenu} from '@astryxdesign/core/MoreMenu';
 import {Toolbar} from '@astryxdesign/core/Toolbar';
@@ -246,7 +247,11 @@ function ArtifactBody({hasOwnTitle = true}: {hasOwnTitle?: boolean}) {
   return (
     <Section variant="transparent" style={artifactScroll}>
       <VStack gap={2} style={articleBody}>
-        {hasOwnTitle && <Heading level={1}>{ARTIFACT_TITLE}</Heading>}
+        {hasOwnTitle && (
+          <Heading level={1} type="display-2">
+            {ARTIFACT_TITLE}
+          </Heading>
+        )}
         <Markdown>{ARTIFACT_CONTENT}</Markdown>
       </VStack>
     </Section>
@@ -367,6 +372,7 @@ export default function AiChat() {
                       }
                     />
                   }>
+                  <VisuallyHidden as="h1">Night thread</VisuallyHidden>
                   <ChatMessageList>
                     {/* Date divider */}
                     <ChatSystemMessage variant="divider">

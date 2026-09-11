@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC[p=6] > V[g=6] > ((V[g=2 a=center] > Hd"Every corner of the castle, caught after dark."[level=1] + Tx"Relics, sketches, and moonlit views from the coven archives, collected over one long Transylvanian night."[t=body]) + (V[g=4] > (V[g=2] > AR[ratio=3/1] + Tx"Title"[t=supporting]) + (G[c={min:280} g=4] > (V[g=2] > AR[ratio=3/2] + Tx"Title"[t=supporting])*4)))
+//   L > LC[p=6] > V[g=8] > ((V[g=2 a=center] > Hd"Every corner of the castle, caught after dark."[level=1] + Tx"Relics, sketches, and moonlit views from the coven archives, collected over one long Transylvanian night."[t=body]) + (V[g=3] > (V[g=2] > AR[ratio=3/1] + Tx"Title"[t=supporting]) + (G[c={min:280} g=4] > (V[g=2] > AR[ratio=3/2] + Tx"Title"[t=supporting])*4)))
 
 import type {CSSProperties} from 'react';
 import {VStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
@@ -35,7 +35,7 @@ interface GalleryImage {
 // One accent per tile from the fixed badge vocabulary; the SVG scenes below
 // resolve to Dracula tokens so tiles stay on-brand in the dark-only theme.
 const IMAGES: GalleryImage[] = [
-  {title: 'The castle at moonrise', hue: 'var(--dracula-purple)'},
+  {title: 'The castle at moonrise', hue: 'var(--dracula-orange)'},
   {title: 'Coven gathering', hue: 'var(--dracula-cyan)'},
   {title: 'Belfry view', hue: 'var(--dracula-pink)'},
   {title: 'Crypt archives', hue: 'var(--dracula-yellow)'},
@@ -88,7 +88,7 @@ export default function MixedGallery() {
       contentWidth={1400}
       content={
         <LayoutContent padding={6}>
-          <VStack gap={6}>
+          <VStack gap={8}>
             {/* Header */}
             <VStack gap={2} hAlign="center">
               <Heading level={1} justify="center">
@@ -104,7 +104,7 @@ export default function MixedGallery() {
                 of the set reflows as a grid (4 → 2 → 1 columns). Every tile
                 keeps its own ratio, so no tile's height depends on another's
                 caption wrapping. */}
-            <VStack gap={4}>
+            <VStack gap={3}>
               <GalleryCard image={IMAGES[0]} ratio={3 / 1} />
               <Grid columns={{minWidth: 280}} gap={4}>
                 {IMAGES.slice(1).map(image => (

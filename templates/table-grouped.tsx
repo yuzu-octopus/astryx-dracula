@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LH[divider] > V[g=4] > (H[j=between a=center] > Hd"Night-shift issues"[level=1] + B.primary"Raise issue"[opens=#raise-issue]) + (H[g=2 a=center] > PS + Po > B.secondary"View Options")) + (LC[p=0] > T[hover] > (TR > THC*7) + (TR > TC*7)*4) + (LP > V[g=4] > (H > Tx[t=supporting] + IB"Close panel") + (V[g=1] > Hd[level=2] + Tx[t=body]) + ML + (D + (V[g=2] > Tx"Labels"[t=label] + (H[g=2] > Tk*2)))) ;; Dlg#raise-issue > (DH"Raise an issue" + (LC[p=4] > V[g=4] > TI*4) + (LF > H[j=end g=2] > B.secondary"Cancel" + B.primary"Raise"))
+//   L > (LH[divider] > V[g=4] > (H[j=between a=center] > Hd"Night-shift issues"[level=1] + B.primary"Raise issue"[opens=#raise-issue]) + (H[g=2 a=center] > PS + Po > B.secondary"View options")) + (LC[p=0] > T[hover] > (TR > THC*7) + (TR > TC*7)*4) + (LP > V[g=4] > (H > Tx[t=supporting] + IB"Close panel") + (V[g=1] > Hd[level=2] + Tx[t=body]) + ML + (D + (V[g=2] > Tx"Labels"[t=label] + (H[g=2] > Tk*2)))) ;; Dlg#raise-issue > (DH"Raise issue" + (LC[p=4] > V[g=4] > TI*4) + (LF > H[j=end g=2] > B.secondary"Cancel" + B.primary"Raise issue"))
 
 /**
  * Table Grouped — the night-shift issue tracker: a grouped, collapsible issue
@@ -105,9 +105,9 @@ interface TaskRow extends Record<string, unknown> {
 
 const STATUS_DOT_VARIANT: Record<
   TaskStatus,
-  'success' | 'accent' | 'neutral' | 'warning'
+  'success' | 'neutral' | 'warning'
 > = {
-  in_progress: 'accent',
+  in_progress: 'neutral',
   todo: 'warning',
   backlog: 'neutral',
   done: 'success',
@@ -115,10 +115,10 @@ const STATUS_DOT_VARIANT: Record<
 
 const PRIORITY_COLOR: Record<
   TaskPriority,
-  'primary' | 'secondary' | 'disabled'
+  'error' | 'warning' | 'secondary' | 'disabled'
 > = {
-  urgent: 'primary',
-  high: 'primary',
+  urgent: 'error',
+  high: 'warning',
   medium: 'secondary',
   low: 'disabled',
   none: 'disabled',
@@ -144,7 +144,7 @@ const allTasks: TaskRow[] = [
   {
     id: '2',
     taskId: 'T235040470',
-    title: 'Use Projects to organize work for features or releases',
+    title: 'Chart the crypt to organize haunts for rituals or releases',
     subtitle: '',
     status: 'in_progress',
     priority: 'medium',
@@ -159,7 +159,7 @@ const allTasks: TaskRow[] = [
   {
     id: '3',
     taskId: 'T235040471',
-    title: 'Use Cycles to focus work over n-weeks',
+    title: 'Follow moon cycles to focus haunts over n-weeks',
     subtitle: '',
     status: 'in_progress',
     priority: 'medium',
@@ -174,7 +174,7 @@ const allTasks: TaskRow[] = [
   {
     id: '4',
     taskId: 'T235040472',
-    title: 'Testing code',
+    title: 'Test the gate wards before moonrise',
     subtitle: 'Update castle gate integration',
     status: 'todo',
     priority: 'medium',
@@ -249,7 +249,7 @@ const allTasks: TaskRow[] = [
   {
     id: '9',
     taskId: 'T235040477',
-    title: 'Invite your teammates',
+    title: 'Invite your fellow familiars to the crypt',
     subtitle: '',
     status: 'todo',
     priority: 'low',
@@ -264,7 +264,7 @@ const allTasks: TaskRow[] = [
   {
     id: '10',
     taskId: 'T235040478',
-    title: 'Next steps',
+    title: 'Next rites after moonrise',
     subtitle: '',
     status: 'todo',
     priority: 'none',
@@ -474,7 +474,7 @@ const allTasks: TaskRow[] = [
   {
     id: '24',
     taskId: 'T235040492',
-    title: 'Add dark mode support to dashboard',
+    title: 'Audit dashboard contrast against the Dracula ramp',
     subtitle: '',
     status: 'backlog',
     priority: 'low',
@@ -763,6 +763,7 @@ function TaskDetailPanel({
               <StatusDot
                 variant={STATUS_DOT_VARIANT[task.status]}
                 label={STATUS_LABEL[task.status]}
+                isPulsing={task.status === 'in_progress'}
               />
               <Text type="body">{STATUS_LABEL[task.status]}</Text>
             </HStack>
@@ -880,7 +881,7 @@ export default function TableGrouped() {
       <Layout
         height="fill"
         header={
-          <LayoutHeader hasDivider padding={4}>
+          <LayoutHeader hasDivider>
             <VStack gap={4}>
               <HStack gap={3} vAlign="center">
                 <StackItem size="fill">
@@ -889,7 +890,6 @@ export default function TableGrouped() {
                 <Button
                   label="Raise issue"
                   variant="primary"
-                  size="lg"
                   onClick={() => setDialogOpen(true)}
                 />
               </HStack>
@@ -924,7 +924,7 @@ export default function TableGrouped() {
                       </RadioList>
                     </VStack>
                   }>
-                  <Button label="View Options" variant="secondary" size="md" />
+                  <Button label="View options" variant="secondary" size="md" />
                 </Popover>
               </HStack>
             </VStack>
@@ -975,7 +975,7 @@ export default function TableGrouped() {
                               size="sm"
                               color="secondary"
                             />
-                            <Text type="body" weight="bold">
+                            <Text type="body" weight="semibold">
                               {getGroupLabel(groupBy, key)}
                             </Text>
                             <Badge
@@ -996,6 +996,7 @@ export default function TableGrouped() {
                               <StatusDot
                                 variant={STATUS_DOT_VARIANT[task.status]}
                                 label={STATUS_LABEL[task.status]}
+                                isPulsing={task.status === 'in_progress'}
                               />
                             </Center>
                           </TableCell>
@@ -1132,7 +1133,7 @@ export default function TableGrouped() {
         <Layout
           header={
             <DialogHeader
-              title="Raise an issue"
+              title="Raise issue"
               onOpenChange={open => setDialogOpen(open)}
             />
           }
@@ -1186,7 +1187,7 @@ export default function TableGrouped() {
                   onClick={() => setDialogOpen(false)}
                 />
                 <Button
-                  label="Raise"
+                  label="Raise issue"
                   variant="primary"
                   size="md"
                   onClick={() => setDialogOpen(false)}

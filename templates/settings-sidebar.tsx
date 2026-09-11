@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LP[p=0] > V[g=4] > Hd"Account settings"[level=2] + (UL > LI*8) + D + LI"Professional hosting tools") + (LC[p=4] > V[g=0] > (Tbar > B.ghost + Hd"Personal info"[level=2]) + Hd"Personal info"[level=2] + (V[g=0] > (H[j=between a=start] > (V[g=0] > Tx"Legal name"[weight=semibold] + Tx"Vlad Dracul"[t=supporting]) + Lk"Edit")*7) + (C.muted > V[g=4] > (H[g=3 a=start] > Ic + (V[g=1] > Tx"Why is info hidden?"[weight=semibold] + Tx[t=supporting]))*3))
+//   L > (LP[p=0] > V[g=4] > Tx"Account settings"[t=label] + (UL > LI*8) + D + LI"Professional hosting tools") + (LC[p=6] > V[g=0] > (Tbar > B.ghost + Hd"Personal info"[level=1]) + Hd"Personal info"[level=1] + (V[g=0] > (H[j=between a=start] > (V[g=0] > Tx"Legal name"[weight=semibold] + Tx"Vlad Dracul"[t=supporting]) + Lk"Edit")*7) + (C.muted > V[g=4] > (H[g=3 a=start] > Ic + (V[g=1] > Tx"Why is info hidden?"[weight=semibold] + Tx[t=supporting]))*3))
 
 /**
  * Settings Panels — account sections with a nav panel and divided rows.
@@ -130,13 +130,13 @@ const SOCIAL_ROWS: InfoRow[] = [
 ];
 
 const TAX_ROWS: InfoRow[] = [
-  {label: 'Taxpayer information', value: 'Not provided', action: 'Add'},
-  {label: 'Tax documents', value: 'No documents yet', action: 'View'},
+  {label: 'Tithe information', value: 'Not provided', action: 'Add'},
+  {label: 'Tithe scrolls', value: 'No scrolls yet', action: 'View'},
 ];
 
 const PAYOUT_ROWS: InfoRow[] = [
-  {label: 'Payout method', value: 'Not set up', action: 'Add'},
-  {label: 'Past payments', value: 'No payments yet', action: 'View'},
+  {label: 'Tribute method', value: 'Not set up', action: 'Add'},
+  {label: 'Past tributes', value: 'No tributes yet', action: 'View'},
 ];
 
 const DEVICE_ROWS: {
@@ -339,9 +339,9 @@ export default function SettingsSidebar() {
 
   const navList = (
     <VStack gap={4} style={sideNavPadding}>
-      <Heading level={2} style={sideNavHeading}>
+      <Text type="label" style={sideNavHeading}>
         Account settings
-      </Heading>
+      </Text>
       <List density="spacious">
         {NAV_ITEMS.map(item => (
           <ListItem
@@ -393,7 +393,7 @@ export default function SettingsSidebar() {
         )
       }
       content={
-        <LayoutContent padding={4}>
+        <LayoutContent padding={6}>
           <VStack gap={0}>
             {/* Mobile detail view: a back button sits beside the section title
                 (the per-section headings below are hidden on mobile). Toolbar's
@@ -413,14 +413,14 @@ export default function SettingsSidebar() {
                       icon={<Icon icon={ArrowLeft} size="sm" />}
                       onClick={() => setMobileView('nav')}
                     />
-                    <Heading level={2}>{SECTION_TITLES[activeNav]}</Heading>
+                    <Heading level={1}>{SECTION_TITLES[activeNav]}</Heading>
                   </>
                 }
               />
             )}
             {activeNav === 'Login & security' && (
               <VStack gap={6}>
-                {!isNarrow && <Heading level={2}>Login &amp; security</Heading>}
+                {!isNarrow && <Heading level={1}>Login &amp; security</Heading>}
 
                 <TabList value={activeTab} onChange={setActiveTab} hasDivider>
                   <Tab value="login" label="Login" />
@@ -526,10 +526,10 @@ export default function SettingsSidebar() {
                     <VStack gap={2}>
                       <Heading level={3}>Shared access</Heading>
                       <Divider />
-                      <Text type="supporting" color="secondary">
+                      <Text type="body" color="secondary">
                         Review each request carefully before approving access.
-                        We&apos;ll email your employee or co-worker a 4-digit
-                        code that lets them log into your account with their
+                        We&apos;ll email your kin or coven-mate a 4-digit
+                        code that lets them enter your crypt from their
                         trusted device.
                       </Text>
                     </VStack>
@@ -560,7 +560,7 @@ export default function SettingsSidebar() {
             {activeNav === 'Languages & currency' && (
               <VStack gap={6}>
                 {!isNarrow && (
-                  <Heading level={2}>Languages &amp; currency</Heading>
+                  <Heading level={1}>Languages &amp; currency</Heading>
                 )}
                 <VStack gap={0}>
                   <ExpandableRow
@@ -626,7 +626,7 @@ export default function SettingsSidebar() {
 
             {activeNav === 'Personal information' && (
               <VStack gap={6}>
-                {!isNarrow && <Heading level={2}>Personal info</Heading>}
+                {!isNarrow && <Heading level={1}>Personal info</Heading>}
                 <VStack gap={0}>
                   <ExpandableRow
                     label="Legal name"
@@ -747,7 +747,7 @@ export default function SettingsSidebar() {
                           type="supporting"
                           color="secondary"
                           display="block">
-                          We&apos;re hiding some account details to protect your
+                          We&apos;re veiling some crypt details to protect your
                           identity.
                         </Text>
                       </VStack>
@@ -765,10 +765,10 @@ export default function SettingsSidebar() {
                           type="supporting"
                           color="secondary"
                           display="block">
-                          Contact info and personal details can be edited. If
-                          this info was used to verify your identity,
-                          you&apos;ll need to get verified again the next time
-                          you book, or to continue hosting.
+                          Contact runes and personal details can be edited. If
+                          these were used to verify your identity,
+                          you&apos;ll need to be verified anew before your
+                          next stay, or to keep hosting your crypt.
                         </Text>
                       </VStack>
                     </HStack>
@@ -785,8 +785,8 @@ export default function SettingsSidebar() {
                           type="supporting"
                           color="secondary"
                           display="block">
-                          We only release contact information after a
-                          reservation is confirmed.
+                          We only release contact runes after a booking is
+                          sealed.
                         </Text>
                       </VStack>
                     </HStack>
@@ -797,7 +797,7 @@ export default function SettingsSidebar() {
 
             {activeNav === 'Privacy' && (
               <VStack gap={6}>
-                {!isNarrow && <Heading level={2}>Privacy</Heading>}
+                {!isNarrow && <Heading level={1}>Privacy</Heading>}
 
                 <VStack gap={8}>
                   <VStack gap={0}>
@@ -824,8 +824,8 @@ export default function SettingsSidebar() {
                     <Heading level={3}>Listings</Heading>
                     <VStack style={rowPadding}>
                       <Switch
-                        label="Include my listing(s) in search engines"
-                        description="Turning this on means search engines, like Google, will display your listing page(s) in search results."
+                        label="List my wares in the scrying mirrors"
+                        description="Turning this on means scrying engines, like Google, will show your wares to seekers."
                         value={searchEngines}
                         onChange={setSearchEngines}
                         labelPosition="start"
@@ -837,15 +837,15 @@ export default function SettingsSidebar() {
 
                   <VStack gap={4}>
                     <Heading level={3}>Reviews</Heading>
-                    <Text type="supporting" color="secondary">
+                    <Text type="body" color="secondary">
                       Choose what&apos;s shared when you write a review.{' '}
-                      <Link href={SELF_HASH} type="supporting">
+                      <Link href={SELF_HASH} type="body">
                         Learn more
                       </Link>
                     </Text>
                     <VStack gap={4}>
                       <Switch
-                        label="Show my home city and country"
+                        label="Show my home haunt and country"
                         description="Ex: City and country"
                         value={showCity}
                         onChange={setShowCity}
@@ -853,8 +853,8 @@ export default function SettingsSidebar() {
                         labelSpacing="spread"
                       />
                       <Switch
-                        label="Show my trip type"
-                        description="Ex: Stayed with kids or pets"
+                        label="Show my journey type"
+                        description="Ex: Rested with kin or familiars"
                         value={showTripType}
                         onChange={setShowTripType}
                         labelPosition="start"
@@ -869,8 +869,8 @@ export default function SettingsSidebar() {
                         labelSpacing="spread"
                       />
                       <Switch
-                        label="Show my booked services"
-                        description="Ex: Gourmet brunch or tasting menu"
+                        label="Show my booked revels"
+                        description="Ex: Midnight feasts and tasting rituals"
                         value={showServices}
                         onChange={setShowServices}
                         labelPosition="start"
@@ -929,13 +929,13 @@ export default function SettingsSidebar() {
 
             {activeNav === 'Notifications' && (
               <VStack gap={6}>
-                {!isNarrow && <Heading level={2}>Notifications</Heading>}
+                {!isNarrow && <Heading level={1}>Notifications</Heading>}
                 <VStack gap={0}>
                   <Heading level={3}>Messages</Heading>
                   <VStack style={rowPadding}>
                     <Switch
                       label="Email notifications"
-                      description="Listing updates, trip reminders, and account activity."
+                      description="Coven updates, journey reminders, and crypt activity."
                       value={emailNotif}
                       onChange={setEmailNotif}
                       labelPosition="start"
@@ -946,7 +946,7 @@ export default function SettingsSidebar() {
                   <VStack style={rowPadding}>
                     <Switch
                       label="Push notifications"
-                      description="Instant alerts for messages and reservation requests."
+                      description="Swift ravens for messages and booking requests."
                       value={pushNotif}
                       onChange={setPushNotif}
                       labelPosition="start"
@@ -960,7 +960,7 @@ export default function SettingsSidebar() {
 
             {activeNav === 'Taxes' && (
               <VStack gap={6}>
-                {!isNarrow && <Heading level={2}>Taxes</Heading>}
+                {!isNarrow && <Heading level={1}>Taxes</Heading>}
                 <VStack gap={0}>
                   <Heading level={3}>Tax documents</Heading>
                   <Divider />
@@ -973,7 +973,7 @@ export default function SettingsSidebar() {
 
             {activeNav === 'Payments' && (
               <VStack gap={6}>
-                {!isNarrow && <Heading level={2}>Payments</Heading>}
+                {!isNarrow && <Heading level={1}>Payments</Heading>}
                 <VStack gap={0}>
                   <Heading level={3}>Payouts</Heading>
                   <Divider />
@@ -986,13 +986,13 @@ export default function SettingsSidebar() {
 
             {activeNav === 'Travel for work' && (
               <VStack gap={6}>
-                {!isNarrow && <Heading level={2}>Travel for work</Heading>}
+                {!isNarrow && <Heading level={1}>Travel for work</Heading>}
                 <VStack gap={0}>
                   <Heading level={3}>Work trips</Heading>
                   <VStack style={rowPadding}>
                     <Switch
-                      label="Show work-trip options at checkout"
-                      description="Add a work email to expense trips and unlock business-ready listings."
+                      label="Show night-errand options at checkout"
+                      description="Add a coven address to expense night errands and unlock travel-ready wares."
                       value={workTrips}
                       onChange={setWorkTrips}
                       labelPosition="start"
@@ -1007,7 +1007,7 @@ export default function SettingsSidebar() {
             {activeNav === 'Professional hosting tools' && (
               <VStack gap={6}>
                 {!isNarrow && (
-                  <Heading level={2}>Professional hosting tools</Heading>
+                  <Heading level={1}>Professional hosting tools</Heading>
                 )}
                 <Card variant="muted">
                   <HStack gap={4} vAlign="start">

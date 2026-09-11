@@ -52,7 +52,7 @@ const columns: TableColumn<Relic>[] = [
           variant={STATUS_VARIANT[item.status]}
           label={STATUS_LABEL[item.status]}
         />
-        <Text type="supporting" color="secondary">
+        <Text type="body" color="secondary">
           {STATUS_LABEL[item.status]}
         </Text>
       </HStack>

@@ -578,7 +578,7 @@ export default function MessagingShell() {
           }
           emptyState={
             <EmptyState
-              icon={<Icon icon={Inbox} size="lg" />}
+              icon={<Icon icon={Inbox} size="lg" color="secondary" />}
               title="No messages yet"
               description="Start the conversation. Messages posted here are visible to the whole channel."
             />

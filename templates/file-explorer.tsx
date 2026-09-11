@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (Tbar[size=sm] > (H > IB"Go back" + IB"Go forward" + Tx"Folder"[t=label]) + (SG"View mode" > SGI*4) + (H > IB"Group" + IB"Share" + IB"Tags" + IB"More" + IB"Search")) + (LC[p=0 !scroll] > H[h=fill] > (S.transparent[p=2 w=240 dv=[end]] > UL[density=compact !hasDividers] > (LI > Ic + Tx"Item"[t=body])*3)*3 + (S.transparent[p=6] > V[g=4 a=center] > Av[size=96] + (V[g=1 a=center] > Tx"Name"[t=label] + Tx"Kind"[t=supporting]) + (ML"Information" > MLI*3)))
+//   L > (Tbar[size=sm] > (H > IB"Go back" + IB"Go forward" + Tx"Folder"[t=label]) + (SG"View mode" > SGI*4) + (H > IB"Group" + IB"Share" + IB"Tags" + IB"More" + IB"Search")) + (LC[p=0 !scroll] > (Hd"File Explorer"[level=1] + H[h=fill] > (S.transparent[p=2 w=240 dv=[end]] > UL[density=compact !hasDividers] > (LI > Ic + Tx"Item"[t=body])*3)*3 + (S.transparent[p=6] > V[g=4 a=center] > Av[size=96] + (V[g=1 a=center] > Tx"Name"[t=body] + Tx"Kind"[t=supporting]) + (ML"Information" > MLI*3))))
 
 import {useState, useMemo, type CSSProperties} from 'react';
 import {Layout, LayoutContent} from '@astryxdesign/core/Layout';
@@ -8,10 +8,11 @@ import {Toolbar} from '@astryxdesign/core/Toolbar';
 import {List, ListItem} from '@astryxdesign/core/List';
 import {HStack, VStack} from '@astryxdesign/core/Layout';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
-import {Text} from '@astryxdesign/core/Text';
+import {Heading, Text} from '@astryxdesign/core/Text';
 import {Icon} from '@astryxdesign/core/Icon';
 import {IconButton} from '@astryxdesign/core/IconButton';
 import {Section} from '@astryxdesign/core/Section';
+import {EmptyState} from '@astryxdesign/core/EmptyState';
 import {Avatar} from '@astryxdesign/core/Avatar';
 import {MetadataList, MetadataListItem} from '@astryxdesign/core/MetadataList';
 import {
@@ -272,6 +273,15 @@ const detailColumn: CSSProperties = {
   flexShrink: 0,
 };
 const controlsScroll: CSSProperties = {overflowX: 'auto'};
+// Screen-reader heading: the page identity lives in the Toolbar label,
+// so the h1 stays out of the visual column rhythm entirely.
+const visuallyHidden: CSSProperties = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  overflow: 'clip',
+  whiteSpace: 'nowrap',
+};
 
 // Static toolbar content, hoisted out of the render path: neither element
 // reads component state, so rebuilding them per render buys nothing.
@@ -496,6 +506,9 @@ export default function FileExplorer() {
       }
       content={
         <LayoutContent padding={0} isScrollable={false}>
+          <Heading level={1} style={visuallyHidden}>
+            File Explorer
+          </Heading>
           <HStack height="100%" style={columnRow}>
             {visibleColumns.map((col, colIndex) => {
               const trueIndex = columnOffset + colIndex;
@@ -509,6 +522,13 @@ export default function FileExplorer() {
                   variant="transparent"
                   dividers={showDivider ? ['end'] : undefined}
                   style={{...scrollable, ...fixedColumn}}>
+                  {col.items.length === 0 ? (
+                    <EmptyState
+                      title="Quiet in the crypt"
+                      description="This folder holds no scrolls yet."
+                      isCompact
+                    />
+                  ) : (
                   <List density="compact" hasDividers={false}>
                     {col.items.map(item => {
                       const isSelected = col.selectedId === item.id;
@@ -552,6 +572,7 @@ export default function FileExplorer() {
                       );
                     })}
                   </List>
+                  )}
                 </Section>
               );
             })}
@@ -564,7 +585,7 @@ export default function FileExplorer() {
                 <VStack gap={4} hAlign="center">
                   <Avatar name={selectedFile.name} size={96} />
                   <VStack gap={1} hAlign="center">
-                    <Text type="label" maxLines={1}>
+                    <Text type="body" weight="semibold" maxLines={1}>
                       {selectedFile.name}
                     </Text>
                     <Text type="supporting" color="secondary">
@@ -573,13 +594,15 @@ export default function FileExplorer() {
                   </VStack>
                   <MetadataList title="Information">
                     <MetadataListItem label="Created">
-                      March 28, 2026 at 2:15 PM
+                      <Text type="body">March 28, 2026 at 2:15 PM</Text>
                     </MetadataListItem>
                     <MetadataListItem label="Modified">
-                      Yesterday, 10:27 PM
+                      <Text type="body">Yesterday, 10:27 PM</Text>
                     </MetadataListItem>
                     <MetadataListItem label="Kind">
-                      {getFileExtension(selectedFile.name)} Document
+                      <Text type="body">
+                        {getFileExtension(selectedFile.name)} Document
+                      </Text>
                     </MetadataListItem>
                   </MetadataList>
                 </VStack>

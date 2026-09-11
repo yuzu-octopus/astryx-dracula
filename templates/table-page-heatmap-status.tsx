@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LH[divider] > H[g2 a=center] > Hd"Status"[level=1] + IB"Filter"[variant=ghost] + IB"Export"[variant=ghost] + B"Refresh") + (LC[p3] > V[g4] > (V[g3] > C[p3] + Tx"Incidents by day and hour"[t=supporting] + (H[g4] > (H[g2] > Tx[t=supporting])*4)) + (T[hover] > (TR > THC"Incident" + THC"Product" + THC"Description" + THC"Started" + THC"Duration" + THC"On-call" + THC"Status" + THC"Date") + (TR > TC"INC-4008" + TC"Business Suite" + TC"Notification delivery delays" + TC"09:15" + TC"ongoing" + TC"Carlos Mendez" + (TC > Tk.red"Ongoing") + TC"2025-01-15")*5))
+//   L > (LH[divider] > H[g2 a=center] > Hd"Status"[level=1] + IB"Filter"[variant=ghost] + IB"Export"[variant=ghost] + B.secondary"Refresh") + (LC[p3] > V[g4] > (V[g3] > C[p3] + Tx"Incidents by day and hour"[t=supporting] + (H[g4] > (H[g2] > Tx[t=supporting])*4)) + (T[hover] > (TR > THC"Incident" + THC"Product" + THC"Description" + THC"Started" + THC"Duration" + THC"On-call" + THC"Status" + THC"Date") + (TR > TC"INC-4008" + TC"Business Suite" + TC"Notification delivery delays" + TC"09:15" + TC"ongoing" + TC"Carlos Mendez" + (TC > Tk.red"Ongoing") + TC"2025-01-15")*5))
 
 /**
  * Status — the incident heatmap for the week plus the log behind it.
@@ -469,7 +469,7 @@ function OutageHeatmap() {
               x={labelW + di * (cellW + gap) + cellW / 2}
               y={14}
               textAnchor="middle"
-              fontSize={9}
+              fontSize={13}
               fill="var(--color-text-paragraph)"
               fontFamily="var(--font-family-mono)">
               {day}
@@ -481,7 +481,7 @@ function OutageHeatmap() {
                 x={labelW - 6}
                 y={labelH + hi * (cellH + gap) + cellH / 2 + 3}
                 textAnchor="end"
-                fontSize={9}
+                fontSize={13}
                 fill="var(--color-text-paragraph)"
                 fontFamily="var(--font-family-mono)">
                 {hour}
@@ -505,7 +505,7 @@ function OutageHeatmap() {
                       x={labelW + di * (cellW + gap) + cellW / 2}
                       y={labelH + hi * (cellH + gap) + cellH / 2 + 3}
                       textAnchor="middle"
-                      fontSize={9}
+                      fontSize={13}
                       fill={
                         count > 0
                           ? 'var(--dracula-bg-dark)'
@@ -568,7 +568,11 @@ export default function HeatmapTable() {
               variant="ghost"
               tooltip="Export"
             />
-            <Button label="Refresh" icon={<Icon icon={RotateCw} size="sm" />} />
+            <Button
+              label="Refresh"
+              variant="secondary"
+              icon={<Icon icon={RotateCw} size="sm" />}
+            />
           </HStack>
         </LayoutHeader>
       }

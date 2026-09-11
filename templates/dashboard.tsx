@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC[p=6] > V[g=6] > (V[g=6] > (H[j=between a=center] > Hd"Awake after dark"[level=2] + B.secondary"Reload") + (V[g=3] > C[p=3] + Tx"Hourly intervals"[t=supporting] + (H[g=6] > (H[g=2 a=center] > Ic + Tx"Desktop"[t=supporting])*2))) + (G[c={min:280} g=4] > (C > V[g=2] > Tx"Moonlit visitors"[t=supporting] + (H[g=2] > Tx"27.3 k"[t=display-3] + Tx"+18.2%"[t=body]) + Tx"Last 30 days vs. Previous"[t=supporting])*4) + D + (H[j=between a=center] > Hd"Night denizens"[level=2] + B.secondary"View more") + (G[c={min:280} g=4] > (C > V[g=4] > Hd"Territory"[level=3] + (H[g=4 wrap] > (V[g=0] > (H[g=2 a=center] > Ic + Tx[t=supporting]) + Tx[t=supporting])*5))*2) + D + (H[j=between a=center] > Hd"Engagement"[level=2] + B.secondary"View more") + (G[c={min:280} g=4] > (C > V[g=6] > (H[j=between a=center] > Hd"Top pages"[level=3] + Lk"All pages") + T)*2)
+//   L > LC[p=6] > V[g=6] > (Hd"The night shift"[level=1] + V[g=6] > (H[j=between a=center] > Hd"Awake after dark"[level=2] + B.secondary"Reload") + (V[g=3] > C[p=3] + Tx"Hourly intervals"[t=supporting] + (H[g=6] > (H[g=2 a=center] > Ic + Tx"Desktop"[t=supporting])*2))) + (G[c={min:280} g=4] > (C > V[g=2] > Tx"Moonlit visitors"[t=supporting] + (H[g=2] > Tx"27.3 k"[t=display-3] + Tx"+18.2%"[t=body]) + Tx"Last 30 days vs. Previous"[t=supporting])*4) + D + (H[j=between a=center] > Hd"Night denizens"[level=2] + B.secondary"View more") + (G[c={min:280} g=4] > (C > V[g=4] > Hd"Territory"[level=3] + (H[g=4 wrap] > (V[g=0] > (H[g=2 a=center] > Ic + Tx[t=supporting]) + Tx[t=supporting])*5))*2) + D + (H[j=between a=center] > Hd"Engagement"[level=2] + B.secondary"View more") + (G[c={min:280} g=4] > (C > V[g=6] > (H[j=between a=center] > Hd"Top pages"[level=3] + Lk"All pages") + T)*2)
 
 /**
  * Analytics Dashboard — the night shift at a glance: live active users, four
@@ -239,7 +239,7 @@ const regionData = [
   {
     label: 'LATAM',
     value: 8,
-    color: 'var(--dracula-purple)',
+    color: 'var(--dracula-pink)',
   },
   {label: 'Other', value: 4, color: 'var(--dracula-comment)'},
 ];
@@ -263,7 +263,7 @@ const roleData = [
   {
     label: 'Data Scientist',
     value: 12,
-    color: 'var(--dracula-purple)',
+    color: 'var(--dracula-pink)',
   },
   {label: 'Other', value: 8, color: 'var(--dracula-comment)'},
 ];
@@ -465,10 +465,10 @@ const topEventsColumns: TableColumn<EventRow>[] = [
 
 // ============= CHART COMPONENTS =============
 
-// Chart series colors: desktop glows orange, mobile purple
+// Chart series colors: desktop glows orange, mobile glows cyan
 const chartColors = {
   desktop: 'var(--dracula-orange)',
-  mobile: 'var(--dracula-purple)',
+  mobile: 'var(--dracula-cyan)',
 };
 
 function ChartLegendItem({color, label}: {color: string; label: string}) {
@@ -634,7 +634,15 @@ function MetricCard({
               size="xsm"
               color={positive ? 'success' : 'error'}
             />
-            <Text type="body" color="secondary" hasTabularNumbers>
+            <Text
+              type="body"
+              weight="semibold"
+              hasTabularNumbers
+              style={{
+                color: positive
+                  ? 'var(--color-positive)'
+                  : 'var(--color-negative)',
+              }}>
               {change}
             </Text>
           </HStack>
@@ -759,7 +767,7 @@ export default function DashboardTemplate() {
         <LayoutContent padding={6}>
           <VStack gap={6}>
             {/* Page header — the only h1; section titles sit at level 2 */}
-            <Heading level={1}>Analytics Dashboard</Heading>
+            <Heading level={1}>The night shift</Heading>
 
             {/* Active Users Chart */}
             <VStack gap={6}>

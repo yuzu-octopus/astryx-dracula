@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LP[p=4] > V[g=2] > TI"Search files" + TreeList) + (LC[p=0] > V > (SI[fill] > Cd) + (V > (TL > Tab"Terminal"! + Tab"Problems" + Tab"Output" + Tab"Debug") + Cd)) + (LP[p=4] > V[g=3] > (SG > SGI"Properties"! + SGI"History") + (V[g=3] > (V[g=1] > Hd"NightCounter.tsx"[level=3] + Tx"src/components/NightCounter.tsx"[t=supporting]) + ML + (V[g=2] > B.secondary"Format Document" + B.secondary"Go to Definition" + B.secondary"Find References")))
+//   L > (LP[p=4] > V[g=2] > TI"Search files" + TreeList) + (LC[p=0] > (Hd"Code editor"[level=1] + V > (SI[fill] > Cd) + (V > (TL > Tab"Terminal"! + Tab"Problems" + Tab"Output" + Tab"Debug") + Cd))) + (LP[p=4] > V[g=3] > (SG > SGI"Properties"! + SGI"History") + (V[g=3] > (V[g=1] > Hd"NightCounter.tsx"[level=3] + Tx"src/components/NightCounter.tsx"[t=supporting]) + ML + (V[g=2] > B.secondary"Format Document" + B.secondary"Go to Definition" + B.secondary"Find References")))
 
 import {useState, useMemo, type CSSProperties} from 'react';
 
@@ -62,6 +62,13 @@ const styles: Record<string, CSSProperties> = {
   terminalPanel: {
     flexShrink: 0,
     overflow: 'hidden',
+  },
+  visuallyHidden: {
+    position: 'absolute',
+    width: 1,
+    height: 1,
+    overflow: 'clip',
+    whiteSpace: 'nowrap',
   },
 };
 
@@ -252,6 +259,9 @@ export default function IdeWorkspace() {
       height="fill"
       content={
         <LayoutContent padding={0}>
+          <Heading level={1} style={styles.visuallyHidden}>
+            Code editor
+          </Heading>
           <Layout
             height="fill"
             start={

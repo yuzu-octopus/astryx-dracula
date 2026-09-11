@@ -140,22 +140,23 @@ const CHAPTER_GROUPS: Array<{title: string; chapters: DocChapter[]}> = [
         icon: FileText,
         hasArt: true,
         intro:
-          'DeepSeek-V4.1-Flash is a multimodal Mixture-of-Experts model built for input-heavy agentic workloads: 552B backbone parameters, contexts of up to one million tokens, and a KV cache small enough to change what long-context serving costs.',
+          'One idea first: long agents are limited by memory, not math. DeepSeek-V4.1-Flash is a 552B-parameter multimodal Mixture-of-Experts model that attacks the KV cache from three sides at once, shrinking global cache to 890 bytes per token (about 1/4 of DeepSeek-V4-Flash and 1/437 of DeepSeek-V1) and persistent cache to about 1/8, while scoring higher. Think of it as cutting warehouse rent while stocking better goods.',
         sections: [
           {
             key: 'bottleneck',
             heading: 'The bottleneck moved to storage',
-            body: 'Sparse attention already cut the compute cost of long-sequence processing, which pushed the binding constraint onto keeping, moving, and reloading KV caches. DeepSeek-V4 pairs a global attention branch spanning the full context with local sliding-window attention; for a fixed window size the SWA footprint is bounded independently of sequence length, so on long sequences the global branch dominates the runtime KV that HBM has to hold.',
+            body: 'Attention compute got cheap first. Sparse attention cut the cost of processing long sequences, so the binding constraint moved to keeping, moving, and reloading KV caches. DeepSeek-V4 pairs a global branch that spans the full context with local sliding-window attention. For a fixed window size the sliding-window footprint stays bounded no matter how long the sequence gets, so on long sequences the global branch dominates the runtime KV that HBM must hold.',
             bullets: [
               'Runtime KV lives in HBM and bounds serving throughput at a given batch size.',
               'Persistent KV is held for prefix reuse on SSD or in host memory, where capacity and I/O bandwidth both bind.',
               'Interconnect bandwidth limits how fast either cache can be migrated or loaded back.',
+              'Worked example: at one million tokens, 890 bytes per token is about 0.89 GB of global KV per request, which is why bytes per token is the headline metric.',
             ],
           },
           {
             key: 'three-levers',
             heading: 'Three levers, pulled together',
-            body: 'The compression comes from model architecture, cache precision, and deployment strategy at once, and each lever multiplies the others.',
+            body: 'The savings multiply because three levers move together: the architecture stores less, the format uses fewer bits, and the deployment strategy recomputes a little instead of storing a lot.',
             bullets: [
               'Architecture: Compressed Sparse Attention 2 shares main KV and indexer K across layers and lets layers reuse Top-K indices, decoupling cache sharing from index reuse. V4.1-Flash uses pure CSA2, dropping the CSA and HCA hybrid of DeepSeek-V4.',
               'Precision: the main KV cache is trained and stored in FP4, which nearly halves its footprint in HBM and on SSD.',
@@ -166,7 +167,7 @@ const CHAPTER_GROUPS: Array<{title: string; chapters: DocChapter[]}> = [
           {
             key: 'headline-numbers',
             heading: 'What it adds up to',
-            body: 'At equal sequence length, the global KV cache of DeepSeek-V4.1-Flash is roughly 1/4 of that of DeepSeek-V4-Flash and the persistent KV cache is roughly 1/8, at better end-to-end quality.',
+            body: 'At equal sequence length, the global KV cache of DeepSeek-V4.1-Flash is roughly 1/4 of DeepSeek-V4-Flash and the persistent cache is roughly 1/8, at better end-to-end quality. The rest of this tour explains where each fraction comes from.',
             bullets: [
               'Global KV cache: 890 bytes per token, an approximately 4-fold reduction against DeepSeek-V4-Flash and a 437-fold reduction against DeepSeek-V1.',
               'Persistent KV cache: about 1/8 of DeepSeek-V4-Flash, because SWA KV is no longer persisted and the global KV that remains is 1/4 of its former size.',
@@ -183,24 +184,24 @@ const CHAPTER_GROUPS: Array<{title: string; chapters: DocChapter[]}> = [
         icon: Table2,
         hasArt: true,
         intro:
-          'Forty layers split into a 20-layer causal encoder and a 20-layer decoder. Every block is a DeepSeekMoE, every attention path is either a sliding window or CSA2, and the modes are assigned statically per layer.',
+          'One idea first: forty layers, two halves, three static choices per layer. The backbone is a 20-layer causal encoder plus a 20-layer decoder at hidden dimension 5120, where every block is a DeepSeekMoE and every attention path is either a sliding window or CSA2. Think of a forty-story tower where the lower half writes one shared catalog and the upper half reads it.',
         sections: [
           {
             key: 'backbone',
             heading: 'Backbone',
-            body: 'The language backbone is 40 causal Transformer layers at a hidden dimension of 5120. The first two layers use sliding-window attention only; every later layer combines a global branch with SWA. Images enter through a vision encoder and an MLP projector and are processed jointly with text from the start of language-model pre-training.',
+            body: 'The language backbone is 40 causal Transformer layers at hidden dimension 5120. The first two layers use sliding-window attention only, and every later layer pairs a global branch with SWA. Images enter through a vision encoder and an MLP projector and are processed jointly with text from the start of language-model pre-training.',
             bullets: [
               'Attention: 64 query heads of dimension 512, a query compression dimension of 1280, and 8 output projection groups of intermediate dimension 1024.',
               'Sparse attention selects the top 512 KV entries per query, scored by an indexer with 32 query heads of dimension 128.',
               'Sliding window: n_win is 128 tokens on both the SWA branch and the DSpark drafter.',
-              'Mixture-of-Experts: 1 shared expert and 384 routed experts per block, each with an intermediate dimension of 2304, 6 activated per token, SwiGLU with clamping at a threshold of 10.',
+              'Mixture-of-Experts: 1 shared expert and 384 routed experts per block, each with an intermediate dimension of 2304, 6 activated per token, SwiGLU with clamping at a threshold of 10. Worked example: 6 active out of 384 means about 1.6 percent of routed experts fire on any token.',
               'Vision: a 32-layer DeepSeek-ViT with hidden dimension 1024, 16 heads, and patch size 14, feeding a 2-layer projector of hidden dimension 5120. A 3x3 pixel unshuffle cuts visual tokens by a factor of nine, supporting inputs up to roughly 1344x1344.',
             ],
           },
           {
             key: 'layer-plan',
             heading: 'How the modes are assigned',
-            body: 'Each CSA2 layer is statically assigned one of three modes and one compression ratio. Encoder layers compress at m = 2 in three identical groups of six, where the first layer of the group computes the cache and the other five reuse it. The decoder compresses at m = 1 in five groups of four, and only its first group opens with a Full layer; the other four open with Reindex, which keeps the cache shared but refreshes the selection.',
+            body: 'Each CSA2 layer is statically assigned one mode and one compression ratio for the whole run. Encoder layers compress at m = 2 in three identical groups of six: the first layer of each group computes the cache and the other five reuse it. The decoder compresses at m = 1 in five groups of four, and only its first group opens with a Full layer; the other four open with Reindex, which shares the cache but refreshes the selection. Picture three identical work crews of six on the encoder side, each with one surveyor and five builders.',
             code: {
               language: 'plaintext',
               title: 'layer plan',
@@ -214,9 +215,9 @@ decoder[4:20]   (Reindex, Reuse x3) x 4     # m = 1`,
           {
             key: 'parameters',
             heading: 'Parameters and activation',
-            body: 'The backbone carries 552B parameters; Engram adds another 196B, split evenly across two modules placed at layers 1 and 14 to balance memory across training pipeline stages. Activation is where the model pays for itself: 8B parameters per token during prefill and 16B during decode, against 284B and 13B for DeepSeek-V4-Flash and 1.6T and 49B for DeepSeek-V4-Pro.',
+            body: 'The backbone carries 552B parameters and Engram adds 196B more, split evenly across two modules at layers 1 and 14 to balance memory across training pipeline stages. What matters for cost is activation: 8B parameters per token during prefill and 16B during decode, against 13B activated of 284B total for DeepSeek-V4-Flash and 49B activated of 1.6T total for DeepSeek-V4-Pro.',
             bullets: [
-              'Routing balances image and text tokens separately, with modality-specific correction biases, so neither modality hides an imbalance in the other.',
+              'Routing balances image and text tokens separately with modality-specific correction biases, so neither modality can hide an imbalance in the other.',
               'Engram tables hold roughly 16M entries per hash head in FP8, which keeps conditional memory out of the dense parameter path.',
               'Checkpoints for the release are at huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash.',
             ],
@@ -233,12 +234,12 @@ decoder[4:20]   (Reindex, Reuse x3) x 4     # m = 1`,
         title: 'Causal Encoder-Decoder',
         icon: Layers,
         intro:
-          'Decoder global KV is not computed by the decoder. It is projected from the hidden state of the last encoder layer, which nearly halves prefill computation for the tool-call-heavy shapes that agentic workloads actually produce.',
+          'One idea first: the decoder borrows its global memory instead of computing it. Decoder global KV is projected from the hidden state of the last encoder layer, so prefill walks 20 layers instead of 40 and nearly halves its cost on the tool-call-heavy shapes agentic workloads actually produce. Picture a library where every upper floor shares the catalog compiled on floor 20.',
         sections: [
           {
             key: 'projection',
             heading: 'One hidden state feeds the decoder',
-            body: 'For global attention, the bottom L/2 layers act as a causal encoder. For every decoder layer above L/2, the KV entries are not derived from that layer. They are projected directly from H[L/2], the hidden state of the final encoder layer, using layer-dependent projection weights, so prefill computes only the first half of the layers and the decoder receives its global KV at minimal cost.',
+            body: 'For global attention, the bottom L/2 layers act as a causal encoder. For every decoder layer above L/2, the KV entries are not derived from that layer hidden state. They are projected directly from H[L/2], the hidden state of the final encoder layer, using layer-dependent projection weights, so prefill computes only the first half of the layers and the decoder receives its global KV at minimal cost.',
             code: {
               language: 'plaintext',
               title: 'ced projections',
@@ -253,7 +254,7 @@ K_l, V_l = H_l @ W_lK, H_l @ W_lV`,
           {
             key: 'local-depth',
             heading: 'Local KV keeps its depth',
-            body: 'Sharing global KV would be cheap but shallow, so CED leaves the sliding-window path alone: at any layer, local keys and values come from that layer own hidden state, which preserves the computational depth of local KV generation. The cost is that decoder SWA state cannot be inferred from the encoder, and rebuilding it is what SWA Bounded Replay exists to bound.',
+            body: 'Sharing global KV would be cheap but shallow, so CED leaves the sliding-window path alone: at any layer, local keys and values come from that layer own hidden state, which preserves the computational depth of local KV generation. Think of it as one shared catalog for global facts plus a private notebook per floor for local detail. The cost is that decoder SWA state cannot be inferred from the encoder, and rebuilding it is what SWA Bounded Replay exists to bound.',
             bullets: [
               'CED is inspired by YoCo, which lets the upper half of the layers share the lower half KV cache.',
               'CED adds layer-dependent projections so the shared state can be read at every decoder depth.',
@@ -263,7 +264,7 @@ K_l, V_l = H_l @ W_lK, H_l @ W_lV`,
           {
             key: 'prefill-complexity',
             heading: 'Prefill complexity halves',
-            body: 'For a sequence length N much larger than n_win, CED reduces prefill complexity from O(N x L) to O(N x L/2 + n_win x L/2), which is O(N x L/2) in practice. On 1M-token prompts with frequent cache misses, that is the difference between paying for forty layers and paying for twenty.',
+            body: 'For a sequence length N much larger than n_win, CED reduces prefill complexity from O(N x L) to O(N x L/2 + n_win x L/2), which is O(N x L/2) in practice. Worked example: on a 1M-token prompt with n_win at 128, that is the difference between paying for forty layers per token and paying for about twenty.',
             code: {
               language: 'plaintext',
               title: 'prefill cost',
@@ -281,12 +282,12 @@ CED prefill:    O(N * L/2 + n_win * L/2)  ~  O(N * L/2)
         icon: Grid2x2,
         hasArt: true,
         intro:
-          'KV cache storage and attention compute can be cut along three multiplicative dimensions: entry size, sequence length, and layer count. CSA2 attacks all three at once, and it decouples sharing the cache from reusing the selection.',
+          'One idea first: storage and compute shrink along three multiplicative axes, entry size, sequence length, and layer count, and CSA2 is the first design in this lineage to press all three at once. It shares main KV and indexer K across layers, lets layers reuse Top-K indices, and keeps cache sharing decoupled from index reuse.',
         sections: [
           {
             key: 'modes',
             heading: 'Full, Reindex, and Reuse',
-            body: 'Every CSA2 layer computes its own main query and its own SWA KV, and every layer uses the selected main KV entries to produce its attention output. The three modes differ only in where main KV, indexer K, and Top-K indices come from, and each layer is assigned one mode for the whole run.',
+            body: 'Every CSA2 layer computes its own main query and its own SWA KV, and every layer uses the selected main KV entries to produce its attention output. The three modes differ only in where main KV, indexer K, and Top-K indices come from, and each layer keeps one mode for the whole run. Analogy: three cooks sharing one pantry. Full stocks it and writes the recipe, Reindex keeps the pantry but rewrites the recipe, Reuse just follows the latest recipe.',
             code: {
               language: 'plaintext',
               title: 'csa2 modes',
@@ -304,7 +305,7 @@ Reuse     reuse      reuse        reuse the latest selection`,
           {
             key: 'sparse-attention',
             heading: 'The indexer selects, SWA covers the rest',
-            body: 'A lightweight indexer scores main KV entries with indexer query and indexer key and selects the top 512 entries for each query; the query then attends to those entries together with the layer-local sliding-window KV. Uncompressed main KV remains a special case, available at a compression ratio of 1.',
+            body: 'A lightweight indexer scores main KV entries with indexer query and indexer key and selects the top 512 entries for each query; the query then attends to those entries together with the layer-local sliding-window KV. The 512 picks carry the distant past while the 128-token window covers the recent past. Uncompressed main KV remains a special case, available at a compression ratio of 1.',
             bullets: [
               'Cache sharing and index reuse are separate knobs: a Reindex layer shares storage while still choosing its own entries.',
               'When CSA2 meets CED, the decoder layer assigned to Full Mode builds its global KV from the last encoder hidden state; Reindex and Reuse are unchanged.',
@@ -313,12 +314,12 @@ Reuse     reuse      reuse        reuse the latest selection`,
           {
             key: 'compressor',
             heading: 'A simpler compressor',
-            body: 'In CSA, each main KV entry was compressed from two original entries whose sources overlapped with the adjacent entry, and absolute positional embedding encoded those two positions. CSA2 removes both. It also derives indexer K by projecting main KV entries rather than compressing a separate path out of the hidden states, which simplifies the implementation and speeds up training.',
+            body: 'In CSA, each main KV entry was compressed from two original entries whose sources overlapped with the adjacent entry, and absolute positional embedding encoded those two positions. CSA2 removes both the overlap and the absolute embedding, like filing one copy per folder instead of two overlapping copies. It also derives indexer K by projecting main KV entries rather than compressing a separate path out of the hidden states, which simplifies the implementation and speeds up training.',
           },
           {
             key: 'hierarchical',
             heading: 'The Hierarchical Sparse Indexer',
-            body: 'Cross-layer index reuse removes indexer evaluations but leaves the survivors scoring the whole causally visible context, which is still the bottleneck at extreme lengths. The decoder answer is to let shallow indexers restrict what deeper indexers are allowed to consider, with no extra state: the first Full Mode layer of the group builds a candidate pool, later Reindex layers score only inside it, and Reuse layers do no indexing at all.',
+            body: 'Cross-layer index reuse removes indexer evaluations but leaves the survivors scoring the whole causally visible context, which is still the bottleneck at extreme lengths. The decoder answer is to let shallow indexers restrict what deeper indexers may consider, with no extra state: the first Full Mode layer of the group builds a candidate pool, later Reindex layers score only inside it, and Reuse layers do no indexing at all.',
             code: {
               language: 'plaintext',
               title: 'candidate pool',
@@ -332,6 +333,7 @@ pool    = 16,384 candidate positions     # later indexers search only here`,
               'For a fixed pool size, the per-query cost of every deeper indexer is bounded independently of context length.',
               'The restriction is training-aware: the same candidate restriction is applied in training and inference, so deeper indexers are optimized under the search domain they meet in production.',
               'The first Full Mode layer still pays for a full-range scan, so hierarchical indexing shrinks the tail of the cost rather than the whole of it.',
+              'Worked example: at one million tokens of context, a deeper indexer scores 16,384 candidates instead of 1,000,000, which is about 1.6 percent of the range.',
             ],
           },
         ],
@@ -340,26 +342,29 @@ pool    = 16,384 candidate positions     # later indexers search only here`,
         id: 'mhc',
         title: 'Single-Pass mHC',
         icon: Combine,
+        hasArt: true,
         intro:
-          'mHC keeps n residual streams between adjacent blocks. The original implementation read those streams twice per block because input mixing had to wait on a reduction. Shifting the coefficients by one block removes that dependency and halves the activation traffic.',
+          'One idea first: borrow the previous block mixing weights and the residual gets read once instead of twice. mHC keeps n residual streams between adjacent blocks, and the original implementation read those streams twice per block because input mixing had to wait on a reduction. Shifting the coefficients by one block removes that dependency and halves activation traffic to the theoretical ideal. It is like signing the previous cover sheet so the current page never waits on the printer.',
         sections: [
           {
             key: 'multi-pass',
             heading: 'Why the residual was read twice',
-            body: 'The ideal residual map reads and writes (n + 1)d values, a lower bound of (2n + 2)d. DeepSeek-V4 ran the update as three kernels that could not overlap, because each depends on the one before it, and paid (4n + 4)d: twice the lower bound. Two of the three stages can share a traversal of the residual, since the residual update needs no reduction over the hidden dimension, but input mixing cannot join them while it depends on coefficients that are only available once every hidden tile has been reduced.',
+            body: 'The ideal residual map reads and writes (n + 1)d values, a lower bound of (2n + 2)d. DeepSeek-V4 ran the update as three sequential kernels, each waiting on the one before it, and paid (4n + 4)d: twice the lower bound. The residual update needs no reduction over the hidden dimension, so two of the three stages could share one traversal of the residual, but input mixing cannot join them while its coefficients stay unavailable until every hidden tile has been reduced.',
             code: {
               language: 'plaintext',
               title: 'mhc kernels',
               source: `# three dependent kernels, (4n + 4)d activation traffic
 X_l     = B[l-1] @ X[l-1] + C[l-1] @ Y[l-1]   # residual update
 A,B,C   = H(X_l)                              # coefficient prediction
-X_hat_l = A[l] @ X_l                          # input mixing`,
+X_hat_l = A[l] @ X_l                          # input mixing
+
+# worked example, n = 4: 20d moved per block vs 10d ideal`,
             },
           },
           {
             key: 'one-block-shift',
             heading: 'Shift the coefficients by one block',
-            body: 'Single-Pass mHC lets each block consume the mixing coefficients produced by the previous one. Input mixing now reads A[l-1] instead of A[l], so it no longer depends on a reduction over X_l, and every tile can be used immediately for both input mixing and coefficient prediction. Empirically the shift costs negligible quality, which makes it a free read against a bounded ideal.',
+            body: 'Single-Pass mHC lets each block consume the mixing coefficients produced by the previous one. Input mixing now reads A[l-1] instead of A[l], so it no longer depends on a reduction over X_l, and every tile can be used immediately for both input mixing and coefficient prediction. The measured quality cost of the shift is negligible, which makes it a free read against a bounded ideal.',
             code: {
               language: 'plaintext',
               title: 'single-pass mhc',
@@ -383,13 +388,14 @@ A,B,C  = H(X_l)      # no dependency on this block's own coefficients`,
         id: 'auxiliary',
         title: 'Engram, DSpark, FP4',
         icon: Boxes,
+        hasArt: true,
         intro:
-          'Three additions carry the rest of the compression budget: a sparsely accessed conditional memory, a speculative drafter trained after pre-training, and a four-bit main KV cache.',
+          'One idea first: what the attention core cannot save, memory, drafting, and precision save instead. Engram is a sparsely accessed conditional memory, a wall of sticky notes the model looks up instead of computing. DSpark is a speculative drafter that sketches five tokens at once and checks how far the sketch survives. FP4 is the same archive in a smaller box: a four-bit main KV cache.',
         sections: [
           {
             key: 'engram',
             heading: 'Engram',
-            body: 'Engram adds 196B parameters of conditional memory, split evenly across two modules at layers 1 and 14, to decouple memorization from computation. It follows the earlier design (tokenizer compression, multi-head hashing, context-aware gating, multi-branch integration) with two changes: the short causal convolution is dropped because its gains do not justify the inference complexity, and the embedding update moves to momentum plus Sinkhorn balancing.',
+            body: 'Engram adds 196B parameters of conditional memory, split evenly across two modules at layers 1 and 14, to decouple memorization from computation. It follows the earlier design (tokenizer compression, multi-head hashing, context-aware gating, multi-branch integration) with two changes: the short causal convolution is dropped because its gains do not justify the inference complexity, and the embedding update moves to momentum plus Sinkhorn balancing. Memory without matmuls is the whole point: a lookup into a giant table costs far less than computing the same fact through dense layers.',
             bullets: [
               'Each module uses N-gram orders 2, 3, and 4, with 8 hash heads and a total embedding dimension of 2048 per order.',
               'Each head indexes a table of roughly 16M entries, with table sizes chosen to be distinct primes.',
@@ -400,7 +406,7 @@ A,B,C  = H(X_l)      # no dependency on this block's own coefficients`,
           {
             key: 'dspark',
             heading: 'DSpark',
-            body: 'DSpark is a speculative decoding module combining semi-autoregressive drafting with confidence-scheduled verification. Three Transformer blocks with a 128-token sliding window produce base logits for five draft positions in one forward pass, a lightweight Markov head models the dependencies between those drafts, and a confidence head predicts per-position acceptance probabilities that feed a scheduler choosing the verification length per request.',
+            body: 'DSpark is a speculative decoding module combining semi-autoregressive drafting with confidence-scheduled verification. Three Transformer blocks with a 128-token sliding window produce base logits for five draft positions in one forward pass, a lightweight Markov head models the dependencies between those drafts, and a confidence head predicts per-position acceptance probabilities that feed a scheduler choosing the verification length per request. It plays like a chess sketch artist: draw five moves at once, estimate how far the line survives, then verify exactly that far.',
             bullets: [
               'The scheduler combines predicted prefix survival with profiled engine throughput curves to maximize expected system-wide token throughput at the current load.',
               'Unlike the MTP module of DeepSeek-V3, DSpark is trained after pre-training with the backbone frozen, then alongside the backbone in post-training without gradients flowing back into it.',
@@ -424,6 +430,7 @@ SWA KV     FP8, retained for its sensitivity to quantization`,
               'Dropping the second-level global scale costs nothing measurable: the largest trained RMSNorm weight magnitude is about 1, the rotated 512-channel KV latent stays near sqrt(512) at about 22.6, and the largest magnitude observed in training is around 10.',
               'Quantizing after RoPE rather than before is a deliberate trade: quantizing earlier helps accuracy marginally and would add decode overhead.',
               'Against the FP8 main KV cache of DeepSeek-V4, this nearly halves storage in HBM and when the cache is offloaded to SSD.',
+              'Worked example: the format ceiling of 2688 sits more than 100x above the largest magnitude seen in training (about 10), so dropping the second-level global scale costs nothing measurable.',
             ],
           },
         ],
@@ -438,12 +445,12 @@ SWA KV     FP8, retained for its sensitivity to quantization`,
         title: 'Training infrastructure',
         icon: Server,
         intro:
-          'The compression only pays off if the training system can feed it: one-million-token multimodal sequences, attention state shared across pipeline stages, and embedding tables that sit far from the compute that reads them.',
+          'One idea first: the training system exists to serve the architecture. Million-token multimodal steps must stay fed, attention state shared across layers must survive pipeline stage boundaries, and giant embedding tables must be reachable from far-away compute. Three mechanisms cover the three needs: overlapped I/O, shadow replicas, and scheduled prefetch.',
         sections: [
           {
             key: 'multimodal',
             heading: 'Multimodal training',
-            body: 'The vision encoder is first optimized against a contrastive objective, where the loss over a full batch forces both modalities to be all-gathered across data-parallel ranks. Because the text gradient depends only on the gathered visual features and the visual gradient only on the gathered text features, each all-gather hides behind useful computation instead of stalling the pipeline.',
+            body: 'The vision encoder is first optimized against a contrastive objective, where the loss over a full batch forces both modalities to be all-gathered across data-parallel ranks. The text gradient needs only the gathered visual features and the visual gradient needs only the gathered text features, so each all-gather hides behind useful computation instead of stalling the pipeline.',
             code: {
               language: 'plaintext',
               title: 'contrastive overlap',
@@ -456,12 +463,13 @@ SWA KV     FP8, retained for its sensitivity to quantization`,
               'End-to-end parallelism replicates the vision encoder outside the LLM parameter tree and splits each step into vision forward, LLM forward and backward, and vision backward, so the LLM phase keeps the parallel strategy of text-only training.',
               'Balanced image sharding spreads the images of one ultra-long sequence across context-parallel ranks with each image loaded exactly once; the load-hiding criterion reduces to per-token quantities and is therefore independent of sequence length and cluster size.',
               'During RL rollout, images transfer to the inference engine incrementally and the engine CPU-side decoding and preprocessing outputs are cached on a distributed file system for reuse across rollouts and later training.',
+              'Worked example: in the load-hiding check, the token count N cancels out, so a one-million-token sequence hides I/O exactly as well as a one-thousand-token one. Only per-token bytes and per-token compute matter.',
             ],
           },
           {
             key: 'attention-sharing',
             heading: 'Attention sharing across stages',
-            body: 'Layers that share attention components can land on different pipeline stages, which makes direct module reuse incompatible with stage-local execution. Three mechanisms keep CSA2 trainable under an ordinary pipeline schedule.',
+            body: 'Layers that share attention components can land on different pipeline stages, which makes direct module reuse incompatible with stage-local execution. Three mechanisms keep CSA2 trainable under an ordinary pipeline schedule, and the first works like theater understudies: a lightweight replica stands on every stage while one logical owner holds the true parameters.',
             bullets: [
               'Shadow indexers place a lightweight executable replica on each participating stage while a single logical owner keeps the shared parameters, handles optimization and checkpointing, and keeps replicas consistent through parameter synchronization and gradient aggregation.',
               'Pipeline payload extensions carry the intermediate representations and sparse routing information that downstream consumers need across a pipeline boundary, partitioned consistently with context parallelism.',
@@ -471,7 +479,7 @@ SWA KV     FP8, retained for its sensitivity to quantization`,
           {
             key: 'engram-training',
             heading: 'Engram at scale',
-            body: 'Engram tables are partitioned by row across dedicated process groups whose size trades per-device memory against the communication scope of each lookup, with optimizer states sharded across replicas of every partition. Because lookup indices depend only on the input token sequence, prefetch for the whole local batch starts before each pipeline stage touches its microbatches; embedding gradients are buffered during backward and returned to their owning ranks after the backbone backward pass.',
+            body: 'Engram tables are partitioned by row across dedicated process groups whose size trades per-device memory against the communication scope of each lookup, with optimizer states sharded across replicas of every partition. Lookup indices depend only on the input token sequence, so prefetch for the whole local batch starts before each pipeline stage touches its microbatches; embedding gradients are buffered during backward and returned to their owning ranks after the backbone backward pass.',
             bullets: [
               'Prefetch and gradient transfers are scheduled to overlap the vision encoder forward and backward passes.',
               'Embeddings are stored and fetched in FP8, with retrieved values and scaling factors handed straight to the following GEMM.',
@@ -487,12 +495,12 @@ SWA KV     FP8, retained for its sensitivity to quantization`,
         icon: Cpu,
         hasArt: true,
         intro:
-          'The architecture is conceptually complex and the kernel flow is deliberately not. Most layers run a short fixed list of fused kernels, and Encoder-Prefill-Decode disaggregation lets the three stages scale and overlap on their own terms.',
+          'One idea first: conceptually complex, mechanically short. Most layers run a short fixed list of fused kernels, and Encoder-Prefill-Decode disaggregation lets vision encoding, prefill, and decoding scale and overlap on their own terms.',
         sections: [
           {
             key: 'kernels',
             heading: 'A short kernel flow',
-            body: 'Fusion encapsulates the intricate operations and keeps hardware pipelined inside a handful of kernels: the fused RoPE-attention-RoPE-cast kernel in FlashMLA, the Mega-Gate, Mega-mHC, and Mega-MoE kernels in DeepGEMM, the TileKernels set, and the TopK kernel in DeepSelect. The result is that the Reuse Mode layers, which are the vast majority of the stack, execute with only 15 kernels during prefill and 11 during decode.',
+            body: 'Fusion encapsulates the intricate operations and keeps hardware pipelined inside a handful of kernels: the fused RoPE-attention-RoPE-cast kernel in FlashMLA, the Mega-Gate, Mega-mHC, and Mega-MoE kernels in DeepGEMM, the TileKernels set, and the TopK kernel in DeepSelect. The vast majority of the stack runs in Reuse Mode at 15 kernels during prefill and 11 during decode: a food-truck menu with fifteen steps in and eleven steps out, the same result every time.',
             code: {
               language: 'plaintext',
               title: 'reuse mode layer',
@@ -503,16 +511,17 @@ decode    11 kernels`,
           {
             key: 'epd',
             heading: 'Encoder, prefill, decode',
-            body: 'Deployment adopts Encoder-Prefill-Decode disaggregation, so vision encoding, prefill, and decoding scale independently and overlap in execution. That separation is what makes the two replay paths of SWA Bounded Replay practical: the encoder side and the decoder side can be reconstructed in different processes, against the same cached global KV.',
+            body: 'Deployment adopts Encoder-Prefill-Decode disaggregation, so vision encoding, prefill, and decoding scale independently and overlap in execution. That separation is what makes the two replay paths of SWA Bounded Replay practical: the encoder side and the decoder side are reconstructed in different processes against the same cached global KV.',
           },
           {
             key: 'persistent-kv',
             heading: 'Persistent KV cache management',
-            body: 'Under identical workloads the persistent KV cache of V4.1-Flash is about 1/8 of DeepSeek-V4, and two multiplicative factors explain it: the persistent cache no longer stores SWA KV, which almost halves it, and the global KV it does retain is compressed to 1/4 through architecture and precision. In DeepSeek-V4, SWA KV was nearly half the persistent capacity, cached only at the end of the prompt and the end of the output, under an LRU policy shared with global KV.',
+            body: 'Under identical workloads the persistent KV cache of V4.1-Flash is about 1/8 of DeepSeek-V4, and two multiplicative factors explain it: the persistent cache no longer stores SWA KV, which almost halves it, and the global KV it retains is compressed to 1/4 through architecture and precision. In DeepSeek-V4, SWA KV was nearly half the persistent capacity, cached only at the end of the prompt and the end of the output under an LRU policy shared with global KV.',
             bullets: [
               'SWA KV moves out of the persistent cache into a distributed memory pool provisioned from 10% of host DRAM per machine, where a lifetime of minutes lets expired entries recycle immediately for new sessions.',
               'Global KV stays in the persistent cache with a guaranteed lifetime of at least 72 hours, matching its long-tail reuse pattern.',
               'The misses that eviction causes are affordable because of Encoder SWA Bounded Replay, which turns a catastrophic miss into a graceful, inexpensive degradation.',
+              'Worked example: the 1/8 is multiplicative, about 1/2 from evicting SWA KV times 1/4 from compressing the global KV that remains.',
             ],
           },
         ],
@@ -523,12 +532,12 @@ decode    11 kernels`,
         icon: RefreshCw,
         hasArt: true,
         intro:
-          'Exact SWA reconstruction needs L x n_win tokens of replay. Bounded replay does the work with n_win and accepts approximate state, which is the trade that lets SWA KV leave the persistent cache entirely.',
+          'One idea first: replay 128 tokens, not 5,120. Exact SWA reconstruction needs L x n_win tokens of replay; bounded replay does the work with n_win and accepts approximate state. That trade is what lets SWA KV leave the persistent cache entirely.',
         sections: [
           {
             key: 'the-trade',
             heading: 'Replay only the window',
-            body: 'SWA dependencies accumulate across layers, so exactly reconstructing the SWA KV of L layers would mean replaying L x n_win tokens. Bounded replay replays only the most recent n_win tokens and truncates SWA to that replay segment: for a replay starting at position s, a query at position i attends to SWA keys between max(s, i - W + 1) and i. The state is approximate by construction, and the measurements say the approximation is cheap.',
+            body: 'SWA dependencies accumulate across layers, so exactly reconstructing the SWA KV of L layers would mean replaying L x n_win tokens. Bounded replay replays only the most recent n_win tokens and truncates SWA to that replay segment: for a replay starting at position s, a query at position i attends to SWA keys between max(s, i - W + 1) and i. The state is approximate by construction, and the measurements say the approximation is cheap. Worked example: exact replay for 40 layers costs 40 times 128, which is 5,120 tokens of work, while bounded replay costs 128, a 40x cut.',
             code: {
               language: 'plaintext',
               title: 'replay rule',
@@ -539,7 +548,7 @@ attend(i): SWA keys in [max(s, i - W + 1), i]`,
           {
             key: 'encoder-path',
             heading: 'Encoder SWA Bounded Replay',
-            body: 'When encoder SWA KV is missing, the last n_win tokens of the cached prefix are replayed together with the uncached suffix. The replayed tokens regenerate only SWA KV, reusing the cached global KV without recomputing or overwriting it, while the uncached suffix generates both. This is what lets prefix caching depend on global KV alone, and therefore what lets SWA KV be removed from the persistent cache.',
+            body: 'When encoder SWA KV is missing, the last n_win tokens of the cached prefix are replayed together with the uncached suffix. The replayed tokens regenerate only SWA KV, reusing the cached global KV without recomputing or overwriting it, while the uncached suffix generates both. It is like re-reading only the last page of the previous chapter to recover your place. This is what lets prefix caching depend on global KV alone, and therefore what lets SWA KV leave the persistent cache.',
             bullets: [
               'The replayed prefix state is approximate, so global KV and SWA KV for the uncached suffix depend on the cache-hit position and are not mathematically identical across positions.',
               'Experiments across diverse boundary conditions show the bounded replay barely compromises response quality.',
@@ -549,7 +558,7 @@ attend(i): SWA keys in [max(s, i - W + 1), i]`,
           {
             key: 'decoder-path',
             heading: 'Decoder SWA Bounded Replay',
-            body: 'Under CED, decoder global KV comes from the encoder, so the only obstacle to ending prefill at the encoder is decoder SWA KV, which comes from each decoder layer own hidden states and is needed by the first decode steps. Exact reconstruction would run the decoder layers over the last L/2 x n_win prompt tokens, which is expensive when a short uncached suffix follows a long cached prefix. Bounded replay instead replays the last n_win tokens of the prompt at every prefill, feeds their encoder outputs through the decoder under the same SWA truncation, and uses the resulting SWA KV for decoding only, never for prefix caching.',
+            body: 'Under CED, decoder global KV comes from the encoder, so the only obstacle to ending prefill at the encoder is decoder SWA KV, which comes from each decoder layer own hidden states and is needed by the first decode steps. Exact reconstruction would run the decoder layers over the last L/2 x n_win prompt tokens: 20 layers over 2,560 tokens, expensive when a short uncached suffix follows a long cached prefix. Bounded replay instead replays the last n_win tokens of the prompt at every prefill, feeds their encoder outputs through the decoder under the same SWA truncation, and uses the resulting SWA KV for decoding only, never for prefix caching.',
             bullets: [
               'The reconstructed decoder SWA KV is not mathematically equivalent to a full decoder forward pass, with negligible measured impact on response quality.',
               'The same replay is simulated during post-training, so the model is trained under the approximation it will meet in production.',
@@ -568,23 +577,23 @@ attend(i): SWA keys in [max(s, i - W + 1), i]`,
         title: 'Pre-training',
         icon: Database,
         intro:
-          'Forty-five trillion tokens of multimodal data, sparse attention trained from scratch at 64K with no dense warmup, and a sequence length extended to one million tokens at 34T.',
+          'One idea first: 45T tokens, sparse from step one, long from token 34T. Sparse attention trains from scratch at 64K sequence length with no dense warmup, and the sequence length extends to one million tokens at 34T of the 45T-token run. The data pipeline, not a new optimizer, is what the base model results credit.',
         sections: [
           {
             key: 'data',
             heading: 'Data construction',
-            body: 'Text curation targets the interactions between corpora rather than sample-level quality, and it filters out model-generated content with limited information gain, including outputs from weaker models and low-quality machine translation, treating it as implicit duplication that becomes detrimental over long training horizons. The corpus adds recent code from newly released repositories, commits, libraries, and frameworks to reflect contemporary software engineering.',
+            body: 'Text curation targets the interactions between corpora rather than sample-level quality, and it filters out model-generated content with limited information gain, including outputs from weaker models and low-quality machine translation. Such content counts as implicit duplication, reformulating existing information in ways that turn detrimental over long horizons, like a curriculum committee throwing out photocopies of photocopies. The corpus adds recent code from newly released repositories, commits, libraries, and frameworks to reflect contemporary software engineering.',
             bullets: [
               'Multimodal data comes from image-text pairs, interleaved image-text data, and domain-specific sets, cleaned in native form rather than synthesized at scale.',
               'Interleaved construction runs in progressively more expensive stages, ending with strict quality scoring by SmolVLM; documents filtered out are partly recycled into additional image-text pairs.',
               'Domain-specific data covers fine-grained visual perception, OCR, long-tail knowledge, and image-code pairs with computer-use trajectories.',
-              'The final corpus is a 7:1 token ratio of text-only to multimodal data, with ultra-long documents pre-split before mixing and a best-fit packing padding rate of at most 10^-4.',
+              'The final corpus is a 7:1 token ratio of text-only to multimodal data, with ultra-long documents pre-split before mixing and a best-fit packing padding rate of at most 10^-4. Worked example: a 7:1 ratio means roughly one multimodal token in every eight.',
             ],
           },
           {
             key: 'setups',
             heading: 'Training setups',
-            body: 'The model trains on 45T tokens of multimodal data with no instability, keeping the batch size fixed at 100.6M tokens throughout. Sparse attention is trained from scratch at a 64K sequence length with no dense attention warmup, and the sequence length extends to 1M at 34T tokens.',
+            body: 'The model trains on 45T tokens of multimodal data with no instability, keeping the batch size fixed at 100.6M tokens throughout. Sparse attention trains from scratch at a 64K sequence length with no dense attention warmup, and the sequence length extends to 1M at 34T tokens: short drills first, marathon context for the final stretch.',
             code: {
               language: 'plaintext',
               title: 'pre-training setup',
@@ -608,17 +617,17 @@ Engram            learning rate scaled by 5x`,
           {
             key: 'vision-encoder',
             heading: 'Training the vision encoder',
-            body: 'DeepSeek-ViT is built from scratch on the Vision Transformer with three changes for this stack: 2D-RoPE replaces absolute positional embeddings so arbitrary resolutions work, the patch embedding convolution becomes a linear projection for Muon compatibility, and RMSNorm with SwiGLU handles normalization and activation. Its own training runs in two stages.',
+            body: 'DeepSeek-ViT is built from scratch on the Vision Transformer with three changes for this stack: 2D-RoPE replaces absolute positional embeddings so arbitrary resolutions work, the patch embedding convolution becomes a linear projection for Muon compatibility, and RMSNorm with SwiGLU handles normalization and activation. Its own training runs in two stages, cheap wide pretraining first and expensive high-resolution tuning second.',
             bullets: [
               'Contrastive pre-training optimizes a sigmoid contrastive loss on approximately 47B image-text pairs at a maximum resolution of 224x224, preserving aspect ratio.',
               'Autoregressive fine-tuning attaches the encoder to a 4B MoE LLM and trains on 236B tokens of captions, alt text, charts, and OCR, constraining resolution between 544x544 and 1344x1344.',
-              'The LLM is discarded afterwards, keeping only the encoder and the same input-resolution policy for the main pre-training pipeline.',
+              'The LLM is discarded afterwards, keeping only the encoder and the same input-resolution policy for the main pre-training pipeline. Worked example: contrastive pretraining caps at 224 pixels per side while fine-tuning reaches 1344, a 6x resolution ladder per side.',
             ],
           },
           {
             key: 'base-eval',
             heading: 'Base model evaluation',
-            body: 'DeepSeek-V4.1-Flash-Base is evaluated against DeepSeek-V4-Flash-Base and DeepSeek-V4-Pro-Base across world knowledge, language understanding and reasoning, coding and mathematics, long context, and multimodal ability. It reaches world knowledge, reasoning, and coding ability comparable to DeepSeek-V4-Pro-Base and delivers 5% to 10% improvements on held-out evaluations, using only 1/3 total parameters and 1/4 activated parameters.',
+            body: 'DeepSeek-V4.1-Flash-Base is evaluated against DeepSeek-V4-Flash-Base and DeepSeek-V4-Pro-Base across world knowledge, language understanding and reasoning, coding and mathematics, long context, and multimodal ability. It matches DeepSeek-V4-Pro-Base on knowledge, reasoning, and coding and reports 5% to 10% gains on held-out evaluations, using only 1/3 of the total parameters and 1/4 of the activated ones.',
             bullets: [
               'Multimodal scores with no counterpart in the earlier base models: MMMU-Pro 56.5, CVBench 77.9, DocVQA 95.6, and RefCOCO average 86.0.',
               'LongBench-V2 lands at 45.2 against 44.7 for DeepSeek-V4-Flash-Base and 51.5 for DeepSeek-V4-Pro-Base.',
@@ -632,12 +641,12 @@ Engram            learning rate scaled by 5x`,
         title: 'Post-training',
         icon: Sparkles,
         intro:
-          'The recipe introduces no new algorithm: supervised fine-tuning, reinforcement learning, and on-policy distillation follow the standard practice used for DeepSeek-V4. All the work went into what the model is trained on rather than how it is optimized.',
+          'One idea first: no new optimizer tricks, all gains from better fuel. Supervised fine-tuning, reinforcement learning, and on-policy distillation follow the standard practice used for DeepSeek-V4. All the work went into what the model trains on: synthesized tasks, scaled rollouts, and a controllable effort dial that trades tokens for accuracy.',
         sections: [
           {
             key: 'task-synthesis',
             heading: 'Synthesizing tasks and environments',
-            body: 'Each task is a triplet of problem, environment, and verification system, scored on difficulty and correctness, and those two scores double as reward signals for iteratively training the model to construct better tasks of its own. Every reuse of a task in a new RL run feeds fresh trajectory evidence back into quality re-audit.',
+            body: 'Each task is a triplet of problem, environment, and verification system, scored on difficulty and correctness, and those two scores double as reward signals for iteratively training the model to construct better tasks of its own. Every reuse of a task in a new RL run feeds fresh trajectory evidence back into quality re-audit, so the task factory inspects its own output on every shift.',
             bullets: [
               'General agents get mocked tools that reproduce real interfaces, schemas, and behavioral constraints, built from voluntarily returned interaction data, plus failure cases replayed as single-turn and multi-turn environments.',
               'Coding agents draw on internal sessions filtered for complexity and deduplicated by trajectory, and on public GitHub repositories above a star threshold.',
@@ -659,12 +668,13 @@ thorough reasoning)`,
               'A length penalty whose coefficient decays exponentially with effort makes lower effort levels press harder for brevity while higher levels permit more computation.',
               'Public API tiers map onto the scalar directly: max is 100, high is 75, and low is 50, on the same weights and decoding configuration.',
               'Raising effort from 25 to 100 lifts average Pass@1 on eight reasoning benchmarks from 67.1% to 76.3%, DeepSWE v1.1 from 66.0% to 74.2%, and Terminal-Bench 2.1 from 82.4% to 90.6%, for roughly 2.5x more output tokens.',
+              'Worked example: the 60 to 80 band already recovers most of the accuracy of the maximum setting at less than half its token budget, so reserve effort 100 for the hardest tasks.',
             ],
           },
           {
             key: 'async-infra',
             heading: 'Asynchronous post-training',
-            body: 'Rollout and training are colocated on the same devices and time-share execution, removing manual resource tuning between the two phases. Dispatch granularity took three attempts to settle: batch-level dispatch made training metrics oscillate, prompt-level dispatch stalled on long-tail samples inside a group, and sample-level dispatch, which releases a new prompt once enough samples complete to fill its GRPO group, holds rollout concurrency steady.',
+            body: 'Rollout and training are colocated on the same devices and time-share execution, removing manual resource tuning between the two phases. Dispatch granularity took three attempts to settle: batch-level dispatch made training metrics oscillate, prompt-level dispatch stalled on long-tail samples inside a group, and sample-level dispatch, which releases a new prompt once enough samples complete to fill its GRPO group, holds rollout concurrency steady. It runs like a kitchen that fires the next order the moment any burner frees up, not when the whole table is done.',
             bullets: [
               'Length bias is handled by per-dataset concurrency limits and by discarding early-returned short samples, which smooths the transition into the steady-state length distribution.',
               'Off-policy drift is bounded by dispatch and waiting logic and by a loss mask that drops tokens whose staleness exceeds the bound.',
@@ -678,7 +688,7 @@ thorough reasoning)`,
             body: 'DSec is the production sandbox platform behind this training, initially built to address heterogeneous execution environments, image distribution, isolation backends, density, trajectory logging, and safe resumption. V4.1 training pushed demand to millions of concurrent sandbox instances spanning harnesses, platforms, repositories, dependencies, and task-specific services, which moved the bottlenecks to datacenter scalability, isolation, per-node density, and the containment of misbehaving agents.',
             bullets: [
               'Compute scales by sharding machines into scale units, with a custom placement engine trading strong global consistency for scalability: unsynchronized replicas make good-enough placements from recent measurements, and each node enforces a hard admission constraint on the decisions it receives.',
-              'Sub-NUMA partitioning binds each worker VM to its own NUMA domain, raising supported density from roughly 1,000 to more than 2,500 concurrent live containers per physical node before measurable end-to-end degradation.',
+              'Sub-NUMA partitioning binds each worker VM to its own NUMA domain, raising supported density from roughly 1,000 to more than 2,500 concurrent live containers per physical node before measurable end-to-end degradation, a 2.5x density gain.',
               'A latency-sensitive execution class applies SCHED_IDLE to non-sensitive tasks and core scheduling to keep only same-priority tasks on sibling hyperthreads, so background load cannot distort time-sensitive evaluations.',
               'Agents that attempt reward hacking are contained by per-sandbox AppArmor profiles and fine-grained eBPF network policies, and a crash is treated as a failed trajectory with a repercussion signal reported to the RL framework.',
             ],
@@ -689,13 +699,14 @@ thorough reasoning)`,
         id: 'conclusion',
         title: 'Conclusion',
         icon: Flag,
+        hasArt: true,
         intro:
-          'DeepSeek-V4.1-Flash matches or beats frontier models on the vast majority of benchmarks, at a fraction of the activation footprint, and the report is explicit about where the evidence stops.',
+          'One idea first: frontier-level agency at a fraction of the footprint, with the failure modes named, not hidden. DeepSeek-V4.1-Flash matches or beats frontier models on the vast majority of benchmarks, and the report is explicit about where the evidence stops: sparse retrieval at long context, state reconstruction at cache boundaries, and the hardest reasoning edges.',
         sections: [
           {
             key: 'results',
             heading: 'What the compression bought',
-            body: 'The performance gains over DeepSeek-V4-Flash are concentrated in agentic work. DeepSWE v1.1 reaches 74.2% resolved, up from 54.4% and above Opus-5 at 74.0% and GPT-5.6 Sol at 73.0%; Terminal-Bench 2.1 reaches 90.6% against 89.1% for Opus-5 and 88.2% for GLM-5.3; Automation-Bench reaches 54.8% and Agents Last Exam 31.8%.',
+            body: 'The gains over DeepSeek-V4-Flash concentrate in agentic work. DeepSWE v1.1 reaches 74.2% resolved, up from 54.4% and above Opus-5 at 74.0% and GPT-5.6 Sol at 73.0%; Terminal-Bench 2.1 reaches 90.6% against 89.1% for Opus-5 and 88.2% for GLM-5.3; Automation-Bench reaches 54.8% and Agents Last Exam 31.8%. Read each score as beats the previous generation and trades blows with the frontier, at 8B to 16B activated parameters.',
             bullets: [
               'Reasoning: a Codeforces rating of 3471, above DeepSeek-V4-Pro at 3348 and DeepSeek-V4-Flash at 3289, and a MathArena Apex Pass@1 of 65.6%, matching Kimi-K3 and above DeepSeek-V4-Pro at 65.3%.',
               'Cyber security: CyberGym 88.1% and SEC-Bench Pro 62.8%, a new open-source state of the art for dual-use capability that the report asks the community to apply responsibly.',
@@ -706,7 +717,7 @@ thorough reasoning)`,
           {
             key: 'scaffolds',
             heading: 'Scaffolds and multi-agent',
-            body: 'Agentic ability transfers across harnesses rather than depending on one. At maximum effort, eight configurations from six scaffold families land between 65.5% (OpenCode) and 74.2% (mini-SWE) on DeepSWE v1.1, and between 84.1% (Codex) and 90.6% (DeepSeek Harness in Minimal mode) on Terminal-Bench v2.1, which is consistent with the diversity of environments and tool schemas in the synthesized training data.',
+            body: 'Agentic ability transfers across harnesses rather than depending on one. At maximum effort, eight configurations from six scaffold families land between 65.5% (OpenCode) and 74.2% (mini-SWE) on DeepSWE v1.1, and between 84.1% (Codex) and 90.6% (DeepSeek Harness in Minimal mode) on Terminal-Bench v2.1, which is consistent with the diversity of environments and tool schemas in the synthesized training data. Worked example: the 8.7-point DeepSWE spread across scaffolds is smaller than the 19.8-point jump over V4-Flash, so the gains travel with the model, not the harness.',
             bullets: [
               'Multi-agent Agent Team mode outperforms single-agent at every deadline on both benchmarks tested.',
               'On ProgramBench, Almost@1 rises from 13.59% at one hour to a peak of 30.04% at eight hours, against 12.79% and 20.39% for the single-agent configuration.',
@@ -717,7 +728,7 @@ thorough reasoning)`,
           {
             key: 'limitations',
             heading: 'Limitations',
-            body: 'The architectural simplifications create robustness boundaries that are not yet fully characterized. Internal evaluation covers a diverse range of cases without systematic degradation, but no finite suite covers every extreme input: potential selection errors in CSA2 and approximate state reconstruction in SWA Bounded Replay may still degrade capability in untested boundary cases.',
+            body: 'The simplifications create robustness boundaries that are not yet fully characterized. Internal evaluation covers a diverse range of cases without systematic degradation, but no finite suite covers every extreme input: potential selection errors in CSA2 and approximate state reconstruction in SWA Bounded Replay may still degrade capability in untested boundary cases. Think of a bridge rated for every truck tested, with signs posted where heavier trucks have not yet crossed.',
             bullets: [
               'Stress testing will focus on sparse retrieval over long contexts and on SWA state reconstruction at cache-resumption boundaries.',
               'Benchmarks are saturating, and benchmark parity does not imply matching frontier capability on the hardest reasoning and edge cases.',
@@ -727,7 +738,7 @@ thorough reasoning)`,
           {
             key: 'availability',
             heading: 'Availability',
-            body: 'DeepSeek-V4.1-Flash is released by DeepSeek-AI with checkpoints published on Hugging Face. The report credits the whole team and lists authors alphabetically by first name.',
+            body: 'DeepSeek-V4.1-Flash is released by DeepSeek-AI with checkpoints published on Hugging Face. The report credits the whole team and lists its hundreds of authors alphabetically by first name.',
             bullets: [
               'Checkpoints: huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash',
               'Contact: research@deepseek.com',
@@ -936,6 +947,17 @@ function ArchitectureScene({alt}: {alt: string}) {
         <rect x="266" y="193" width="8" height="8" rx="1" fill="var(--dracula-yellow)" />
         <text x="280" y="201">reuses global KV</text>
       </g>
+
+      <text
+        x="200"
+        y="220"
+        fontFamily="var(--font-family-mono)"
+        fontSize="10"
+        textAnchor="middle"
+        fill="var(--dracula-comment)"
+        fillOpacity={0.7}>
+        prefill walks 20 layers at 8B, decode walks 40 at 16B
+      </text>
     </svg>
   );
 }
@@ -946,17 +968,17 @@ function ArchitectureScene({alt}: {alt: string}) {
 // of the real pool. Rows marked as selected carry the cyan slab; the green
 // cells inside them are the positions that survive to Top-K.
 const INDEXER_ROWS: ReadonlyArray<{y: number; picks: number[]}> = [
-  {y: 48, picks: []},
-  {y: 60, picks: [1, 5]},
-  {y: 72, picks: []},
-  {y: 84, picks: []},
-  {y: 96, picks: [3]},
-  {y: 108, picks: [0, 6]},
-  {y: 120, picks: []},
-  {y: 132, picks: [4]},
-  {y: 144, picks: []},
-  {y: 156, picks: []},
-  {y: 168, picks: [2, 7]},
+  {y: 56, picks: []},
+  {y: 68, picks: [1, 5]},
+  {y: 80, picks: []},
+  {y: 92, picks: []},
+  {y: 104, picks: [3]},
+  {y: 116, picks: [0, 6]},
+  {y: 128, picks: []},
+  {y: 140, picks: [4]},
+  {y: 152, picks: []},
+  {y: 164, picks: []},
+  {y: 176, picks: [2, 7]},
 ];
 
 const INDEXER_CELLS = [0, 1, 2, 3, 4, 5, 6, 7];
@@ -1006,6 +1028,9 @@ function IndexerScene({alt}: {alt: string}) {
       <g fontFamily="var(--font-family-mono)" fontSize="10" fill="var(--dracula-comment)">
         <text x="40" y="28" fillOpacity={0.85}>
           2,048 blocks of 8 positions, 16,384 candidates
+        </text>
+        <text x="40" y="43" fillOpacity={0.7}>
+          score everything once, then search only the 16,384 survivors
         </text>
         <rect x="40" y="196" width="8" height="8" rx="1" fill="var(--dracula-cyan)" fillOpacity={0.45} />
         <text x="54" y="204">block kept by its top score</text>
@@ -1224,6 +1249,275 @@ function ReplayScene({alt}: {alt: string}) {
   );
 }
 
+// ─── Scene: Single-Pass mHC, one read instead of two ─────────────────────────
+// Two bars at expansion factor 4: the original three-kernel path moves 20d of
+// activation per block against the 10d ideal, and the one-block coefficient
+// shift closes the gap by letting each tile serve both mixing and prediction.
+const MHC_BARS = [
+  {
+    name: 'before',
+    detail: '(4n + 4)d = 20d, three kernels',
+    width: 300,
+    fill: 'var(--dracula-orange)',
+    opacity: 0.8,
+  },
+  {
+    name: 'after',
+    detail: '(2n + 2)d = 10d, single pass',
+    width: 150,
+    fill: 'var(--dracula-green)',
+    opacity: 0.9,
+  },
+];
+
+function MhcShiftScene({alt}: {alt: string}) {
+  return (
+    <svg
+      viewBox="0 0 400 225"
+      preserveAspectRatio="xMidYMid slice"
+      style={sceneFill}
+      role="img"
+      aria-label={alt}>
+      <rect width="400" height="225" fill="var(--dracula-bg-dark)" />
+      <text
+        x="40"
+        y="28"
+        fontFamily="var(--font-family-mono)"
+        fontSize="10"
+        fill="var(--dracula-comment)"
+        fillOpacity={0.85}>
+        Residual traffic per block, n = 4
+      </text>
+      <text
+        x="360"
+        y="44"
+        fontFamily="var(--font-family-mono)"
+        fontSize="10"
+        textAnchor="end"
+        fill="var(--dracula-comment)"
+        fillOpacity={0.7}>
+        shift: read A[l-1], not A[l]
+      </text>
+      {MHC_BARS.map((bar, position) => (
+        <g key={bar.name}>
+          <text
+            x="40"
+            y={66 + position * 68}
+            fontFamily="var(--font-family-mono)"
+            fontSize="10"
+            fill="var(--dracula-comment)">
+            {bar.name}
+          </text>
+          <rect
+            x="40"
+            y={74 + position * 68}
+            width={bar.width}
+            height="22"
+            rx="2"
+            fill={bar.fill}
+            fillOpacity={bar.opacity}
+          />
+          <text
+            x="40"
+            y={112 + position * 68}
+            fontFamily="var(--font-family-mono)"
+            fontSize="10"
+            fill="var(--dracula-comment)">
+            {bar.detail}
+          </text>
+        </g>
+      ))}
+      <text
+        x="40"
+        y="208"
+        fontFamily="var(--font-family-mono)"
+        fontSize="10"
+        fill="var(--dracula-comment)"
+        fillOpacity={0.7}>
+        use last block mixing weights, read the residual once
+      </text>
+    </svg>
+  );
+}
+
+// ─── Scene: FP4 halves the main KV ───────────────────────────────────────────
+// Two bars on a 2:1 scale: eight bits per value against four. The footer
+// carries the safety argument, a format ceiling far above anything observed.
+const FP4_BARS = [
+  {
+    name: 'DeepSeek-V4',
+    value: 'FP8',
+    x: 110,
+    height: 120,
+    fill: 'var(--dracula-comment)',
+    opacity: 0.75,
+  },
+  {
+    name: 'V4.1-Flash',
+    value: 'FP4 E2M1',
+    x: 230,
+    height: 60,
+    fill: 'var(--dracula-green)',
+    opacity: 0.9,
+  },
+];
+
+const FP4_BASELINE = 176;
+
+function Fp4Scene({alt}: {alt: string}) {
+  return (
+    <svg
+      viewBox="0 0 400 225"
+      preserveAspectRatio="xMidYMid slice"
+      style={sceneFill}
+      role="img"
+      aria-label={alt}>
+      <rect width="400" height="225" fill="var(--dracula-bg-dark)" />
+      <path
+        d={`M40 ${FP4_BASELINE} H360`}
+        stroke="var(--dracula-comment)"
+        strokeOpacity={0.4}
+      />
+      {FP4_BARS.map(bar => (
+        <g key={bar.name}>
+          <rect
+            x={bar.x}
+            y={FP4_BASELINE - bar.height}
+            width="44"
+            height={bar.height}
+            rx="2"
+            fill={bar.fill}
+            fillOpacity={bar.opacity}
+          />
+          <text
+            x={bar.x + 22}
+            y={FP4_BASELINE - bar.height - 9}
+            fontFamily="var(--font-family-mono)"
+            fontSize="11"
+            textAnchor="middle"
+            fill={bar.fill}
+            fillOpacity={0.95}>
+            {bar.value}
+          </text>
+        </g>
+      ))}
+      <g
+        fontFamily="var(--font-family-mono)"
+        fontSize="10"
+        fill="var(--dracula-comment)"
+        textAnchor="middle">
+        {FP4_BARS.map(bar => (
+          <text key={bar.name} x={bar.x + 22} y={FP4_BASELINE + 16}>
+            {bar.name}
+          </text>
+        ))}
+      </g>
+      <g fontFamily="var(--font-family-mono)" fontSize="10" fill="var(--dracula-comment)">
+        <text x="40" y="30" fillOpacity={0.85}>
+          Main KV storage per value
+        </text>
+        <text x="40" y="208" fillOpacity={0.7}>
+          four bits per value, same cache: ceiling 2688, largest seen about 10
+        </text>
+      </g>
+    </svg>
+  );
+}
+
+// ─── Scene: what the compression bought on DeepSWE ───────────────────────────
+// Three bars on a linear 0-80 scale: the previous generation, V4.1-Flash,
+// and the frontier reference. The caption states the reading plainly.
+const EVAL_BARS = [
+  {
+    name: 'V4-Flash',
+    value: '54.4%',
+    x: 70,
+    height: 95,
+    fill: 'var(--dracula-comment)',
+    opacity: 0.75,
+  },
+  {
+    name: 'Opus-5',
+    value: '74.0%',
+    x: 170,
+    height: 129,
+    fill: 'var(--dracula-comment)',
+    opacity: 0.5,
+    labelDx: 24,
+    labelDy: 0,
+  },
+  {
+    name: 'V4.1-Flash',
+    value: '74.2%',
+    x: 270,
+    height: 130,
+    fill: 'var(--dracula-green)',
+    opacity: 0.9,
+  },
+];
+
+const EVAL_BASELINE = 176;
+
+function EvalScene({alt}: {alt: string}) {
+  return (
+    <svg
+      viewBox="0 0 400 225"
+      preserveAspectRatio="xMidYMid slice"
+      style={sceneFill}
+      role="img"
+      aria-label={alt}>
+      <rect width="400" height="225" fill="var(--dracula-bg-dark)" />
+      <path
+        d={`M40 ${EVAL_BASELINE} H360`}
+        stroke="var(--dracula-comment)"
+        strokeOpacity={0.4}
+      />
+      {EVAL_BARS.map(bar => (
+        <g key={bar.name}>
+          <rect
+            x={bar.x}
+            y={EVAL_BASELINE - bar.height}
+            width="48"
+            height={bar.height}
+            rx="2"
+            fill={bar.fill}
+            fillOpacity={bar.opacity}
+          />
+          <text
+            x={bar.x + 24 + (bar.labelDx ?? 0)}
+            y={EVAL_BASELINE - bar.height - 9 + (bar.labelDy ?? 0)}
+            fontFamily="var(--font-family-mono)"
+            fontSize="11"
+            textAnchor="middle"
+            fill={bar.fill}
+            fillOpacity={0.95}>
+            {bar.value}
+          </text>
+        </g>
+      ))}
+      <g
+        fontFamily="var(--font-family-mono)"
+        fontSize="10"
+        fill="var(--dracula-comment)"
+        textAnchor="middle">
+        {EVAL_BARS.map(bar => (
+          <text key={bar.name} x={bar.x + 24} y={EVAL_BASELINE + 16}>
+            {bar.name}
+          </text>
+        ))}
+      </g>
+      <g fontFamily="var(--font-family-mono)" fontSize="10" fill="var(--dracula-comment)">
+        <text x="40" y="30" fillOpacity={0.85}>
+          DeepSWE v1.1 resolved
+        </text>
+        <text x="40" y="208" fillOpacity={0.7}>
+          74.2% beats the frontier at a quarter of the cache
+        </text>
+      </g>
+    </svg>
+  );
+}
+
 function ChapterArt({chapterId}: {chapterId: string}) {
   if (chapterId === 'abstract') {
     return (
@@ -1246,6 +1540,20 @@ function ChapterArt({chapterId}: {chapterId: string}) {
       </AspectRatio>
     );
   }
+  if (chapterId === 'mhc') {
+    return (
+      <AspectRatio ratio={16 / 9} style={sceneClip}>
+        <MhcShiftScene alt="Two bars comparing residual memory traffic per block at expansion factor 4: twenty units of hidden size for the original three-kernel path against ten for Single-Pass mHC, annotated with the one-block coefficient shift" />
+      </AspectRatio>
+    );
+  }
+  if (chapterId === 'auxiliary') {
+    return (
+      <AspectRatio ratio={16 / 9} style={sceneClip}>
+        <Fp4Scene alt="Two bars showing main KV storage per value halving from FP8 to four-bit FP4, annotated with a format ceiling of 2688 against the largest magnitude seen in training, about 10" />
+      </AspectRatio>
+    );
+  }
   if (chapterId === 'inference') {
     return (
       <AspectRatio ratio={16 / 9} style={sceneClip}>
@@ -1257,6 +1565,13 @@ function ChapterArt({chapterId}: {chapterId: string}) {
     return (
       <AspectRatio ratio={16 / 9} style={sceneClip}>
         <ReplayScene alt="A prompt strip split into cached prefix, the replayed window, and the uncached suffix, above two replay-work bars showing a full layer stack against a single window" />
+      </AspectRatio>
+    );
+  }
+  if (chapterId === 'conclusion') {
+    return (
+      <AspectRatio ratio={16 / 9} style={sceneClip}>
+        <EvalScene alt="Bars comparing DeepSWE resolved rates: 54.4 percent for DeepSeek-V4-Flash, 74.2 for DeepSeek-V4.1-Flash, 74.0 for Opus-5" />
       </AspectRatio>
     );
   }

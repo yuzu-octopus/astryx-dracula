@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   A[cp=0 @sideNav=(SN > SNI"New chat" + SNI"Search" + SNI"Library" + D + (SNI"Personal" > SNI"Weekend trip planning")*3)] > L > (LC[p=6] > V[g=5] > (H > C.muted[p=0])*4) + (LF > TI"Message Night Owl")
+//   A[cp=0 @sideNav=(SN > SNI"New chat" + SNI"Search" + SNI"Library" + D + (SNI"Personal" > SNI"Full-moon rite planning")*3)] > L > (LC[p=6] > V[g=5] > (H > C.muted[p=0])*4) + (LF > TI"Message Night Owl")
 
 import {useState} from 'react';
 import {AppShell} from '@astryxdesign/core/AppShell';
@@ -50,39 +50,43 @@ const WORKSPACES: Workspace[] = [
     icon: User,
     chats: [
       {
-        label: 'Weekend trip planning',
+        label: 'Full-moon rite planning',
         status: 'success',
         statusLabel: 'Active',
       },
       {
-        label: 'Recipe ideas for the week',
+        label: 'Potion recipes for the week',
         status: 'neutral',
         statusLabel: 'Idle',
       },
       {
-        label: 'Book recommendations',
+        label: 'Grimoire recommendations',
         status: 'warning',
         statusLabel: 'Needs review',
       },
-      {label: 'Home workout plan', status: 'neutral', statusLabel: 'Idle'},
+      {label: 'Crypt workout plan', status: 'neutral', statusLabel: 'Idle'},
     ],
   },
   {
-    name: 'Acme Corp',
+    name: 'Night Watch',
     icon: Building2,
     chats: [
-      {label: 'Q3 roadmap draft', status: 'accent', statusLabel: 'In progress'},
       {
-        label: 'Customer onboarding flow',
+        label: 'Crypt expansion draft',
+        status: 'accent',
+        statusLabel: 'In progress',
+      },
+      {
+        label: 'Neonate welcoming rite',
         status: 'success',
         statusLabel: 'Active',
       },
       {
-        label: 'Pricing strategy review',
+        label: 'Tribute ledger review',
         status: 'warning',
         statusLabel: 'Needs review',
       },
-      {label: 'Standup summary', status: 'neutral', statusLabel: 'Idle'},
+      {label: 'Night-watch summary', status: 'neutral', statusLabel: 'Idle'},
     ],
   },
   {
@@ -90,12 +94,12 @@ const WORKSPACES: Workspace[] = [
     icon: CodeXml,
     chats: [
       {
-        label: 'StyleX migration notes',
+        label: 'Coven theme migration notes',
         status: 'accent',
         statusLabel: 'In progress',
       },
       {
-        label: 'Skeleton loading states',
+        label: 'Crypt loading states',
         status: 'success',
         statusLabel: 'Active',
       },
@@ -105,7 +109,7 @@ const WORKSPACES: Workspace[] = [
   },
 ];
 
-const SELECTED_CHAT = 'StyleX migration notes';
+const SELECTED_CHAT = 'Coven theme migration notes';
 // Same-route hash: demo links stay focusable anchors without escaping the
 // template through the hash router (bare "#" would drop back to the home page).
 const SELF_HASH = '#/templates/shell-side-nav';
@@ -208,6 +212,7 @@ export default function ShellSideNav() {
         contentWidth={768}
         content={
           <LayoutContent padding={6}>
+            {/* Skeleton chrome only — the routed conversation supplies the h1. */}
             <VStack gap={5}>
               {MESSAGES.map(message => (
                 <HStack

@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LH[divider] > H[a=center wrap] > (SI[fill] > Hd"Settings"[level=1]) + TY"Search") + (LP[w=260 p=2] > UL > LI*6) + (LC[p=4] > V[g=4] > (V[a=center] > TabList) + ((G[c={min:280} g=10] > (V[g=1] > Hd"Basic information"[level=2] + Tx"View and update your details"[t=body]) + (V[g=4] > TI"Username" + TI"Email address" + (H > B.primary"Save"))) + D)*3)
+//   L > (LH[divider] > H[a=center wrap] > (SI[fill] > Hd"Settings"[level=1 t=display-2]) + TY"Search") + (LP[w=260 p=2] > UL > LI*6) + (LC[p=6] > V[g=4] > (V[a=center] > TabList) + ((G[c={min:280} g=8] > (V[g=1] > Hd"Basic information"[level=2] + Tx"View and update your details"[t=body]) + (V[g=4] > TI"Username" + TI"Email address" + (H > B.primary"Save"))) + D)*3)
 
 /**
  * Settings — one scrolling page of account sections.
@@ -95,7 +95,7 @@ export default function SettingsTemplate() {
         <LayoutHeader hasDivider>
           <HStack vAlign="center" wrap="wrap">
             <StackItem size="fill">
-              <Heading level={1}>Settings</Heading>
+              <Heading level={1} type="display-2">Settings</Heading>
             </StackItem>
             <Typeahead
               label="Search"
@@ -127,7 +127,7 @@ export default function SettingsTemplate() {
         )
       }
       content={
-        <LayoutContent padding={4}>
+        <LayoutContent padding={6}>
           <VStack gap={4}>
             {/* Mobile: the sidebar nav collapses to a horizontal, centered
                 tab bar above the content. */}
@@ -147,7 +147,7 @@ export default function SettingsTemplate() {
                 </TabList>
               </VStack>
             )}
-            <Grid columns={{minWidth: 280}} gap={10}>
+            <Grid columns={{minWidth: 280}} gap={8}>
               <VStack gap={1}>
                 <Heading level={2}>Basic information</Heading>
                 <Text type="body" color="secondary">
@@ -185,7 +185,7 @@ export default function SettingsTemplate() {
 
             <Divider />
 
-            <Grid columns={{minWidth: 280}} gap={10}>
+            <Grid columns={{minWidth: 280}} gap={8}>
               <VStack gap={1}>
                 <Heading level={2}>Change password</Heading>
                 <Text type="body" color="secondary">
@@ -222,14 +222,14 @@ export default function SettingsTemplate() {
 
             <Divider />
 
-            <Grid columns={{minWidth: 280}} gap={10}>
+            <Grid columns={{minWidth: 280}} gap={8}>
               <VStack gap={1}>
                 <Heading level={2}>Advanced settings</Heading>
                 <Text type="body" color="secondary">
                   Configure detailed coven preferences and warding options.
                 </Text>
               </VStack>
-              <VStack gap={5}>
+              <VStack gap={4}>
                 <CheckboxInput
                   label="Data Export Access"
                   description="Allow export of personal data and backups."

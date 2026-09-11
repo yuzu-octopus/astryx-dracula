@@ -185,7 +185,7 @@ const ACTIVITY = [
 // ─── Bullet separator ───────────────────────────────────────────────────────
 function Bullet() {
   return (
-    <Text type="supporting" color="secondary">
+    <Text type="supporting" color="secondary" aria-hidden="true">
       {'・'}
     </Text>
   );
@@ -572,7 +572,7 @@ function TimelineSection() {
 function PanelContent() {
   return (
     <VStack gap={4}>
-      <Collapsible trigger={<Heading level={2}>Notes</Heading>}>
+      <Collapsible trigger={<Heading level={3}>Notes</Heading>}>
         <Text type="body">
           Customer is a repeat buyer, 3rd order this quarter. Prefers
           moonlight and sage glazes. Requested gift wrapping for the mug set.
@@ -582,7 +582,7 @@ function PanelContent() {
           </Link>
         </Text>
       </Collapsible>
-      <Collapsible trigger={<Heading level={2}>Customer</Heading>}>
+      <Collapsible trigger={<Heading level={3}>Customer</Heading>}>
         <MetadataList>
           <MetadataListItem label="Name">Jane Doe</MetadataListItem>
           <MetadataListItem label="Address">
@@ -595,7 +595,7 @@ function PanelContent() {
           </MetadataListItem>
         </MetadataList>
       </Collapsible>
-      <Collapsible trigger={<Heading level={2}>Fraud Analysis</Heading>}>
+      <Collapsible trigger={<Heading level={3}>Fraud Analysis</Heading>}>
         <VStack gap={1}>
           <ProgressBar
             label="Risk level"

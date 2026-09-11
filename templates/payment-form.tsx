@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC[p=0] > Ctr > S.transparent[p=6 mw=1100] > V[g=5] > (V[g=6] > (V[g=2] > (Hd"Payment Request"[level=1 t=display-1] + Tx"Review your order"[t=body]) + D) + H[g=8] > (SI > V[g=8] > (V[g=1] > (H[j=between] > (Hd"Sign in"[level=2] + B"Sign In") + Tx"Sign in to track your order"[t=body]) + V[g=3] > (Hd"Contact Information"[level=2] + TI"Email" + CB"Email offers") + V[g=3] > (Hd"Shipping Information"[level=2] + G[c=2 g=3] > (TI"First Name" + TI"Last Name") + TI"Address" + G[c=2 g=3] > (TI"City" + TI"ZIP Code") + SE"State" + TI"Phone Number" + CB"Save information") + V[g=3] > (V[g=1] > (Hd"Delivery"[level=2] + Tx"Processing time"[t=body]) + RL"Delivery method" > RLI*2) + V[g=3] > (V[g=1] > (Hd"Payment Method"[level=2] + Tx"Encrypted"[t=body]) + G[c=2 g=3] > (B"PayPal" + B"Google Pay") + TI"Card Number" + G[c=3 g=3] > (SE"Expiry Month" + SE"Expiry Year" + TI"CVC") + TI"Name on Card" + CB"Billing address") + V[g=3] > (Hd"Promo Code"[level=2] + H[g=2] > (TI"Promo code" + B"Apply")) + V[g=3] > (Hd"Gift Options"[level=2] + CB"Gift message" + TA"Gift message") + V[g=4] > (H[g=5] > (H[g=1] > (Ic + Tx))*3 + V[g=2] > (B"Place Order"[primary] + B"Continue Shopping") + D + H[g=4] > (Lk"Refund policy" + Lk"Privacy policy" + Lk"Terms" + Lk"Cancellations"))) + SI > C[p=5] > Col"Order Summary" > V[g=4] > (V[g=3] > V[g=3] > (H[g=3] > (Tmb + V[g=1] > (Tx"Obsidian Ritual Chalice" + Tx"Hand-carved"[t=supporting])) + D)*3 + V[g=3] > (Hd"Order Total"[level=3] + H[j=between] > (Tx"Subtotal" + Tx"$91.20") + D + H[j=between] > (Tx"Total"[t=large] + Tx"$91.20"[t=large]) + Bn"Free shipping over $300"))))
+//   L > LC[p=0] > Ctr > S.transparent[p=6 mw=1100] > V[g=5] > (V[g=6] > (V[g=2] > (Hd"Payment Request"[level=1 t=display-2] + Tx"Review your order"[t=body]) + D) + H[g=8] > (SI > V[g=8] > (V[g=1] > (H[j=between] > (Hd"Sign in to check out"[level=2] + B"Sign in") + Tx"Sign in to track your order"[t=body]) + V[g=3] > (Hd"Contact information"[level=2] + TI"Email" + CB"Email offers") + V[g=3] > (Hd"Shipping information"[level=2] + G[c=2 g=3] > (TI"First Name" + TI"Last Name") + TI"Address" + G[c=2 g=3] > (TI"City" + TI"ZIP Code") + SE"State" + TI"Phone Number" + CB"Save information") + V[g=3] > (V[g=1] > (Hd"Delivery"[level=2] + Tx"Processing time"[t=body]) + RL"Delivery method" > RLI*2) + V[g=3] > (V[g=1] > (Hd"Payment method"[level=2] + Tx"Encrypted"[t=body]) + G[c=2 g=3] > (B"PayPal" + B"Google Pay") + D"Or pay with card" + TI"Card Number" + G[c=3 g=3] > (SE"Expiry Month" + SE"Expiry Year" + TI"CVC") + TI"Name on Card" + CB"Billing address") + V[g=3] > (Hd"Promo code"[level=2] + H[g=2] > (TI"Promo code" + B"Apply")) + V[g=3] > (Hd"Gift options"[level=2] + CB"Gift message" + TA"Gift message") + V[g=4] > (H[g=5] > (H[g=1] > (Ic + Tx))*3 + V[g=2] > (B"Place order"[primary] + B"Continue shopping") + D + H[g=4] > (Lk"Refund policy" + Lk"Privacy policy" + Lk"Terms" + Lk"Cancellations"))) + SI > C[p=4] > Col"Order Summary" > V[g=4] > (V[g=3] > V[g=3] > (H[g=3] > (Tmb + V[g=1] > (Tx"Obsidian Ritual Chalice" + Tx"Hand-carved"[t=supporting])) + D)*3 + V[g=3] > (Hd"Order Total"[level=3] + H[j=between] > (Tx"Subtotal" + Tx"$91.20") + D + H[j=between] > (Tx"Total"[t=large] + Tx"$91.20"[t=large]) + Bn"Free shipping over $300"))))
 
 import {useState, type CSSProperties} from 'react';
 import {
@@ -159,19 +159,6 @@ const summarySticky: CSSProperties = {
 };
 // On mobile the summary moves above the form.
 const summaryMobileOrder: CSSProperties = {order: -1};
-// Express-checkout buttons (Dracula tokens stand in for brand colors).
-const paypalButton: CSSProperties = {
-  backgroundColor: 'var(--color-warning)',
-  borderColor: 'var(--color-warning)',
-};
-// Google Pay button: widget-surface token stands in for the official dark
-// button background (no raw hex on brand surfaces).
-const gpayButton: CSSProperties = {
-  backgroundColor: 'var(--color-widget-background)',
-  borderColor: 'var(--color-widget-background)',
-};
-// Brand logos inside the express-checkout buttons.
-const brandLogo: CSSProperties = {height: 'var(--spacing-5)', width: 'auto'};
 // Line-item photo: a fixed square frame that clips the inline scene.
 // Astryx has no Image primitive (#2582), so the placeholder is inline SVG on
 // brand tokens instead of a data-URI bitmap with baked-in hex.
@@ -305,7 +292,7 @@ function OrderSummaryCard({
   total: number;
 }) {
   return (
-    <Card padding={5}>
+    <Card padding={4}>
       <VStack gap={4}>
         {/* Accordion header — clickable on mobile only */}
         <Collapsible trigger="Order Summary" defaultIsOpen={true}>
@@ -534,7 +521,7 @@ export default function PaymentForm() {
                 {/* Page header */}
                 <VStack gap={6}>
                   <VStack gap={2}>
-                    <Heading level={1} type="display-1">
+                    <Heading level={1} type="display-2">
                       Payment Request
                     </Heading>
                     <Text type="body" color="secondary">
@@ -558,7 +545,7 @@ export default function PaymentForm() {
                         <HStack gap={2} hAlign="between" vAlign="center">
                           <Heading level={2}>Sign in to check out</Heading>
                           <Button
-                            label="Sign In"
+                            label="Sign in"
                             variant="secondary"
                             size="sm"
                             onClick={() => {}}
@@ -572,12 +559,12 @@ export default function PaymentForm() {
 
                       {/* Contact Information */}
                       <VStack gap={3}>
-                        <Heading level={2}>Contact Information</Heading>
+                        <Heading level={2}>Contact information</Heading>
                         <TextInput
                           size="lg"
                           label="Email"
                           isRequired
-                          placeholder="you@example.com"
+                          placeholder="you@castle.dracula"
                           value={email}
                           onChange={setEmail}
                           status={
@@ -595,7 +582,7 @@ export default function PaymentForm() {
 
                       {/* Shipping Information */}
                       <VStack gap={3}>
-                        <Heading level={2}>Shipping Information</Heading>
+                        <Heading level={2}>Shipping information</Heading>
                         <Grid columns={isMobile ? 1 : 2} gap={3}>
                           <TextInput
                             size="lg"
@@ -743,7 +730,7 @@ export default function PaymentForm() {
                       {/* Payment Method */}
                       <VStack gap={3}>
                         <VStack gap={1}>
-                          <Heading level={2}>Payment Method</Heading>
+                          <Heading level={2}>Payment method</Heading>
                           <Text type="body" color="secondary">
                             All transactions are secure and encrypted.
                           </Text>
@@ -755,44 +742,21 @@ export default function PaymentForm() {
                             {/* PayPal */}
                             <Button
                               label="PayPal"
-                              variant="primary"
+                              variant="secondary"
                               size="lg"
                               onClick={() => {}}
-                              style={paypalButton}>
-                              <img
-                                src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png"
-                                alt="PayPal"
-                                style={brandLogo}
-                              />
-                            </Button>
+                            />
                             {/* Google Pay */}
                             <Button
                               label="Google Pay"
-                              variant="primary"
+                              variant="secondary"
                               size="lg"
                               onClick={() => {}}
-                              style={gpayButton}>
-                              <img
-                                src="https://pay.google.com/about/static_kcs/images/logos/google-pay-logo.svg"
-                                alt="Google Pay"
-                                style={brandLogo}
-                              />
-                            </Button>
+                            />
                           </Grid>
                         </VStack>
 
-                        {/* OR divider */}
-                        <HStack gap={3} vAlign="center">
-                          <StackItem size="fill">
-                            <Divider />
-                          </StackItem>
-                          <Text type="supporting" color="secondary">
-                            OR
-                          </Text>
-                          <StackItem size="fill">
-                            <Divider />
-                          </StackItem>
-                        </HStack>
+                        <Divider label="Or pay with card" />
 
                         {/* Credit card fields */}
                         <VStack gap={3}>
@@ -965,7 +929,7 @@ export default function PaymentForm() {
 
                       {/* Promo Code */}
                       <VStack gap={3}>
-                        <Heading level={2}>Promo Code</Heading>
+                        <Heading level={2}>Promo code</Heading>
                         <HStack gap={2} vAlign="end">
                           <StackItem size="fill">
                             <TextInput
@@ -988,7 +952,7 @@ export default function PaymentForm() {
 
                       {/* Gift Options */}
                       <VStack gap={3}>
-                        <Heading level={2}>Gift Options</Heading>
+                        <Heading level={2}>Gift options</Heading>
                         <CheckboxInput
                           label="Add a gift message"
                           value={addGiftMessage}
@@ -1027,14 +991,14 @@ export default function PaymentForm() {
                         <TrustBar />
                         <VStack gap={2}>
                           <Button
-                            label="Place Order"
+                            label="Place order"
                             variant="primary"
                             size="lg"
                             style={fullWidth}
                             onClick={() => setSubmitted(true)}
                           />
                           <Button
-                            label="Continue Shopping"
+                            label="Continue shopping"
                             variant="secondary"
                             size="lg"
                             style={fullWidth}

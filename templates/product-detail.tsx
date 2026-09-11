@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC[p=6] > G[c={min:280} g=5] > (V[g=3] > AR[ratio=4/5] + (G[c=3 g=2] > (AR[ratio=1] > SelectableCard)*6)) + (V[g=5] > (V[g=2] > Hd"Midnight Ceremony Mug & Plate Set"[level=1 t=display-2] + (H[g=1] > Ic*5 + Tx"4.3 (128)") + (H[g=2] > Tx"$89.00"[t=large] + Tx"$119.00"[t=body] + Tk"Sale")) + Tx"A hand-thrown mug and plate set"[t=large] + (V[g=2] > Tx"Glaze"[t=label] + SG) + (V[g=2] > Tx"Finish"[t=label] + SG) + (V[g=2] > Tx"Quantity"[t=label] + (H[g=1] > B.ghost"-" + TI"1" + B.ghost"+")) + (V[g=2] > B.primary"Add to Cart" + B.secondary"Buy it now") + (ColG > Col"Composition" + Col"Delivery & Returns" + Col"Dimensions"))
+//   L > LC[p=6] > G[c={min:280} g=8] > (V[g=3] > AR[ratio=4/5] + (G[c=3 g=2] > (AR[ratio=1] > SelectableCard)*6)) + (V[g=8] > (V[g=3] > Hd"Midnight Ceremony Mug & Plate Set"[level=1 t=display-2] + (H[g=1] > Ic*5 + Tx"4.3 (128)") + (H[g=2] > Tx"$89.00"[t=large] + Tx"$119.00"[t=body] + Tk"Sale")) + Tx"A hand-thrown mug and plate set"[t=large] + (V[g=3] > Tx"Glaze"[t=label] + SG) + (V[g=3] > Tx"Finish"[t=label] + SG) + (V[g=3] > Tx"Quantity"[t=label] + (H[g=1] > B.ghost"-" + TI"1" + B.ghost"+")) + (V[g=3] > B.primary"Add to cart" + B.secondary"Buy it now") + (ColG > Col"Composition" + Col"Delivery & Returns" + Col"Dimensions"))
 
 import {useState} from 'react';
 import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
@@ -84,7 +84,7 @@ function StarRating({rating, count}: {rating: number; count: number}) {
   return (
     <HStack gap={1} vAlign="center">
       {Array.from({length: filled}, (_, i) => (
-        <Icon key={`full-${i}`} icon={Star} size="sm" color="warning" />
+        <Icon key={`full-${i}`} icon={Star} size="sm" color="yellow" />
       ))}
       {Array.from({length: empty}, (_, i) => (
         <Icon key={`empty-${i}`} icon={Star} size="sm" color="disabled" />
@@ -188,8 +188,8 @@ function ProductInfo() {
   const increment = () => setQuantity(q => Math.min(10, (q ?? 1) + 1));
 
   return (
-    <VStack gap={5}>
-      <VStack gap={2}>
+    <VStack gap={8}>
+      <VStack gap={3}>
         <Heading level={1} type="display-2">
           {PRODUCT.name}
         </Heading>
@@ -201,13 +201,13 @@ function ProductInfo() {
           <Text type="body" color="secondary" hasStrikethrough hasTabularNumbers>
             {fmt(PRODUCT.originalPrice)}
           </Text>
-          <Token label="Sale" color="green" />
+          <Token label="Sale" color="yellow" />
         </HStack>
       </VStack>
       <Text type="large" weight="normal">
         {PRODUCT.description}
       </Text>
-      <VStack gap={2}>
+      <VStack gap={3}>
         <Text type="label">Glaze</Text>
         <VStack hAlign="start">
           <SegmentedControl value={color} onChange={setColor} label="Glaze">
@@ -221,7 +221,7 @@ function ProductInfo() {
           </SegmentedControl>
         </VStack>
       </VStack>
-      <VStack gap={2}>
+      <VStack gap={3}>
         <Text type="label">Finish</Text>
         <VStack hAlign="start">
           <SegmentedControl value={finish} onChange={setFinish} label="Finish">
@@ -235,7 +235,7 @@ function ProductInfo() {
           </SegmentedControl>
         </VStack>
       </VStack>
-      <VStack gap={2}>
+      <VStack gap={3}>
         <Text type="label">Quantity</Text>
         <HStack gap={1} vAlign="center">
           <Button
@@ -269,7 +269,7 @@ function ProductInfo() {
           />
         </HStack>
       </VStack>
-      <VStack gap={2}>
+      <VStack gap={3}>
         {notice && (
           <Banner
             status={notice.status}
@@ -280,7 +280,7 @@ function ProductInfo() {
           />
         )}
         <Button
-          label="Add to Cart"
+          label="Add to cart"
           variant="primary"
           size="lg"
           clickAction={() =>
@@ -292,6 +292,7 @@ function ProductInfo() {
         />
         <Button
           label="Buy it now"
+          variant="secondary"
           size="lg"
           clickAction={() =>
             setNotice({
@@ -352,7 +353,7 @@ export default function ProductDetail() {
       contentWidth={1200}
       content={
         <LayoutContent padding={6}>
-          <Grid columns={{minWidth: 280, repeat: 'fit'}} gap={5}>
+          <Grid columns={{minWidth: 280, repeat: 'fit'}} gap={8}>
             <ImageGallery
               selected={selectedThumb}
               onSelect={setSelectedThumb}

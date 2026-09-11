@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC > V[g=10] > (C[p=10] > (H[g=8 a=center] > (V[g=4] > Tx.display-1"The coven grimoire" + Tx.lg"Every incantation in the Astryx spellbook"[t=large] + (H > B.primary"Enter the grimoire")))) + (V[g=4] > (H[j=between a=center] > Hd"Category"[level=2] + Tx"18 spells"[t=supporting]) + (G[c={min:260} g=2] > (CC[p=2] > V[g=3] > C[p=0] + (V[g=1] > Tx"AppShell"[t=body] + Tx"Description"[t=body]))*4))*4
+//   L > LC > V[g=10] > (C[p=10] > (H[g=8 a=center] > (V[g=4] > Hd"The coven grimoire"[level=1 t=display-1] + Tx.lg"Every incantation in the Astryx spellbook"[t=large] + (H > B.primary"Enter the grimoire")))) + (V[g=4] > (H[j=between a=center] > Hd"Category"[level=2] + Tx"18 spells"[t=supporting]) + (G[c={min:260} g=2] > (CC[p=2] > V[g=3] > C[p=0] + (V[g=1] > Tx"AppShell"[t=body] + Tx"Description"[t=body]))*4))*4
 
 /**
  * Documentation catalog — every component shelf in the grimoire.
@@ -299,7 +299,9 @@ export default function DocumentationCatalog() {
               <HStack gap={8} vAlign="center">
                 <StackItem size="fill">
                   <VStack gap={4}>
-                    <Text type="display-1">The coven grimoire</Text>
+                    <Heading level={1} type="display-1">
+                      The coven grimoire
+                    </Heading>
                     <Text type="large" weight="normal" color="secondary">
                       Every incantation in the Astryx spellbook, with thirty-one
                       components for building beautiful, accessible products
@@ -309,12 +311,10 @@ export default function DocumentationCatalog() {
                       <Button
                         label="Enter the grimoire"
                         variant="primary"
-                        size="lg"
                       />
                     </HStack>
                   </VStack>
                 </StackItem>
-                <StackItem size="fill" />
               </HStack>
             </Card>
 
@@ -349,7 +349,7 @@ export default function DocumentationCatalog() {
                             shelf={category.label}
                           />
                         </Card>
-                        <VStack gap={0.5}>
+                        <VStack gap={1}>
                           <Text type="body" weight="semibold">
                             {item.name}
                           </Text>

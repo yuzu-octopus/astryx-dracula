@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC > V[g=8 a=center] > (V[g=1] > (H[g=2 a=center] > Ic + Tx.lg"Hi, Vlad") + Hd"Where should we start?"[level=1 type=display-2]) + ChC"Ask anything" + (V[g=6] > (TgG"Category" > Tg"Writing"*4) + (G[c={min:280} g=3] > (CC[p=4] > V[g=0.5] > Hd"Draft"[level=2] + Tx"Compose"[t=body])*4))
+//   L > LC > V[g=8 a=center] > (V[g=1] > (H[g=2 a=center] > Ic + Tx.lg"Hi, Vlad") + Hd"Where should we start?"[level=1 type=display-2]) + ChC"Ask anything" + (V[g=6] > (TgG"Category" > Tg"Writing"*4) + Hd"Suggested prompts"[level=2] + (G[c={min:280} g=3] > (CC[p=4] > V[g=0.5] > Hd"Draft"[level=3] + Tx"Compose"[t=body])*4))
 
 import {useRef, useState, type CSSProperties} from 'react';
 
@@ -22,6 +22,7 @@ import {
 } from '@astryxdesign/core/Typeahead';
 import {ToggleButton, ToggleButtonGroup} from '@astryxdesign/core/ToggleButton';
 import {Token} from '@astryxdesign/core/Token';
+import {VisuallyHidden} from '@astryxdesign/core/VisuallyHidden';
 import {ClickableCard} from '@astryxdesign/core/ClickableCard';
 import {Grid} from '@astryxdesign/core/Grid';
 import {Icon} from '@astryxdesign/core/Icon';
@@ -80,7 +81,7 @@ const CATEGORY_SUGGESTIONS: Record<
     },
     {
       heading: 'Write a function',
-      body: 'Generate a well-typed function with error handling',
+      body: 'Conjure a well-typed function warded against the dark',
       prompt: 'Write a function that',
     },
     {
@@ -90,7 +91,7 @@ const CATEGORY_SUGGESTIONS: Record<
     },
     {
       heading: 'Review my pull request',
-      body: 'Check for bugs, contrast, and best practices',
+      body: 'Hunt bugs by moonlight, weigh contrast, bless the rite',
       prompt: 'Review this code for bugs and improvements:',
     },
   ],
@@ -102,7 +103,7 @@ const CATEGORY_SUGGESTIONS: Record<
     },
     {
       heading: 'Explain a concept',
-      body: 'Break down a complex topic in simple terms',
+      body: 'Unravel a tangled grimoire into plain night-tongue',
       prompt: 'Explain the concept of',
     },
     {
@@ -124,12 +125,12 @@ const CATEGORY_SUGGESTIONS: Record<
     },
     {
       heading: 'Write a dark tale',
-      body: 'Create an engaging narrative with creatures',
+      body: 'Spin a moonlit tale crawling with night creatures',
       prompt: 'Write a short story about',
     },
     {
       heading: 'Design a concept',
-      body: 'Explore product or visual design ideas',
+      body: 'Conjure nocturnal rites for product or visual haunts',
       prompt: 'Help me design a concept for',
     },
     {
@@ -471,7 +472,9 @@ export default function AiChatLanding() {
               </ToggleButtonGroup>
 
               {suggestions && (
-                <Grid columns={{minWidth: 280}} gap={3}>
+                <>
+                  <VisuallyHidden as="h2">Suggested prompts</VisuallyHidden>
+                  <Grid columns={{minWidth: 280}} gap={3}>
                   {suggestions.map(suggestion => (
                     <ClickableCard
                       key={suggestion.heading}
@@ -483,16 +486,15 @@ export default function AiChatLanding() {
                         setMode(category);
                       }}>
                       <VStack gap={0.5}>
-                        {/* Section tier: the deck sits directly under the page
-                            h1, so h3 would skip h2. */}
-                        <Heading level={2}>{suggestion.heading}</Heading>
+                        <Heading level={3}>{suggestion.heading}</Heading>
                         <Text type="body" color="secondary">
                           {suggestion.body}
                         </Text>
                       </VStack>
                     </ClickableCard>
                   ))}
-                </Grid>
+                  </Grid>
+                </>
               )}
             </VStack>
           </VStack>

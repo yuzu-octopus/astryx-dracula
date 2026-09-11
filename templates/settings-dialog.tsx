@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC > Ctr[h=80vh] > B.primary"Open settings"[opens=#settings] ;; Dlg#settings > L > (LP[w=280 divider p=3] > V[g=4] > Hd"Account settings"[level=2] + (UL > LI"Personal information"*8)) + (LC[p=6] > V[g=6] > DH"Account" + SE"Settings section" + (V[g=0] > TabList + (V[g=4] > Hd"Login"[level=3] + D + (H[j=between a=start] > (V[g=0] > Tx"Password"[weight=semibold] + Tx"Not created"[t=supporting]) + Lk"Create") + (H[g=3 a=start] > Ic + (V[g=0] > (H[g=2 a=center wrap] > Tx"OS X 10.15.7 Chrome"[weight=semibold] + SD) + Tx"March 30, 2026"[t=supporting])))))
+//   L > LC > Ctr[h=80vh] > B.primary"Open settings"[opens=#settings] ;; Dlg#settings > L > (LP[w=280 divider p=3] > V[g=4] > Hd"Account settings"[level=2] + (UL > LI"Personal information"*8)) + (LC[p=6] > V[g=6] > DH"Account" + SE"Settings section" + (V[g=0] > TabList + (V[g=0] > Hd"Login"[level=3] + D + (H[j=between a=start] > (V[g=0] > Tx"Password"[weight=semibold] + Tx"Not created"[t=supporting]) + Lk"Create") + (H[g=3 a=start] > Ic + (V[g=0] > (H[g=2 a=center wrap] > Tx"OS X 10.15.7 Chrome"[weight=semibold] + SD) + Tx"March 30, 2026"[t=supporting])))))
 
 /**
  * Settings Dialog — account sections inside one modal.
@@ -627,7 +627,7 @@ export default function SettingsDialog() {
 
                       {activeTab === 'login' && (
                         <VStack gap={8}>
-                          <VStack gap={4}>
+                          <VStack gap={0}>
                             <Heading level={3}>Login</Heading>
                             <Divider />
                             {LOGIN_ROWS.map(row => (
@@ -635,7 +635,7 @@ export default function SettingsDialog() {
                             ))}
                           </VStack>
 
-                          <VStack gap={4}>
+                          <VStack gap={0}>
                             <Heading level={3}>Social accounts</Heading>
                             <Divider />
                             {SOCIAL_ROWS.map(row => (
@@ -643,7 +643,7 @@ export default function SettingsDialog() {
                             ))}
                           </VStack>
 
-                          <VStack gap={4}>
+                          <VStack gap={0}>
                             <Heading level={3}>Device history</Heading>
                             <Divider />
                             {DEVICE_ROWS.map(device => (
@@ -654,7 +654,7 @@ export default function SettingsDialog() {
                             ))}
                           </VStack>
 
-                          <VStack gap={4}>
+                          <VStack gap={0}>
                             <Heading level={3}>Account</Heading>
                             <Divider />
                             <HStack hAlign="between" vAlign="start">
@@ -684,11 +684,11 @@ export default function SettingsDialog() {
                           <VStack gap={2}>
                             <Heading level={3}>Shared access</Heading>
                             <Divider />
-                            <Text type="supporting" color="secondary">
+                            <Text type="body" color="secondary">
                               Review each request carefully before approving
-                              access. We&apos;ll email your employee or
-                              co-worker a 4-digit code that lets them log into
-                              your account with their trusted device.
+                              access. We&apos;ll email your kin or coven-mate
+                              a 4-digit code that lets them enter your crypt
+                              from their trusted device.
                             </Text>
                           </VStack>
 
@@ -699,12 +699,12 @@ export default function SettingsDialog() {
                               </Center>
                               <VStack gap={1}>
                                 <Text type="body" weight="bold">
-                                  Adding devices from people you trust
+                                  Adding devices for your trusted coven
                                 </Text>
                                 <Text type="body" color="secondary">
-                                  When you approve a request, you grant someone
-                                  full access to your account. They&apos;ll be
-                                  able to change reservations and send messages
+                                  When you approve a request, you grant them
+                                  full passage through your crypt. They&apos;ll
+                                  be able to change bookings and send ravens
                                   on your behalf.
                                 </Text>
                               </VStack>
@@ -785,7 +785,7 @@ export default function SettingsDialog() {
                         <Heading level={3}>Notifications</Heading>
                         <Switch
                           label="Email notifications"
-                          description="Booking updates, reminders, and policy changes."
+                          description="Booking updates, reminders, and coven decrees."
                           value={emailNotif}
                           onChange={setEmailNotif}
                           labelPosition="start"
@@ -794,7 +794,7 @@ export default function SettingsDialog() {
                         <Divider />
                         <Switch
                           label="Push notifications"
-                          description="Time-sensitive alerts on this device."
+                          description="Time-sensitive alerts, delivered by raven."
                           value={pushNotif}
                           onChange={setPushNotif}
                           labelPosition="start"
@@ -811,13 +811,13 @@ export default function SettingsDialog() {
                         <Heading level={3}>Payments</Heading>
                         <Divider />
                         <InfoRowItem
-                          label="Payout method"
+                          label="Tribute method"
                           value="Visa ending in 4821"
                           action=""
                         />
                         <InfoRowItem
-                          label="Billing history"
-                          value="No invoices yet"
+                          label="Tribute ledger"
+                          value="No tributes yet"
                           action=""
                         />
                       </VStack>
@@ -830,13 +830,13 @@ export default function SettingsDialog() {
                         <Heading level={3}>Taxes</Heading>
                         <Divider />
                         <InfoRowItem
-                          label="Tax profile"
+                          label="Tithe profile"
                           value="Not submitted"
                           action=""
                         />
                         <InfoRowItem
-                          label="Tax documents"
-                          value="Available after your first payout"
+                          label="Tithe scrolls"
+                          value="Available after your first tribute"
                           action=""
                         />
                       </VStack>
@@ -848,8 +848,8 @@ export default function SettingsDialog() {
                       <VStack gap={4}>
                         <Heading level={3}>Travel for work</Heading>
                         <Switch
-                          label="Show work-trip options"
-                          description="Adds a work-trip toggle at checkout."
+                          label="Show night-errand options"
+                          description="Adds a night-errand toggle at checkout."
                           value={workTravel}
                           onChange={setWorkTravel}
                           labelPosition="start"
@@ -884,8 +884,8 @@ export default function SettingsDialog() {
                         <VStack gap={4}>
                           <Heading level={3}>Listings</Heading>
                           <Switch
-                            label="Include my listing(s) in search engines"
-                            description="Turning this on means search engines, like Google, will display your listing page(s) in search results."
+                            label="List my wares in the scrying mirrors"
+                            description="Turning this on means scrying engines, like Google, will show your wares to seekers."
                             value={searchEngines}
                             onChange={setSearchEngines}
                             labelPosition="start"
@@ -896,13 +896,13 @@ export default function SettingsDialog() {
 
                         <VStack gap={4}>
                           <Heading level={3}>Reviews</Heading>
-                          <Text type="supporting" color="secondary">
+                          <Text type="body" color="secondary">
                             Choose what&apos;s shared when you write a review.{' '}
                             <Link href={SELF_HASH}>Learn more</Link>
                           </Text>
                           <VStack gap={4}>
                             <Switch
-                              label="Show my home city and country"
+                              label="Show my home haunt and country"
                               description="Ex: City and country"
                               value={showCity}
                               onChange={setShowCity}
@@ -910,8 +910,8 @@ export default function SettingsDialog() {
                               labelSpacing="spread"
                             />
                             <Switch
-                              label="Show my trip type"
-                              description="Ex: Stayed with kids or pets"
+                              label="Show my journey type"
+                              description="Ex: Rested with kin or familiars"
                               value={showTripType}
                               onChange={setShowTripType}
                               labelPosition="start"
@@ -926,8 +926,8 @@ export default function SettingsDialog() {
                               labelSpacing="spread"
                             />
                             <Switch
-                              label="Show my booked services"
-                              description="Ex: Gourmet brunch or tasting menu"
+                              label="Show my booked revels"
+                              description="Ex: Midnight feasts and tasting rituals"
                               value={showServices}
                               onChange={setShowServices}
                               labelPosition="start"

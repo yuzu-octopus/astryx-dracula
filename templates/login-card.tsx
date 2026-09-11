@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   Ctr > V[g=4 a=center] > (V[g=2 a=center] > Ic + Tx"Castle Dracula"[t=body]) + (C[p=8] > V[g=4] > (V[g=1 a=center] > Hd"Welcome back to the night"[level=2] + Tx"Sign in to your crypt"[t=body]) + (V[g=2] > TI"Email"[t=email] + (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?")) + B.primary"Enter the night" + D"Or continue with" + (V[g=3] > B.secondary"Login with Apple" + B.secondary"Login with Google") + (V[a=center] > Tx"New to the castle?"[t=supporting] + Lk"Sign up")) + (V[a=center] > Tx"By clicking continue, you agree to our Terms of Service and Privacy Policy"[t=supporting])
+//   Ctr > V[g=4 a=center] > (V[g=2 a=center] > Ic + Tx"Castle Dracula"[t=body]) + (C[p=8] > V[g=4] > (V[g=1 a=center] > Hd"Welcome back to the night"[level=1] + Tx"Sign in to your crypt"[t=body]) + (V[g=2] > TI"Email"[t=email] + (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?")) + B.primary"Enter the night" + D"Or continue with" + (V[g=3] > B.secondary"Login with Apple" + B.secondary"Login with Google") + (V[a=center] > Tx"New to the castle?"[t=supporting] + Lk"Sign up")) + (V[a=center] > Tx"By clicking continue, you agree to our Terms of service and Privacy policy"[t=supporting])
 
 import {useState, useTransition, type CSSProperties} from 'react';
 import {Moon} from 'lucide-react';
@@ -86,7 +86,7 @@ export default function LoginCard() {
         {/* Logo */}
         <VStack gap={2} hAlign="center">
           <Icon icon={Moon} size="lg" color="accent" />
-          <Text type="body" weight="bold" size="lg">
+          <Text type="body" weight="semibold" size="lg">
             Castle Dracula
           </Text>
         </VStack>
@@ -96,7 +96,7 @@ export default function LoginCard() {
           <VStack gap={4} hAlign="stretch">
             {/* Header */}
             <VStack gap={1} hAlign="center">
-              <Heading level={2}>Welcome back to the night</Heading>
+              <Heading level={1}>Welcome back to the night</Heading>
               <Text type="body" color="secondary">
                 Sign in to your crypt
               </Text>
@@ -200,11 +200,11 @@ export default function LoginCard() {
           <Text type="supporting" color="secondary" justify="center">
             By clicking continue, you agree to our{' '}
             <Link href="#/templates/login-card" type="supporting">
-              Terms of Service
+              Terms of service
             </Link>{' '}
             and{' '}
             <Link href="#/templates/login-card" type="supporting">
-              Privacy Policy
+              Privacy policy
             </Link>
             .
           </Text>

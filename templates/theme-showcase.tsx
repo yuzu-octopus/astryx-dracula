@@ -289,7 +289,7 @@ const DEFAULT_PRODUCTS: ProductSpec[] = [
     name: 'Moonphase Watch',
     description: 'Clean lines and lume that carry through the longest night.',
     badge: 'New',
-    badgeVariant: 'blue',
+    badgeVariant: 'cyan',
   },
   {
     name: 'Night-Owl Headphones',
@@ -493,7 +493,7 @@ function StorePreview({
           <VStack gap={10} style={styles.contentFluid}>
             <Center>
               <VStack gap={4} hAlign="center" style={styles.heroText}>
-                <Heading level={1} type="display-2" color="accent">
+                <Heading level={1} type="display-2">
                   Little haunts,
                   <br />
                   everywhere you roam
@@ -564,7 +564,7 @@ function StorePreview({
 
 function CheckoutCard({isMobile}: {isMobile: boolean}) {
   return (
-    <Card padding={5} style={styles.card}>
+    <Card padding={4} style={styles.card}>
       <VStack gap={4} style={styles.checkoutStack}>
         <Heading level={2}>Checkout</Heading>
 
@@ -947,7 +947,7 @@ function formatAmount(amount: number): string {
 
 function LatestActivityCard({isMobile}: {isMobile: boolean}) {
   return (
-    <Card padding={5} style={styles.activityCard}>
+    <Card padding={4} style={styles.activityCard}>
       <VStack gap={4} style={styles.activityCardStack}>
         <Heading level={2}>Revenue</Heading>
 
@@ -1030,7 +1030,7 @@ const DEFAULT_INVENTORY: InventoryRow[] = [
     meta: 'Steel case, moonphase dial',
     available: 42,
     location: 'Aisle 3',
-    tags: [{label: 'New', variant: 'blue'}],
+    tags: [{label: 'New', variant: 'cyan'}],
     hue: 'var(--dracula-comment)',
     selected: false,
   },
@@ -1070,7 +1070,7 @@ const DEFAULT_INVENTORY: InventoryRow[] = [
     meta: 'Vacuum insulated, 16oz',
     available: 87,
     location: 'Aisle 5',
-    tags: [{label: 'Drinkware', variant: 'green'}],
+    tags: [{label: 'Drinkware', variant: 'yellow'}],
     hue: 'var(--dracula-pink)',
     selected: false,
   },
@@ -1080,7 +1080,7 @@ const DEFAULT_INVENTORY: InventoryRow[] = [
     meta: 'Heavyweight, oat',
     available: 24,
     location: 'Aisle 6',
-    tags: [{label: 'Home', variant: 'orange'}],
+    tags: [{label: 'Home', variant: 'yellow'}],
     hue: 'var(--dracula-green)',
     selected: true,
   },

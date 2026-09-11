@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   Ctr > V[g=4] > (Ctr.horizontal > C[p=0] > G[c={min:240} g=8 a=stretch] > (S[p=0] > V[g=4] > (H[g=2 a=center] > Ic + Tx"Castle Dracula"[t=body]) + (V[g=4] > (V[g=1] > Hd"Welcome back to the night"[level=2] + Tx"Sign in to your crypt"[t=body]) + (V[g=2] > TI"Email"[t=email] + (V[g=1] > TI"Password"[t=password] + Lk"Forgot your password?")) + B.primary"Enter the night" + D"Or continue with" + (G[c={min:200} g=3] > B.secondary"Login with Apple" + B.secondary"Login with Google")) + Tx"New to the castle?"[t=supporting]) + (C[p=0] > AR)) + (V[a=center] > Tx"By clicking continue, you agree to our Terms of Service and Privacy Policy"[t=supporting])
+//   Ctr > V[g=4] > (Ctr.horizontal > C[p=0] > G[c={min:240} g=8 a=stretch] > (S[p=0] > V[g=4] > (H[g=2 a=center] > Ic + Tx"Castle Dracula"[t=body]) + (V[g=4] > (V[g=1] > Hd"Welcome back to the night"[level=1] + Tx"Sign in to your crypt"[t=body]) + (V[g=2] > TI"Email"[t=email] + (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?")) + B.primary"Enter the night" + D"Or continue with" + (G[c={min:200} g=3] > B.secondary"Login with Apple" + B.secondary"Login with Google")) + Tx"New to the castle?"[t=supporting]) + (C[p=0] > AR)) + (V[a=center] > Tx"By clicking continue, you agree to our Terms of service and Privacy policy"[t=supporting])
 
 import {useState, useTransition, type CSSProperties} from 'react';
 import {VStack, HStack, StackItem} from '@astryxdesign/core/Layout';
@@ -181,7 +181,7 @@ export default function LoginSplit() {
               <Section variant="transparent" padding={0} height="100%">
                 <VStack gap={4} height="100%">
                   <HStack gap={2} vAlign="center">
-                    <Icon icon={Moon} color="accent" />
+                    <Icon icon={Moon} color="accent" size="lg" />
                     <Text type="body" weight="semibold">
                       Castle Dracula
                     </Text>
@@ -193,12 +193,18 @@ export default function LoginSplit() {
                         <EmptyState
                           title="You're in for the night"
                           description="Drifting to your crypt…"
-                          icon={<Icon icon={CircleCheck} size="lg" />}
+                          icon={
+                            <Icon
+                              icon={CircleCheck}
+                              size="lg"
+                              color="secondary"
+                            />
+                          }
                         />
                       ) : (
                         <VStack gap={4} hAlign="stretch" width="100%">
                           <VStack gap={1}>
-                            <Heading level={2}>
+                            <Heading level={1}>
                               Welcome back to the night
                             </Heading>
                             <Text type="body" color="secondary">
@@ -248,7 +254,7 @@ export default function LoginSplit() {
                               {loginFailed && (
                                 <VStack hAlign="end">
                                   <Link href="#/templates/login-split">
-                                    Forgot your password?
+                                    Forgot password?
                                   </Link>
                                 </VStack>
                               )}
@@ -293,7 +299,7 @@ export default function LoginSplit() {
                   {!isSuccess && (
                     <Text type="supporting" color="secondary">
                       New to the castle?{' '}
-                      <Link href="#/templates/login-split">
+                      <Link href="#/templates/login-split" type="supporting">
                         Sign up
                       </Link>
                     </Text>
@@ -318,12 +324,12 @@ export default function LoginSplit() {
         <VStack hAlign="center">
           <Text type="supporting" color="secondary">
             By clicking continue, you agree to our{' '}
-            <Link href="#/templates/login-split">
-              Terms of Service
+            <Link href="#/templates/login-split" type="supporting">
+              Terms of service
             </Link>{' '}
             and{' '}
-            <Link href="#/templates/login-split">
-              Privacy Policy
+            <Link href="#/templates/login-split" type="supporting">
+              Privacy policy
             </Link>
             .
           </Text>

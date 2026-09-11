@@ -68,42 +68,46 @@ type MegaItem = {name: string; tagline: string; icon: IconType};
 // Shop and Brands each render 8 items — the mega menu's built-in 2-column grid
 // lays them out as 2 columns × 4 rows, alongside a featured card.
 const SHOP_ITEMS: MegaItem[] = [
-  {name: 'New Arrivals', tagline: 'The latest drops', icon: Sparkles},
-  {name: 'Womenswear', tagline: 'Dresses, knitwear & more', icon: SwatchBook},
-  {name: 'Menswear', tagline: 'Shirts, tailoring & more', icon: Tag},
-  {name: 'Home', tagline: 'Bedding, lighting & décor', icon: House},
+  {name: 'New Moon Arrivals', tagline: 'Fresh from the kiln', icon: Sparkles},
   {
-    name: 'Beauty',
-    tagline: 'Skincare, fragrance & makeup',
+    name: 'Gowns & Cloaks',
+    tagline: 'Dresses, knitwear & moonlit layers',
+    icon: SwatchBook,
+  },
+  {name: 'Doublets & Tailoring', tagline: 'Shirts, cloaks & more', icon: Tag},
+  {name: 'Keep & Crypt', tagline: 'Bedding, candlelight & décor', icon: House},
+  {
+    name: 'Potions',
+    tagline: 'Salves, scents & powders',
     icon: Smile,
   },
   {
-    name: 'Accessories',
-    tagline: 'Bags, hats & sunglasses',
+    name: 'Relics',
+    tagline: 'Satchels, hats & moonshades',
     icon: ShoppingBag,
   },
   {name: 'Sale', tagline: 'Up to 50% off', icon: BadgePercent},
-  {name: 'Gift Cards', tagline: 'The perfect present', icon: Gift},
+  {name: 'Gift Tokens', tagline: 'The perfect tribute', icon: Gift},
 ];
 
 const BRAND_ITEMS: MegaItem[] = [
-  {name: 'Aether', tagline: 'Performance essentials', icon: Sparkles},
-  {name: 'Northwind', tagline: 'Outdoor & technical', icon: Cloud},
-  {name: 'Loomwell', tagline: 'Everyday knitwear', icon: Zap},
-  {name: 'Verdant', tagline: 'Sustainable basics', icon: Sun},
-  {name: 'Studio Mara', tagline: 'Modern tailoring', icon: Star},
-  {name: 'Atelier Kos', tagline: 'Limited ateliers', icon: Flame},
-  {name: 'Rue & Co', tagline: 'City streetwear', icon: Globe},
-  {name: 'Halden', tagline: 'Minimal staples', icon: Moon},
+  {name: 'Aether', tagline: 'Moonlit essentials', icon: Sparkles},
+  {name: 'Northcrypt', tagline: 'Cold-weather & travel', icon: Cloud},
+  {name: 'Loomwell', tagline: 'Everyday knitwear, coven-stitched', icon: Zap},
+  {name: 'Verdant', tagline: 'Earth-kept basics', icon: Sun},
+  {name: 'Studio Mara', tagline: 'Modern tailoring for the night', icon: Star},
+  {name: 'Atelier Kos', tagline: 'Small-batch ateliers', icon: Flame},
+  {name: 'Rue & Co', tagline: 'Old-town streetwear', icon: Globe},
+  {name: 'Halden', tagline: 'Spare, lasting staples', icon: Moon},
 ];
 
 const CATEGORY_TILES = [
-  'New Arrivals',
-  'Womenswear',
-  'Menswear',
-  'Home & Living',
-  'Beauty',
-  'Accessories',
+  'New Moon Arrivals',
+  'Gowns & Cloaks',
+  'Doublets & Tailoring',
+  'Keep & Crypt',
+  'Potions',
+  'Relics',
 ];
 
 // Wraps the 8 items in a fixed-width 2-column grid so every mega menu's item
@@ -241,6 +245,7 @@ export default function ShellTopNav() {
           width="100%"
           padding={0}>
           <VStack gap={10}>
+            {/* Skeleton shelves only — the routed collection supplies the h1. */}
             <Card variant="muted" padding={0} width="100%" height={360} />
 
             {SHELVES.map(shelf => (

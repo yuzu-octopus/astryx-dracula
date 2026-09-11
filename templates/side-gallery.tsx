@@ -37,7 +37,7 @@ const GALLERY_SCENES = [
     alt: 'Lamplit reading nook after midnight',
     hue: 'var(--dracula-yellow)',
   },
-  {alt: 'Fog rolling over the night pines', hue: 'var(--dracula-purple)'},
+  {alt: 'Fog rolling over the night pines', hue: 'var(--dracula-green)'},
   {alt: 'Dancer caught mid-step in stage pink', hue: 'var(--dracula-pink)'},
   {
     alt: 'Kitchen table set for a midnight feast',
@@ -63,7 +63,7 @@ function NightScene({alt, hue, index}: {alt: string; hue: string; index: number}
       role="img"
       aria-label={alt}>
       <rect width="400" height="300" fill="var(--dracula-bg-light)" />
-      <g fill="var(--dracula-purple)" opacity={0.55}>
+      <g fill="var(--dracula-comment)" opacity={0.55}>
         <circle cx={40 + ((index * 37) % 320)} cy={30} r={2} />
         <circle cx={120 + ((index * 23) % 200)} cy={52} r={1.6} />
         <circle cx={260 + ((index * 11) % 110)} cy={26} r={2.2} />
@@ -157,9 +157,7 @@ export default function SideGallery() {
                 </Text>
               </VStack>
 
-              <HStack gap={3} vAlign="center">
-                <Button label="Explore the night" variant="primary" />
-              </HStack>
+              <Button label="Explore the night" variant="primary" />
 
               <VStack gap={4}>
                 <Divider />

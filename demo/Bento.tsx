@@ -85,30 +85,18 @@ export function Bento() {
 
   return (
     <Theme theme={astryxDraculaTheme} mode="dark">
+      {/* Compact chrome: the showcase top bar already carries the wordmark,
+          links, and CTA, so this page skips its own header row and opens on
+          the content. Padding 16/0 keeps the grid off the viewport edges
+          with no dead band above the first card. */}
       <VStack
         gap={3}
         style={{
           backgroundColor: 'var(--color-background)',
           minHeight: '100vh',
-          padding: '24px',
+          padding: '0 16px 16px',
         }}
       >
-        <HStack justify="between" vAlign="center" wrap="wrap" gap={3}>
-          <HStack gap={2} vAlign="center">
-            <StatusDot variant="accent" label="Dracula" isPulsing />
-            <Text weight="semibold">Astryx Dracula</Text>
-            <Badge label="dark-only" variant="purple" />
-          </HStack>
-          <HStack gap={2} vAlign="center">
-            <Link href="https://github.com/yuzu-octopus/astryx-dracula">GitHub</Link>
-            <Button
-              label="Use this theme"
-              variant="primary"
-              href="https://yuzu-octopus.github.io/astryx-dracula/#quickstart"
-            />
-          </HStack>
-        </HStack>
-
         <Card padding={4}>
           <HStack justify="between" vAlign="center" wrap="wrap" gap={4}>
             <VStack gap={1}>

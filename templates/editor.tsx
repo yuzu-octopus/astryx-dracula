@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LP[w=320] > V[g=4] > (S[p=4] > V[g=4] > Hd"Page Editor"[level=2] + Tbar) + (V[g=4] > (TL > Tab"Blocks"! + Tab"Properties") + D + (S[p=4] > V[g=2] > Hd"Add Block"[level=3] + UL + Hd"Layers"[level=3] + UL))) + (LC > V[g=4] > C*3)
+//   L > (LP[w=320] > V[g=4] > (S[p=4] > V[g=4] > Hd"Page Editor"[level=1] + Tbar) + (V[g=4] > (TL > Tab"Blocks"! + Tab"Properties") + D + (S[p=4] > V[g=2] > Hd"Add Block"[level=3] + UL + Hd"Layers"[level=3] + UL))) + (LC > V[g=4] > C*3)
 
 import {
   useState,
@@ -66,7 +66,6 @@ import {
   CirclePlay,
   Lock,
 } from 'lucide-react';
-import {Spinner} from '@astryxdesign/core/Spinner';
 
 type BlockType =
   'hero' | 'text' | 'image' | 'button' | 'cards' | 'features' | 'cta';
@@ -239,9 +238,9 @@ function defaultProps(type: BlockType): Record<string, unknown> {
   switch (type) {
     case 'hero':
       return {
-        heading: 'New Hero',
-        subheading: 'Subtitle goes here',
-        buttonLabel: 'Click Me',
+        heading: 'Midnight at the Castle Gates',
+        subheading: 'Gather the coven — the night is young and the candles are lit.',
+        buttonLabel: 'Enter the night',
         alignment: 'center',
       };
     case 'text':
@@ -279,10 +278,11 @@ function defaultProps(type: BlockType): Record<string, unknown> {
       };
     case 'cta':
       return {
-        heading: 'Call to Action',
-        description: 'Description text',
-        primaryLabel: 'Primary',
-        secondaryLabel: 'Secondary',
+        heading: 'Join the Midnight Coven',
+        description:
+          'Claim your seat at the table — letters from the crypt, once a moon.',
+        primaryLabel: 'Join the coven',
+        secondaryLabel: 'Read the lore',
       };
   }
 }
@@ -469,11 +469,11 @@ function BlockPreview({
       return (
         <Card padding={6} style={cardStyle} onClick={onSelect}>
           <VStack gap={4}>
-            <Heading level={2}>
+            <Heading level={3}>
               {(props.heading as string) || 'Hero Heading'}
             </Heading>
             <Text type="body" color="secondary">
-              {(props.subheading as string) || 'Subtitle text goes here'}
+              {(props.subheading as string) || 'A whisper from the crypt…'}
             </Text>
             {(props.buttonLabel as string) && (
               <Button label={props.buttonLabel as string} />
@@ -489,7 +489,7 @@ function BlockPreview({
             <EmptyState
               title={props.heading as string}
               description={props.description as string}
-              icon={<Spinner />}
+              icon={<Icon icon={FileText} />}
               actions={
                 (props.buttonLabel as string) ? (
                   <Button
@@ -503,16 +503,16 @@ function BlockPreview({
         );
       }
       return (
-        <Card style={cardStyle} onClick={onSelect}>
+        <Card padding={6} style={cardStyle} onClick={onSelect}>
           <Text type="body">
-            {(props.content as string) || 'Text content goes here'}
+            {(props.content as string) || 'Ink your midnight thoughts here…'}
           </Text>
         </Card>
       );
 
     case 'image':
       return (
-        <Card style={cardStyle} onClick={onSelect}>
+        <Card padding={6} style={cardStyle} onClick={onSelect}>
           <EmptyState
             title="Image Block"
             description="Drop an image or enter a URL"
@@ -549,7 +549,7 @@ function BlockPreview({
                   {(props.heading as string) || 'Features'}
                 </Heading>
                 {(props.description as string) && (
-                  <Text type="supporting" color="secondary">
+                  <Text type="body" color="secondary">
                     {props.description as string}
                   </Text>
                 )}
@@ -572,7 +572,7 @@ function BlockPreview({
       const cardItems =
         (props.cards as Array<{title: string; description: string}>) || [];
       return (
-        <Card style={cardStyle} onClick={onSelect}>
+        <Card padding={6} style={cardStyle} onClick={onSelect}>
           <VStack gap={4}>
             <Heading level={3}>Cards</Heading>
             <Divider />
@@ -602,7 +602,8 @@ function BlockPreview({
                 {(props.heading as string) || 'Notice'}
               </Heading>
               <Text type="body" color="secondary">
-                {(props.description as string) || 'Description text'}
+                {(props.description as string) ||
+                  'Words from the crypt gather here…'}
               </Text>
             </VStack>
           </HStack>
@@ -820,7 +821,7 @@ export default function PageEditor() {
             // Mobile: the title, an Edit button that opens the customizations
             // dialog, and the primary action.
             <HStack gap={3} vAlign="center" hAlign="between">
-              <Heading level={2}>{pageTitle}</Heading>
+              <Heading level={1}>{pageTitle}</Heading>
               <HStack gap={2} vAlign="center">
                 <Button
                   label="Edit"
@@ -849,7 +850,7 @@ export default function PageEditor() {
                   onBlur={() => setIsEditingTitle(false)}
                 />
               ) : (
-                <Heading level={2}>{pageTitle}</Heading>
+                <Heading level={1}>{pageTitle}</Heading>
               )}
 
               <Toolbar

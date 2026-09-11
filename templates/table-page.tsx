@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LH[divider] > H[g=2 a=center] > (SI[fill] > Hd"Familiars"[level=1]) + IB"Filter" + IB"Download" + B.primary"Add") + (LC[p=3] > V[g=4] > PS + (T[hover] > (TR > THC*3) + (TR > TC*3)*3))
+//   L > (LH[divider] > H[g=2 a=center] > (SI[fill] > Hd"Familiars"[level=1]) + IB"Filter"[variant=ghost] + IB"Download"[variant=ghost] + B.primary"Add") + (LC[p=3] > V[g=4] > PS + (T[hover] > (TR > THC*3) + (TR > TC*3)*3))
 
 /**
  * Familiars — the full roster of the crypt's companions, with a PowerSearch
@@ -425,13 +425,19 @@ export default function TablePage() {
               label="Filter"
               icon={<Icon icon={Filter} size="sm" />}
               variant="ghost"
+              tooltip="Filter"
             />
             <IconButton
               label="Download"
               icon={<Icon icon={Download} size="sm" />}
               variant="ghost"
+              tooltip="Export"
             />
-            <Button label="Add" icon={<Icon icon={Plus} size="sm" />} />
+            <Button
+              label="Add"
+              variant="primary"
+              icon={<Icon icon={Plus} size="sm" />}
+            />
           </HStack>
         </LayoutHeader>
       }

@@ -268,6 +268,7 @@ export default function ShellNav() {
           }
           content={
             <LayoutContent padding={6}>
+              {/* Skeleton chrome only — the open file supplies the h1. */}
               <VStack gap={2}>
                 {CODE_LINES.map(line =>
                   line.width === '0%' ? (

@@ -17,6 +17,7 @@ import {Link} from '@astryxdesign/core/Link';
 import {Divider} from '@astryxdesign/core/Divider';
 import {Card} from '@astryxdesign/core/Card';
 import {Selector} from '@astryxdesign/core/Selector';
+import {Banner} from '@astryxdesign/core/Banner';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Check} from 'lucide-react';
 
@@ -29,7 +30,7 @@ function CastleIllustration() {
       aria-label="Moonlit castle where the night crew works">
       <title>Castle office after dark</title>
       <rect width="400" height="300" fill="var(--dracula-bg-dark)" />
-      <g fill="var(--dracula-purple)">
+      <g fill="var(--dracula-comment)">
         <circle cx="40" cy="40" r="2.5" />
         <circle cx="120" cy="70" r="2" />
         <circle cx="210" cy="36" r="2.5" />
@@ -50,7 +51,7 @@ function CastleIllustration() {
       />
       <g
         fill="none"
-        stroke="var(--dracula-purple)"
+        stroke="var(--dracula-fg)"
         strokeWidth={3}
         strokeLinecap="round">
         <path d="M90 100 q9 -9 18 0 q9 -9 18 0" />
@@ -175,6 +176,11 @@ export default function TwoColumnForm() {
       }
     : {};
 
+  const isValid =
+    fullName.trim() !== '' &&
+    email.trim() !== '' &&
+    details.trim() !== '';
+
   const handleSubmit = () => setSubmitted(true);
 
   return (
@@ -292,6 +298,13 @@ export default function TwoColumnForm() {
                       : undefined
                   }
                 />
+                {submitted && isValid && (
+                  <Banner
+                    status="success"
+                    title="Sent into the night"
+                    description="The coven received your message and will answer after dark."
+                  />
+                )}
                 {/* hAlign="stretch" = full-width button workaround; Button
                     has no full-width prop (#2600). */}
                 <VStack hAlign="stretch">

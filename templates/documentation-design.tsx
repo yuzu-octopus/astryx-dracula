@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LC > V[g=8] > (V[g=2] > Tx.display-1"Button" + Tx"March 30, 2026"[t=supporting]) + (C.muted[p=0] > Ctr[h=360]) + (V[g=4] > Hd"Usage"[level=2] + Tx.lg"Usage" + Hd"Best practices"[level=3] + T) + D + (V[g=4] > Hd"Examples"[level=2] + Tx.lg"Explore") + (V[g=8] > (C[p=0] > (S[p=3] > Tx"Title"[t=body]) + Ctr[h=280] + (S.muted[p=3] > V[g=3] > (TL > Tab"Description"! + Tab"Code") + Tx"Description"[t=body]))*2)) + (LP > Outline)
+//   L > (LC > V[g=8] > (V[g=2] > Hd"Button"[level=1] + Tx"March 30, 2026"[t=supporting]) + (C.muted[p=0] > Ctr[h=360]) + (V[g=4] > Hd"Usage"[level=2] + Tx"Usage"[t=body] + Hd"Best practices"[level=3] + T) + D + (V[g=4] > Hd"Examples"[level=2] + Tx"Explore"[t=body]) + (V[g=8] > (C[p=0] > (S[p=3] > Tx"Title"[t=body]) + Ctr[h=280] + (S.muted[p=3] > V[g=3] > (TL > Tab"Description"! + Tab"Code") + Tx"Description"[t=body]))*2)) + (LP > Outline)
 
 /**
  * Documentation detail — one component, its usage, its guidance and its
@@ -83,7 +83,9 @@ function DialogPreview() {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <VStack gap={3}>
-      <Heading level={3}>Dialog</Heading>
+      <Text type="body" weight="semibold">
+        Dialog
+      </Text>
       <Button
         label="Open Dialog"
         variant="primary"
@@ -470,7 +472,7 @@ const COMPONENT_DOCS: Record<
         title: 'Default button with badge',
         description:
           'Buttons can include a badge to highlight new or updated actions.',
-        code: `<Button\n  label="Button"\n  variant="default"\n/>`,
+        code: `<Button\n  label="Button"\n  variant="secondary"\n/>`,
       },
     ],
   },
@@ -547,11 +549,13 @@ const COMPONENT_PREVIEWS: Record<string, ReactNode> = {
     />
   ),
   avatar: <Avatar name="Vlad" size="lg" />,
-  badge: <Badge label="Design" variant="teal" />,
+  badge: <Badge label="Design" variant="yellow" />,
   card: (
     <Card>
       <VStack gap={2}>
-        <Heading level={4}>Castle Card</Heading>
+        <Text type="body" weight="semibold">
+          Castle Card
+        </Text>
         <Text type="body" color="secondary">
           Cards group related content and actions.
         </Text>
@@ -619,7 +623,7 @@ function ComponentDetailView({activeNav}: {activeNav: string}) {
         <LayoutContent isScrollable={false} padding={8}>
           <VStack gap={8}>
             <VStack gap={2}>
-              <Text type="display-1">{getComponentName(activeNav)}</Text>
+              <Heading level={1}>{getComponentName(activeNav)}</Heading>
               <Text type="supporting" color="secondary" hasTabularNumbers>
                 March 30, 2026 · Updated 5:40 p.m. PST
               </Text>
@@ -639,7 +643,7 @@ function ComponentDetailView({activeNav}: {activeNav: string}) {
               <Center height={360}>
                 {COMPONENT_PREVIEWS[activeNav] ?? (
                   <Text type="supporting" color="secondary">
-                    Preview coming soon
+                    Quiet in the crypt — no preview haunts this shelf yet.
                   </Text>
                 )}
               </Center>
@@ -649,9 +653,7 @@ function ComponentDetailView({activeNav}: {activeNav: string}) {
               <Heading id="usage" level={2}>
                 Usage
               </Heading>
-              <Text type="large" weight="normal">
-                {docs.usage}
-              </Text>
+              <Text type="body">{docs.usage}</Text>
               <Heading id="best-practices" level={3}>
                 Best practices
               </Heading>
@@ -690,7 +692,7 @@ function ComponentDetailView({activeNav}: {activeNav: string}) {
               <Heading id="examples" level={2}>
                 Examples
               </Heading>
-              <Text type="large" weight="normal">
+              <Text type="body">
                 Explore common configurations, variations, and states for this
                 component.
               </Text>
@@ -702,14 +704,14 @@ function ComponentDetailView({activeNav}: {activeNav: string}) {
                 return (
                   <Card key={example.title} padding={0}>
                     <Section padding={3} variant="transparent">
-                      <Text type="body" weight="medium">
+                      <Text type="body" weight="semibold">
                         {example.title}
                       </Text>
                     </Section>
                     <Center height={280}>
                       {previews[i] ?? (
                         <Text type="supporting" color="secondary">
-                          Preview coming soon
+                          Quiet in the crypt — no preview haunts this shelf yet.
                         </Text>
                       )}
                     </Center>

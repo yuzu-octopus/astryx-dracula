@@ -103,7 +103,12 @@
  * brand accent for anything interactive. Selection (#44475A) was the resting
  * thumb before, at 1.5:1 against the background, which made the scrollbar
  * effectively invisible.
- * Firefox uses the two properties; Chromium uses the pseudo-elements. */
+ * Firefox uses the two properties; Chromium uses the pseudo-elements.
+ *
+ * Environment note: the shared headless browser paints overlay scrollbars
+ * (scrollbarWidth 0 even with content overflowing), so themed scrollbar
+ * rules cannot be verified there. Check them in a real Chrome against
+ * /templates and /bento: resting thumb Current Line, hover Purple. */
 :root {
   scrollbar-width: thin;
   scrollbar-color: var(--dracula-current-line) transparent;

@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   Ctr > C[p=8 mw=400] > V[g=4] > ((V[g=1 a=center] > Hd"Welcome back to the night"[level=2] + Tx"Whisper your details to enter the night"[t=body]) + TI"Work email"[t=email] + Lk"Having trouble signing in?" + B.primary"Continue" + D"Or sign in with" + B.secondary"Continue with SSO" + (V[a=center] > Tx"New to the castle?"[t=supporting] + Lk"Request access") + (V[g=2 a=center] > Av + Hd"Sign in with Google Workspace"[level=2] + Tx"You will be redirected back after signing in."[t=body]) + (C[p=0] > S[p=4 muted] > (H[g=2 a=center] > Ic + (V[g=0] > Tx"Google Workspace"[t=label] + Tx"vlad@castle.ro"[t=supporting]))) + (V[g=3] > B.primary"Continue with Google Workspace" + B.ghost"Use a different email") + (V[g=1 a=center] > Hd"Welcome back to the night"[level=2] + Tx"vlad@castle.ro"[t=body]) + (V[g=4] > (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?") + B.primary"Enter the night" + B.ghost"Use a different email"))
+//   Ctr > C[p=8 mw=400] > V[g=4] > ((V[g=1 a=center] > Hd"Welcome back to the night"[level=1] + Tx"Whisper your details to enter the night"[t=body]) + TI"Work email"[t=email] + Lk"Having trouble signing in?" + B.primary"Continue" + D"Or sign in with" + B.secondary"Continue with SSO" + (V[a=center] > Tx"New to the castle?"[t=supporting] + Lk"Request access") + (V[g=2 a=center] > Av + Hd"Sign in with Google Workspace"[level=1] + Tx"You will be redirected back after signing in."[t=body]) + (C[p=0] > S[p=4 muted] > (H[g=2 a=center] > Ic + (V[g=0] > Tx"Google Workspace"[t=label] + Tx"vlad@castle.ro"[t=supporting]))) + (V[g=3] > B.primary"Continue with Google Workspace" + B.ghost"Use a different email") + (V[g=1 a=center] > Hd"Welcome back to the night"[level=1] + Tx"vlad@castle.ro"[t=body]) + (V[g=4] > (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?") + B.primary"Enter the night" + B.ghost"Use a different email") + (V[a=center] > Tx"By clicking continue, you agree to our Terms of service and Privacy policy"[t=supporting]))
 
 import {useState, useTransition, type CSSProperties} from 'react';
 import {VStack, HStack} from '@astryxdesign/core/Layout';
@@ -112,7 +112,7 @@ export default function LoginSso() {
           {step === 'email' && (
             <>
               <VStack gap={1} hAlign="center">
-                <Heading level={2}>Welcome back to the night</Heading>
+                <Heading level={1}>Welcome back to the night</Heading>
                 <Text type="body" color="secondary">
                   Whisper your details to enter the night
                 </Text>
@@ -162,7 +162,7 @@ export default function LoginSso() {
               <VStack hAlign="center">
                 <Text type="supporting" color="secondary">
                   New to the castle?{' '}
-                  <Link href="#/templates/login-sso">
+                  <Link href="#/templates/login-sso" type="supporting">
                     Request access
                   </Link>
                 </Text>
@@ -175,7 +175,7 @@ export default function LoginSso() {
             <>
               <VStack gap={2} hAlign="center">
                 <Avatar name={provider.name} size={48} />
-                <Heading level={2}>Sign in with {provider.name}</Heading>
+                <Heading level={1}>Sign in with {provider.name}</Heading>
                 <Text type="body" color="secondary">
                   You will be redirected back after signing in.
                 </Text>
@@ -223,7 +223,7 @@ export default function LoginSso() {
           {step === 'password-fallback' && (
             <>
               <VStack gap={1} hAlign="center">
-                <Heading level={2}>Welcome back to the night</Heading>
+                <Heading level={1}>Welcome back to the night</Heading>
                 <Text type="body" color="secondary">
                   {email}
                 </Text>
@@ -276,6 +276,21 @@ export default function LoginSso() {
               </VStack>
             </>
           )}
+
+          {/* Terms — family line, shown on every step */}
+          <VStack hAlign="center" width="100%">
+            <Text type="supporting" color="secondary" justify="center">
+              By clicking continue, you agree to our{' '}
+              <Link href="#/templates/login-sso" type="supporting">
+                Terms of service
+              </Link>{' '}
+              and{' '}
+              <Link href="#/templates/login-sso" type="supporting">
+                Privacy policy
+              </Link>
+              .
+            </Text>
+          </VStack>
         </VStack>
       </Card>
     </Center>

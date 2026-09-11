@@ -37,7 +37,7 @@ function NightCastleScene() {
       aria-label="Moonlit castle on midnight hills">
       <title>Castle under a harvest moon</title>
       <rect width="400" height="500" fill="var(--dracula-bg-dark)" />
-      <g fill="var(--dracula-purple)">
+      <g fill="var(--dracula-comment)">
         <circle cx="50" cy="60" r="2.5" />
         <circle cx="140" cy="130" r="2" />
         <circle cx="240" cy="50" r="2.5" />
@@ -59,7 +59,7 @@ function NightCastleScene() {
       />
       <g
         fill="none"
-        stroke="var(--dracula-purple)"
+        stroke="var(--dracula-fg)"
         strokeWidth={4}
         strokeLinecap="round">
         <path d="M70 170 q12 -12 24 0 q12 -12 24 0" />
@@ -152,7 +152,7 @@ function HarvestMoonScene() {
       />
       <g
         fill="none"
-        stroke="var(--dracula-purple)"
+        stroke="var(--dracula-fg)"
         strokeWidth={4}
         strokeLinecap="round">
         <path d="M90 260 q12 -12 24 0 q12 -12 24 0" />

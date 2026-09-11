@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   Ctr > V[g=4 a=center] > (V[g=2 a=center] > Ic + Tx"Castle Dracula"[t=body]) + (C[p=8] > V[g=4] > (V[g=1 a=center] > Hd"Welcome back to the night"[level=2] + Tx"Sign in to your crypt"[t=body]) + TI"Email"[t=email] + TI"Password"[t=password] + B.primary"Enter the night")
+//   Ctr > V[g=4 a=center] > (V[g=2 a=center] > Ic + Tx"Castle Dracula"[t=body]) + (C[p=8] > V[g=4] > (V[g=1 a=center] > Hd"Welcome back to the night"[level=1] + Tx"Sign in to your crypt"[t=body]) + TI"Email"[t=email] + (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?") + B.primary"Enter the night" + (V[a=center] > Tx"New to the castle?"[t=supporting] + Lk"Sign up")) + (V[a=center] > Tx"By clicking continue, you agree to our Terms of service and Privacy policy"[t=supporting])
 
 import {useState, useTransition, type CSSProperties} from 'react';
 import {Moon} from 'lucide-react';
@@ -11,7 +11,7 @@ import {TextInput} from '@astryxdesign/core/TextInput';
 import {Button} from '@astryxdesign/core/Button';
 import {Card} from '@astryxdesign/core/Card';
 import {Icon} from '@astryxdesign/core/Icon';
-import {Banner} from '@astryxdesign/core/Banner';
+import {Link} from '@astryxdesign/core/Link';
 
 // Standalone auth page paints its own body background (no host shell).
 const pageStyle: CSSProperties = {
@@ -56,7 +56,7 @@ export default function LoginPage() {
         {/* Logo */}
         <VStack gap={2} hAlign="center">
           <Icon icon={Moon} size="lg" color="accent" />
-          <Text type="body" weight="bold" size="lg">
+          <Text type="body" weight="semibold" size="lg">
             Castle Dracula
           </Text>
         </VStack>
@@ -65,7 +65,7 @@ export default function LoginPage() {
         <Card padding={8} width="100%">
           <VStack gap={4} hAlign="stretch">
             <VStack gap={1} hAlign="center">
-              <Heading level={2} justify="center">
+              <Heading level={1} justify="center">
                 Welcome back to the night
               </Heading>
               <Text type="body" color="secondary">
@@ -73,10 +73,9 @@ export default function LoginPage() {
               </Text>
             </VStack>
 
-            {error && <Banner status="error" title={error} container="card" />}
-
             <TextInput
               label="Email"
+              isLabelHidden
               value={email}
               onChange={setEmail}
               placeholder="you@castle.dracula"
@@ -86,16 +85,38 @@ export default function LoginPage() {
               onEnter={handleSignIn}
             />
 
-            <TextInput
-              label="Password"
-              value={password}
-              onChange={setPassword}
-              placeholder="Whisper your password"
-              type="password"
-              {...inputAutoComplete('current-password')}
-              size="lg"
-              onEnter={handleSignIn}
-            />
+            <VStack gap={1}>
+              <TextInput
+                label="Password"
+                isLabelHidden
+                value={password}
+                onChange={setPassword}
+                placeholder="Whisper your password"
+                type="password"
+                {...inputAutoComplete('current-password')}
+                size="lg"
+                onEnter={handleSignIn}
+                status={
+                  error
+                    ? {
+                        type: 'error',
+                        message: error,
+                      }
+                    : undefined
+                }
+              />
+              {error && (
+                <VStack hAlign="end">
+                  <Link
+                    href="#/templates/login"
+                    size="sm"
+                    color="secondary"
+                    type="supporting">
+                    Forgot password?
+                  </Link>
+                </VStack>
+              )}
+            </VStack>
 
             <Button
               label="Enter the night"
@@ -104,8 +125,33 @@ export default function LoginPage() {
               isLoading={isLoading}
               onClick={handleSignIn}
             />
+
+            {/* Sign up link */}
+            <VStack hAlign="center">
+              <Text type="supporting" color="secondary">
+                New to the castle?{' '}
+                <Link href="#/templates/login" type="supporting">
+                  Sign up
+                </Link>
+              </Text>
+            </VStack>
           </VStack>
         </Card>
+
+        {/* Terms */}
+        <VStack hAlign="center" width="100%">
+          <Text type="supporting" color="secondary" justify="center">
+            By clicking continue, you agree to our{' '}
+            <Link href="#/templates/login" type="supporting">
+              Terms of service
+            </Link>{' '}
+            and{' '}
+            <Link href="#/templates/login" type="supporting">
+              Privacy policy
+            </Link>
+            .
+          </Text>
+        </VStack>
       </VStack>
     </Center>
   );

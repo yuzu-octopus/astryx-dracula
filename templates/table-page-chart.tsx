@@ -478,10 +478,10 @@ const revenueData = [
 
 const STATUS_TOKEN_COLOR: Record<
   OrderRow['status'],
-  'green' | 'blue' | 'orange' | 'red'
+  'green' | 'cyan' | 'orange' | 'red'
 > = {
   completed: 'green',
-  shipped: 'blue',
+  shipped: 'cyan',
   processing: 'orange',
   refunded: 'red',
 };
@@ -583,7 +583,7 @@ const columns: TableColumn<OrderRow>[] = [
 
 // ============= REVENUE CHART (hand SVG, Dracula ramp) =============
 
-const REVENUE_LINE = 'var(--dracula-purple)';
+const REVENUE_LINE = 'var(--dracula-cyan)';
 const CHART_W = 540;
 const CHART_H = 200;
 const CHART_PAD_LEFT = 44;
@@ -651,7 +651,7 @@ function RevenueChart() {
                   x={padLeft - 6}
                   y={y + 3}
                   textAnchor="end"
-                  fontSize={9}
+                  fontSize={13}
                   fill="var(--color-text-paragraph)"
                   fontFamily="var(--font-family-mono)">
                   {formatRevenueTick(tick)}
@@ -676,7 +676,7 @@ function RevenueChart() {
                   x={i === points.length - 1 ? W - padRight - 2 : p.x}
                   y={H - 8}
                   textAnchor={i === points.length - 1 ? 'end' : 'middle'}
-                  fontSize={9}
+                  fontSize={13}
                   fill="var(--color-text-paragraph)"
                   fontFamily="var(--font-family-mono)">
                   {p.date}
