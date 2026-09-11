@@ -147,5 +147,5 @@ README. Not required for this kit.
 Before tagging a release:
 
 1. Pin versions: `@astryxdesign/core` / `@astryxdesign/cli` in `package.json` match the showcase and CI.
-2. Refresh the approximate template counts in `README.md` / `USAGE.md` (no gate asserts them).
+2. Refresh the approximate template counts in `README.md` / `USAGE.md` (no gate asserts them) and the version badges baked into `templates/product-tour.tsx` + `templates/centered-hero.tsx` (rendered text + XLE header) to match `package.json`.
 3. Rebuild and gate: `bun run theme:build`, then `bun run theme:check`, then `bun run audit`.
