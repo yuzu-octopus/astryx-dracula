@@ -77,7 +77,6 @@ const styles: Record<string, CSSProperties> = {
   inspector: {
     padding: 'var(--spacing-4)',
     height: '100%',
-    overflowY: 'auto',
   },
   controlsRow: {
     // The four-option filter plus the action never fit a phone header; the
@@ -551,7 +550,7 @@ export default function IncidentConsole() {
         </LayoutHeader>
       }
       content={
-        <LayoutContent padding={0}>
+        <LayoutContent padding={0} isScrollable={false}>
           <VStack gap={0} style={styles.contentFill}>
             <HStack style={styles.searchRow}>
               <StackItem size="fill">

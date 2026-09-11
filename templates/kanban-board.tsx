@@ -738,7 +738,7 @@ export default function KanbanBoard() {
           </LayoutHeader>
         }
         content={
-          <LayoutContent padding={0}>
+          <LayoutContent padding={0} isScrollable={false}>
             <Grid columns={{ minWidth: 280, max: 4 }} gap={4} style={boardColumnsStyle}>
               {COLUMNS.map(meta => (
                 <BoardColumn

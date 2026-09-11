@@ -780,7 +780,7 @@ function ChatCard() {
 
       <Divider variant="subtle" />
 
-      <VStack gap={0} style={inlineStyles.chatBody}>
+      <VStack gap={0} style={inlineStyles.chatBody} isScrollable={false}>
         <ChatMessageList>
           <ChatSystemMessage>Today</ChatSystemMessage>
 
