@@ -3,19 +3,7 @@
 //   L > (LH[divider] > H[g=2 a=center] > (SI[fill] > Hd"Familiars"[level=1]) + IB"Filter"[variant=ghost] + IB"Download"[variant=ghost] + B.primary"Add") + (LC[p=3] > V[g=4] > PS + (T[hover] > (TR > THC*3) + (TR > TC*3)*3))
 
 /**
- * Familiars — the full roster of the crypt's companions, with a PowerSearch
- * field filter bar above one dense table.
- *
- * Frame: page header (title + actions) | search | table (38 rows).
- *
- * Container policy: one dense table, edge-to-edge, zero Cards. The name cell
- * carries avatar + name + kind, the biography column wraps, age is tabular.
- *
- * Responsive contract:
- *   no media queries — the frame is header | table at every width. The table
- *   owns the only horizontal scroll (its minimum is ~920px across the three
- *   columns), so below that the name/kind lines truncate and the biography
- *   column stays readable rather than compressing the whole page.
+ * Familiars — the full roster of the crypt's companions, with a PowerSearch field filter bar above one dense table. (Frame/responsive/container: see XLE header above.)
  */
 
 import {useState, useMemo} from 'react';
@@ -416,7 +404,7 @@ export default function TablePage() {
     <Layout
       height="fill"
       header={
-        <LayoutHeader hasDivider>
+        <LayoutHeader hasDivider padding={6}>
           <HStack gap={2} vAlign="center">
             <StackItem size="fill">
               <Heading level={1}>Familiars</Heading>

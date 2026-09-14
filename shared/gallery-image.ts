@@ -12,8 +12,8 @@ export const galleryImage: CSSProperties = {
   display: 'block',
 };
 
-// Rounds the gallery corners. No radius prop on AspectRatio (#2582);
-// overflow clip masks the SVG scene to the rounded corners.
+// Rounds the gallery corners (element radius; chapter art uses container — see
+// shared/chaptered-doc sceneClip). No radius prop on AspectRatio (#2582);
 export const galleryImageClip: CSSProperties = {
   borderRadius: 'var(--radius-element)',
   overflow: 'clip',

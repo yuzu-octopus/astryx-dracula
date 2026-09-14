@@ -78,10 +78,9 @@ export function Gallery() {
 
             <VStack gap={2}>
               <Text type="label" color="secondary">
-                States & Sizes
+                States
               </Text>
               <HStack gap={2} wrap="wrap" vAlign="center">
-                <Button label="Small Primary" size="sm" variant="primary" />
                 <Button label="Loading…" isLoading variant="secondary" />
                 <Button label="Disabled" isDisabled variant="ghost" />
               </HStack>
@@ -132,7 +131,7 @@ export function Gallery() {
                   <Text type="supporting">Canary</Text>
                 </HStack>
                 <HStack gap={1} vAlign="center">
-                  <StatusDot variant="accent" label="Accent" />
+                  <StatusDot variant="info" label="Syncing" isPulsing />
                   <Text type="supporting">Edge</Text>
                 </HStack>
               </HStack>
@@ -155,7 +154,7 @@ export function Gallery() {
           </HStack>
 
           <Grid columns={{ minWidth: 280, max: 2 }} gap={4}>
-            <ProgressBar label="Build pipeline execution" value={62} variant="accent" hasValueLabel />
+            <ProgressBar label="Build pipeline execution" value={62} variant="neutral" hasValueLabel />
             <ProgressBar label="Network bandwidth headroom" value={38} variant="success" hasValueLabel />
           </Grid>
 

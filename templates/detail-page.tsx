@@ -205,7 +205,7 @@ function PageHeader({
   isNarrow: boolean;
 }) {
   return (
-    <LayoutHeader hasDivider padding={4}>
+    <LayoutHeader hasDivider padding={6}>
       <VStack gap={3}>
         <HStack gap={4} vAlign="start">
           <StackItem size="fill">

@@ -3,22 +3,7 @@
 //   L > (LC > V[g=8] > (V[g=2] > Hd"Button"[level=1] + Tx"March 30, 2026"[t=supporting]) + (C.muted[p=0] > Ctr[h=360]) + (V[g=4] > Hd"Usage"[level=2] + Tx"Usage"[t=body] + Hd"Best practices"[level=3] + T) + D + (V[g=4] > Hd"Examples"[level=2] + Tx"Explore"[t=body]) + (V[g=8] > (C[p=0] > (S[p=3] > Tx"Semantics"[t=body]) + Ctr[h=280] + (S.muted[p=3] > V[g=3] > (TL > Tab"Description"! + Tab"Code") + Tx"We have four"[t=body])) + (C[p=0] > (S[p=3] > Tx"Default button with badge"[t=body]) + Ctr[h=280] + (S.muted[p=3] > V[g=3] > (TL > Tab"Description"! + Tab"Code") + Tx"Buttons can include"[t=body])))) + (LP > Outline)
 
 /**
- * Documentation detail — one component, its usage, its guidance and its
- * live examples.
- *
- * Frame-first layout (see `bunx astryx docs layout`):
- *
- *   Frame: component page (fill) | on-this-page outline
- *
- * Responsive contract:
- *   > 768px  the outline is a sticky end panel beside the page
- *   <= 768px the outline collapses into an "On this page" Selector at the
- *            top of the page; the examples stack their preview over the
- *            description panel
- *
- * Container policy (docs detail archetype): prose sections run full width;
- * examples are cards because each one pairs a preview with a switchable
- * description/code panel.
+ * Documentation detail — one component, its usage, its guidance and its live examples. (Frame/responsive/container: see XLE header above.)
  */
 
 import {
@@ -50,18 +35,11 @@ import {Section} from '@astryxdesign/core/Section';
 import {Center} from '@astryxdesign/core/Center';
 import {Outline, type OutlineItem} from '@astryxdesign/core/Outline';
 import {Plus} from 'lucide-react';
+import {outlinePanel} from 'astryx-dracula/shared/chaptered-doc';
 
 // Flush the tab list with the example card's 12px inset (Section padding 3).
 const tabListFlush: CSSProperties = {
   marginInlineStart: 'calc(var(--spacing-3) * -1)',
-};
-// The outline is sticky so it tracks the page as the document scrolls; the
-// large block offset parks its first item level with the "Usage" heading.
-const outlinePanel: CSSProperties = {
-  position: 'sticky',
-  top: 'var(--spacing-6)',
-  alignSelf: 'start',
-  paddingBlockStart: 'calc(var(--spacing-10) * 3)',
 };
 
 const COMPONENT_OUTLINE_ITEMS: OutlineItem[] = [

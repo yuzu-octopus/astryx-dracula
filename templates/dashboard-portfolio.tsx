@@ -3,21 +3,7 @@
 //   L[h=fill] > LC[p=6] > V[g=6] > (H[j=between a=center] > Hd"The night vault"[level=1] + DM"1 year") + (G[c={min:280} g=4] > (C > V[g=2] > Tx"Total value"[t=supporting] + (H[g=2] > Tx"$294,200"[t=display-3] + Tx"+14.8%"[t=body]))*4) + (G[c={min:280} g=4] > (C > V[g=4] > (H[j=between] > Hd"Vault value"[level=2] + Lk"View details") + (C > V[g=3] > Tx"Weekly closes"[t=supporting])) + (V[g=4] > (H[j=between] > Hd"Top holdings"[level=2] + Lk"View all") + UL)) + D + (H[j=between a=start] > (V[g=1] > Hd"Market at midnight"[level=2] + Tx"Past 24 hours under moonlight"[t=body]) + B"View more") + (G[c={min:280} g=4] > (C > V[g=3] > Hd"Index"[level=3] + Tx"$5,200"[t=body])*8) + (C > V[g=4] > Hd"Trending stocks"[level=3] + T)
 
 /**
- * Portfolio Dashboard — the night vault: KPI tiles, a weekly value chart, the
- * holdings list, and the market board.
- *
- * Frame: single content column (page header, tile rows, market section).
- *
- * Container policy: tiles are Cards (KPI, market index); the holdings list is
- * dense rows (List/ListItem) and the trending table is edge-to-edge, neither
- * card-wrapped. Sparklines are one shared component at two sizes, and signed
- * figures pair an arrow with the sign so tone never carries the direction.
- *
- * Responsive contract:
- *   no media queries — every row is an auto-fit Grid or a full-width Table.
- *   Tiles collapse from 4 columns to 1 as the content column narrows (280px
- *   track floor), and below the table's ~570px floor the trending table
- *   scrolls horizontally inside its own wrapper while cells truncate.
+ * Portfolio Dashboard — the night vault: KPI tiles, a weekly value chart, the holdings list, and the market board. (Frame/responsive/container: see XLE header above.)
  */
 
 import {useState} from 'react';
@@ -37,6 +23,7 @@ import {Divider} from '@astryxdesign/core/Divider';
 import {MetricDelta} from 'astryx-dracula/shared/metric-delta';
 import {Sparkline, type SparkPoint} from 'astryx-dracula/shared/sparkline';
 import {CHART_PANEL_STYLE} from 'astryx-dracula/shared/revenue-chart';
+import {ChartLabel} from 'astryx-dracula/shared/chart-labels';
 
 // ============= DATA =============
 
@@ -380,7 +367,7 @@ const PORTFOLIO_Y_TICKS = [200000, 240000, 280000, 320000];
 function PortfolioChart() {
   return (
     <VStack gap={3}>
-      <Card padding={3} style={CHART_PANEL_STYLE}>
+      <Card padding={4} style={CHART_PANEL_STYLE}>
         <svg
           viewBox="0 0 560 210"
           width="100%"
@@ -397,15 +384,12 @@ function PortfolioChart() {
                 strokeDasharray="3 3"
                 opacity={0.5}
               />
-              <text
+              <ChartLabel
                 x={PORTFOLIO_LEFT - 8}
                 y={portfolioYFor(t) + 4}
-                textAnchor="end"
-                fontSize={13}
-                fill="var(--color-text-paragraph)"
-                fontFamily="var(--font-family-mono)">
+                textAnchor="end">
                 ${(t / 1000).toFixed(0)}k
-              </text>
+              </ChartLabel>
             </g>
           ))}
           {portfolioBars.map((d, i) => {
@@ -423,26 +407,21 @@ function PortfolioChart() {
             );
           })}
           {xAxisTicks.map(m => (
-            <text
+            <ChartLabel
               key={m}
               x={PORTFOLIO_LEFT + (m / 12) * PORTFOLIO_WIDTH}
               y={192}
-              textAnchor={m === 12 ? 'end' : 'middle'}
-              fontSize={13}
-              fill="var(--color-text-paragraph)"
-              fontFamily="var(--font-family-mono)">
+              textAnchor={m === 12 ? 'end' : 'middle'}>
               {xAxisLabels[m] ?? ''}
-            </text>
+            </ChartLabel>
           ))}
-          <text
+          <ChartLabel
             x={PORTFOLIO_LEFT + PORTFOLIO_WIDTH - 4}
             y={portfolioYFor(294200) - 8}
             textAnchor="end"
-            fontSize={13}
-            fill="var(--color-text-highlight)"
-            fontFamily="var(--font-family-mono)">
+            fill="var(--color-text-highlight)">
             $294k
-          </text>
+          </ChartLabel>
         </svg>
       </Card>
       <Text type="supporting" color="secondary">

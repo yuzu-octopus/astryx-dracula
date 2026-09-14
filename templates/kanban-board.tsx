@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   S > L > (LH[divider] > Tbar > (Hd"Sprint Board"[level=1] + Bd.neutral"8") + (H[g=2] > SE + D.strong + IB"Sort" + IB"Filter" + IB"Search" + B.primary"Add task")) + (LC[p=0] > G[c={min:280,max:4} g=4] > (C.muted[p=0] > L > (LH[divider] > H[j=between a=center] > (H[g=2 a=center] > SD + Hd"To-do"[level=2] + IB) + Tx) + (LC[p=4] > V[g=2] > (C[p=3] > V[g=2] > (H[j=between] > (H[g=2] > Tk + Bd) + MM) + (V[g=1] > Hd[level=3] + Tx) + Tx)*2))*4)
+//   S > L > (LH[divider] > Tbar > (Hd"Sprint Board"[level=1] + Bd.neutral"8") + (H[g=2] > SE + D.strong + IB"Sort" + IB"Filter" + IB"Search" + B.primary"Add task")) + (LC[p=0] > G[c={min:280,max:4} g=4] > (C.muted[p=0] > L > (LH[divider] > H[j=between a=center] > (H[g=2 a=center] > SD + Hd"To-do"[level=2] + IB) + Tx) + (LC[p=3] > V[g=2] > (C[p=3] > V[g=2] > (H[j=between] > (H[g=2] > Tk + Bd) + MM) + (V[g=1] > Hd[level=3] + Tx) + Tx)*2))*4)
 
 import {
   useEffect,
@@ -117,7 +117,7 @@ const COLUMNS: ColumnMeta[] = [
   {
     id: 'in-review',
     title: 'In review',
-    variant: 'warning',
+    variant: 'info',
     tooltip: 'Shades waiting for your contrast review.',
     emptyTitle: 'Nothing in review',
     emptyDescription: 'Tasks awaiting your review appear here.',
@@ -136,11 +136,11 @@ const COLUMNS: ColumnMeta[] = [
 
 const PRIORITY_META: Record<
   Priority,
-  {label: string; variant: 'red' | 'yellow' | 'cyan'}
+  {label: string; variant: 'red' | 'yellow' | 'neutral'}
 > = {
   high: {label: 'High', variant: 'red'},
   medium: {label: 'Medium', variant: 'yellow'},
-  low: {label: 'Low', variant: 'cyan'},
+  low: {label: 'Low', variant: 'neutral'}, // neutral: low priority is not info
 };
 
 function groupByColumn(items: WorkItem[]): Record<ColumnId, WorkItem[]> {
@@ -418,7 +418,7 @@ function BoardColumn({
                 <StatusDot
                   variant={meta.variant}
                   label={`${meta.title} status`}
-                  isPulsing={meta.id === 'in-progress'}
+                  isPulsing={meta.id === 'in-progress' || meta.id === 'in-review'}
                 />
                 <Heading level={2}>{meta.title}</Heading>
                 <Popover
@@ -445,7 +445,7 @@ function BoardColumn({
           </LayoutHeader>
         }
         content={
-          <LayoutContent ref={contentRef} padding={4}>
+          <LayoutContent ref={contentRef} padding={3}>
             {children ?? (
               <EmptyState
                 isCompact

@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   Ctr > C[p=8 mw=400] > V[g=4] > ((V[g=1 a=center] > Hd"Welcome back to the night"[level=1] + Tx"Whisper your details to enter the night"[t=body]) + TI"Work email"[t=email] + Lk"Having trouble signing in?" + B.primary"Continue" + D"Or continue with" + B.secondary"Continue with SSO" + (V[a=center] > Tx"New to the castle?"[t=supporting] + Lk"Request access") + (V[g=2 a=center] > Av + Hd"Sign in with Google Workspace"[level=1] + Tx"You will be redirected back after signing in."[t=body]) + (C[p=0] > S[p=4 muted] > (H[g=2 a=center] > Ic + (V[g=0] > Tx"Google Workspace"[t=label] + Tx"vlad@castle.ro"[t=supporting]))) + (V[g=3] > B.primary"Continue with Google Workspace" + B.ghost"Use a different email") + (V[g=1 a=center] > Hd"Welcome back to the night"[level=1] + Tx"vlad@castle.ro"[t=body]) + (V[g=4] > (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?") + B.primary"Enter the night" + B.ghost"Use a different email") + (V[a=center] > Tx"By clicking continue, you agree to our Terms of service and Privacy policy"[t=supporting]))
+//   Ctr > C[p=4 mw=400] > V[g=4] > ((V[g=1 a=center] > Hd"Welcome back to the night"[level=1] + Tx"Whisper your details to enter the night"[t=body]) + TI"Work email"[t=email] + Lk"Having trouble signing in?" + B.primary"Continue" + D"Or continue with" + B.secondary"Continue with SSO" + (V[a=center] > Tx"New to the castle?"[t=supporting] + Lk"Request access") + (V[g=2 a=center] > Av + Hd"Sign in with Google Workspace"[level=1] + Tx"You will be redirected back after signing in."[t=body]) + (C[p=0] > S[p=4 muted] > (H[g=2 a=center] > Ic + (V[g=0] > Tx"Google Workspace"[t=label] + Tx"vlad@castle.ro"[t=supporting]))) + (V[g=3] > B.primary"Continue with Google Workspace" + B.ghost"Use a different email") + (V[g=1 a=center] > Hd"Welcome back to the night"[level=1] + Tx"vlad@castle.ro"[t=body]) + (V[g=4] > (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?") + B.primary"Enter the night" + B.ghost"Use a different email") + (V[a=center] > Tx"By clicking continue, you agree to our Terms of service and Privacy policy"[t=supporting]))
 
 //   Step-conditional h1: the email and SSO-confirm steps each render their own
 //   h1 (email entry vs provider confirm); the password fallback reuses the
@@ -34,6 +34,7 @@ import {Avatar} from '@astryxdesign/core/Avatar';
 // ============= ICONS (verified lucide-react exports) =============
 // ShieldCheck ← ShieldCheckIcon.
 import {ShieldCheck} from 'lucide-react';
+import {inputAutoComplete} from 'astryx-dracula/shared/auth-chrome';
 
 // ---------------------------------------------------------------------------
 // Styles
@@ -45,11 +46,6 @@ const pageStyle: CSSProperties = {
   backgroundColor: 'var(--color-background-body)',
   padding: 'var(--spacing-6)',
 };
-// WCAG 1.3.5 wants autocomplete on identity fields. TextInput forwards unknown
-// props to the <input>, but its prop type omits input-only attributes, so the
-// attribute is spread in through a widened record.
-const inputAutoComplete = (value: string) =>
-  ({autoComplete: value}) as Record<string, string>;
 
 type SSOProvider = {
   name: string;
@@ -118,7 +114,7 @@ export default function LoginSso() {
 
   return (
     <Center axis="both" style={pageStyle}>
-      <Card padding={8} width="100%" maxWidth={400}>
+      <Card padding={4} width="100%" maxWidth={400}>
         <VStack gap={4} hAlign="stretch">
           {/* ── Step 1: Email entry, route by domain ──
               The password is collected on the fallback step below, never

@@ -3,22 +3,7 @@
 //   L > (LH > H[g3 a=center] > (H[g2 a=center] > Hd"Night watch"[level=1] + Tx"3 investigating"[t=supporting]) + SegmentedControl"Filter by status" + B"Declare incident") + (LC[p0] > V[g0] > (H > PowerSearch"Search the night watch…") + (List > (ListItem)*7)) + (LayoutPanel[w380 p0] > V[g4] > (V[g2] > (H[g2 a=center] > StatusDot + Tx"INC-2417"[t=supporting] + Token"Investigating") + Hd"Checkout API elevated 5xx rate"[level=2]) + (H[g2] > B.primary"Mark mitigated" + B.secondary"Escalate") + Divider + MetadataList + Divider + (V[g2] > Hd"Timeline"[level=3] + List))
 
 /**
- * Incident Console — an on-call incident response tool for the night watch.
- *
- * Frame-first layout (see `bunx astryx docs layout`), distilled from
- * product-scale apps built with the design system:
- *
- *   Frame: header | grouped incident rows (fill) | inspector 380 (resizable)
- *
- * Responsive contract:
- *   > 1024px  header (single row) | rows | inspector 380
- *   <= 1024px header stacks the filter and the action into a second,
- *             horizontally scrollable row; inspector hidden, rows keep
- *             full width
- *
- * Container policy (tracker archetype): dense data renders as rows —
- * edge-to-edge lists grouped by status, zero cards. Status is carried by
- * StatusDot (severity) and Token (state), not decorative badges.
+ * Incident Console — an on-call incident response tool for the night watch.  Frame-first layout (see `bunx astryx docs layout`), distilled fro (Frame/responsive/container: see XLE header above.)
  */
 
 import {useMemo, useState, type CSSProperties} from 'react';
@@ -277,8 +262,9 @@ const STATUS_LABEL: Record<Status, string> = {
   resolved: 'Resolved',
 };
 
-const STATUS_TOKEN_COLOR: Record<Status, 'red' | 'yellow' | 'green'> = {
-  investigating: 'red',
+const STATUS_TOKEN_COLOR: Record<Status, 'cyan' | 'yellow' | 'green'> = {
+  // Info vocab: an open investigation pulses cyan, never red.
+  investigating: 'cyan',
   mitigated: 'yellow',
   resolved: 'green',
 };
@@ -363,10 +349,7 @@ function IncidentRows({
                   <StatusDot
                     variant={SEVERITY_DOT[incident.severity]}
                     label={incident.severity.toUpperCase()}
-                    isPulsing={
-                      incident.severity === 'sev1' &&
-                      incident.status === 'investigating'
-                    }
+                    isPulsing={incident.status === 'investigating'}
                   />
                 }
                 endContent={
@@ -409,6 +392,7 @@ function IncidentInspector({incident}: {incident: Incident}) {
           <StatusDot
             variant={SEVERITY_DOT[incident.severity]}
             label={incident.severity.toUpperCase()}
+            isPulsing={incident.status === 'investigating'}
           />
           <Text type="supporting" color="secondary">
             {incident.id}
@@ -423,8 +407,8 @@ function IncidentInspector({incident}: {incident: Incident}) {
       </VStack>
 
       <HStack gap={2}>
-        <Button label={nextAction} variant="primary" size="sm" />
-        <Button label="Escalate" variant="secondary" size="sm" />
+        <Button label={nextAction} variant="primary" />
+        <Button label="Escalate" variant="secondary" />
       </HStack>
 
       <Divider />
@@ -515,7 +499,6 @@ export default function IncidentConsole() {
     <Button
       label="Declare incident"
       icon={<Icon icon={Plus} size="sm" />}
-      size="sm"
     />
   );
   const titleGroup = (
@@ -531,7 +514,7 @@ export default function IncidentConsole() {
     <Layout
       height="fill"
       header={
-        <LayoutHeader hasDivider>
+        <LayoutHeader hasDivider padding={6}>
           {isNarrow ? (
             <VStack gap={2}>
               {titleGroup}

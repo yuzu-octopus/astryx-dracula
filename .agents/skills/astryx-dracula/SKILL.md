@@ -32,7 +32,7 @@ bun add -d typescript vite @vitejs/plugin-react @astryxdesign/cli @types/react @
 cp -r node_modules/astryx-dracula/fonts public/fonts
 ```
 
-Entry file, in this order:
+Entry file, in this order (reset, base, plain tokens, prebuilt theme):
 
 ```tsx
 import '@astryxdesign/core/reset.css';
@@ -65,7 +65,7 @@ Live at `/astryx-dracula/#/templates` on the showcase,
 where `demo/Templates.tsx` renders each page bare inside a viewer iframe
 and keeps the `Templates / <name>` bar plus its `<Theme>` provider outside it.
 That bar, the provider, and the frame are viewer chrome, not page content:
-never copy them into a `templates/` file. Pack rules: templates import React plus `@astryxdesign/core`, `lucide-react`, and the kit's own shared modules (`astryx-dracula/shared/*`: chart labels/hues, MetricDelta, settings rows), no chart libraries; every template carries its `<id>.template.mjs` spec. IDs: dashboard, table-grouped, table-page, kanban-board, settings-sidebar, settings, payment-form, login-card, file-explorer, ai-chat-landing, library, centered-hero, ai-chat, classic-gallery, contact-form, dashboard-portfolio, detail-page, documentation, documentation-design, documentation-technical, editor, form-two-column, gallery-hero, ide, login, mixed-gallery, product-detail, product-gallery, product-tour, settings-dialog, shell-nav, shell-side-nav, shell-top-nav, table, table-page-chart, table-page-heatmap-status, table-page-shoe-store-heatmap, blank, incident-console, login-split, login-sso, messaging-shell, side-gallery, tech-report, theme-showcase.
+never copy them into a `templates/` file. Pack rules: templates import `@astryxdesign/core`, `lucide-react`, and the kit's own shared modules (`astryx-dracula/shared/*`: auth-copy, chaptered-doc, chart-hues, chart-labels, gallery-image, login-demo, metric-delta, revenue-chart, scene-castle, scene-tile, settings-rows, sparkline, sso-icons), no chart libraries; no default `React` import in 43 templates (JSX transform — 11 omit `react` entirely, the rest use named hook/type imports) — only `settings-dialog` and `table-grouped` carry a default `React` import for the `React.*` namespace (`React.ReactNode`, `React.useEffect`, `React.Fragment`); every template carries its `<id>.template.mjs` spec. IDs: dashboard, table-grouped, table-page, kanban-board, settings-sidebar, settings, payment-form, login-card, file-explorer, ai-chat-landing, library, centered-hero, ai-chat, classic-gallery, contact-form, dashboard-portfolio, detail-page, documentation, documentation-design, documentation-technical, editor, form-two-column, gallery-hero, ide, login, mixed-gallery, product-detail, product-gallery, product-tour, settings-dialog, shell-nav, shell-side-nav, shell-…
 
 ## Brand principles
 
@@ -73,7 +73,7 @@ These are decisions, not suggestions. Every one comes from the showcase that def
 
 1. **Dark is the brand, not a mode.** Every surface resolves to the Dracula ramp. No light tokens, no light-mode branches, no `prefers-color-scheme` forks. A component that looks wrong dark is a wrong token, never a missing light theme.
 2. **Purple means tappable.** Links, titles, and primary actions are purple; visited falls back to text, hover resolves to foreground plus underline. Users learn this in seconds. Nothing decorative is purple.
-3. **Status has a fixed vocabulary.** Green positive, red negative, yellow tags, cyan info, pink flair, orange warning. Status surfaces use 10% categorical washes with semantic borders, never direct fills. Text on fills is always `#21222C`. In-progress/activity is `StatusDot variant="info"` (cyan) with `isPulsing`; the purple `accent` StatusDot is never a status — purple means tappable, no exceptions. Info states are always cyan, never blue: blue tendency goes to comment (categorical charts) and blue Badge/Token variants are not status vocabulary.
+3. **Status has a fixed vocabulary.** Green positive, red negative, yellow tags and warning states, cyan info, pink flair, orange attention and constants (Orange never carries warning: `--color-warning` ships Yellow `#F1FA8C`, both in the theme and behind `StatusDot variant="warning"`). Status surfaces use 10% categorical washes with semantic borders, never direct fills. Text on fills is always `#21222C`. In-progress/activity is `StatusDot variant="info"` (cyan) with `isPulsing`; the purple `accent` StatusDot is never a status — purple means tappable, no exceptions. Info states are always cyan, never blue: blue tendency goes to comment (categorical charts) and blue Badge/Token variants are not status vocabulary.
 4. **Mono everywhere, on purpose.** JetBrains Mono for body, heading, and code alike. One family, clearly distinct from every sans-serif product. Copy `fonts/` to served `public/fonts/`; monospace fallback means the copy step was skipped.
 5. **Dense, not cramped.** The bento reference packs 12 cells with zero dead space: hero strip with live stats, wide chart, tall table spanning two rows, palette strip, type specimen, install command. Size equals importance (hero 2x, feature wide, metrics small). Information-heavy beats airy on every brand surface.
 6. **Hierarchy is two-tier.** Section headers pair `Heading level={2}` with `Text type="body"`. Widget headers pair `Heading level={3}` with `Text type="supporting"`. Never two same-size tiers stacked, never a subtitle larger than its heading.
@@ -117,27 +117,99 @@ Map jobs to components, never to lookalikes: action goes to Button (never a nav-
 
 ## Exact token names (use these verbatim)
 
-Background `--color-background`, primary `--color-primary`, positive `--color-positive`,
-negative `--color-negative`, muted text `--color-text-base-muted` (never `--color-text-subdue`: chrome only, never text), primary text `--color-text-primary`,
-border `--color-border`, accent `--color-accent`, success `--color-success`, error `--color-error`,
-warning `--color-warning`, info `--color-info`, icon `--color-icon-primary` / `--color-icon-secondary` / `--color-icon-disabled` / `--color-icon-accent`, radius `--radius-element` / `--border-radius`,
-spacing `--space-gap` / `--space-viewport`. Raw primitives: `--dracula-bg`, `--dracula-fg`,
-`--dracula-comment`, `--dracula-purple`, `--dracula-green`, `--dracula-red`,
-`--dracula-yellow`, `--dracula-cyan`, `--dracula-pink`, `--dracula-orange`,
-`--dracula-current-line`. Glance widget/text vars: `--color-widget-background`,
-`--color-widget-content-border`, `--color-widget-background-highlight`, `--color-separator`,
-`--color-popover-background`, `--color-popover-border`, `--color-progress-border`,
-`--color-progress-value`, `--color-graph-gridlines`, `--color-text-highlight`,
-`--color-text-paragraph`, `--color-text-base`, `--color-text-base-muted`.
-Surface tiers: `--color-background-body` (page), `--color-background-surface`
-and `--color-background-card` (chrome/cards), `--color-background-popover` (floaters),
-`--color-background-muted` (quiet edges). Never use `variant="section"` for a band:
-see `references/visual.md` Surfaces. Status tints:
-`--color-background-<blue|cyan|gray|green|orange|pink|purple|red|teal|yellow>` (10% washes),
-`--color-functional-<red|orange|green|cyan|purple>`. Charts:
-`--color-data-categorical-*` and ramp tokens per `BRAND.md`. Nothing else exists.
-For Astryx tokens beyond the kit, `bunx astryx docs tokens`.
+200 source keys in `astryx-theme.ts` (281 unique custom properties in the
+prebuilt `theme.css` across 319 declaration lines incl. scoped repeats =
+278 public + 3 private `--_*-radius` aliases; `tokens.css` is a full
+plain-CSS mirror, 289 `:root` vars, unlayered by design so it beats core
+layers with zero `!important`). No gate asserts these counts;
+`bun run theme:check` asserts freshness, `bun run audit`
+asserts palette purity and contrast floors.
 
+Core roles `--color-background`, `--color-primary`, `--color-positive`,
+`--color-negative`, `--color-accent`, `--color-success`, `--color-error`,
+`--color-warning` (warning ships Dracula Yellow `#F1FA8C`; Orange `#FFB86C`
+is attention/constants only), `--color-info`, `--color-neutral`.
+Text `--color-text-primary` / `--color-text-secondary` /
+`--color-text-disabled` / `--color-text-accent` /
+`--color-text-highlight` (same as primary) /
+`--color-text-paragraph` / `--color-text-base` /
+`--color-text-base-muted` (never `--color-text-subdue`: chrome only, never
+text).
+Icon `--color-icon-primary` / `--color-icon-secondary` /
+`--color-icon-disabled` / `--color-icon-accent`.
+Border `--color-border` / `--color-border-emphasized`; flat-crisp shadow hue
+`--color-shadow` (`#21222C`, not Stone's cold blue); hover-tint bases
+`--color-tint-hover` / `--color-on-dark` (white, dark-mode side) /
+`--color-on-light` (black).
+Radius `--radius-element` / `--radius-inner` / `--radius-container` /
+`--radius-page` / `--radius-chat` (5px everywhere — chat bubbles read as
+widgets, not pills) / `--border-radius` (legacy alias, same 5px).
+Spacing `--space-gap` / `--space-viewport` / `--widget-content-vertical` /
+`--widget-content-horizontal` / `--widget-gap` / `--tile-row`.
+Raw primitives: `--dracula-bg`, `--dracula-fg`, `--dracula-comment`,
+`--dracula-purple`, `--dracula-green`, `--dracula-red`, `--dracula-yellow`,
+`--dracula-cyan`, `--dracula-pink`, `--dracula-orange`,
+`--dracula-current-line`, plus `--dracula-selection`, `--dracula-bg-light`,
+`--dracula-bg-lighter`, `--dracula-bg-dark`, and
+`--dracula-functional-<red|orange|green|cyan|purple>` (9 extra Dracula vars
+for UI/palette completeness).
+Glance widget/text vars: `--color-widget-background`,
+`--color-widget-content-border`, `--color-widget-background-highlight`,
+`--color-separator`, `--color-popover-background`, `--color-popover-border`,
+`--color-progress-border`, `--color-progress-value`,
+`--color-vertical-progress-value`, `--color-graph-gridlines`,
+`--color-widget-shadow`, `--color-current-line`, `--color-selection`.
+Surface tiers: `--color-background-body` (page), `--color-background-surface`
+and `--color-background-card` (chrome/cards), `--color-background-popover`
+(floaters), `--color-background-muted` (quiet edges). Never use
+`variant="section"` for a band: see `references/visual.md` Surfaces.
+Overlays `--color-overlay` / `--color-overlay-hover` /
+`--color-overlay-pressed`. On-fill text `--color-on-<accent|success|warning|error|info>`
+(always `#21222C`; the spec never uses raw black). Muted scopes
+`--color-<accent|success|warning|error|info>-muted` (each an alias of its
+10% categorical wash). State tints `--color-background-<blue|cyan|gray|green|orange|pink|purple|red|teal|yellow>`
+(10% washes) with matching `--color-border-<...>` (30%), `--color-icon-<...>`
+and `--color-text-<...>` accents. Spec fills `--color-functional-<red|orange|green|cyan|purple>`
+(token-compat pins for spec parity; shipped components consume the accent
+ring instead — never encode status in these). Tag accents
+`--color-tag-<orange|pink|cyan|yellow|green|blue>` (blue reads Purple:
+purple means tappable, never data). Inverted surfaces
+`--color-background-inverted` (`#F8F8F2`) /
+`--color-background-error-inverted` (`#FFD5CC`, pale error surface the spec
+palette does not supply; consumed by the error Toast). Skeleton/track
+`--color-skeleton` / `--color-track`.
+Charts: `--color-data-categorical-<blue|orange|purple|green|pink|cyan|red|teal|brown|indigo>`
+(blue goes comment; teal ANSI bright cyan `#A4FFFF`, indigo ANSI bright blue
+`#D6ACFF`, brown reuses orange), `--color-data-neutral` (`#8C939B`, Stone gray
+reads fine on dark — deliberate), and 45 sequential ramps
+`--color-data-<purple|pink|red|orange|yellow|teal|blue|shamrock|gray>-<1-5>`
+(lightness 28/44/60/74/88, constant hue/saturation per family).
+Type `--font-family-mono` (+ `--font-family-<body|heading|code>` aliases),
+`--font-size-base` / `--font-size-h1` … `--font-size-h6` (compat pins h1 24 /
+h2 20 / h3 16 / h4 14 / h5 13 / h6 12; `Heading` resolves the 14-base 1.2
+scale roles instead) plus the full `--font-size-<4xs…5xl>` scale and
+`--text-<body|large|label|code|supporting|display-1…3|heading-1…6>-<size|weight|leading>`
+roles (label pins semibold — only 400 + 600 faces ship, never restore
+medium), motion `--duration-<fast|medium|slow>(-min|-max)?` + `--ease-standard`
+(core defaults), shadows `--shadow-<low|med|high>` /
+`--shadow-inset-<hover|selected|success|warning|error>` (selected Purple 30%).
+Nothing else exists. For Astryx tokens beyond the kit, `bunx astryx docs tokens`.
+
+## Precedence (binding)
+
+When sources conflict: 1) visual common sense — if the spec letter looks
+wrong on dark, keep the better-looking choice; 2) this skill plus
+`references/visual.md` plus `BRAND.md` (purple=tappable, status vocabulary,
+hierarchy, flat-crisp); 3) dracula-ui conventions (on-fill text `#21222C`,
+accent-underlined links resolving to foreground on hover, status through
+muted-token washes with semantic borders, no direct fills); 4) the spec
+letter last. Known deltas kept under this rule: warning ships Yellow (brand
+choice, see principle 3), syntax keeps the official-editor mapping over
+dracula-ui brights (constants Purple, attributes Green, no regexp split —
+see the `draculaSyntax` comment in `astryx-theme.ts`), and
+secondary/paragraph/base-muted are same-hue AA lifts of Comment (see
+`tokens.css` header). Record any new visual-over-spec deviation in a code
+comment at the site of the choice.
 ## Rationalizations (do not accept these)
 
 | Excuse | Reality |
@@ -161,23 +233,24 @@ For Astryx tokens beyond the kit, `bunx astryx docs tokens`.
 
 - Unstyled components → entry is missing `reset.css` or `astryx.css`, or import order is wrong.
 - Monospace fallback → `fonts/` not copied to served `public/fonts/`.
-- Wrong colors after theme edit → rebuild: `bun run theme:build`, or `bun run theme:check` to confirm staleness.
+- Wrong colors after theme edit → rebuild: `bun run theme:build`, or `bun run theme:check` to confirm staleness (it ignores `astryx-dracula.js` by design — that file is a build artifact, not a freshness signal).
 - Old `:root` `--color-*` overrides still winning → delete them; brand lives in the kit theme.
+- Carousel keeps core's layered `scrollbar-width: none` (intentional hiding, not theming) — the only `scrollbar-width` in the stack; never add another.
 
 ## Common Mistakes
 
 - Raw hex/px or invented names (`--color-bg`, `--space-lg`) → Exact list or component prop.
 - Raw `<div>`/`<span>`/`<a>` → Card/Text/Link/Stack/Grid.
-- Source-compile StyleX plugin from the example-vite README → unneeded; kit ships prebuilt CSS.
+- Purple StatusDot for a status, or a blue Badge/Token for info → `info` + `isPulsing` for in-progress, cyan for info, yellow for tags.
 - Section subtitle in `supporting` → `body`. Widget caption in `body` → `supporting`.
 - Mixed Card insets (2 vs 3) → outer 4, nested 3.
 - EmptyState icon without `color="secondary"` → `Icon` defaults to `inherit`, so the icon tints with surrounding text; always pass `color="secondary"` explicitly.
-- Purple StatusDot for a status, or a blue Badge/Token for info → `info` + `isPulsing` for in-progress, cyan for info, yellow for tags.
-
 ## Heading ladder
 
-Exactly one h1 per routed page, sections at h2, cards at h3. Two structural exceptions, decided once:
+Exactly one h1 per routed page at runtime, sections at h2, cards at h3. Structural exceptions, decided once:
 
-- **Dialogs are page fragments.** `DialogHeader` renders h2 by core API (there is no title-as-h1 prop, by design — the host page owns the h1). Never hack an h1 into a dialog template; panel labels inside dialogs are `Text type="label"`, never Headings.
+- **Dialogs are page fragments.** `DialogHeader` renders `Heading level={2}` with `tabIndex={-1}` by core API (verified in `@astryxdesign/core` `DialogHeader.tsx`: title takes focus on open and names the dialog via `aria-labelledby`; there is no title-as-h1 prop, by design — the host page owns the h1). Never hack an h1 into a dialog template; panel labels inside dialogs are `Text type="label"`, never Headings.
 - **Skeleton shells are exempt.** The shell-nav/shell-side-nav/shell-top-nav placeholder cards carry no headings by construction; routed pages supply the h1. Their XLE headers record this with a `skeleton-shell exemption` note instead of an Hd node.
+- **Conditional branches render one h1.** Multi-state templates (`login-sso` steps, `editor` mobile/desktop titles) carry several `level={1}` call sites but render exactly one at a time — verify at runtime, not by grep.
+- **Shared-module h1.** `product-tour` and `tech-report` carry no `level={1}` call site of their own; their h1 renders from the shared `ChapteredDoc` module (`ChapteredDoc` hero `Heading level={1}` per active chapter).
 - Tool-chrome pages with no visible title (file-explorer, ide) use a visually-hidden h1 so the outline survives.

@@ -1,22 +1,9 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC > V[g=10] > (C[p=10] > (H[g=8 a=center] > (V[g=4] > Hd"The coven grimoire"[level=1 t=display-1] + Tx.lg"Every incantation in the Astryx spellbook"[t=large] + (H > B.primary"Enter the grimoire")))) + (V[g=4] > (H[j=between a=center] > Hd"Core"[level=2] + Tx"15 spells"[t=supporting]) + (H[j=between a=center] > Hd"Layout"[level=2] + Tx"4 spells"[t=supporting]) + (H[j=between a=center] > Hd"Navigation"[level=2] + Tx"4 spells"[t=supporting]) + (H[j=between a=center] > Hd"Form"[level=2] + Tx"5 spells"[t=supporting]) + (G[c={min:260} g=2] > (CC[p=2] > V[g=3] > C[p=0] + (V[g=1] > Tx"Avatar"[t=body] + Tx"Avatars represent"[t=body]))*4))
+//   L > LC > V[g=10] > (C[p=10] > (H[g=8 a=center] > (V[g=4] > Hd"The coven grimoire"[level=1 t=display-1] + Tx.lg"Every incantation in the Astryx spellbook"[t=large] + (H > B.primary"Enter the grimoire")))) + (V[g=4] > (H[j=between a=center] > Hd"Core"[level=2] + Tx"15 spells"[t=body]) + (H[j=between a=center] > Hd"Layout"[level=2] + Tx"4 spells"[t=body]) + (H[j=between a=center] > Hd"Navigation"[level=2] + Tx"4 spells"[t=body]) + (H[j=between a=center] > Hd"Form"[level=2] + Tx"5 spells"[t=body]) + (G[c={min:260} g=2] > (CC[p=4] > V[g=3] > C[p=0] + (V[g=1] > Tx"Avatar"[t=body] + Tx"Avatars represent"[t=body]))*4))
 
 /**
- * Documentation catalog — every component shelf in the grimoire.
- *
- * Frame-first layout (see `bunx astryx docs layout`):
- *
- *   Frame: hero card | category shelves (heading + card grid)
- *
- * Responsive contract:
- *   No JS breakpoints: the grid fills the content column with as many 260px
- *   cards as fit and lands on a single column on phone widths; the hero copy
- *   wraps in place.
- *
- * Container policy (catalog archetype): the shelf is the only grouping. Each
- * category pairs a level-2 heading with its card grid, and the previews carry
- * the density — rows would flatten them into a list of names.
+ * Documentation catalog — every component shelf in the grimoire.  Frame-first layout (see `bunx astryx docs layout`): (Frame/responsive/container: see XLE header above.)
  */
 
 import type {CSSProperties} from 'react';
@@ -244,7 +231,7 @@ export default function DocumentationCatalog() {
       content={
         <LayoutContent padding={8}>
           <VStack gap={10}>
-            <Card variant="gray" padding={10}>
+            <Card variant="transparent" padding={10}>
               <HStack gap={8} vAlign="center">
                 <StackItem size="fill">
                   <VStack gap={4}>
@@ -272,7 +259,7 @@ export default function DocumentationCatalog() {
                 <HStack justify="between" vAlign="center">
                   <Heading level={2}>{category.label}</Heading>
                   <Text
-                    type="supporting"
+                    type="body"
                     color="secondary"
                     hasTabularNumbers>
                     {category.items.length}{' '}
@@ -286,7 +273,7 @@ export default function DocumentationCatalog() {
                       label={`Open ${item.name}`}
                       href={SELF_HASH}
                       variant="transparent"
-                      padding={2}>
+                      padding={4}>
                       <VStack gap={3}>
                         <Card
                           variant="muted"

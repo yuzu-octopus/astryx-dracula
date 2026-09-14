@@ -3,6 +3,7 @@
 //   Ctr > V[g=4] > (Ctr.horizontal > C[p=0] > G[c={min:240} g=8 a=stretch] > (S[p=0] > V[g=4] > (H[g=2 a=center] > Ic + Tx"Castle Dracula"[t=body]) + (V[g=4] > (V[g=1] > Hd"Welcome back to the night"[level=1] + Tx"Sign in to your crypt"[t=body]) + (V[g=2] > TI"Email"[t=email] + (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?")) + B.primary"Enter the night" + D"Or continue with" + (G[c={min:200} g=3] > B.secondary"Login with Apple" + B.secondary"Login with Google")) + Tx"New to the castle?"[t=supporting]) + (C[p=0] > AR)) + (V[a=center] > Tx"By clicking continue, you agree to our Terms of service and Privacy policy"[t=supporting])
 
 import {useState, useTransition, type CSSProperties} from 'react';
+import {inputAutoComplete} from 'astryx-dracula/shared/auth-chrome';
 import {demoLogin} from 'astryx-dracula/shared/login-demo';
 import {AppleIcon, GoogleIcon} from 'astryx-dracula/shared/sso-icons';
 import {
@@ -63,11 +64,6 @@ const cardWrap: CSSProperties = {
   maxWidth: 1000,
   marginInline: 'auto',
 };
-// WCAG 1.3.5 wants autocomplete on identity fields. TextInput forwards unknown
-// props to the <input>, but its prop type omits input-only attributes, so the
-// attribute is spread in through a widened record.
-const inputAutoComplete = (value: string) =>
-  ({autoComplete: value}) as Record<string, string>;
 
 // The container query lives in a plain <style> tag so it needs NO CSS compiler.
 // - Pad the grid, not the Card: the form's Section escapes Card's
@@ -80,7 +76,7 @@ const LOGIN_SPLIT_CSS = `
 .login-split-grid {
   container-type: inline-size;
   container-name: login-split;
-  padding: var(--spacing-8);
+  padding: var(--spacing-4);
 }
 .login-split-image {
   width: 100%;
@@ -88,7 +84,7 @@ const LOGIN_SPLIT_CSS = `
 }
 @container login-split (max-width: 511px) {
   .login-split-grid {
-    padding: var(--spacing-4);
+    padding: var(--spacing-3);
   }
   .login-split-image {
     order: -1;
@@ -130,7 +126,7 @@ export default function LoginSplit() {
               <Section variant="transparent" padding={0} height="100%">
                 <VStack gap={4} height="100%">
                   <HStack gap={2} vAlign="center">
-                    <Icon icon={Moon} color="accent" size="lg" />
+                    <Icon icon={Moon} color="secondary" size="lg" />
                     <Text type="body" weight="semibold">
                       {AUTH_BRAND_NAME}
                     </Text>

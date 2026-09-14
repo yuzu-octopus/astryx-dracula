@@ -2,7 +2,6 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   L > (LH[divider] > H[a=center j=between] > Hd"Artifacts"[level=1] + B.primary"Add artifact") + (LC > T[hover] > (TR > THC"Name" + THC"Status" + THC"Updated" + THC"Actions") + (TR > TC"Blood Vial" + (TC > SD.success + Tx"Active") + TC"2025-01-15" + (TC > B.secondary"Edit"))*3)
 
-import {useState} from 'react';
 import {Layout, LayoutHeader, LayoutContent, HStack} from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
 import {Button} from '@astryxdesign/core/Button';
@@ -79,7 +78,7 @@ const columns: TableColumn<Relic>[] = [
 ];
 
 export default function SimpleTable() {
-  const [data] = useState<Relic[]>(SAMPLE_DATA);
+  const data = SAMPLE_DATA;
 
   return (
     <Layout

@@ -24,7 +24,7 @@ export function Quickstart() {
         <Card padding={4}>
           <VStack gap={3}>
             <HStack gap={2} vAlign="center">
-              <Badge label="01" variant="purple" />
+              <Badge label="01" variant="neutral" />
               <Heading level={3}>Add the Package</Heading>
             </HStack>
             <Text type="body" color="secondary">
@@ -42,7 +42,7 @@ export function Quickstart() {
         <Card padding={4}>
           <VStack gap={3}>
             <HStack gap={2} vAlign="center">
-              <Badge label="02" variant="purple" />
+              <Badge label="02" variant="neutral" />
               <Heading level={3}>Install Dependencies & Fonts</Heading>
             </HStack>
             <Text type="body" color="secondary">
@@ -60,7 +60,7 @@ export function Quickstart() {
         <Card padding={4}>
           <VStack gap={3}>
             <HStack gap={2} vAlign="center">
-              <Badge label="03" variant="purple" />
+              <Badge label="03" variant="neutral" />
               <Heading level={3}>Wrap Your Application Root</Heading>
             </HStack>
             <Text type="body" color="secondary">
@@ -79,7 +79,7 @@ export function Quickstart() {
         <Card padding={4}>
           <VStack gap={3}>
             <HStack gap={2} vAlign="center">
-              <Badge label="04" variant="purple" />
+              <Badge label="04" variant="neutral" />
               <Heading level={3}>Style With Tokens</Heading>
             </HStack>
             <Text type="body" color="secondary">
@@ -112,10 +112,10 @@ export function Quickstart() {
         <Card padding={4}>
           <VStack gap={3}>
             <HStack gap={2} vAlign="center">
-              <Badge label="05" variant="purple" />
+              <Badge label="05" variant="neutral" />
               <Heading level={3}>Delegate To An Agent</Heading>
             </HStack>
-            <Text type="supporting" color="secondary">
+            <Text type="body" color="secondary">
               Copy this prompt. Replace SITE with your project path.
             </Text>
             <CodeBlock

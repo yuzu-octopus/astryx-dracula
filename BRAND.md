@@ -12,28 +12,30 @@ Source of truth is `astryx-theme.ts`. Do not add hexes; `bun run audit` enforces
 | Selection | #44475A | selected rows, quiet surfaces |
 | Background Light | #343746 | cards, surfaces |
 | Background Lighter | #424450 | popovers, floating elements |
-| Background Dark | #21222C | shadows |
+| Background Dark | #21222C | shadows, on-fill text |
+| Darker | #191A21 | shadow washes only (never a surface: `--shadow-*` alpha blends) |
 | Foreground | #F8F8F2 | primary text on dark |
-| Comment | #6272A4 | disabled / muted text |
+| Comment | #6272A4 | disabled text, subtle borders |
 | Cyan | #8BE9FD | info, secondary links |
 | Green | #50FA7B | positive, success |
-| Orange | #FFB86C | warning, attention |
+| Orange | #FFB86C | attention, constants (never warning) |
 | Pink | #FF79C6 | flair, accent |
 | Purple | #BD93F9 | primary, links and titles unvisited |
 | Red | #FF5555 | negative, error |
-| Yellow | #F1FA8C | tags, chips |
+| Yellow | #F1FA8C | tags, chips, warning states |
+| Inverted error | #FFD5CC | pale surface for the inverted error Toast (not a spec hex) |
 
 [^current-line]: Upstream pins both Current Line and Comment to #6272A4. This kit follows suit for line affordances, including scrollbar thumbs in `tokens.css`. Do not "correct" one of them to #44475A.
 
 ## Semantic map (glimpse)
 
 - Purple links/titles unvisited. Visited falls back to text-base, hover goes primary + underline. Users learn purple means tappable title.
-- Green positive and success. Red negative and error. Yellow tags and chips. Cyan info and secondary links. Pink flair. Orange warning.
+- Green positive and success. Red negative and error. Yellow tags, chips, and warning states (`--color-warning` ships Yellow; Orange never carries warning). Cyan info and secondary links. Pink flair. Orange attention and constants.
 - Subdue #4C5067 for separators and hairline chrome, never text (1.8:1 on the page background, 1.5:1 on cards). Not a Dracula hex; derived from the glimpse ramp for chrome hierarchy.
 
 ## Charts
 
-Categorical series use nearest Dracula hues: blue goes comment, orange orange, purple purple,
+Categorical series use nearest Dracula hues: blue goes comment, orange orange, purple purple (compat token only — purple means tappable, never encode data),
 green green, pink pink, cyan cyan, red red. Teal uses ANSI bright cyan #A4FFFF and indigo
 ANSI bright blue #D6ACFF; brown has no spectral match and reuses orange. Sequential ramps cover 9 families (purple, pink, red,
 orange, yellow, teal, blue, shamrock, gray) with 5 lightness steps each (28/44/60/74/88),
@@ -41,8 +43,8 @@ constant hue and saturation per family.
 
 ## Code highlighting
 
-Custom spec-exact syntax theme (`draculaSyntax` in `astryx-theme.ts`, stricter than the bundled preset):
-pink keywords, yellow strings, comment gray comments, orange numbers, green functions, cyan types.
+Syntax theme (`draculaSyntax` in `astryx-theme.ts`, 14 slots per the spec Token Classification):
+pink keywords/operators/tags, yellow strings, comment-gray comments, orange numbers, green functions and attributes, cyan types, purple constants, foreground variables/properties/punctuation, Background canvas. Regexps get no split (core's tokenizer emits no regexp scope); attributes/tags follow the official Dracula editors and the core `dracula` preset, not the Support bucket's Cyan.
 
 ## Status surfaces
 
@@ -52,7 +54,7 @@ Each status scope redefines its muted token to the categorical tint
 Text on fills is always `#21222C`; spec never uses raw black. Links render accent
 with underline and resolve to foreground on hover. Focus and interactive edges
 use accent, not Functional Purple: `--color-functional-*` is pinned for spec parity
-and no shipped component consumes it.
+(token compat — never encode status in these) and no shipped component consumes it.
 
 ## Interactions
 
@@ -68,9 +70,9 @@ Radii flat and crisp (5px elements, 4px inner). Everything below is a core defau
 
 - Motion durations: neutral defaults (fast 175ms, medium 410ms).
 - Spacing/size/ease scales: core defaults. Shadows, radii, and surfaces are Dracula-hued tokens above.
-- Zero theme dependencies: icons vendored (Lucide), everything else defined here.
+- One runtime dependency: `lucide-react` (icons render from it at runtime, both the theme `draculaIconRegistry` in `icons.tsx` and every template's direct imports — `bun run audit` fails when a registered glyph stops resolving to a real export). Everything else is defined here.
 - Derived AA lifts (not spec hexes, same hues): secondary text #9AA1BC, muted text #8288A6, paragraph #B0B3C4. Subdue #4C5067 is chrome, below every text floor.
-- Icon glyphs vendored from Lucide in `icons.tsx` (MIT). The theme also sets icon colors (primary, secondary, disabled, accent).
+- Icon glyphs from Lucide in `icons.tsx` (MIT). The theme also sets icon colors (primary, secondary, disabled, accent).
 - onDark: generated defaults inherited. Dark-surface content resolves from the same ramp.
 - `--color-data-neutral`: default gray reads fine on dark.
 - No color-scale config: HCT generation would fight the pinned hexes. No light mode, ever.

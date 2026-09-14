@@ -26,41 +26,30 @@ export const CHART_PANEL_STYLE: CSSProperties = {
 
 const swatchStyle: CSSProperties = {flexShrink: 0};
 
-// Rounded product swatch: Dracula surface with a per-product accent glyph.
-export function ProductSwatch({
-  accent,
-  label,
-  size = 36,
-}: {
-  accent: string;
-  label: string;
-  /** @default 36 */
-  size?: 36 | 40;
-}) {
-  const ring = size - 2;
-  const center = size / 2;
+// Rounded product swatch: Dracula surface with a per-product accent glyph (one 36px size).
+export function ProductSwatch({accent, label}: {accent: string; label: string}) {
   return (
     <svg
-      viewBox={`0 0 ${size} ${size}`}
-      width={size}
-      height={size}
+      viewBox="0 0 36 36"
+      width={36}
+      height={36}
       style={swatchStyle}
       role="img"
       aria-label={`${label} swatch`}>
-      <rect width={size} height={size} rx={5} fill="var(--dracula-bg-light)" />
+      <rect width={36} height={36} rx={5} fill="var(--dracula-bg-light)" />
       <rect
         x={1}
         y={1}
-        width={ring}
-        height={ring}
+        width={34}
+        height={34}
         rx={4}
         fill="none"
         stroke="var(--color-widget-content-border)"
       />
       <circle
-        cx={center}
-        cy={center}
-        r={size === 40 ? 8 : 7}
+        cx={18}
+        cy={18}
+        r={7}
         fill="none"
         stroke={accent}
         strokeWidth={3}
@@ -115,7 +104,7 @@ export function RevenueChart({
   const areaPath = `${linePath} L${points[points.length - 1].x.toFixed(1)},${CHART_BASELINE} L${points[0].x.toFixed(1)},${CHART_BASELINE} Z`;
   return (
     <VStack gap={3}>
-      <Card padding={3} style={CHART_PANEL_STYLE}>
+      <Card padding={4} style={CHART_PANEL_STYLE}>
         <svg
           viewBox={`0 0 ${CHART_W} ${CHART_H}`}
           width="100%"

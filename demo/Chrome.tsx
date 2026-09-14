@@ -82,7 +82,7 @@ export function SiteShell({
                     the wordmark would push them off a 320px viewport. The logo
                     carries the same name as its accessible label. */}
                 {!narrow && <Text weight="semibold">Astryx Dracula</Text>}
-                {!narrow && <Badge label="dark-only" variant="purple" />}
+                {!narrow && <Badge label="dark-only" variant="yellow" />}
               </HStack>
             }
             startContent={<SiteNavLinks isVertical={narrow} />}

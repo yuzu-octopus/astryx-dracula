@@ -1,24 +1,9 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LP[w=68] > V > Av + (V > IB*4) + IB) + (LP[w=260] > V > (H > Hd"Night watch"[level=1] + IB) + TI"Jump to…" + (V > Tx"Channels"[t=label] + (List > (ListItem)*4)) + (V > Tx"Direct messages"[t=label] + (List > (ListItem)*3))) + (LC[p=0] > V > (H > Hd"design-systems"[level=2] + SD + IB) + (ChL > ChML > (ChM > ChB)*6 + ChC)) + (LP[w=340] > V > (H > Tx"Thread"[weight=semibold] + IB) + (ChL > ChML > (ChM > ChB)*3 + ChC))
+//   L > (LP[w=68] > V > Av + (V > IB*4) + IB) + (LP[w=260] > V > (H > Hd"Messages"[level=1] + IB) + TI"Jump to…" + (V > Tx"Channels"[t=label] + (List > (ListItem)*4)) + (V > Tx"Direct messages"[t=label] + (List > (ListItem)*3))) + (LC[p=0] > V > (H > Hd"design-systems"[level=2] + SD + IB) + (ChL > ChML > (ChM > ChB)*6 + ChC)) + (LP[w=340] > V > (H > Tx"Thread"[weight=semibold] + IB) + (ChL > ChML > (ChM > ChB)*3 + ChC))
 
 /**
- * Messaging Shell — Slack-style column frame for team messaging tools.
- *
- * Frame (desktop, left to right):
- *   workspace rail 68px | channel sidebar 260px | message stream (fill) | thread panel 340px
- *
- * Container policy: dense rows, zero Cards. Channels and DMs are List/ListItem
- * rows, presence is AvatarStatusDot/StatusDot, unread counts are the only
- * Badge usage. The stream and thread are built on the Chat component family.
- *
- * Responsive contract:
- *   >1024px  — full four-column frame (rail | sidebar | stream | thread)
- *   <=1024px — thread panel hidden; stream takes the reclaimed width
- *   <=768px  — sidebar also hidden; rail + stream keep full width
- *
- * Fixtures are deterministic: fixed ISO timestamps rendered via <Timestamp>,
- * no Date.now()/Math.random() anywhere.
+ * Messaging Shell — Slack-style column frame for team messaging tools.  Frame (desktop, left to right): (Frame/responsive/container: see XLE header above.)
  */
 
 import {useState, type CSSProperties} from 'react';
@@ -135,7 +120,7 @@ const styles: Record<string, CSSProperties> = {
   threadHeader: {
     alignItems: 'center',
     paddingInline: 'var(--spacing-3)',
-    paddingBlock: 'var(--spacing-2)',
+    paddingBlock: 'var(--spacing-3)',
   },
   threadScroll: {
     minHeight: 0,
@@ -207,7 +192,7 @@ const DIRECT_MESSAGES: DirectMessage[] = [
   {id: 'dm-sasha', userId: 'sasha', presence: 'offline', unread: 0},
 ];
 
-// AvatarStatusDot supports success | neutral | error (no warning).
+// AvatarStatusDot supports success | neutral | error (no warning): busy stays error (do-not-disturb), never warning.
 const PRESENCE_VARIANT: Record<Presence, 'success' | 'error' | 'neutral'> = {
   online: 'success',
   busy: 'error',
@@ -454,7 +439,7 @@ export default function MessagingShell() {
     <Stack direction="vertical" style={styles.sidebar}>
       <HStack gap={2} style={styles.sidebarHeader}>
         <StackItem size="fill">
-          <Heading level={1}>Night watch</Heading>
+          <Heading level={1}>Messages</Heading>
         </StackItem>
         <IconButton
           label="New message"
@@ -557,7 +542,7 @@ export default function MessagingShell() {
         <Icon icon={Hash} size="sm" color="secondary" />
         <Heading level={2}>{selectedChannel.name}</Heading>
         <StackItem size="fill" style={styles.streamTopic}>
-          <Text type="supporting" color="secondary" maxLines={1}>
+          <Text type="body" color="secondary" maxLines={1}>
             {selectedChannel.topic}
           </Text>
         </StackItem>

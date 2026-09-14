@@ -319,10 +319,10 @@ const selectedCard: CSSProperties = {
 };
 // The sidebar keeps its width when the canvas is wider than the window.
 const panelShrink: CSSProperties = {flexShrink: 0};
-// Circular muted chip behind the CTA icon — Center handles the centering
+// Square muted chip behind the CTA icon — Center handles the centering
 // and sizing; only the surface (radius + fill) needs custom CSS.
 const iconCircle: CSSProperties = {
-  borderRadius: '50%',
+  borderRadius: 'var(--radius-element)',
   backgroundColor: 'var(--color-selection)',
 };
 
@@ -467,7 +467,7 @@ function BlockPreview({
   switch (type) {
     case 'hero':
       return (
-        <Card padding={6} style={cardStyle} onClick={onSelect}>
+        <Card padding={4} style={cardStyle} onClick={onSelect}>
           <VStack gap={4}>
             <Heading level={3}>
               {(props.heading as string) || 'Hero Heading'}
@@ -485,7 +485,7 @@ function BlockPreview({
     case 'text':
       if (props.heading) {
         return (
-          <Card padding={6} style={cardStyle} onClick={onSelect}>
+          <Card padding={4} style={cardStyle} onClick={onSelect}>
             <EmptyState
               title={props.heading as string}
               description={props.description as string}
@@ -503,7 +503,7 @@ function BlockPreview({
         );
       }
       return (
-        <Card padding={6} style={cardStyle} onClick={onSelect}>
+        <Card padding={4} style={cardStyle} onClick={onSelect}>
           <Text type="body">
             {(props.content as string) || 'Ink your midnight thoughts here…'}
           </Text>
@@ -512,7 +512,7 @@ function BlockPreview({
 
     case 'image':
       return (
-        <Card padding={6} style={cardStyle} onClick={onSelect}>
+        <Card padding={4} style={cardStyle} onClick={onSelect}>
           <EmptyState
             title="Image Block"
             description="Drop an image or enter a URL"
@@ -524,7 +524,7 @@ function BlockPreview({
 
     case 'button':
       return (
-        <Card padding={6} style={cardStyle} onClick={onSelect}>
+        <Card padding={4} style={cardStyle} onClick={onSelect}>
           <Center>
             <Button
               label={(props.label as string) || 'Button'}
@@ -541,7 +541,7 @@ function BlockPreview({
     case 'features': {
       const items = (props.items as Transaction[]) || [];
       return (
-        <Card padding={6} style={cardStyle} onClick={onSelect}>
+        <Card padding={4} style={cardStyle} onClick={onSelect}>
           <VStack gap={4}>
             <HStack gap={3} vAlign="start" hAlign="between">
               <VStack gap={1}>
@@ -554,7 +554,7 @@ function BlockPreview({
                   </Text>
                 )}
               </VStack>
-              <Button label="View All" variant="secondary" size="sm" />
+              <Button label="View All" variant="secondary" />
             </HStack>
             <Table
               data={items}
@@ -572,7 +572,7 @@ function BlockPreview({
       const cardItems =
         (props.cards as Array<{title: string; description: string}>) || [];
       return (
-        <Card padding={6} style={cardStyle} onClick={onSelect}>
+        <Card padding={4} style={cardStyle} onClick={onSelect}>
           <VStack gap={4}>
             <Heading level={3}>Cards</Heading>
             <Divider />
@@ -592,7 +592,7 @@ function BlockPreview({
 
     case 'cta':
       return (
-        <Card padding={6} style={cardStyle} onClick={onSelect}>
+        <Card padding={4} style={cardStyle} onClick={onSelect}>
           <HStack gap={4} vAlign="start">
             <Center width={40} height={40} style={iconCircle}>
               <Icon icon={Lock} color="secondary" />
@@ -815,7 +815,7 @@ export default function PageEditor() {
       width={isMobile ? '100%' : 320}
       style={panelShrink}>
       <VStack gap={4}>
-        {/* Panel Header */}
+        {/* Panel Header — mobile/desktop branches are exclusive: exactly one h1. */}
         <Section variant="transparent" padding={4}>
           {isMobile ? (
             // Mobile: the title, an Edit button that opens the customizations

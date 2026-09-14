@@ -177,7 +177,7 @@ const cardLogo: CSSProperties = {
   borderRadius: 'var(--radius-element)',
   borderWidth: 'var(--border-width)',
   borderStyle: 'solid',
-  borderColor: 'var(--color-border)',
+  borderColor: 'var(--color-separator)',
   backgroundColor: 'var(--color-background-surface)',
 };
 
@@ -206,7 +206,7 @@ function OrderLineItem({
           <VStack gap={1}>
             <HStack gap={2} hAlign="between" vAlign="start">
               <HStack gap={2} vAlign="center" wrap="wrap">
-                <Text type="body" weight="medium">
+                <Text type="body" weight="semibold">
                   {item.name}
                 </Text>
                 {item.limited && (
@@ -520,7 +520,7 @@ export default function PaymentForm() {
                           <Button
                             label="Sign in"
                             variant="secondary"
-                            size="sm"
+                            
                             onClick={() => {}}
                           />
                         </HStack>
@@ -679,7 +679,7 @@ export default function PaymentForm() {
                             endContent={
                               <Text
                                 type="body"
-                                weight="medium"
+                                weight="semibold"
                                 hasTabularNumbers>
                                 $4.95
                               </Text>
@@ -691,7 +691,7 @@ export default function PaymentForm() {
                             endContent={
                               <Text
                                 type="body"
-                                weight="medium"
+                                weight="semibold"
                                 hasTabularNumbers>
                                 $9.95
                               </Text>
@@ -752,7 +752,7 @@ export default function PaymentForm() {
                                 textAnchor="middle"
                                 fontSize="10"
                                 fontStyle="italic"
-                                fill="var(--dracula-purple)">
+                                fill="var(--dracula-comment)">
                                 VISA
                               </text>
                             </svg>

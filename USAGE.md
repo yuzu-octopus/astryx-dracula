@@ -14,7 +14,7 @@ Or clone `https://github.com/yuzu-octopus/astryx-dracula.git` and copy
 
 ## Prebuilt (recommended for Astryx apps)
 
-Zero runtime cost. Built with `bun run theme:build` from `astryx-theme.ts`.
+Prebuilt CSS plus runtime theme injection (the CSS carries the paint, the `<Theme>` object carries the tokens). Built with `bun run theme:build` from `astryx-theme.ts`.
 
 ```tsx
 import '@astryxdesign/core/reset.css';
@@ -62,7 +62,7 @@ import '../tokens.css';
 ```
 
 Then use `var(--color-primary)`, `var(--dracula-purple)`, `var(--space-gap)`.
-`tokens.css` sets real `:root` values with `color-scheme: dark`, so first paint is correct with no runtime.
+`tokens.css` sets real `:root` values with `color-scheme: dark`, so first paint is correct with no runtime. It is a full plain-CSS mirror of the theme (289 `:root` vars, unlayered by design so it beats core layers with zero `!important`); edit the theme, not this file, then re-mirror.
 
 ## Migrating an existing site
 
@@ -82,14 +82,16 @@ bunx astryx template dashboard --package astryx-dracula
 ```
 
 View them all live at `/astryx-dracula/#/templates` on the showcase (agent index: [AGENTS.snippet.md](AGENTS.snippet.md)). Pack rules: templates
-import React plus `@astryxdesign/core` and `lucide-react`, no chart libraries.
+import `@astryxdesign/core`, `lucide-react`, and the kit's own shared modules (`astryx-dracula/shared/*`: auth-copy, chaptered-doc, chart-hues, chart-labels, gallery-image, login-demo, metric-delta, revenue-chart, scene-castle, scene-tile, settings-rows, sparkline, sso-icons), no chart libraries.
 
 ## Fonts
 
 Copy `fonts/` to your app's served static dir (Vite: `public/fonts/`).
 `tokens.css` declares the `@font-face` blocks; the theme sets JetBrains Mono
-for body, heading, and code roles. Without the files, text falls back to
-`monospace` — `bun run audit` fails when they are missing here.
+for body, heading, and code roles. The shipped URLs are base-scoped
+(`/astryx-dracula/fonts/*.woff2`, matching this repo's demo `base`) — apps
+served from `/` remap or self-host the files at that path, otherwise text
+falls back to `monospace`. `bun run audit` fails when the files are missing here. Only the package root `fonts/` ships them: a subpath import resolves nothing, so a fallback after copying means the copy step missed the expected path.
 
 ## Consumer Vite config
 
@@ -97,7 +99,9 @@ No special config needed. This kit follows the glimpse path: prebuilt
 `@astryxdesign/core` CSS plus `<Theme>` injection. A stock Vite React
 config works. The only recommended extra is the CSS layer-order snippet so
 theme overrides beat component base styles (our repo `vite.config.ts` also
-sets a demo-only `base` path; do not copy that):
+sets a demo-only `base` path; do not copy that). Tailwind projects keep their
+own setup and add the snippet as a plain `<style>` tag in `index.html` — the
+layer names are the contract, not the Vite plugin:
 
 ```ts
 // vite.config.ts
@@ -132,7 +136,7 @@ README. Not required for this kit.
 
 - Unstyled components: entry is missing `reset.css`/`astryx.css` or the import order is wrong.
 - Monospace fallback: `fonts/` not copied to served `public/fonts/`.
-- Wrong colors after a theme edit: rebuild with `bun run theme:build`; `bun run theme:check` confirms staleness.
+- Wrong colors after a theme edit: rebuild with `bun run theme:build`; `bun run theme:check` confirms staleness (it ignores `astryx-dracula.js` by design — that file is a build artifact, not a freshness signal).
 - Old `:root` `--color-*` overrides winning: delete them.
 
 ## Rules

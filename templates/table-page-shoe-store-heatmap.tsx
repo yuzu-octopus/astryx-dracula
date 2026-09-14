@@ -1,65 +1,19 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LH[divider] > H[g2 a=center] > Hd"Midnight Kicks"[level=1] + IB"Filter"[variant=ghost] + IB"Export"[variant=ghost] + B.primary"New order") + (LC[p3] > V[g4] > (V[g3] > C[p3] + Tx"Daily revenue"[t=supporting] + (H[g2 a=center] > Ic + Tx"Revenue"[t=supporting])) + (T[hover] > (TR > THC"Order" + THC"Product" + THC"Amount" + THC"Customer" + THC"Email" + THC"Status" + THC"Date") + (TR > TC"ORD-1001" + TC"Air Max 90" + TC"$130" + TC"Sarah Chen" + TC"sarah.chen@acme.co" + (TC > Tk.green"Completed") + TC"2025-01-12")*5))
+//   L > (LH[divider] > H[g2 a=center] > Hd"Midnight Kicks"[level=1] + IB"Filter"[variant=ghost] + IB"Export"[variant=ghost] + B.primary"New order") + (LC[p3] > V[g4] > (V[g3] > C[p=4] + Tx"Daily revenue"[t=supporting] + (H[g2 a=center] > Ic + Tx"Revenue"[t=supporting])) + (T[hover] > (TR > THC"Order" + THC"Product" + THC"Amount" + THC"Customer" + THC"Email" + THC"Status" + THC"Date") + (TR > TC"ORD-1001" + TC"Air Max 90" + TC"$130" + TC"Sarah Chen" + TC"sarah.chen@acme.co" + (TC > Tk.green"Completed") + TC"2025-01-12")*5))
 
 /**
- * Midnight Kicks — sneaker order desk: a daily revenue line over the order log.
- *
- * Frame: page header (title + icon actions) | content column (chart, table).
- *
- * Container policy: the chart is a single Card widget; the orders are dense
- * rows in one edge-to-edge table (never card-wrapped). Status is a Token, the
- * numeric columns carry tabular figures, and product swatch accents come from
- * the catalogue. Shared swatch/chart helpers are kept byte-aligned with
- * table-page-chart.
- *
- * Responsive contract:
- *   no media queries — the chart is an SVG that scales to its column, so it
- *   reflows at any width. The table declares a ~820px floor across its seven
- *   columns and truncates each text cell (maxLines=1), so narrower viewports
- *   scroll the table horizontally instead of widening the page.
+ * Midnight Kicks — sneaker order desk: a daily revenue line over the order log.  Frame: page header (title + icon actions) | content column (c (Frame/responsive/container: see XLE header above.)
  */
 
-import {
-  VStack,
-  HStack,
-  StackItem,
-  Layout,
-  LayoutContent,
-  LayoutHeader,
-} from '@astryxdesign/core/Layout';
-import {Text, Heading} from '@astryxdesign/core/Text';
-import {Button} from '@astryxdesign/core/Button';
-import {IconButton} from '@astryxdesign/core/IconButton';
-import {Icon} from '@astryxdesign/core/Icon';
-import {Token} from '@astryxdesign/core/Token';
-import {Link} from '@astryxdesign/core/Link';
-import {Table, proportional, pixel} from '@astryxdesign/core/Table';
-import type {TableColumn} from '@astryxdesign/core/Table';
-import {Filter, Download, Plus} from 'lucide-react';
-import {RevenueChart, ProductSwatch} from 'astryx-dracula/shared/revenue-chart';
-
-// ============= ICONS (verified lucide-react exports) =============
-// Filter ← FunnelIcon, Download ← ArrowDownTrayIcon, Plus ← PlusIcon.
+import {OrderDesk, type OrderDeskRow} from 'astryx-dracula/shared/order-desk';
 
 // ============= DATA =============
 
 type ProductCategory =
   'Running' | 'Lifestyle' | 'Basketball' | 'Training' | 'Skateboarding';
 
-interface OrderRow extends Record<string, unknown> {
-  id: string;
-  customer: string;
-  email: string;
-  product: string;
-  category: ProductCategory;
-  imageIndex: number;
-  amount: number;
-  status: 'completed' | 'processing' | 'shipped' | 'refunded';
-  date: string;
-}
-
-const PRODUCTS = [
+const PRODUCTS: Array<{name: string; category: string; accent: string; price: number}> = [
   {
     name: 'Air Max 90',
     category: 'Lifestyle' as ProductCategory,
@@ -98,7 +52,7 @@ const PRODUCTS = [
   },
 ];
 
-const orders: OrderRow[] = [
+const orders: OrderDeskRow[] = [
   // Sun (0) — spread across 9am–5pm, very hot
   {
     id: 'ORD-1001',
@@ -797,164 +751,18 @@ const revenueData = [
   {date: 'Jan 15', revenue: 7100},
 ];
 
-const STATUS_TOKEN_COLOR: Record<
-  OrderRow['status'],
-  'green' | 'cyan' | 'orange' | 'red'
-> = {
-  completed: 'green',
-  shipped: 'cyan',
-  processing: 'orange',
-  refunded: 'red',
-};
-
-const STATUS_LABEL: Record<OrderRow['status'], string> = {
-  completed: 'Completed',
-  shipped: 'Shipped',
-  processing: 'Processing',
-  refunded: 'Refunded',
-};
-
-const columns: TableColumn<OrderRow>[] = [
-  {
-    key: 'id',
-    header: 'Order',
-    width: pixel(96),
-    renderCell: (item: OrderRow) => (
-      <Link href="#/templates/table-page-shoe-store-heatmap" isStandalone>
-        {item.id}
-      </Link>
-    ),
-  },
-  {
-    key: 'product',
-    header: 'Product',
-    width: proportional(3, {minWidth: 160}),
-    renderCell: (item: OrderRow) => (
-      <HStack gap={3} vAlign="center">
-        <ProductSwatch
-          accent={PRODUCTS[item.imageIndex].accent}
-          label={item.product}
-        />
-        <StackItem size="fill">
-          <VStack gap={0}>
-            <Text type="body" maxLines={1}>
-              {item.product}
-            </Text>
-            <Text type="supporting" color="secondary" maxLines={1}>
-              {item.category}
-            </Text>
-          </VStack>
-        </StackItem>
-      </HStack>
-    ),
-  },
-  {
-    key: 'amount',
-    header: 'Amount',
-    width: pixel(88),
-    renderCell: (item: OrderRow) => (
-      <Text type="body" hasTabularNumbers maxLines={1}>
-        ${item.amount}
-      </Text>
-    ),
-  },
-  {
-    key: 'customer',
-    header: 'Customer',
-    width: proportional(2, {minWidth: 120}),
-    renderCell: (item: OrderRow) => (
-      <Text type="body" maxLines={1}>
-        {item.customer}
-      </Text>
-    ),
-  },
-  {
-    key: 'email',
-    header: 'Email',
-    width: proportional(2, {minWidth: 120}),
-    renderCell: (item: OrderRow) => (
-      <Text type="body" maxLines={1}>
-        {item.email}
-      </Text>
-    ),
-  },
-  {
-    key: 'status',
-    header: 'Status',
-    width: pixel(120),
-    renderCell: (item: OrderRow) => (
-      <Token
-        size="sm"
-        color={STATUS_TOKEN_COLOR[item.status]}
-        label={STATUS_LABEL[item.status]}
-      />
-    ),
-  },
-  {
-    key: 'date',
-    header: 'Date',
-    width: pixel(112),
-    renderCell: (item: OrderRow) => (
-      <Text type="body" hasTabularNumbers maxLines={1}>
-        {item.date}
-      </Text>
-    ),
-  },
-];
-
-// ============= PAGE =============
+// ============= PAGE (parametric OrderDesk; catalogue + rows + scale only) =============
 
 export default function ShoeStoreTable() {
   return (
-    <Layout
-      height="fill"
-      header={
-        <LayoutHeader hasDivider>
-          <HStack gap={2} vAlign="center">
-            <StackItem size="fill">
-              <Heading level={1}>Midnight Kicks</Heading>
-            </StackItem>
-            <IconButton
-              label="Filter"
-              icon={<Icon icon={Filter} size="sm" />}
-              variant="ghost"
-              tooltip="Filter"
-            />
-            <IconButton
-              label="Export"
-              icon={<Icon icon={Download} size="sm" />}
-              variant="ghost"
-              tooltip="Export"
-            />
-            <Button
-              label="New order"
-              variant="primary"
-              icon={<Icon icon={Plus} size="sm" />}
-            />
-          </HStack>
-        </LayoutHeader>
-      }
-      content={
-        <LayoutContent padding={3}>
-          <VStack gap={4}>
-            <RevenueChart
-              data={revenueData}
-              chartMax={10000}
-              gridTicks={[0, 2000, 4000, 6000, 8000, 10000]}
-            />
-
-            <Table<OrderRow>
-              data={orders}
-              columns={columns}
-              idKey="id"
-              density="balanced"
-              dividers="rows"
-              textOverflow="truncate"
-              hasHover
-            />
-          </VStack>
-        </LayoutContent>
-      }
+    <OrderDesk
+      title="Midnight Kicks"
+      selfHash="#/templates/table-page-shoe-store-heatmap"
+      products={PRODUCTS}
+      orders={orders}
+      revenueData={revenueData}
+      chartMax={10000}
+      gridTicks={[0, 2000, 4000, 6000, 8000, 10000]}
     />
   );
 }

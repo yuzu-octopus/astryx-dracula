@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   Ctr > S.transparent[p=10] > V[g=10] > (G[c={min:280,max:2} g=10] > (V[g=6] > (V[g=3] > Hd"Let's conjure together"[level=1 t=display-1] + Tx"Tell us what you're brewing"[t=body]) + AR) + (C[p=8] > V[g=4] > Hd"Your details"[level=2] + TI"Full name"[req] + (G[c={min:180} g=3] > TI"Email"[req] + TI"Company") + (G[c={min:180} g=3] > TI"Job title" + TI"Phone") + (V[g=2] > Tx"Reason"[t=label] + (H[g=2] > Tk"Reason"*7)) + SE"Budget" + TA"Project details" + B.primary"Send it into the night")) + (V[g=6] > D + (G[c={min:200} g=6] > (V[g=1 a=center] > Tx"General"[t=supporting] + Lk"hello@castle.dracula")*3))
+//   Ctr > S.transparent[p=10] > V[g=10] > (G[c={min:280,max:2} g=10] > (V[g=6] > (V[g=3] > Hd"Let's conjure together"[level=1 t=display-1] + Tx"Tell us what you're brewing"[t=body]) + AR) + (C[p=4] > V[g=4] > Hd"Your details"[level=2] + TI"Full name"[req] + (G[c={min:180} g=3] > TI"Email"[req] + TI"Company") + (G[c={min:180} g=3] > TI"Job title" + TI"Phone") + (V[g=2] > Tx"Reason"[t=label] + (H[g=2] > Tk"Reason"*7)) + SE"Budget" + TA"Project details" + B.primary"Send it into the night")) + (V[g=6] > D + (G[c={min:200} g=6] > (V[g=1 a=center] > Tx"General"[t=supporting] + Lk"hello@castle.dracula")*3))
 
 import {useState, type CSSProperties} from 'react';
 import {VStack, HStack} from '@astryxdesign/core/Layout';
@@ -115,7 +115,7 @@ export default function TwoColumnForm() {
               </AspectRatio>
             </VStack>
 
-            <Card padding={8}>
+            <Card padding={4}>
               <VStack gap={4}>
                 <Heading level={2}>Your details</Heading>
                 <TextInput
@@ -238,7 +238,7 @@ export default function TwoColumnForm() {
                   <Text type="supporting" color="secondary">
                     {col.label}
                   </Text>
-                  <Link href={`mailto:${col.email}`} type="body" size="sm">
+                  <Link href={`mailto:${col.email}`}>
                     {col.email}
                   </Link>
                 </VStack>

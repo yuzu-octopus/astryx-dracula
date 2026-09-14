@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LH[divider] > H[g2 a=center] > Hd"Status"[level=1] + IB"Filter"[variant=ghost] + IB"Export"[variant=ghost] + B.secondary"Refresh") + (LC[p3] > V[g4] > (V[g3] > C[p3] + Tx"Incidents by day and hour"[t=supporting] + (H[g4] > (H[g2] > Tx[t=supporting])*4)) + (T[hover] > (TR > THC"Incident" + THC"Product" + THC"Description" + THC"Started" + THC"Duration" + THC"On-call" + THC"Status" + THC"Date") + (TR > TC"INC-4008" + TC"Business Suite" + TC"Notification delivery delays" + TC"09:15" + TC"ongoing" + TC"Carlos Mendez" + (TC > Tk.red"Ongoing") + TC"2025-01-15")*5))
+//   L > (LH[divider] > H[g2 a=center] > Hd"Status"[level=1] + IB"Filter"[variant=ghost] + IB"Export"[variant=ghost] + B.secondary"Refresh") + (LC[p3] > V[g4] > (V[g3] > C[p4] + Tx"Incidents by day and hour"[t=supporting] + (H[g4] > (H[g2] > Tx[t=supporting])*4)) + (T[hover] > (TR > THC"Incident" + THC"Product" + THC"Description" + THC"Started" + THC"Duration" + THC"On-call" + THC"Status" + THC"Date") + (TR > TC"INC-4008" + TC"Business Suite" + TC"Notification delivery delays" + TC"09:15" + TC"ongoing" + TC"Carlos Mendez" + (TC > Tk.red"Ongoing") + TC"2025-01-15")*5))
 
 /**
  * Status — the incident heatmap for the week plus the log behind it.
@@ -454,7 +454,7 @@ function OutageHeatmap() {
     heatmapData.find(d => d.day === day && d.hour === hour)?.incidents ?? 0;
   return (
     <VStack gap={3}>
-      <Card padding={3} style={CHART_PANEL_STYLE}>
+      <Card padding={4} style={CHART_PANEL_STYLE}>
         <svg
           viewBox={`0 0 ${W} ${H}`}
           width="100%"
@@ -538,7 +538,7 @@ export default function HeatmapTable() {
     <Layout
       height="fill"
       header={
-        <LayoutHeader hasDivider>
+        <LayoutHeader hasDivider padding={6}>
           <HStack gap={2} vAlign="center">
             <StackItem size="fill">
               <Heading level={1}>Status</Heading>

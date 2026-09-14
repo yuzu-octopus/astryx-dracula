@@ -53,7 +53,7 @@ export default function App() {
                     <Heading level={1} type="display-2">
                       Dracula, live in every component
                     </Heading>
-                    <Text type="large" color="secondary">
+                    <Text type="body" color="secondary">
                       Pure Dracula brand kit for Astryx sites. Full token system, syntax highlighting, chart colors. Prebuilt CSS, zero runtime cost.
                     </Text>
                   </VStack>
@@ -79,7 +79,7 @@ export default function App() {
 
                   <HStack gap={1.5} wrap="wrap">
                     <Badge label="0.0 kB runtime" variant="neutral" />
-                    <Badge label="12 spec tokens" variant="purple" />
+                    <Badge label="12 spec tokens" variant="neutral" />
                     <Badge label="4.5:1+ contrast" variant="green" />
                     <Badge label="JetBrains Mono" variant="cyan" />
                   </HStack>

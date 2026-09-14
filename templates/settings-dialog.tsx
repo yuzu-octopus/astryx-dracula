@@ -3,16 +3,7 @@
 //   L > LC > Ctr[h=80vh] > B.primary"Open settings"[opens=#settings] ;; Dlg#settings > L > (LP[w=280 divider p=3] > V[g=4] > Tx"Account settings"[t=label] + (UL > LI"Personal information"*8)) + (LC[p=6] > V[g=6] > DH"Account" + SE"Settings section" + (V[g=0] > TabList + (V[g=0] > Hd"Login"[level=3] + D + (H[j=between a=start] > (V[g=0] > Tx"Password"[weight=semibold] + Tx"Not created"[t=supporting]) + Lk"Create") + (H[g=3 a=start] > Ic + (V[g=0] > (H[g=2 a=center wrap] > Tx"OS X 10.15.7 Chrome"[weight=semibold] + SD) + Tx"March 30, 2026"[t=supporting])))))
 
 /**
- * Settings Dialog — account sections inside one modal.
- *
- * Frame: the trigger page, then a Dialog that sizes to
- * min(900px, 100vw - 32px): section panel (280px, spaced nav list) | scrolling
- * content column with a sticky DialogHeader and one section at a time.
- *
- * Responsive contract:
- *   > 640px  the section panel sits beside the content
- *   <= 640px the panel is dropped and a section Selector renders above the
- *            content; row actions stay nowrap while the info column wraps
+ * Settings Dialog — account sections inside one modal.  Frame: the trigger page, then a Dialog that sizes to (Frame/responsive/container: see XLE header above.)
  */
 
 import React, {useState, type CSSProperties} from 'react';

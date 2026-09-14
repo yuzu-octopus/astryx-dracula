@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   Ctr > V[a=center] > S.transparent[p=6] > V[g=6] > (V[g=2 a=center] > Hd"Let's brew after dark"[level=1] + Tx"Tell us a bit"[t=body]) + (V[g=4] > Hd"Why work with us"[level=2] + (G[c={min:200} g=4] > (C > V[g=3] > Ic + (V[g=1] > Hd"Title"[level=3] + Tx"Desc"[t=supporting]))*3)) + (V[g=4] > Hd"Your details"[level=2] + (G[c={min:260} g=4] > TI"Full name" + TI"Email") + (G[c={min:260} g=4] > TI"Company" + TI"Phone")) + D + (V[g=4] > Hd"Your project"[level=2] + (Fd"Goals"[req] > (H[g=2] > Tk"Goal"*10)) + SE"Timeline" + SE"Budget" + (RL"Source" > RLI*5) + TA"Notes" + CB"Decision maker") + (V[g=3] > B.primary"Send it into the night" + (H[j=center g=1] > Tx[t=supporting] > Lk"Privacy Policy"))
+//   Ctr > V[a=center] > S.transparent[p=6] > V[g=6] > (V[g=2 a=center] > Hd"Let's brew after dark"[level=1] + Tx"Tell us a bit"[t=body]) + (V[g=4] > Hd"Why work with us"[level=2] + (G[c={min:200} g=4] > (C > V[g=3] > Ic + (V[g=1] > Hd"Title"[level=3] + Tx"Desc"[t=body]))*3)) + (V[g=4] > Hd"Your details"[level=2] + (G[c={min:260} g=4] > TI"Full name" + TI"Email") + (G[c={min:260} g=4] > TI"Company" + TI"Phone")) + D + (V[g=4] > Hd"Your project"[level=2] + (Fd"Goals"[req] > (H[g=2] > Tk"Goal"*10)) + SE"Timeline" + SE"Budget" + (RL"Source" > RLI*5) + TA"Notes" + CB"Decision maker") + (V[g=3] > B.primary"Send it into the night" + (H[j=center g=1] > Tx[t=supporting] > Lk"Privacy Policy"))
 
 import {useState} from 'react';
 import {VStack, HStack} from '@astryxdesign/core/Layout';
@@ -125,7 +125,7 @@ export default function ContactForm() {
                 {WHY_US.map(item => (
                   <Card key={item.title}>
                     <VStack gap={3}>
-                      <Icon icon={item.icon} size="lg" color="accent" />
+                      <Icon icon={item.icon} size="lg" color="secondary" />
                       <VStack gap={1}>
                         <Heading level={3}>{item.title}</Heading>
                         <Text type="body" color="secondary">

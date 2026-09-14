@@ -28,6 +28,17 @@ const DRA = {
 
 const pin = (hex: string): [string, string] => [hex, hex];
 
+// Syntax mapping per the Dracula spec Token Classification
+// (https://raw.githubusercontent.com/dracula/draculatheme.com/refs/heads/main/content/spec.mdx):
+// keywords Pink, strings Yellow, numbers Orange, functions Green, types Cyan,
+// variables + object properties Foreground, punctuation Foreground.
+// Deliberate deviations, verified on dark: constants Purple (Instance Reserved
+// Words rule + official Dracula editors, not the Numbers bucket's Orange);
+// attributes Green and tags Pink (official editors + core `dracula` preset,
+// not the Support bucket's Cyan — green attributes stay distinct from cyan
+// types); regex literals get no split because core's tokenizer emits no regex
+// scope and the 14-slot architecture has no room for one — they fall through
+// to string/operator scopes, so string stays spec Yellow.
 const draculaSyntax = defineSyntaxTheme({
   name: 'astryx-dracula',
   tokens: {
@@ -39,10 +50,10 @@ const draculaSyntax = defineSyntaxTheme({
     type: DRA.cyan,
     variable: DRA.fg,
     operator: DRA.pink,
-    constant: DRA.orange,
+    constant: DRA.purple,
     tag: DRA.pink,
-    attribute: DRA.yellow,
-    property: DRA.cyan,
+    attribute: DRA.green,
+    property: DRA.fg,
     punctuation: DRA.fg,
     background: DRA.bg,
   },
@@ -61,6 +72,10 @@ const tokens: Record<string, TokenValue> = {
   '--radius-element': '5px',
   '--radius-container': '5px',
   '--radius-page': '5px',
+  // Chat bubbles: Stone defaults to 28px pill chat. Flat-crisp brand wins —
+  // chat resolves to the same 5px element radius so bubbles read as widgets,
+  // not pills. Precedence: brand doctrine > Stone default. Never restore 28px.
+  '--radius-chat': '5px',
   '--font-family-mono': "'JetBrains Mono', monospace",
   '--font-size-h1': '24px',
   '--font-size-h2': '20px',
@@ -69,16 +84,35 @@ const tokens: Record<string, TokenValue> = {
   '--font-size-base': '14px',
   '--font-size-h5': '13px',
   '--font-size-h6': '12px',
+  // Label role pins semibold: only 400 + 600 faces ship (see tokens.css),
+  // so Stone's medium 500 would synthesize. Never restore medium.
+  '--text-label-weight': 'var(--font-weight-semibold)',
   '--shadow-low': '0 2px 4px #191A210D, 0 4px 8px #191A211A',
   '--shadow-med': '0 2px 4px #191A210D, 0 4px 12px #191A211A',
   '--shadow-high': '0 4px 6px #191A211A, 0 12px 24px #191A2126',
   '--shadow-inset-hover': 'inset 0px 0px 0px 2px #6272A430',
+  // Selected ring: Purple 30%. Stone's default blue has no Dracula meaning;
+  // hover already owns Current Line, so selected takes the accent (verified:
+  // no other consumer reads this token in core 0.3.0 — Field rings use
+  // hover/success/warning/error).
+  '--shadow-inset-selected': 'inset 0px 0px 0px 2px #BD93F930',
   '--shadow-inset-success': 'inset 0px 0px 0px 2px #50FA7B30',
   '--shadow-inset-warning': 'inset 0px 0px 0px 2px #F1FA8C30',
   '--shadow-inset-error': 'inset 0px 0px 0px 2px #FF555530',
   '--color-neutral': pin('#F8F8F21A'),
   '--color-background-inverted': pin('#F8F8F2'),
   '--color-background-error-inverted': pin('#FFD5CC'),
+  // Hover tint: Stone mixes accent with this at 5-20% for checkbox/radio/
+  // switch/link hovers. Pin white (dark-mode side) so hover dims lighten —
+  // never black, which would fight the dim doctrine on dark.
+  '--color-tint-hover': pin('#FFFFFF'),
+  // Thumb/track tint base: same white, consumed by Thumbnail/Lightbox/Spinner
+  // overlays on dark imagery.
+  '--color-on-dark': pin('#FFFFFF'),
+  '--color-on-light': pin('#000000'),
+  // Flat-crisp brand: shadows resolve through this Dracula-hued token, not
+  // Stone's cold blue. Table sticky-column edges use it directly.
+  '--color-shadow': pin('#21222C'),
   '--color-accent-muted': 'var(--color-background-purple)',
   '--color-success-muted': 'var(--color-background-green)',
   '--color-warning-muted': 'var(--color-background-yellow)',
@@ -121,6 +155,8 @@ const tokens: Record<string, TokenValue> = {
   '--color-on-warning': pin('#21222C'),
   '--color-on-error': pin('#21222C'),
   '--color-on-info': pin('#21222C'),
+  // Chart neutral: Stone's gray reads fine on dark (BRAND.md deliberate).
+  '--color-data-neutral': pin('#8C939B'),
   '--color-track': pin(DRA.comment),
   '--color-skeleton': pin(DRA.comment),
   // Spec functional colors for fills, interactive borders, focus
@@ -376,16 +412,37 @@ export const astryxDraculaTheme: DefinedTheme = defineTheme({
         '--color-background-gray': 'var(--color-skeleton)',
       },
     },
-    'field-status': {
-      'type:success': {
-        backgroundColor: 'var(--color-background-green)',
-      },
-      'type:warning': {
-        backgroundColor: 'var(--color-background-yellow)',
-      },
-      'type:error': {
-        backgroundColor: 'var(--color-background-red)',
-      },
+  // Toast type rules: info rides the inverted surface, error rides the pale
+  // #FFD5CC surface, so the existing --color-background-error-inverted token
+  // is consumed here (it was otherwise orphaned). Dark text on the pale
+  // surface keeps error toasts assertive without a dark-on-dark wash.
+  toast: {
+    'type:info': {
+      backgroundColor: 'var(--color-background-inverted)',
+      color: 'var(--color-on-light)',
     },
+    'type:error': {
+      backgroundColor: 'var(--color-background-error-inverted)',
+      color: 'var(--color-on-light)',
+    },
+  },
+  'field-status': {
+    'type:success': {
+      backgroundColor: 'var(--color-background-green)',
+    },
+    'type:warning': {
+      backgroundColor: 'var(--color-background-yellow)',
+    },
+    'type:error': {
+      backgroundColor: 'var(--color-background-red)',
+    },
+  },
+  },
+  // Inverted-surface passthrough: core's MediaTheme defaults collapse accent
+  // to white on dark surfaces, which would un-purple every button/link inside
+  // an inverted Toast. Purple stays the accent on dark media so tappable
+  // still reads tappable there.
+  onDark: {
+    tokens: { '--color-accent': pin(DRA.purple) },
   },
 });

@@ -251,8 +251,9 @@ function ArtifactBody({hasOwnTitle = true}: {hasOwnTitle?: boolean}) {
       aria-label={ARTIFACT_TITLE}
       tabIndex={0}>
       <VStack gap={2} style={articleBody}>
+        {/* Page owns the h1 (VisuallyHidden "Night thread"); the panel title is h2. */}
         {hasOwnTitle && (
-          <Heading level={1} type="display-2">
+          <Heading level={2} type="display-2">
             {ARTIFACT_TITLE}
           </Heading>
         )}

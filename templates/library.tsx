@@ -1,21 +1,9 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LH[divider] > (V[g=1] > Hd"Library"[level=1] + Tx"30 components across 5 categories"[t=body])) + (LC[p=6] > V[g=8] > (V[g=4] > TI"Search the stacks…" + (H[a=center g=3] > (SI[fill] > TgG"Filter" > OFL > Tg"All"! + Tg"Layout" + Tg"Forms" + Tg"Navigation" + Tg"Feedback" + Tg"Data") + DM"Sort")) + D + (V[g=8] > (H[j=between a=center] > Hd"Layout"[level=2] + Tx"6 items"[t=supporting]) + (G[c={min:280} g=4] > (C[p=0] > AR + (S.transparent[p=4] > V[g=1] > Hd"Card"[level=3] + Tx"Description"[t=supporting]))*4)))
+//   L > (LH[divider] > (V[g=1] > Hd"Library"[level=1] + Tx"30 components across 5 categories"[t=body])) + (LC[p=6] > V[g=8] > (V[g=4] > TI"Search the stacks…" + (H[a=center g=3] > (SI[fill] > TgG"Filter" > OFL > Tg"All"! + Tg"Layout" + Tg"Forms" + Tg"Navigation" + Tg"Feedback" + Tg"Data") + DM"Sort")) + D + (V[g=8] > (H[j=between a=center] > Hd"Layout"[level=2] + Tx"6 items"[t=body]) + (G[c={min:280} g=4] > (C[p=0] > AR + (S.transparent[p=4] > V[g=1] > Hd"Card"[level=3] + Tx"Description"[t=supporting]))*4)))
 
 /**
- * Library — a browsable grid of design-system entries grouped by category.
- *
- * Frame: page header (title) | content column (search, filter row, sections).
- *
- * Container policy: entries are Cards in a grid (gallery archetype); each
- * card is a thumbnail plus a heading and description. Category hue is drawn
- * from the Dracula accents, one per shelf, and only marks the thumbnail glyph.
- *
- * Responsive contract:
- *   no media queries — sections are auto-fit grids. The entry grid collapses
- *   from 3 columns to 1 as the content column narrows (280px track floor), and
- *   the category filter buttons overflow into a "+N" DropdownMenu rather than
- *   wrapping, so the filter row keeps a single line at every width.
+ * Library — a browsable grid of design-system entries grouped by category.  Frame: page header (title) | content column (search, filter row, s (Frame/responsive/container: see XLE header above.)
  */
 
 import {useState, useMemo} from 'react';
@@ -323,7 +311,7 @@ function LibrarySection({
     <VStack gap={8}>
       <HStack justify="between" vAlign="center">
         <Heading level={2}>{category}</Heading>
-        <Text type="supporting" color="secondary" hasTabularNumbers>
+        <Text type="body" color="secondary" hasTabularNumbers>
           {items.length} {items.length === 1 ? 'item' : 'items'}
         </Text>
       </HStack>

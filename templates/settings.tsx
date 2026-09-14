@@ -95,7 +95,7 @@ export default function SettingsTemplate() {
       height="fill"
       contentWidth={1200}
       header={
-        <LayoutHeader hasDivider>
+        <LayoutHeader hasDivider padding={6}>
           <HStack vAlign="center" wrap="wrap">
             <StackItem size="fill">
               <Heading level={1} type="display-2">Settings</Heading>

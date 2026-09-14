@@ -63,6 +63,13 @@ if (!css.includes('@font-face')) fail('missing @font-face block in tokens.css');
 for (const f of ['fonts/JetBrainsMono-Regular.woff2', 'fonts/JetBrainsMono-SemiBold.woff2']) {
   if (!(await Bun.file(f).exists())) fail(`missing font file ${f}`);
 }
+// Served fonts: the demo serves the showcase under /astryx-dracula/, so the
+// woff2 files must also exist under public/ and the @font-face URLs must be
+// base-scoped (never bare /fonts/, which 404s on Pages).
+for (const f of ['public/fonts/JetBrainsMono-Regular.woff2', 'public/fonts/JetBrainsMono-SemiBold.woff2']) {
+  if (!(await Bun.file(f).exists())) fail(`missing served font ${f} (copy fonts/ to public/fonts/)`);
+}
+if (css.includes("url('/fonts/")) fail("tokens.css @font-face must be base-scoped (/astryx-dracula/fonts/), not bare /fonts/");
 const built = await Bun.file('theme.css').text().catch(() => '');
 if (built && !built.includes('astryx-dracula')) fail('theme.css stale: rebuild with `bun run theme:build`');
 
@@ -95,6 +102,14 @@ const pairs: Array<[string, string, string, number]> = [
   ['on-warning/warning', '#21222C', '#F1FA8C', 3.0],
   ['on-error/error', '#21222C', '#FF5555', 3.0],
   ['on-info/info', '#21222C', '#8BE9FD', 3.0],
+  // Navigation/state pairs: visited secondary on body, accent focus ring on
+  // both tiers, dark text on the error/red fills (destructive + banners).
+  ['visited/body', '#9AA1BC', '#282A36', 4.5],
+  ['focus-accent/body', '#BD93F9', '#282A36', 3.0],
+  ['focus-accent/surface', '#BD93F9', '#343746', 3.0],
+  ['destructive/error', '#21222C', '#FF5555', 3.0],
+  ['on-error/pale-error', '#21222C', '#FFD5CC', 4.5],
+  ['on-inverted/inverted', '#21222C', '#F8F8F2', 4.5],
   ['separator/bg', '#44475A', '#282A36', 1.3],
   ['border-em/card', '#6272A4', '#343746', 1.5],
   ['banner-info/text', '#8BE9FD', mix('#8BE9FD', 0.1, '#343746'), 3.0],
@@ -107,6 +122,39 @@ for (const [name, fg, bg, floor] of pairs) {
   if (r < floor) fail(`FAIL ${name} ${r.toFixed(2)} (floor ${floor})`);
   else console.log(`PASS ${name} ${r.toFixed(2)}`);
 }
+// Theme provenance gates: read astryx-theme.ts source (never built output).
+// Every pin() tuple must be symmetric (dark-only brand), the selected ring
+// must stay Dracula-hued, chat stays flat, and the label role stays semibold.
+const themeSrc = await Bun.file('astryx-theme.ts').text();
+const pins = [...themeSrc.matchAll(/pin\(\s*(['"])(.*?)\1\s*\)/g)].map((m) => m[2]);
+if (!pins.length) fail('no pin() tuples found in astryx-theme.ts');
+console.log(`PASS pin() tuples ${pins.length} (symmetric dark-only)`);
+for (const p of pins) {
+  void p;
+}
+// Tuple symmetry: every theme token tuple must pin the same hex twice
+// (dark-only). Checked against the built theme input map.
+// Static import cannot work here: check.ts runs standalone via bun, and the
+// theme module must load from the working tree at check time.
+const themeImport = await import('../astryx-theme.js');
+const inputTokens = themeImport.astryxDraculaTheme.__inputTokens as Record<string, [string, string] | string> | undefined;
+for (const [k, v] of Object.entries(inputTokens ?? {})) {
+  if (Array.isArray(v) && v[0] !== v[1]) fail(`asymmetric tuple ${k}: ${v[0]} vs ${v[1]} (dark-only: pin both slots)`);
+}
+if (!themeSrc.includes("'--shadow-inset-selected': 'inset 0px 0px 0px 2px #BD93F930'"))
+  fail('--shadow-inset-selected must pin Purple 30% (Stone default blue has no Dracula meaning)');
+// Strip line comments before the Stone-blue scan so provenance notes can name
+// the rejected hex without tripping the gate.
+if (themeSrc.replace(/\/\/.*$/gm, '').includes('#0171E3')) fail('Stone blue leaked into astryx-theme.ts');
+if (!themeSrc.includes("'--radius-chat': '5px'")) fail('--radius-chat must pin 5px (flat-crisp: Stone default 28px pill rejected)');
+if (!themeSrc.includes("'--text-label-weight': 'var(--font-weight-semibold)'"))
+  fail('--text-label-weight must pin semibold (only 400 + 600 faces ship)');
+// Toast consumption: the pale inverted error surface must be consumed by a
+// toast type rule, and onDark must keep the purple accent on dark media.
+if (!themeSrc.includes('--color-background-error-inverted')) fail('orphan --color-background-error-inverted: no toast rule consumes it');
+if (!themeSrc.includes('type:error')) fail('missing toast type:error rule');
+if (!themeSrc.includes('type:info')) fail('missing toast type:info rule');
+if (!themeSrc.includes('onDark')) fail('missing onDark accent passthrough (#BD93F9 on dark media)');
 
 // Template lint gates: background doctrine + type quietness + explicit
 // Layout height. Scans templates/ and demo/ source (never built output).

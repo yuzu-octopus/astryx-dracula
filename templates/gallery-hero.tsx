@@ -16,7 +16,7 @@ import {SceneCastle} from 'astryx-dracula/shared/scene-castle';
 // harvest-yellow moon, fg-stroke bats, per-scene hill constants). Fill +
 // radius-clip live in shared/gallery-image (no Image primitive, #2582).
 // The bats tile stays local: it is deliberately moonless-magic (the violet
-// disc is ambient glow, not a moon — the alt names the violet sky), so the
+// disc is ambient glow (comment grey), never tappable purple — the alt names the moonless sky), so the
 // harvest-yellow rule does not apply; yellowing it would duplicate the pines
 // tile instead.
 
@@ -26,9 +26,9 @@ function BatFlightScene() {
       style={galleryImage}
       viewBox="0 0 400 500"
       role="img"
-      aria-label="Bats crossing a violet night sky">
+      aria-label="Bats crossing a moonless night sky">
       <rect width="400" height="500" fill="var(--dracula-bg-dark)" />
-      <circle cx="200" cy="140" r="60" fill="var(--dracula-purple)" />
+      <circle cx="200" cy="140" r="60" fill="var(--dracula-comment)" />
       <circle
         cx="200"
         cy="140"
@@ -76,7 +76,7 @@ function BatFlightScene() {
 const SCENES = [
   {alt: 'Moonlit castle on midnight hills', scene: <SceneCastle variant="card" />},
   {alt: 'Harvest moon over midnight pines', scene: <SceneCastle variant="tall" />},
-  {alt: 'Bats crossing a violet night sky', scene: <BatFlightScene />},
+  {alt: 'Bats crossing a moonless night sky', scene: <BatFlightScene />},
 ];
 
 export default function GalleryHero() {

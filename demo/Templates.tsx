@@ -57,24 +57,14 @@ const LAZY_PAGES: Record<string, ComponentType> = Object.fromEntries(
 // fold. So the viewer gives each template a frame of its own that matches the
 // space left over, and the template renders bare inside it.
 const bareHref = (id: string) => `${window.location.pathname}?bare=${id}`;
-
-// The bare document owns the viewport height. Layout height="fill" is
-// height:100%, which only resolves against a definite ancestor height —
-// <html>/<body> don't set one, so without this an unconstrained Layout grows
-// to its content height and the *document* scrolls instead of the template's
-// own LayoutContent/Table scroll containers (a redundant outer scrollbar that
-// shouldn't be there). height="auto" pages are unaffected: taller content
-// still overflows visibly and the document scrolls as designed. Consumers
-// scaffolding a template into their own app must provide the same
-// definite-height ancestor (the editor template's pageStyle is the pattern).
-const bareViewport: CSSProperties = {
+// Both frames below share one viewport constant: AppShell sizes itself to
+// 100dvh with its side nav at calc(100dvh - header), and Layout height="fill"
+// (height:100%) only resolves against a definite ancestor height, so every
+// template needs a 100dvh ancestor of its own. The detail viewer adds hidden
+// overflow plus the body wash on top; the bare document keeps visible
+// overflow so taller height="auto" pages still scroll the document.
+const viewport: CSSProperties = {
   height: '100dvh',
-};
-
-const viewerFrame: CSSProperties = {
-  height: '100dvh',
-  overflow: 'hidden',
-  backgroundColor: 'var(--color-background-body)',
 };
 const viewerBar: CSSProperties = {
   padding: '12px 24px',
@@ -105,7 +95,7 @@ export function TemplateDetail({ id }: { id: string }) {
   }
   return (
     <Theme theme={astryxDraculaTheme} mode="dark">
-      <VStack gap={0} style={viewerFrame}>
+      <VStack gap={0} style={{ ...viewport, overflow: 'hidden', backgroundColor: 'var(--color-background-body)' }}>
         <HStack gap={2} vAlign="center" style={viewerBar}>
           <Link href="#/templates">Templates</Link>
           <Text color="secondary">/</Text>
@@ -135,7 +125,7 @@ export function BareTemplate({ id }: { id: string }) {
   if (!Page) return <TemplatesIndex />;
   return (
     <Theme theme={astryxDraculaTheme} mode="dark">
-      <div style={bareViewport}>
+      <div style={viewport}>
         <Page />
       </div>
     </Theme>

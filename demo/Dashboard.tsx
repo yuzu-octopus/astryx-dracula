@@ -1,29 +1,6 @@
 import { Badge, Card, Grid, Heading, HStack, ProgressBar, StatusDot, Table, Text, VStack, proportional } from '@astryxdesign/core';
-
-const BARS = [
-  { month: 'Jan', value: 42, color: 'var(--dracula-purple)', label: 'Purple' },
-  { month: 'Feb', value: 68, color: 'var(--dracula-pink)', label: 'Pink' },
-  { month: 'Mar', value: 55, color: 'var(--dracula-cyan)', label: 'Cyan' },
-  { month: 'Apr', value: 90, color: 'var(--dracula-green)', label: 'Green' },
-  { month: 'May', value: 74, color: 'var(--dracula-yellow)', label: 'Yellow' },
-  { month: 'Jun', value: 61, color: 'var(--dracula-orange)', label: 'Orange' },
-  { month: 'Jul', value: 83, color: 'var(--dracula-red)', label: 'Red' },
-];
-
-interface TrafficRow extends Record<string, unknown> {
-  page: string;
-  views: string;
-  latency: string;
-  status: 'healthy' | 'degraded';
-  change: number;
-}
-
-const TRAFFIC: TrafficRow[] = [
-  { page: '/', views: '48,210', latency: '12ms', status: 'healthy', change: 12.4 },
-  { page: '/docs', views: '21,740', latency: '18ms', status: 'healthy', change: 8.1 },
-  { page: '/components', views: '9,430', latency: '24ms', status: 'degraded', change: -3.2 },
-  { page: '/dashboard', views: '6,120', latency: '16ms', status: 'healthy', change: 21.0 },
-];
+import { MetricDelta } from '../shared/metric-delta';
+import { BARS, ROUTES } from './fixtures';
 
 function Kpi({
   label,
@@ -40,32 +17,18 @@ function Kpi({
   return (
     <Card padding={4}>
       <VStack gap={2}>
-        <HStack justify="between" vAlign="center">
-          <Text type="supporting" color="secondary">
-            {label}
+        <Text type="supporting" color="secondary">
+          {label}
+        </Text>
+        <HStack gap={2} vAlign="center">
+          <Text type="display-3" weight="semibold" hasTabularNumbers>
+            {value}
           </Text>
-          <StatusDot
-            variant={up ? 'success' : 'error'}
-            label={up ? 'Positive trend' : 'Negative trend'}
-          />
+          <MetricDelta value={`${up ? '+' : ''}${delta}%`} positive={up} />
         </HStack>
-        <Heading level={3} type="display-2">
-          {value}
-        </Heading>
-        <HStack gap={1.5} vAlign="center">
-          <Text
-            weight="semibold"
-            style={{
-              color: up ? 'var(--color-positive)' : 'var(--color-negative)',
-            }}
-          >
-            {up ? '+' : ''}
-            {delta}%
-          </Text>
-          <Text type="supporting" color="secondary">
-            {hint}
-          </Text>
-        </HStack>
+        <Text type="supporting" color="secondary">
+          {hint}
+        </Text>
       </VStack>
     </Card>
   );
@@ -98,7 +61,7 @@ export function Dashboard() {
                   Categorical spectral distribution
                 </Text>
               </VStack>
-              <Badge label="Categorical" variant="purple" />
+              <Badge label="Categorical" variant="yellow" />
             </HStack>
 
             <Card
@@ -188,7 +151,7 @@ export function Dashboard() {
             </HStack>
 
             <VStack gap={4}>
-              <ProgressBar label="Build minutes quota" value={62} variant="accent" hasValueLabel />
+              <ProgressBar label="Build minutes quota" value={62} variant="neutral" hasValueLabel />
               <ProgressBar label="Network egress bandwidth" value={38} variant="success" hasValueLabel />
               <ProgressBar label="Monthly error budget" value={91} variant="warning" hasValueLabel />
               <ProgressBar label="Memory pool allocation" value={45} variant="neutral" hasValueLabel />
@@ -224,11 +187,11 @@ export function Dashboard() {
                 Edge routing throughput and p99 response times
               </Text>
             </VStack>
-            <Badge label="4 endpoints" variant="neutral" />
+            <Badge label="5 endpoints" variant="neutral" />
           </HStack>
 
           <Table
-            data={TRAFFIC}
+            data={ROUTES}
             idKey="page"
             hasHover
             density="balanced"
@@ -276,16 +239,10 @@ export function Dashboard() {
                   const num = row.change as number;
                   const up = num >= 0;
                   return (
-                    <Text
-                      hasTabularNumbers
-                      weight="semibold"
-                      style={{
-                        color: up ? 'var(--color-positive)' : 'var(--color-negative)',
-                      }}
-                    >
-                      {up ? '+' : ''}
-                      {num.toFixed(1)}%
-                    </Text>
+                    <MetricDelta
+                      value={`${up ? '+' : ''}${num.toFixed(1)}%`}
+                      positive={up}
+                    />
                   );
                 },
               },

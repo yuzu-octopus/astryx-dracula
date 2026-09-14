@@ -1,3 +1,7 @@
+// Runtime Theme path: <Theme> injects theme.css-equivalent rules from
+// astryx-theme.ts at runtime. The prebuilt 4-import block (reset + astryx +
+// tokens + theme.css files, see USAGE.md) is the zero-runtime alternative —
+// same hexes, no runtime cost. Demo uses this file + provider wrappers.
 import '@astryxdesign/core/reset.css';
 import '@astryxdesign/core/astryx.css';
 import '../tokens.css';

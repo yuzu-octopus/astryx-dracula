@@ -2,7 +2,7 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   L > (LC > V[g=8] > (V[g=2] > Hd"Getting started with Astryx Dracula"[level=1] + Tx"Last updated March 30, 2026"[t=supporting]) + (C > V[g=3] > (H[j=between] > (H[g=2] > Ic + Tx"AI Assistance"[t=body]) + (H > B"Copy prompt" + DM)) + Tx"Prompt description"[t=body]) + (V[g=4] > Hd"Prerequisites"[level=2] + UL) + D + (V[g=4] > Hd"Install the package"[level=2] + Tx"Description"[t=body] + (V[g=2] > Tx"Step"[t=body] + Cd)*3) + D + (V[g=4] > Hd"Configure theming"[level=2] + Tx"Description"[t=body] + Cd + Tx"Note"[t=body]) + D + (V[g=4] > Hd"Next steps"[level=2] + UL)) + (LP > Outline)
 
-import {useCallback, useState, type CSSProperties} from 'react';
+import {useCallback, useState} from 'react';
 import {Heading, Text} from '@astryxdesign/core/Text';
 import {Button} from '@astryxdesign/core/Button';
 import {Card} from '@astryxdesign/core/Card';
@@ -17,27 +17,14 @@ import {Icon} from '@astryxdesign/core/Icon';
 import {Outline, type OutlineItem} from '@astryxdesign/core/Outline';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {Sparkles, ClipboardCopy, ChevronDown} from 'lucide-react';
+import {outlinePanel} from 'astryx-dracula/shared/chaptered-doc';
 
 // ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
 
 /**
- * Documentation technical — the getting-started guide: prerequisites, install
- * steps, theming, and next steps.
- *
- * Frame-first layout (see `bunx astryx docs layout`):
- *
- *   Frame: guide column (fill) | on-this-page outline
- *
- * Responsive contract:
- *   > 768px  the outline is a sticky end panel beside the guide
- *   <= 768px the outline collapses into an "On this page" Selector under the
- *            page title
- *
- * Container policy (docs archetype): one prose column of headings, code and
- * lists. The page is long, so the outline carries the structure and cards are
- * reserved for the one thing that is not prose — the AI prompt.
+ * Documentation technical — the getting-started guide: prerequisites, install steps, theming, and next steps. (Frame/responsive/container: see XLE header above.)
  */
 
 // Same prompt in the copy action and the visible body: one string, so the
@@ -66,16 +53,6 @@ const OUTLINE_OPTIONS = OUTLINE_ITEMS.map(item => ({
   value: item.id,
   label: item.label,
 }));
-
-// The outline is sticky so it tracks the guide as the document scrolls; the
-// large block offset parks its first item level with the "Prerequisites"
-// heading.
-const outlinePanel: CSSProperties = {
-  position: 'sticky',
-  top: 'var(--spacing-6)',
-  alignSelf: 'start',
-  paddingBlockStart: 'calc(var(--spacing-10) * 3)',
-};
 
 export default function DocumentationTechnical() {
   const [activeId, setActiveId] = useState<string | undefined>(

@@ -3,31 +3,7 @@
 //   A[cp=0 @sideNav=(SN > (SNS"Overview" > (SNI"Abstract"! + SNI"Model at a glance")) + (SNS"Architecture" > (SNI"Causal Encoder-Decoder" + SNI"Compressed Sparse Attention 2" + SNI"Single-Pass mHC" + SNI"Engram, DSpark, FP4")) + (SNS"Infrastructure" > (SNI"Training infrastructure" + SNI"Inference system" + SNI"SWA Bounded Replay")) + (SNS"Training and evaluation" > (SNI"Pre-training" + SNI"Post-training" + SNI"Conclusion")))] > L[h=auto] > (LC[p=8 !scroll] > V[g=8] > (V[g=2] > (H[g=2 a=center] > MNT + Tx[t=supporting]) + Hd"Abstract"[level=1 t=display-2] + Tx"Chapter 1 of 12"[t=supporting]) + Tx"Intro"[t=large] + AR + (V[g=8] > (V[g=3] > Hd"The bottleneck"[level=2] + Tx"Body"[t=body] + UL + Cd)*3) + D + (H[j=between] > B.secondary"Previous" + B.secondary"Next") + (Tx[t=supporting] > Lk"Checkpoints")) + (LP[!scroll] > Outline)
 
 /**
- * Technical report — a chaptered walkthrough of the DeepSeek-V4.1-Flash
- * technical report, from the KV cache bottleneck through architecture,
- * infrastructure, training, evaluation, and limitations.
- *
- * Frame-first layout (see `bunx astryx docs layout`):
- *
- *   Frame: AppShell (SideNav rail, no toggle) | Layout content + sticky Outline
- *   Content: chapter header | intro | scene | level-2 sections | prev/next
- *   Rail: four chapter groups, one item per chapter
- *
- * Responsive contract:
- *   Below 1024px the Outline column is dropped (a narrow viewport has nothing
- *   to outline against) and the same items become an "On this page" Selector
- *   under the chapter title, while the rail collapses into the AppShell
- *   drawer behind the MobileNavToggle. Section ids are derived from the
- *   chapter id and the section key, so the Outline and the headings cannot
- *   drift apart.
- *
- * Known limitation: chapters are short (1350-2200px against a 900px
- * viewport), so mid-chapter headings cannot scroll to the activation line.
- * The Outline's scroll-spy marks the last heading above that line, which
- * means a middle section can be skipped over: scrolling the Abstract to
- * "Three levers" lights "What it adds up to" instead. Long chapters
- * (csa2 at 2189px) track better than short ones (ced, mhc at 1350px).
- * Same shape on product-tour, same cause; revisit if chapters grow.
+ * Technical report — a chaptered walkthrough of the DeepSeek-V4.1-Flash technical report, from the KV cache bottleneck through architecture, i (Frame/responsive/container: see XLE header above.)
  */
 
 import {Icon} from '@astryxdesign/core/Icon';
@@ -1518,7 +1494,7 @@ export default function TechReport() {
       footer={
         <Text type="supporting" color="secondary">
           Checkpoints and the full report:{' '}
-          <Link href={REPORT_URL} isExternalLink type="supporting">
+          <Link href={REPORT_URL} target="_blank" type="supporting">
             huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash
           </Link>
         </Text>

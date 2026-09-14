@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC > V[g=8 a=center] > (V[g=1] > (H[g=2 a=center] > Ic + Tx.lg"Hi, Vlad") + Hd"Where should we start?"[level=1 type=display-2]) + ChC"Ask anything" + (V[g=6] > (TgG"Category" > Tg"Writing"*4) + Hd"Suggested prompts"[level=2] + (G[c={min:280} g=3] > (CC[p=4] > V[g=0.5] > Hd"Draft"[level=3] + Tx"Compose"[t=body])*4))
+//   L > LC > V[g=8 a=center] > (V[g=1] > (H[g=2 a=center] > Ic + Tx"Hi, Vlad"[t=body]) + Hd"Where should we start?"[level=1 type=display-2]) + ChC"Ask anything" + (V[g=6] > (TgG"Category" > Tg"Writing"*4) + Hd"Suggested prompts"[level=2] + (G[c={min:280} g=3] > (CC[p=4] > V[g=0.5] > Hd"Draft"[level=3] + Tx"Compose"[t=body])*4))
 
 import {useRef, useState, type CSSProperties} from 'react';
 
@@ -327,8 +327,8 @@ export default function AiChatLanding() {
             {/* Greeting */}
             <VStack gap={1}>
               <HStack gap={2} vAlign="center">
-                <Icon icon={Sparkles} size="md" color="accent" />
-                <Text type="large">
+                <Icon icon={Sparkles} size="md" color="secondary" />
+                <Text type="body">
                   Hi, Vlad
                 </Text>
               </HStack>

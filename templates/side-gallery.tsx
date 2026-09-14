@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC[p=6] > G[c={min:280} g8 a=center] > (V[g6] > (V[g3] > Tx"AFTER DARK"[t=supporting] + Hd"Make every night"[level=1] + Tx"The smallest rituals"[t=body]) + B.primary"Explore the night" + (V[g4] > D + (H[g6] > (V > Tx"12k+"[t=large] + Tx"Night shots"[t=supporting])*3))) + (G[c3 g3] > AR*9)
+//   L > LC[p=6] > G[c={min:280} g8 a=center] > (V[g6] > (V[g3] > Tx"AFTER DARK"[t=supporting] + Hd"Make every night"[level=1] + Tx"The smallest rituals"[t=body]) + B.primary"Explore the night" + (V[g4] > D + (H[g6] > (V > Tx"12k+"[t=display-3] + Tx"Night shots"[t=supporting])*3))) + (G[c3 g3] > AR*9)
 
 import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
@@ -32,7 +32,7 @@ const GALLERY_SCENES = [
 function StatBlock({value, label}: {value: string; label: string}) {
   return (
     <VStack gap={0}>
-      <Text type="large" weight="semibold" hasTabularNumbers>
+      <Text type="display-3" weight="semibold" hasTabularNumbers>
         {value}
       </Text>
       <Text type="supporting" color="secondary">
@@ -74,7 +74,7 @@ export default function SideGallery() {
             {/* Left side: Text + CTA */}
             <VStack gap={6} vAlign="center">
               <VStack gap={3}>
-                <Text type="supporting" color="secondary" weight="semibold">
+                <Text type="supporting" color="secondary">
                   AFTER DARK
                 </Text>
                 <Heading level={1}>

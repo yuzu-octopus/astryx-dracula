@@ -3,18 +3,7 @@
 //   TN"Nocturne" + (S[p6] > V[g10] > (Ctr > V[g4 a=center] > Hd"Little haunts"[level=1 type=display-2] + Tx"We believe"[t=body]) + (G[c={min:200,max:3} g4] > (C[p0] > AR + V[g2 a=center] > Bd + Hd"Product"[level=2] + Tx"Description"[t=body] + (H[g2] > NI + B"Add to cart"))*3)) + (V[g8] > (G[c={min:200} g4] > (GS[c=1] > C > Hd"Checkout"[level=2]) + (GS[c=2] > C > Hd"Night Owl AI"[level=2])) + (G[c={min:200} g4] > (GS[c=3] > C > T) + (GS[c=1] > C > Hd"Revenue"[level=2])))
 
 /**
- * Theme Showcase — the storefront page each theme is previewed against, and
- * the only template that is deliberately shell-less: it paints its own TopNav
- * and page surfaces so a preview covers the whole viewport (no AppShell, no
- * Layout). Keep it that way.
- *
- * Responsive contract:
- *   > 600px  the inventory table renders all six columns
- *   <= 600px the table drops selection, location and tags, so a row fits the
- *            card without being read sideways
- * The card decks collapse to one column through Grid's minWidth, and
- * `isMobile` (host AppShell context; false when rendered standalone) trims the
- * top nav and switches the deck spans.
+ * Theme Showcase — the storefront page each theme is previewed against, and the only template that is deliberately shell-less: it paints its o (Frame/responsive/container: see XLE header above.)
  */
 
 import {type CSSProperties, type ReactNode} from 'react';
@@ -225,7 +214,7 @@ const inlineStyles: Record<string, CSSProperties> = {
   },
   // Center supplies the 32px box and the centering; only the paint stays here.
   activityIcon: {
-    borderRadius: 'var(--radius-full)',
+    borderRadius: 'var(--radius-element)', // square chip: no circles except dots/avatars
     backgroundColor: 'var(--color-background-muted)',
     color: 'var(--color-text-secondary)',
     flexShrink: 0,
@@ -1093,7 +1082,7 @@ function SelectCell({row}: {row: InventoryRow}) {
 function ItemCell({row}: {row: InventoryRow}) {
   return (
     <HStack gap={3} vAlign="center">
-      <ProductSwatch accent={row.hue} label={row.name} size={40} />
+      <ProductSwatch accent={row.hue} label={row.name} />
       <VStack gap={0} style={styles.inventoryItemText}>
         <Text type="body" weight="semibold">
           {row.name}
@@ -1215,7 +1204,6 @@ function InventoryCard({inventory}: {inventory: InventoryRow[]}) {
         <Button
           label="Add item"
           variant="primary"
-          size="sm"
           icon={<Plus size={16} />}
         />
       </HStack>

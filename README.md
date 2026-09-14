@@ -10,11 +10,11 @@ Live showcase: https://yuzu-octopus.github.io/astryx-dracula/
 
 ## Features
 
-- 191 Dracula tokens pinned in `astryx-theme.ts` (270 resolved tokens; 273 custom properties in the prebuilt `theme.css`, the extra 3 are private core radius aliases), dark-only
-- Spec-exact code syntax theme plus chart series and sequential ramps
-- Prebuilt CSS with zero runtime cost, or runtime injection for prototyping
+- 200 Dracula tokens pinned in `astryx-theme.ts` (281 unique custom properties in the prebuilt `theme.css` across 319 declaration lines incl. scoped repeats = 278 public + 3 private `--_*-radius` aliases; `tokens.css` is a full plain-CSS mirror, 289 `:root` vars), dark-only. No gate asserts these counts — `bun run theme:check` asserts freshness, `bun run audit` asserts palette purity and contrast.
+- Syntax theme plus chart series and sequential ramps
+- Prebuilt CSS plus runtime theme injection, or runtime injection alone for prototyping
 - WCAG contrast gates enforced in CI via `bun run audit`
-- Vendored JetBrains Mono fonts and Lucide icons, zero theme dependencies
+- JetBrains Mono fonts and Lucide icons, one runtime dependency (`lucide-react`)
 - Agent skill, `llms.txt`, and copy-paste quickstart for AI-assisted adoption
 - Around 45 themed pages in `templates/`, published as an Astryx integration pack and viewable live at `/astryx-dracula/#/templates`
 
@@ -27,9 +27,12 @@ bun add astryx-dracula
 ## Usage
 
 ```tsx
+import '@astryxdesign/core/reset.css';
+import '@astryxdesign/core/astryx.css';
+import 'astryx-dracula/tokens.css';
+import 'astryx-dracula/theme.css';
 import { Theme } from '@astryxdesign/core/theme';
 import { astryxDraculaTheme } from 'astryx-dracula';
-import 'astryx-dracula/theme.css';
 
 <Theme theme={astryxDraculaTheme} mode="dark">
   <App />
@@ -46,8 +49,8 @@ Copy `fonts/` from the package into your served `public/fonts/` directory.
 ```text
 astryx-theme.ts   defineTheme source, single source of truth
 theme.css         prebuilt output of bun run theme:build
-tokens.css        plain-CSS :root fallback for any stack
-icons.tsx         vendored Lucide icon registry
+tokens.css        plain-CSS :root mirror for any stack
+icons.tsx         Lucide icon registry (runtime `lucide-react` dependency)
 fonts/            JetBrains Mono woff2 files
 templates/        around 45 themed pages plus integration specs
 scripts/check.ts  palette plus contrast gates

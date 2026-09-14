@@ -3,19 +3,7 @@
 //   L > (LH[divider] > V[g=4] > (H[j=between a=center] > Hd"Night-shift issues"[level=1] + B.primary"Raise issue"[opens=#raise-issue]) + (H[g=2 a=center] > PS + Po > B.secondary"View options")) + (LC[p=0] > T[hover] > (TR > THC*7) + (TR > TC*7)*4) + (LP > V[g=4] > (H > Tx[t=supporting] + IB"Close panel") + (V[g=1] > Hd[level=2] + Tx[t=body]) + ML + (D + (V[g=2] > Tx"Labels"[t=label] + (H[g=2] > Tk*2)))) ;; Dlg#raise-issue > (DH"Raise issue" + (LC[p=4] > V[g=4] > TI*4) + (LF > H[j=end g=2] > B.secondary"Cancel" + B.primary"Raise issue"))
 
 /**
- * Table Grouped — the night-shift issue tracker: a grouped, collapsible issue
- * table with a PowerSearch bar and a resizable detail inspector.
- *
- * Frame: page header (title, search, view options) | grouped table | inspector
- *
- * Container policy: dense rows only, zero Cards. Status rides a StatusDot plus
- * its label, priority a bar-chart glyph plus its name; a count Badge marks each
- * group header, and labels are Tokens rather than decorative badges.
- *
- * Responsive contract:
- *   > 1024px  header | table | inspector 360 (resizable)
- *   <= 1024px inspector hidden; the table keeps the full width and scrolls
- *             horizontally inside its own wrapper
+ * Table Grouped — the night-shift issue tracker: a grouped, collapsible issue table with a PowerSearch bar and a resizable detail inspector. (Frame/responsive/container: see XLE header above.)
  */
 
 import React, {useState, useMemo} from 'react';
@@ -881,7 +869,7 @@ export default function TableGrouped() {
       <Layout
         height="fill"
         header={
-          <LayoutHeader hasDivider>
+          <LayoutHeader hasDivider padding={6}>
             <VStack gap={4}>
               <HStack gap={3} vAlign="center">
                 <StackItem size="fill">

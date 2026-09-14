@@ -3,17 +3,7 @@
 //   L > (LP[p=0] > V[g=4] > Tx"Account settings"[t=label] + (UL > LI*8) + D + LI"Professional hosting tools") + (LC[p=6] > V[g=0] > (Tbar > B.ghost + Hd"Personal info"[level=1]) + Hd"Personal info"[level=1] + (V[g=0] > (H[j=between a=start] > (V[g=0] > Tx"Legal name"[weight=semibold] + Tx"Vlad Dracul"[t=supporting]) + Lk"Edit")*7) + (C.muted > V[g=4] > (H[g=3 a=start] > Ic + (V[g=1] > Tx"Why is info hidden?"[weight=semibold] + Tx[t=supporting]))*3))
 
 /**
- * Settings Panels — account sections with a nav panel and divided rows.
- *
- * Frame: Layout nav panel (fill) | content column of section views. One
- * section renders at a time; rows are [label + value][action] pairs divided
- * edge-to-edge, never card-wrapped.
- *
- * Responsive contract:
- *   > 768px  the nav panel sits beside the content and the selected nav row
- *            carries the selection
- *   <= 768px master to detail: the nav fills the page, and selecting a row
- *            drills into the detail view behind a back button
+ * Settings Panels — account sections with a nav panel and divided rows.  Frame: Layout nav panel (fill) | content column of section views. One (Frame/responsive/container: see XLE header above.)
  */
 
 import {Fragment, useState, type CSSProperties} from 'react';

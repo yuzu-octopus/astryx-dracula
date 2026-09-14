@@ -1,6 +1,6 @@
 # Astryx Dracula Theme
 
-> Pure Dracula brand kit for Astryx React sites. Dark-only tokens, syntax highlighting, and chart colors with prebuilt CSS and zero runtime cost.
+> Pure Dracula brand kit for Astryx React sites. Dark-only tokens, syntax highlighting, and chart colors with prebuilt CSS plus runtime theme injection.
 
 Use the links below to style a site with this theme or migrate a codebase to it. Start with the agent skill, then the usage guide.
 
@@ -26,8 +26,8 @@ Use the links below to style a site with this theme or migrate a codebase to it.
 ## Theme source
 
 - [Theme definition](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/astryx-theme.ts): defineTheme source with all token overrides.
-- [Plain CSS tokens](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/tokens.css): :root fallbacks and font declarations.
-- [Icon registry](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/icons.tsx): Vendored Lucide icons, zero theme dependencies.
+- [Plain CSS tokens](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/tokens.css): full `:root` mirror (289 vars) and font declarations.
+- [Icon registry](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/icons.tsx): Lucide icon registry (runtime `lucide-react` dependency).
 
 ## Optional
 

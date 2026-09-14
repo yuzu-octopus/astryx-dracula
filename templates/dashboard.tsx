@@ -1,24 +1,9 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC[p=6] > V[g=6] > (Hd"The night shift"[level=1] + V[g=6] > (H[j=between a=center] > Hd"Awake after dark"[level=2] + B.secondary"Reload") + (V[g=3] > C[p=3] + Tx"Hourly intervals"[t=supporting] + (H[g=6] > (H[g=2 a=center] > Ic + Tx"Desktop"[t=supporting])*2))) + (G[c={min:280} g=4] > (C > V[g=2] > Tx"Moonlit visitors"[t=supporting] + (H[g=2] > Tx"27.3 k"[t=display-3] + Tx"+18.2%"[t=body]) + Tx"Last 30 days vs. Previous"[t=supporting])*4) + D + (H[j=between a=center] > Hd"Night denizens"[level=2] + B.secondary"View more") + (G[c={min:280} g=4] > (C > V[g=4] > Hd"Territory"[level=3] + (H[g=4 wrap] > (V[g=0] > (H[g=2 a=center] > Ic + Tx[t=supporting]) + Tx[t=supporting])*5))*2) + D + (H[j=between a=center] > Hd"Engagement"[level=2] + B.secondary"View more") + (G[c={min:280} g=4] > (C > V[g=6] > (H[j=between a=center] > Hd"Top pages"[level=3] + Lk"All pages") + T)*2)
+//   L > LC[p=6] > V[g=6] > (Hd"The night shift"[level=1] + V[g=6] > (H[j=between a=center] > Hd"Awake after dark"[level=2] + B.secondary"Reload") + (V[g=3] > C[p=4] + Tx"Hourly intervals"[t=supporting] + (H[g=6] > (H[g=2 a=center] > Ic + Tx"Desktop"[t=supporting])*2))) + (G[c={min:280} g=4] > (C > V[g=2] > Tx"Moonlit visitors"[t=supporting] + (H[g=2] > Tx"27.3 k"[t=display-3] + Tx"+18.2%"[t=body]) + Tx"Last 30 days vs. Previous"[t=supporting])*4) + D + (H[j=between a=center] > Hd"Night denizens"[level=2] + B.secondary"View more") + (G[c={min:280} g=4] > (C > V[g=4] > Hd"Territory"[level=3] + (H[g=4 wrap] > (V[g=0] > (H[g=2 a=center] > Ic + Tx[t=supporting]) + Tx[t=supporting])*5))*2) + D + (H[j=between a=center] > Hd"Engagement"[level=2] + B.secondary"View more") + (G[c={min:280} g=4] > (C > V[g=6] > (H[j=between a=center] > Hd"Top pages"[level=3] + Lk"All pages") + T)*2)
 
 /**
- * Analytics Dashboard — the night shift at a glance: live active users, four
- * KPI tiles, audience breakdown strips, and engagement tables.
- *
- * Frame: one content column, sections separated by dividers.
- *
- * Container policy: a widget dashboard, so tiles are Cards on an auto-fit grid
- * while the engagement tables stay edge-to-edge inside their own card. KPI
- * tiles lead with a supporting label above the figure, chart hues follow the
- * metric's direction (green up, red down), and card headings sit at level 3
- * under level 2 sections.
- *
- * Responsive contract:
- *   no media queries — every row is an auto-fit Grid. Tiles step from four
- *   columns down to one as the content column narrows (280px track floor), and
- *   the two engagement tables scroll horizontally inside their card below
- *   ~440px while every cell truncates to a single line.
+ * Analytics Dashboard — the night shift at a glance: live active users, four KPI tiles, audience breakdown strips, and engagement tables. (Frame/responsive/container: see XLE header above.)
  */
 
 import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
@@ -368,7 +353,7 @@ const topPagesColumns: TableColumn<PageRow>[] = [
           label={`${item.page} views`}
           isLabelHidden
         />
-        <Text type="supporting" hasTabularNumbers maxLines={1}>
+        <Text type="body" hasTabularNumbers maxLines={1}>
           {formatCount(item.views)}
         </Text>
       </VStack>
@@ -434,7 +419,7 @@ const topEventsColumns: TableColumn<EventRow>[] = [
           label={`${item.count}`}
           isLabelHidden
         />
-        <Text type="supporting" hasTabularNumbers maxLines={1}>
+        <Text type="body" hasTabularNumbers maxLines={1}>
           {formatCount(item.count)}
         </Text>
       </VStack>
@@ -488,10 +473,11 @@ function ActiveUsersChart() {
   const bars = activeUsersData.filter((_, i) => i % 4 === 0);
   const max = 130;
   const tickHours = [0, 32, 64, 92];
-  // SVG type scales up with the viewBox, so unit sizes stay small
+  // SVG type scales up with the viewBox, so unit sizes stay small: raw <text>
+  // (not ChartLabel) — 13px labels would render ~2.4x oversize in this 540-wide viewBox.
   return (
     <VStack gap={3}>
-      <Card padding={3} style={CHART_PANEL_STYLE}>
+      <Card padding={4} style={CHART_PANEL_STYLE}>
         <svg
           viewBox="0 0 540 180"
           width="100%"
@@ -650,7 +636,7 @@ function StackedBarCard({
             <VStack key={d.label} gap={0}>
               <HStack gap={2} vAlign="center">
                 <Icon icon={Square} size="xsm" style={{color: d.color}} />
-                <Text type="supporting">{d.label}</Text>
+                <Text type="supporting" color="secondary">{d.label}</Text>
               </HStack>
               <Text type="supporting" color="secondary" hasTabularNumbers>
                 {((d.value / total) * 100).toFixed(0)}%
