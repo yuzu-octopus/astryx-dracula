@@ -39,14 +39,16 @@
 import type {CSSProperties} from 'react';
 import {HStack, StackItem, VStack} from '@astryxdesign/core/Stack';
 import {Text} from '@astryxdesign/core/Text';
+import type {ChartHue} from './chart-hues';
 
 export interface DataBarSegment {
   /** Stable key for the segment. */
   id: string;
   value: number;
   /** MUST be a --color-data-categorical-* or --color-data-<family>-N var.
-   *  Never a raw hex, never a --dracula-* primitive. */
-  color: string;
+   *  Never a raw hex, never a --dracula-* primitive. Typed rather than
+   *  documented: `string` made the rule a comment nobody could break. */
+  color: ChartHue | `var(--color-data-${string})`;
 }
 
 /** Minimum segment share, so a tiny non-zero value stays visible. */

@@ -164,7 +164,16 @@ const pairs: Array<[string, string, string, number]> = [
   ['on-error/pale-error', '#21222C', '#FFD5CC', 4.5],
   ['on-inverted/inverted', '#21222C', '#F8F8F2', 4.5],
   ['separator/bg', '#44475A', '#282A36', 1.3],
-  ['border-em/card', '#6272A4', '#343746', 1.5],
+  // border-em: 3.0, not 1.5. The floor is the WCAG 1.4.11 tier core's own
+  // expandColorScale.ts:22-24 promises for form-control boundaries, which
+  // pin() makes inert. 3.0 passes at 4.60 and would have been RED at 2.51
+  // before the repin, so the gate now carries evidence instead of rubber-
+  // stamping. Popover is a REAL adjacent tier, not a hypothetical one:
+  // DropdownMenuRadioItem.tsx:84 reads this token and DropdownMenu paints
+  // --color-background-popover. Muted is included for the same reason.
+  ['border-em/card',    '#9AA1BC', '#343746', 3.0],
+  ['border-em/popover', '#9AA1BC', '#424450', 3.0],
+  ['border-em/muted',   '#9AA1BC', '#44475A', 3.0],
   ['banner-info/text', '#8BE9FD', mix('#8BE9FD', 0.1, '#343746'), 3.0],
   ['banner-success/text', '#50FA7B', mix('#50FA7B', 0.1, '#343746'), 3.0],
   ['banner-warning/text', '#F1FA8C', mix('#F1FA8C', 0.1, '#343746'), 3.0],

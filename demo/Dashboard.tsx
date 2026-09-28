@@ -100,25 +100,25 @@ export function Dashboard() {
                   ProgressBar. See shared/data-bar.tsx for why. */}
               <DataBar
                 label="Build minutes quota"
-                segments={[{id: 'used', value: 62, color: 'var(--color-success)'}]}
+                segments={[{id: 'used', value: 62, color: 'var(--color-data-categorical-green)'}]}
                 hasValueLabel
                 formatValue={used => `${used}% used`}
               />
               <DataBar
                 label="Network egress bandwidth"
-                segments={[{id: 'used', value: 38, color: 'var(--color-success)'}]}
+                segments={[{id: 'used', value: 38, color: 'var(--color-data-categorical-green)'}]}
                 hasValueLabel
                 formatValue={used => `${used}% used`}
               />
               <DataBar
                 label="Monthly error budget"
-                segments={[{id: 'used', value: 91, color: 'var(--color-warning)'}]}
+                segments={[{id: 'used', value: 91, color: 'var(--color-data-categorical-yellow)'}]}
                 hasValueLabel
                 formatValue={used => `${used}% used`}
               />
               <DataBar
                 label="Memory pool allocation"
-                segments={[{id: 'used', value: 45, color: 'var(--color-success)'}]}
+                segments={[{id: 'used', value: 45, color: 'var(--color-data-categorical-green)'}]}
                 hasValueLabel
                 formatValue={used => `${used}% used`}
               />

@@ -193,19 +193,19 @@ export function Bento() {
               <Heading level={2}>Capacity</Heading>
               <DataBar
                 label="Build quota"
-                segments={[{id: 'used', value: 62, color: 'var(--color-success)'}]}
+                segments={[{id: 'used', value: 62, color: 'var(--color-data-categorical-green)'}]}
                 hasValueLabel
                 formatValue={used => `${used}% used`}
               />
               <DataBar
                 label="Error budget"
-                segments={[{id: 'used', value: 91, color: 'var(--color-warning)'}]}
+                segments={[{id: 'used', value: 91, color: 'var(--color-data-categorical-yellow)'}]}
                 hasValueLabel
                 formatValue={used => `${used}% consumed`}
               />
               <DataBar
                 label="Uptime"
-                segments={[{id: 'used', value: 99, color: 'var(--color-success)'}]}
+                segments={[{id: 'used', value: 99, color: 'var(--color-data-categorical-green)'}]}
                 hasValueLabel
                 formatValue={used => `${used}%`}
               />

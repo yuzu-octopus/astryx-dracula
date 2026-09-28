@@ -2,6 +2,7 @@
 // table-page-shoe-store-heatmap (Midnight Kicks) templates. The two pages are
 // one archetype — revenue line over the order log — differing only in catalogue,
 // rows, and chart scale, so the frame/columns live here once.
+import type {CSSProperties} from 'react';
 import {
   VStack,
   HStack,
@@ -21,6 +22,28 @@ import type {TableColumn} from '@astryxdesign/core/Table';
 import {Filter, Download, Plus} from 'lucide-react';
 import {RevenueChart, ProductSwatch} from 'astryx-dracula/shared/revenue-chart';
 import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
+
+// Anchor for the page wrapper.
+//
+// `height: '100dvh'`, NOT `minHeight: '100%'`. A percentage min-height
+// resolves against the containing block's DEFINITE height and computes to 0
+// when that is indefinite (CSS 2.1 10.5), so against a content-sized host it
+// contributes nothing at all: the Layout's `height: 100%` still resolves to
+// auto and the document keeps the scroll, which is the failure this exists to
+// remove. Viewport units are absolute and need no ancestor, which is why every
+// working instance in this repo uses them -- editor.tsx:302, file-explorer.tsx:
+// 265, messaging-shell.tsx:67, ai-chat.tsx:64, kanban-board.tsx:704 -- and why
+// minHeight appears in none of them.
+//
+// The wrapper is shared by all three callers (table-page-chart.tsx:410,
+// table-page-shoe-store-heatmap.tsx:759, and this module's own default), so
+// anchoring it here covers them together. Anchoring inside each caller instead
+// would put a 100dvh box inside this one and overflow by the header height.
+//
+// The wrapper exists to give the Layout's `height: 100%` (Layout.tsx:58-63)
+// something definite to resolve against when the host is content-sized, which
+// is the case whenever a template ships standalone.
+const pageStyle: CSSProperties = {height: '100dvh'};
 
 export interface OrderDeskProduct {
   name: string;
@@ -182,13 +205,27 @@ export function OrderDesk({
   gridTicks: number[];
 }) {
   return (
-    <Layout
-      height="fill"
+    // The anchor lives on a page-owned wrapper, never on the Layout. A bare
+    // `height="fill"` resolves against `min-height: 100%`, which collapses when
+    // the host is content-sized — and templates ship standalone, so that is the
+    // common case. Putting the height on the Layout instead would trade
+    // a soft failure (the document scrolls) for a hard one (content clipped,
+    // because `LayoutContent` is `overflow: auto` with a definite height).
+    <div style={pageStyle}>
+      <Layout
+        height="fill"
       header={
         <LayoutHeader hasDivider padding={6}>
           <HStack gap={2} vAlign="center">
             <StackItem size="fill">
-              <Heading level={1} type="display-2">{title}</Heading>
+              {/* maxLines={1}, not wrap="wrap": at 390 the 35px display-2 title
+                  wraps 2-3 lines in a 342px header (measured: 136px tall for
+                  "Midnight Kicks", 180px for an 18-char title). Wrapping the
+                  row measured IDENTICAL header heights in both configurations
+                  — the controls already fit, the title is what is tall. And
+                  maxLines wires core's useTruncation, so the full value stays
+                  reachable in a Tooltip (SC 1.4.10, "truncation must reveal"). */}
+              <Heading level={1} type="display-2" maxLines={1}>{title}</Heading>
             </StackItem>
             <IconButton
               label="Filter"
@@ -230,6 +267,7 @@ export function OrderDesk({
           </VStack>
         </LayoutContent>
       }
-    />
+      />
+    </div>
   );
 }

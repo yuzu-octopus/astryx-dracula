@@ -80,6 +80,13 @@ const IMAGES: readonly SceneHue[] = [
   'var(--dracula-yellow)',
   'var(--dracula-green)',
   'var(--dracula-orange)',
+  // The sixth is `muted` (Comment): a legal / neutral / out-of-stock
+  // register, which is exactly what a product photo set needs an extra slot
+  // for. Cyan, pink, yellow, green and orange are all saturated identity
+  // colours; a sixth saturated one would read as a sixth product variant
+  // rather than as "this one is the plain shot". Keeps the 3-column grid
+  // closing on two full rows, which is the reason the set exists.
+  'var(--dracula-comment)',
 ];
 
 // ─── Product Data ───────────────────────────────────────────────────────────

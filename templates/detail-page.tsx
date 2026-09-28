@@ -369,7 +369,6 @@ function ItemsCard() {
                   ))}
                 </VStack>
               }
-              onClick={() => {}}
               startContent={
                 <ProductSigil name={product.name} index={i} />
               }

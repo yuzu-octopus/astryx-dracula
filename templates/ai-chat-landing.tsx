@@ -40,11 +40,17 @@ import {
 } from 'lucide-react';
 
 // Fill the content area so the greeting and composer stay vertically centered.
-const pageStyle: CSSProperties = {minHeight: '100%'};
+// `height`, not `minHeight`. A percentage min-height resolves against the
+// containing block's DEFINITE height and computes to 0 when that is indefinite
+// (CSS 2.1 10.5), so against a content-sized host it contributes nothing and
+// the Layout's `height: 100%` still resolves to auto -- the edit is a no-op.
+// Viewport units are absolute and need no ancestor, which is why every working
+// instance in this repo uses them (editor.tsx:302, file-explorer.tsx:265,
+// messaging-shell.tsx:67, ai-chat.tsx:64, kanban-board.tsx:704).
+const pageStyle: CSSProperties = {height: '100dvh'};
 // Five --spacing-4 steps: the box opens at ~80px so the empty composer reads
 // as a writing surface, not a single-line field. No single token is 80px.
 const composerInput: CSSProperties = {minHeight: 'calc(var(--spacing-4) * 5)'};
-const categories: CSSProperties = {paddingInline: 'var(--space-viewport)'};
 
 // Suggestion cards shown once a category is selected.
 const CATEGORY_SUGGESTIONS: Record<
@@ -455,7 +461,7 @@ export default function AiChatLanding() {
             />
 
             {/* Category filters + suggestion cards */}
-            <VStack gap={6} style={categories}>
+            <VStack gap={6}>
               <ToggleButtonGroup
                 label="Category"
                 value={category}

@@ -19,6 +19,7 @@
  *   viewports scroll the table horizontally instead of widening the page.
  */
 
+import type {CSSProperties} from 'react';
 import {
   VStack,
   HStack,
@@ -38,7 +39,8 @@ import {Link} from '@astryxdesign/core/Link';
 import {Table, proportional, pixel} from '@astryxdesign/core/Table';
 import type {TableColumn} from '@astryxdesign/core/Table';
 import {Filter, Download, RotateCw} from 'lucide-react';
-import {ChartLegend} from 'astryx-dracula/shared/chart-legend';
+import {CHART_HUES} from 'astryx-dracula/shared/chart-hues';
+import {ChartLegend, type ChartLegendEntry} from 'astryx-dracula/shared/chart-legend';
 import {ChartLabel} from 'astryx-dracula/shared/chart-labels';
 import {CHART_PANEL_STYLE} from 'astryx-dracula/shared/revenue-chart';
 
@@ -422,24 +424,32 @@ const columns: TableColumn<IncidentRow>[] = [
 
 // Incident-count ramp: quiet days rest on the Dracula surface, busier cells
 // climb green → orange → red.
+// Delegates to CHART_HUES, the sanctioned categorical source. Writing the
+// literal here is what let a --dracula-* primitive reach a chart mark: the
+// dictionary itself held primitives, so "use the module" was not available.
 function heatFill(count: number): string {
   if (count >= 3) {
-    return 'var(--dracula-red)';
+    return CHART_HUES.red;
   }
   if (count === 2) {
-    return 'var(--dracula-orange)';
+    return CHART_HUES.orange;
   }
   if (count === 1) {
-    return 'var(--dracula-green)';
+    return CHART_HUES.green;
   }
-  return 'var(--dracula-bg-light)';
+  // Zero is a magnitude, not a severity, so it wears the surface tier rather
+  // than a data hue -- which is why the legend type needs a background arm.
+  return 'var(--color-background-card)';
 }
 
-const HEAT_LEGEND = [
-  {label: '0', fill: 'var(--dracula-bg-light)'},
-  {label: '1', fill: 'var(--dracula-green)'},
-  {label: '2', fill: 'var(--dracula-orange)'},
-  {label: '3+', fill: 'var(--dracula-red)'},
+// The zero swatch and its cell MUST move together: the legend is how a reader
+// learns what a colour means, so a legend that disagrees with the grid teaches
+// them the wrong mapping.
+const HEAT_LEGEND: readonly ChartLegendEntry[] = [
+  {label: '0', color: 'var(--color-background-card)'},
+  {label: '1', color: CHART_HUES.green},
+  {label: '2', color: CHART_HUES.orange},
+  {label: '3+', color: CHART_HUES.red},
 ];
 
 function OutageHeatmap() {
@@ -495,10 +505,19 @@ function OutageHeatmap() {
                     <ChartLabel
                       x={labelW + di * (cellW + gap) + cellW / 2}
                       y={labelH + hi * (cellH + gap) + cellH / 2 + 3}
+                      // On-fill ink follows the cell it sits on, so it takes
+                      // the --color-on-* arm for that status rather than one
+                      // fixed token. --color-on-dark is the wrong target here:
+                      // it is #F8F8F2, near-white, which would fail on the
+                      // saturated green/orange/red fills.
                       fill={
-                        count > 0
-                          ? 'var(--dracula-bg-dark)'
-                          : undefined
+                        count >= 3
+                          ? 'var(--color-on-error)'
+                          : count === 2
+                            ? 'var(--color-on-warning)'
+                            : count === 1
+                              ? 'var(--color-on-success)'
+                              : undefined
                       }>
                       {count}
                     </ChartLabel>
@@ -515,7 +534,7 @@ function OutageHeatmap() {
           magnitude ramp and would invert this one — on a dark page a high count
           reads lighter, which is the opposite of "more is worse" here. */}
       <ChartLegend
-        entries={HEAT_LEGEND.map(entry => ({label: entry.label, color: entry.fill}))}
+        entries={HEAT_LEGEND}
         gap={2}
         swatchSize={12}
         caption={
@@ -530,9 +549,18 @@ function OutageHeatmap() {
 
 // ============= PAGE =============
 
+// A definite ancestor for `Layout height="fill"`. 100dvh, not minHeight: '100%':
+// a percentage min-height against an indefinite containing block computes to 0
+// (CSS 2.1 10.5), so the soft failure would survive and the document would keep
+// the scroll. LayoutContent is overflow:auto, so the definite height lands as a
+// content-pane scroller rather than a clip. Same shape as dashboard.tsx and
+// editor.tsx:302.
+const pageStyle: CSSProperties = {height: '100dvh'};
+
 export default function HeatmapTable() {
   return (
     <Layout
+      style={pageStyle}
       height="fill"
       header={
         <LayoutHeader hasDivider padding={6}>

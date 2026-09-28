@@ -81,7 +81,12 @@ export const outlinePanel: CSSProperties = {
   position: 'sticky',
   top: 'var(--spacing-6)',
   alignSelf: 'start',
-  paddingBlockStart: 'var(--spacing-2)',
+  // No paddingBlockStart. This object is applied via `style=` to the outline
+  // LayoutPanels (chaptered-doc.tsx:316, documentation-design.tsx:592,
+  // documentation-technical.tsx:82), and an inline style prop BEATS the stylex
+  // class -- so this 8px silently overrode the panel's own 16px block padding
+  // at the top edge only, leaving every "On this page" rail in the kit
+  // asymmetric by 8px. The panel already owns its block padding.
 };
 
 // Derived once per page so the Outline receives a stable array identity

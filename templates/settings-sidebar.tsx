@@ -186,7 +186,6 @@ export default function SettingsSidebar() {
         <ListItem
           label="Professional hosting tools"
           startContent={<Icon icon={Wrench} />}
-          onClick={() => {}}
         />
       </List>
     </VStack>
@@ -198,7 +197,14 @@ export default function SettingsSidebar() {
       <Layout
         height="fill"
         style={fillViewport}
-        content={<LayoutContent padding={2}>{navList}</LayoutContent>}
+        // padding={0}, not padding={2}. This wraps the SAME navList element
+        // the desktop LayoutPanel renders with padding={0}, and sideNavPadding
+        // already supplies the list's 12px inline inset. The extra 8px here is
+        // what made the same nav list measure 20px on mobile against 12px on
+        // desktop -- and against 24px further down, so the two mobile states
+        // disagreed with each other too. The container owns no gutter; the
+        // list owns its own.
+        content={<LayoutContent padding={0}>{navList}</LayoutContent>}
       />
     );
   }

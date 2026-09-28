@@ -580,7 +580,13 @@ export default function FileExplorer() {
             {selectedFile && (
               <Section
                 width={320}
-                padding={6}
+                // 16px, not 24. The sibling column at :519 is padding={2}
+                // (8px) because it holds a dense compact List, and these two
+                // sit in one HStack (:510) as columns of the same view --
+                // 24 beside 8 made the compact column look broken rather
+                // than compact. 16 is the outer-inset value this repo already
+                // uses for exactly this (scaffolds.md new-site recipe).
+                padding={4}
                 variant="transparent"
                 style={{...scrollable, ...detailColumn}}
                 role="region"

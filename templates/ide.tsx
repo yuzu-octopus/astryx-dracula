@@ -39,12 +39,21 @@ const styles: Record<string, CSSProperties> = {
   },
   tabListPadding: {
     paddingTop: 'var(--spacing-2)',
+    // 4px inline = offset 2 + ring thickness 2, so the focus ring lands INSIDE
+    // this box's clip instead of on its edge being cut in half. Deliberately
+    // NOT applied to `terminalPanel`: that would inset the CodeBlock itself,
+    // moving the code rather than giving the ring somewhere to live.
+    paddingInline: 'var(--spacing-1)',
   },
   metadataCompact: {
     gap: 'var(--spacing-1) var(--spacing-3)',
   },
+  // No `overflow` here, deliberately. The only child is a `CodeBlock` at
+  // `height: 100%` whose own root is `overflow: hidden`, so this box could
+  // never overflow and the scroller never fired — it only clipped. An
+  // `overflow: auto` on a parent whose sole child is a fixed-height
+  // `overflow: hidden` box is inert, which is what the deleted line was.
   editorArea: {
-    overflow: 'auto',
     minHeight: 0,
   },
   fileExplorer: {

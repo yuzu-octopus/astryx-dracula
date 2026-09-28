@@ -13,8 +13,13 @@ interface ChartLabelProps {
   y: number | string;
   textAnchor?: 'start' | 'middle' | 'end';
   /** Defaults to the paragraph token; pass an explicit fill for values drawn
-   *  on colored fills (e.g. in-cell heatmap counts). */
-  fill?: string;
+   *  on colored fills (e.g. in-cell heatmap counts).
+   *
+   *  Deliberately NOT the chart-legend union: this paints TEXT, so its arms
+   *  are a text role and the on-fill role, and neither is a --color-data-*
+   *  var. Reusing the legend type here would reject the one use it exists
+   *  for. */
+  fill?: `var(--color-text-${string})` | `var(--color-on-${string})`;
   children: ReactNode;
 }
 

@@ -29,15 +29,22 @@ import {CHART_HUES, type ChartHue} from 'astryx-dracula/shared/chart-hues';
 export interface ChartLegendEntry {
   /** REQUIRED. The hue never travels alone — this is the 1.4.1 contract. */
   label: string;
-  /** A --color-data-* var, or a CHART_HUES key. Never a raw hex. */
-  color: ChartHue | (string & {});
+  /** A --color-data-* var, or a --color-background-* surface. Never a raw
+   *  hex, never a --dracula-* primitive.
+   *
+   *  The surface arm is not optional: a legend whose first row is a recessive
+   *  surface is normal (the heatmap's zero cell), so a data-only type would
+   *  reject the value the heatmap is supposed to paint. */
+  color: ChartHue | `var(--color-data-${string})` | `var(--color-background-${string})`;
 }
 
-// A call site may pass either a CHART_HUES key or a literal token var, so the
-// lookup is keyed by string and falls through to the caller's own value. Typed
-// as Record<string, string> deliberately: indexing CHART_HUES directly with a
-// `ChartHue` union does not narrow, because the union already includes keys
-// the palette does not define.
+// Kept as a string-keyed fall-through on purpose, and DO NOT narrow it: call
+// sites pass an already-RESOLVED value (CHART_HUES.x is a property access, so
+// it yields the value, never the key), so the lookup misses at every site and
+// the `?? entry.color` is the only path that paints. Narrowing the key type
+// would render `background: undefined` at every call site, compile clean, and
+// break at runtime. The old comment here claimed call sites may pass a KEY;
+// none does. The behaviour is correct; only the comment was wrong.
 const HUE_LOOKUP: Record<string, string> = CHART_HUES;
 
 export interface ChartLegendProps {

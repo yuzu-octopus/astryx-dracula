@@ -6,6 +6,7 @@
  * Analytics Dashboard — the night shift at a glance: live active users, four KPI tiles, audience breakdown strips, and engagement tables. (Frame/responsive/container: see XLE header above.)
  */
 
+import type {CSSProperties} from 'react';
 import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
 import {Card} from '@astryxdesign/core/Card';
@@ -687,9 +688,23 @@ function TableCard<T extends {id: string}>({
 
 // ============= MAIN COMPONENT =============
 
+// A definite ancestor, so `Layout height="fill"` (Layout.tsx:58-63, height:
+// calc(100% + ...)) has something definite to resolve against instead of
+// collapsing to auto and handing the scroll to the document. 100dvh rather
+// than minHeight: '100%' -- a percentage min-height against an indefinite
+// containing block computes to 0, so the soft failure would survive. The
+// anchor is on the Layout, not a wrapper: LayoutContent is overflow:auto
+// (LayoutContent.tsx:36-39), so a definite height is what makes the content
+// pane SCROLL rather than clip. Same shape as editor.tsx:302 and
+// kanban-board.tsx:704. Not applied to shell-nav / shell-side-nav, which
+// already sit inside an AppShell's own 100dvh and would overflow by the
+// header height.
+const pageStyle: CSSProperties = {height: '100dvh'};
+
 export default function DashboardTemplate() {
   return (
     <Layout
+      style={pageStyle}
       height="fill"
       content={
         <LayoutContent padding={6}>

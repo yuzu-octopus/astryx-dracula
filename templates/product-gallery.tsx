@@ -150,7 +150,7 @@ export default function ProductGallery() {
                   full moon.
                 </Text>
               </VStack>
-              <Grid columns={{minWidth: 280}} gap={8} id="products">
+              <Grid columns={{minWidth: 280}} gap={4} id="products">
                 {PRODUCTS.map(product => (
                   <ProductCard key={product.id} product={product} />
                 ))}

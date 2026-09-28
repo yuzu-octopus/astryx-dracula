@@ -397,7 +397,16 @@ function PolicyLinks() {
 }
 
 export default function PaymentForm() {
-  const isMobile = useMediaQuery('(max-width: 767px)');
+  // 768, not 767: eight sibling templates gate the same collapse at exactly
+  // 768 (`documentation-design.tsx:568`, `documentation-technical.tsx:61`,
+  // `editor.tsx:640`, `file-explorer.tsx:375`, `ide.tsx:244`,
+  // `settings-sidebar.tsx:127`, `settings.tsx:79`, `messaging-shell.tsx:393`),
+  // and this file's own second query below is 1024. At 767 this was the only
+  // off-by-one in the set, so at exactly a 768px viewport `isMobile` was
+  // false while `isStacked` was true: the outer Stack had already gone
+  // vertical (`:514`) and all six `columns={isMobile ? 1 : N}` grids below
+  // stayed wide inside it, including the 3-column expiry row at `:821`.
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const isStacked = useMediaQuery('(max-width: 1024px)');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');

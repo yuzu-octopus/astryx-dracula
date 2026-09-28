@@ -872,7 +872,13 @@ export default function TableGrouped() {
             <VStack gap={4}>
               <HStack gap={3} vAlign="center">
                 <StackItem size="fill">
-                  <Heading level={1} type="display-2">Night-shift issues</Heading>
+                  {/* maxLines={1}: this is the worst case in the set — 18
+                      characters at 35px is 378px of a 342px header column, so
+                      it wraps to THREE lines and the header measures 180px
+                      (21.3% of a 390x844 viewport). Core wires maxLines to
+                      useTruncation, so the full title stays reachable in a
+                      Tooltip (SC 1.4.10). */}
+                  <Heading level={1} type="display-2" maxLines={1}>Night-shift issues</Heading>
                 </StackItem>
                 <Button
                   label="Raise issue"

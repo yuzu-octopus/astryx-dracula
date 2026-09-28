@@ -161,7 +161,16 @@ const tokens: Record<string, TokenValue> = {
   '--color-overlay-hover': pin('#0000001F'),
   '--color-overlay-pressed': pin('#00000033'),
   '--color-border': pin(DRA.comment),
-  '--color-border-emphasized': pin(DRA.comment),
+  // Repinned from DRA.comment (#6272A4). Core tone-bumps this token to >=3:1
+  // for form-control boundaries (expandColorScale.ts:22-24), but pin() returns a
+  // literal, so that guarantee is inert by construction on this theme.
+  // #9AA1BC is the shipped AA lift: it clears 3:1 on all four surface tiers
+  // (5.56/4.60/3.77/3.57) where the old value cleared none (3.03/2.51/2.05/1.94),
+  // and it is what a DropdownMenuRadioItem boundary needs on a popover.
+  // Known shortfall: the inverted surface (#F8F8F2) at 2.40, which has no live
+  // consumer — only Toast.tsx paints it and its one control is a Button, which
+  // reads --color-border, not -emphasized. Recorded at the site, not certified.
+  '--color-border-emphasized': pin('#9AA1BC'),
   // Astryx semantics from Dracula accents (text roles AA-verified)
   '--color-accent': pin(DRA.purple),
   '--color-success': pin(DRA.green),

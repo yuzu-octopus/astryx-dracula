@@ -162,7 +162,7 @@ export function Gallery() {
             <ProgressBar label="Build pipeline execution" value={62} variant="neutral" hasValueLabel />
             <DataBar
               label="Network bandwidth headroom"
-              segments={[{id: 'used', value: 38, color: 'var(--color-success)'}]}
+              segments={[{id: 'used', value: 38, color: 'var(--color-data-categorical-green)'}]}
               hasValueLabel
               formatValue={used => `${used}% used`}
             />

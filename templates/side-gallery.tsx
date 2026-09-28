@@ -1,7 +1,10 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC[p=6] > G[c={min:280} g8 a=center] > (V[g6] > (V[g3] > Tx"AFTER DARK"[t=supporting] + Hd"Make every night"[level=1] + Tx"The smallest rituals"[t=body]) + B.primary"Explore the night" + (V[g4] > D + (H[g6] > (V > Tx"12k+"[t=display-3] + Tx"Night shots"[t=supporting])*3))) + (G[c3 g3] > AR*9)
+// AR*10 is the live count: GALLERY_SCENES has 10 entries and a bare .map renders
+// all 10, with no slice. The header said 9 while 10 rendered.
+//   L > LC[p=6] > G[c={min:280} g8 a=center] > (V[g6] > (V[g3] > Tx"AFTER DARK"[t=supporting] + Hd"Make every night"[level=1] + Tx"The smallest rituals"[t=body]) + B.primary"Explore the night" + (V[g4] > D + (H[g6] > (V > Tx"12k+"[t=display-3] + Tx"Night shots"[t=supporting])*3))) + (G[c3 g3] > AR*10)
 
+import type {CSSProperties} from 'react';
 import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
 import {Button} from '@astryxdesign/core/Button';
@@ -64,9 +67,18 @@ function ImageGrid() {
 
 // ─── Main Page ──────────────────────────────────────────────────────────────
 
+// A definite ancestor for `Layout height="fill"`. 100dvh, not minHeight: '100%':
+// a percentage min-height against an indefinite containing block computes to 0
+// (CSS 2.1 10.5), so the soft failure would survive and the document would keep
+// the scroll. LayoutContent is overflow:auto, so the definite height lands as a
+// content-pane scroller rather than a clip. Same shape as dashboard.tsx and
+// editor.tsx:302.
+const pageStyle: CSSProperties = {height: '100dvh'};
+
 export default function SideGallery() {
   return (
     <Layout
+      style={pageStyle}
       height="fill"
       contentWidth={1400}
       content={

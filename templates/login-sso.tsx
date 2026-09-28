@@ -199,8 +199,15 @@ export default function LoginSso() {
                 </Text>
               </VStack>
 
-              <Card padding={0}>
-                <Section variant="muted" padding={4}>
+              {/* The gutter lives on the Card, not the Section. A Section
+                  escapes its container's --container-padding-* (Section.tsx:
+                  56-71), but with Card padding={0} that published var is
+                  --spacing-0, so the escape cancelled nothing and the muted
+                  fill painted flush to the card border. 3 + 1 keeps the text
+                  inset at the 16px it already had while giving the fill a
+                  real one. */}
+              <Card padding={3}>
+                <Section variant="muted" padding={1}>
                   <HStack gap={2} vAlign="center">
                     <Icon icon={ShieldCheck} color="secondary" />
                     <VStack gap={0}>

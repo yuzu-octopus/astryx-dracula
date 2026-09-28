@@ -1,6 +1,10 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC > V[g=10] > (C[p=10] > (H[g=8 a=center] > (V[g=4] > Hd"The coven grimoire"[level=1 t=display-1] + Tx.lg"Every incantation in the Astryx spellbook"[t=large] + (H > B.primary"Enter the grimoire")))) + (V[g=4] > (H[j=between a=center] > Hd"Core"[level=2] + Tx"15 spells"[t=body]) + (H[j=between a=center] > Hd"Layout"[level=2] + Tx"4 spells"[t=body]) + (H[j=between a=center] > Hd"Navigation"[level=2] + Tx"4 spells"[t=body]) + (H[j=between a=center] > Hd"Form"[level=2] + Tx"5 spells"[t=body]) + (G[c={min:260} g=2] > (CC[p=4] > V[g=3] > C[p=0] + (V[g=1] > Tx"Avatar"[t=body] + Tx"Avatars represent"[t=body]))*4))
+// Counts: 31 total, Core 18 / Layout 4 / Navigation 4 / Form 5. Derived at
+// render from COMPONENT_CATEGORIES, so these numerals must move together with
+// the array -- the gate in scripts/check.ts reads the rendered count, not this
+// comment.
+//   L > LC > V[g=10] > (C[p=10] > (H[g=8 a=center] > (V[g=4] > Hd"The coven grimoire"[level=1 t=display-1] + Tx.lg"Every incantation in the Astryx spellbook"[t=large] + (H > B.primary"Enter the grimoire")))) + (V[g=4] > (H[j=between a=center] > Hd"Core"[level=2] + Tx"18 spells"[t=body]) + (H[j=between a=center] > Hd"Layout"[level=2] + Tx"4 spells"[t=body]) + (H[j=between a=center] > Hd"Navigation"[level=2] + Tx"4 spells"[t=body]) + (H[j=between a=center] > Hd"Form"[level=2] + Tx"5 spells"[t=body]) + (G[c={min:260} g=4] > (CC[p=4] > V[g=3] > C[p=0] + (V[g=1] > Tx"Avatar"[t=body] + Tx"Avatars represent"[t=body]))*4))
 
 /**
  * Documentation catalog — every component shelf in the grimoire.  Frame-first layout (see `bunx astryx docs layout`): (Frame/responsive/container: see XLE header above.)
@@ -220,6 +224,17 @@ const COMPONENT_CATEGORIES = [
   },
 ];
 
+// Every count in this template is DERIVED from the array above, never written as
+// a numeral. The hero copy and the per-category "N spells" line both read this
+// and `items.length`, so adding a component can no longer make the page lie
+// about its own size -- which is what happened while the hero copy said
+// "twenty-eight" against 31 entries and the XLE header said 15 for a category
+// of 18.
+const COMPONENT_TOTAL = COMPONENT_CATEGORIES.reduce(
+  (sum, category) => sum + category.items.length,
+  0,
+);
+
 // ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
@@ -240,8 +255,8 @@ export default function DocumentationCatalog() {
                       The coven grimoire
                     </Heading>
                     <Text type="large" weight="normal" color="secondary">
-                      Every incantation in the Astryx spellbook, with
-                      twenty-eight components for building beautiful,
+                      Every incantation in the Astryx spellbook, with{' '}
+                      {COMPONENT_TOTAL} components for building beautiful,
                       accessible products after dark.
                     </Text>
                     <HStack>
@@ -267,7 +282,7 @@ export default function DocumentationCatalog() {
                     {category.items.length === 1 ? 'spell' : 'spells'}
                   </Text>
                 </HStack>
-                <Grid columns={{minWidth: 260}} gap={2} style={cardGrid}>
+                <Grid columns={{minWidth: 260}} gap={4} style={cardGrid}>
                   {category.items.map(item => (
                     <ClickableCard
                       key={item.key}

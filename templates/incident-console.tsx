@@ -55,9 +55,14 @@ const styles: Record<string, CSSProperties> = {
     padding: 'var(--spacing-2) var(--spacing-3)',
     backgroundColor: 'var(--color-background-muted)',
   },
+  // All FOUR edges, not block-only. With `overflowY: auto` and no `overflowX`,
+  // the inline axis computes to `auto` too, so this box clips horizontally as
+  // well as vertically. A block-only padding lands green and still leaves the
+  // inline half of the ring clipped.
   rows: {
     overflowY: 'auto',
     minHeight: 0,
+    padding: 'var(--spacing-1)',
   },
   inspector: {
     padding: 'var(--spacing-4)',

@@ -86,10 +86,20 @@ const styles: Record<string, CSSProperties> = {
     paddingInline: 'var(--spacing-3)',
     paddingBottom: 'var(--spacing-2)',
   },
+  // Block-start only: the inline (8px) and bottom (12px) edges already clear
+  // Two different jobs on one object, so the two different values are not
+  // redundant. INLINE is a content gutter: it must equal sidebarHeader and
+  // sidebarSearch above it (both var(--spacing-3) = 12px) because the channel
+  // list sits directly under the search field in the same 260px start panel --
+  // at 8px the body sat 4px inside the field above it. BLOCK-START is a ring
+  // budget, not a gutter: 4px = ring offset 2 + thickness 2, so the focus ring
+  // lands inside this clip instead of on its edge. The bottom edge stays 12px
+  // because the list scrolls into it, not into a ring.
   sidebarScroll: {
     minHeight: 0,
     overflowY: 'auto',
-    paddingInline: 'var(--spacing-2)',
+    paddingInline: 'var(--spacing-3)',
+    paddingBlockStart: 'var(--spacing-1)',
     paddingBottom: 'var(--spacing-3)',
   },
   streamColumn: {

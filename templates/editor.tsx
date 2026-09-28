@@ -13,7 +13,7 @@ import {
 } from 'react';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {Button} from '@astryxdesign/core/Button';
-import {Card} from '@astryxdesign/core/Card';
+import {SelectableCard} from '@astryxdesign/core/SelectableCard';
 import {Center} from '@astryxdesign/core/Center';
 import {Dialog} from '@astryxdesign/core/Dialog';
 import {Divider} from '@astryxdesign/core/Divider';
@@ -306,21 +306,15 @@ const canvasStyle = (maxWidth: number): CSSProperties => ({
   width: '100%',
   marginInline: 'auto',
 });
-const clickable: CSSProperties = {
-  cursor: 'pointer',
-};
-// Selection ring on the active block — Card has no `isSelected` state. Use the
-// brand's own selection idiom rather than re-deriving it: same 2px inset
-// geometry and same Purple, at the token's translucency instead of fully
-// opaque, so the selected block no longer outshouts the focus ring a keyboard
-// user relies on. A box-shadow is also the only channel core leaves alone —
-// it assigns background-color inline on selected rows (2 sites across
-// core/src) but never box-shadow, so a wash here would be unreachable while
-// a ring is not. 1.4.11 is a documented non-claim at this colour: Comment
-// #6272A4 has a 2.51:1 ceiling on #343746 and cannot reach 3:1 at any alpha.
-const selectedCard: CSSProperties = {
-  boxShadow: 'var(--shadow-inset-selected)',
-};
+// `clickable` and `selectedCard` are gone: the eight block cards are core's
+// `SelectableCard` now, which supplies the cursor, the hover overlay
+// (`SelectableCard.tsx:90` reads `--color-overlay-hover`) and the selected ring
+// from the same tokens this file was hand-rolling. Worth recording why the old
+// pair was wrong twice over: it was reachable only as an inline `style` spread,
+// and a spread of a lookup is not a measurement — those values were never
+// checked against what `Card` actually renders. The 1.4.11 non-claim on the
+// ring colour is unchanged and still stands: Comment #6272A4 cannot reach
+// 3:1 on #343746 at any alpha, and core's own selected ring has that ceiling.
 // The sidebar keeps its width when the canvas is wider than the window.
 const panelShrink: CSSProperties = {flexShrink: 0};
 // Square muted chip behind the CTA icon — Center handles the centering
@@ -463,15 +457,15 @@ function BlockPreview({
   onSelect: () => void;
 }) {
   const {type, props} = block;
-  const cardStyle: CSSProperties = {
-    ...clickable,
-    ...(isSelected ? selectedCard : null),
-  };
 
   switch (type) {
     case 'hero':
       return (
-        <Card padding={4} style={cardStyle} onClick={onSelect}>
+        <SelectableCard
+          padding={4}
+          label={block.label}
+          isSelected={isSelected}
+          onChange={onSelect}>
           <VStack gap={4}>
             <Heading level={3}>
               {(props.heading as string) || 'Hero Heading'}
@@ -483,13 +477,17 @@ function BlockPreview({
               <Button label={props.buttonLabel as string} />
             )}
           </VStack>
-        </Card>
+          </SelectableCard>
       );
 
     case 'text':
       if (props.heading) {
         return (
-          <Card padding={4} style={cardStyle} onClick={onSelect}>
+          <SelectableCard
+          padding={4}
+          label={block.label}
+          isSelected={isSelected}
+          onChange={onSelect}>
             <EmptyState
               title={props.heading as string}
               description={props.description as string}
@@ -503,32 +501,44 @@ function BlockPreview({
                 ) : undefined
               }
             />
-          </Card>
+          </SelectableCard>
         );
       }
       return (
-        <Card padding={4} style={cardStyle} onClick={onSelect}>
+        <SelectableCard
+          padding={4}
+          label={block.label}
+          isSelected={isSelected}
+          onChange={onSelect}>
           <Text type="body">
             {(props.content as string) || 'Ink your midnight thoughts here…'}
           </Text>
-        </Card>
+          </SelectableCard>
       );
 
     case 'image':
       return (
-        <Card padding={4} style={cardStyle} onClick={onSelect}>
+        <SelectableCard
+          padding={4}
+          label={block.label}
+          isSelected={isSelected}
+          onChange={onSelect}>
           <EmptyState
             title="Image Block"
             description="Drop an image or enter a URL"
             icon={<Icon icon={Image} color="secondary" />}
             isCompact
           />
-        </Card>
+          </SelectableCard>
       );
 
     case 'button':
       return (
-        <Card padding={4} style={cardStyle} onClick={onSelect}>
+        <SelectableCard
+          padding={4}
+          label={block.label}
+          isSelected={isSelected}
+          onChange={onSelect}>
           <Center>
             <Button
               label={(props.label as string) || 'Button'}
@@ -539,13 +549,17 @@ function BlockPreview({
               size={(props.size as 'sm' | 'md' | 'lg') || 'md'}
             />
           </Center>
-        </Card>
+          </SelectableCard>
       );
 
     case 'features': {
       const items = (props.items as Transaction[]) || [];
       return (
-        <Card padding={4} style={cardStyle} onClick={onSelect}>
+        <SelectableCard
+          padding={4}
+          label={block.label}
+          isSelected={isSelected}
+          onChange={onSelect}>
           <VStack gap={4}>
             <HStack gap={3} vAlign="start" hAlign="between">
               <VStack gap={1}>
@@ -568,7 +582,7 @@ function BlockPreview({
               textOverflow="truncate"
             />
           </VStack>
-        </Card>
+          </SelectableCard>
       );
     }
 
@@ -576,7 +590,11 @@ function BlockPreview({
       const cardItems =
         (props.cards as Array<{title: string; description: string}>) || [];
       return (
-        <Card padding={4} style={cardStyle} onClick={onSelect}>
+        <SelectableCard
+          padding={4}
+          label={block.label}
+          isSelected={isSelected}
+          onChange={onSelect}>
           <VStack gap={4}>
             <Heading level={3}>Cards</Heading>
             <Divider />
@@ -590,13 +608,17 @@ function BlockPreview({
               ))}
             </List>
           </VStack>
-        </Card>
+          </SelectableCard>
       );
     }
 
     case 'cta':
       return (
-        <Card padding={4} style={cardStyle} onClick={onSelect}>
+        <SelectableCard
+          padding={4}
+          label={block.label}
+          isSelected={isSelected}
+          onChange={onSelect}>
           <HStack gap={4} vAlign="start">
             <Center width={40} height={40} style={iconCircle}>
               <Icon icon={Lock} color="secondary" />
@@ -611,7 +633,7 @@ function BlockPreview({
               </Text>
             </VStack>
           </HStack>
-        </Card>
+          </SelectableCard>
       );
 
     default:

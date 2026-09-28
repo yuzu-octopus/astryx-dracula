@@ -296,7 +296,13 @@ const toolbarDividerStyle: CSSProperties = {
   alignSelf: 'stretch',
 };
 const columnEmptyStateStyle: CSSProperties = {
-  paddingBlock: 'var(--spacing-6)',
+  // 12px, not 24. This applies to an EmptyState inside a LayoutContent
+  // padding={3} (12px), so 24 rendered as 36px of block air on the empty
+  // branch against 12px on the populated one -- a 3x difference between two
+  // states of the same column, and the only nested inset in the kit that
+  // exceeded its container. The block padding is the CONTAINER's job; this
+  // one is the placeholder's room to breathe inside it.
+  paddingBlock: 'var(--spacing-3)',
 };
 
 // ============= CARD BODY =============

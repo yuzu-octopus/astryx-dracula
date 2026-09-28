@@ -407,7 +407,13 @@ export default function TablePage() {
         <LayoutHeader hasDivider padding={6}>
           <HStack gap={2} vAlign="center">
             <StackItem size="fill">
-              <Heading level={1} type="display-2">Familiars</Heading>
+              {/* maxLines={1} for symmetry with the other order-desk headers.
+                  "Familiars" measures 189px at 35px and fits on one line today,
+                  so this is a floor against a longer title rather than a fix
+                  for a visible break — but the row has 129.2px of controls and
+                  24px of gaps against a 342px content box, so it has ~0px of
+                  slack. Tooltip keeps the full value reachable (SC 1.4.10). */}
+              <Heading level={1} type="display-2" maxLines={1}>Familiars</Heading>
             </StackItem>
             <IconButton
               label="Filter"
