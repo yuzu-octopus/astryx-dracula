@@ -420,7 +420,7 @@ function BoardColumn({
         header={
           <LayoutHeader hasDivider padding={3}>
             <HStack hAlign="between" vAlign="center">
-              <HStack gap={2} vAlign="center">
+              <HStack gap={1} vAlign="center">
                 <StatusDot
                   variant={meta.variant}
                   label={`${meta.title} status`}

@@ -293,7 +293,7 @@ export const astryxDraculaTheme = {
     "--color-tag-cyan": "light-dark(#8BE9FD, #8BE9FD)",
     "--color-tag-yellow": "light-dark(#F1FA8C, #F1FA8C)",
     "--color-tag-green": "light-dark(#50FA7B, #50FA7B)",
-    "--color-tag-blue": "light-dark(#BD93F9, #BD93F9)"
+    "--color-tag-purple": "light-dark(#BD93F9, #BD93F9)"
   },
   icons: draculaIconRegistry,
 };

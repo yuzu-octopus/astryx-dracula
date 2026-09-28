@@ -67,23 +67,30 @@ export default function LoginPage() {
               </Text>
             </VStack>
 
-            <TextInput
-              label="Email"
-              isLabelHidden
-              value={email}
-              onChange={v => {
-                setEmail(v);
-                setError(null);
-              }}
-              placeholder={AUTH_EMAIL_PLACEHOLDER}
-              type="email"
-              {...inputAutoComplete('email')}
-              size="lg"
-              onEnter={handleSignIn}
-              status={error ? {type: 'error', message: error} : undefined}
-            />
+            {/* The field group, as its three siblings carry it
+                (login-card.tsx:76, login-split.tsx:160, login-sso.tsx:192).
+                Without it these two inputs sat 16px apart -- the outer
+                VStack's gap={4} -- where all three twins render 8px, so the
+                gap between the two fields was twice the gap between the
+                fields and the sign-up link below. */}
+            <VStack gap={2}>
+              <TextInput
+                label="Email"
+                isLabelHidden
+                value={email}
+                onChange={v => {
+                  setEmail(v);
+                  setError(null);
+                }}
+                placeholder={AUTH_EMAIL_PLACEHOLDER}
+                type="email"
+                {...inputAutoComplete('email')}
+                size="lg"
+                onEnter={handleSignIn}
+                status={error ? {type: 'error', message: error} : undefined}
+              />
 
-            <VStack gap={1}>
+              <VStack gap={1}>
               <TextInput
                 label="Password"
                 isLabelHidden
@@ -99,15 +106,16 @@ export default function LoginPage() {
                 onEnter={handleSignIn}
                 status={error ? {type: 'error', message: error} : undefined}
               />
-              {error && (
-                <VStack hAlign="end">
-                  <Link
-                    href="#/templates/login"
-                    color="secondary">
-                    {AUTH_FORGOT_PASSWORD}
-                  </Link>
-                </VStack>
-              )}
+                {error && (
+                  <VStack hAlign="end">
+                    <Link
+                      href="#/templates/login"
+                      color="secondary">
+                      {AUTH_FORGOT_PASSWORD}
+                    </Link>
+                  </VStack>
+                )}
+              </VStack>
             </VStack>
 
             <Button

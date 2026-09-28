@@ -353,7 +353,11 @@ const tokens: Record<string, TokenValue> = {
   '--color-tag-cyan': pin(DRA.cyan),
   '--color-tag-yellow': pin(DRA.yellow),
   '--color-tag-green': pin(DRA.green),
-  '--color-tag-blue': pin(DRA.purple),
+  // Named `tag-blue` and pinned to purple. The value was right -- Purple is
+  // the brand's fourth accent and Dracula has no blue -- but the name was
+  // wrong, so it is renamed rather than repinned. See tokens.css for why a
+  // contrast gate cannot catch this class of defect.
+  '--color-tag-purple': pin(DRA.purple),
 };
 
 // Input validation tint shared by all 9 input components (stone shapes it per

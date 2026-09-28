@@ -11,7 +11,6 @@ import {Link} from '@astryxdesign/core/Link';
 import {Text} from '@astryxdesign/core/Text';
 import ChapteredDoc, {
   ChapterArtFrame,
-  sceneFill,
   type ChapterGroup,
 } from 'astryx-dracula/shared/chaptered-doc';
 import {SceneFrame} from 'astryx-dracula/shared/scene-frame';
@@ -782,13 +781,7 @@ const LAYER_TICKS = Array.from({length: 40}, (_, index) => ({
 
 function ArchitectureScene({alt}: {alt: string}) {
   return (
-    <svg
-      viewBox="0 0 400 225"
-      preserveAspectRatio="xMidYMid slice"
-      style={sceneFill}
-      role="img"
-      aria-label={alt}>
-      <rect width="400" height="225" fill="var(--dracula-bg-dark)" />
+    <SceneFrame label={alt}>
 
       {/* Global KV crosses the encoder boundary instead of being rebuilt in
           every decoder layer, which is the whole point of the diagram. */}
@@ -806,7 +799,7 @@ function ArchitectureScene({alt}: {alt: string}) {
         fontFamily="var(--font-family-mono)"
         fontSize="10"
         textAnchor="middle"
-        fill="var(--dracula-comment)">
+        fill="var(--color-text-paragraph)">
         global KV projected from H[L/2]
       </text>
 
@@ -841,7 +834,7 @@ function ArchitectureScene({alt}: {alt: string}) {
         </text>
       </g>
 
-      <g fontFamily="var(--font-family-mono)" fontSize="10" fill="var(--dracula-comment)">
+      <g fontFamily="var(--font-family-mono)" fontSize="10" fill="var(--color-text-paragraph)">
         <rect x="42" y="193" width="8" height="8" rx="1" fill="var(--dracula-cyan)" />
         <text x="56" y="201">SWA only</text>
         <rect x="132" y="193" width="8" height="8" rx="1" fill="var(--dracula-green)" />
@@ -856,11 +849,11 @@ function ArchitectureScene({alt}: {alt: string}) {
         fontFamily="var(--font-family-mono)"
         fontSize="10"
         textAnchor="middle"
-        fill="var(--dracula-comment)"
+        fill="var(--color-text-paragraph)"
         fillOpacity={0.7}>
         prefill walks 20 layers at 8B, decode walks 40 at 16B
       </text>
-    </svg>
+    </SceneFrame>
   );
 }
 
@@ -967,13 +960,7 @@ const CONTEXT_TICKS = ['4K', '16K', '64K', '256K', '1M'];
 
 function FlopsScene({alt}: {alt: string}) {
   return (
-    <svg
-      viewBox="0 0 400 225"
-      preserveAspectRatio="xMidYMid slice"
-      style={sceneFill}
-      role="img"
-      aria-label={alt}>
-      <rect width="400" height="225" fill="var(--dracula-bg-dark)" />
+    <SceneFrame label={alt}>
 
       {/* Five ticks for a 256-fold range: equal spacing is the log scale. */}
       <g stroke="var(--dracula-comment)" strokeOpacity={0.18}>
@@ -986,7 +973,7 @@ function FlopsScene({alt}: {alt: string}) {
         y="26"
         fontFamily="var(--font-family-mono)"
         fontSize="10"
-        fill="var(--dracula-comment)"
+        fill="var(--color-text-paragraph)"
         fillOpacity={0.85}>
         Single-token decode FLOPs against context length
       </text>
@@ -1020,10 +1007,10 @@ function FlopsScene({alt}: {alt: string}) {
         <text x="378" y="142" textAnchor="end" fill="var(--dracula-cyan)">
           DeepSeek-V4.1-Flash
         </text>
-        <text x="56" y="60" fill="var(--dracula-comment)">
+        <text x="56" y="60" fill="var(--color-text-paragraph)">
           4K to 1M, 256x context:
         </text>
-        <text x="56" y="74" fill="var(--dracula-comment)">
+        <text x="56" y="74" fill="var(--color-text-paragraph)">
           +1/4 decode FLOPs
         </text>
         {CONTEXT_TICKS.map((tick, index) => (
@@ -1032,15 +1019,15 @@ function FlopsScene({alt}: {alt: string}) {
             x={56 + index * 81}
             y="188"
             textAnchor={index === 0 ? 'start' : index === CONTEXT_TICKS.length - 1 ? 'end' : 'middle'}
-            fill="var(--dracula-comment)">
+            fill="var(--color-text-paragraph)">
             {tick}
           </text>
         ))}
-        <text x="56" y="206" fill="var(--dracula-comment)" fillOpacity={0.7}>
+        <text x="56" y="206" fill="var(--color-text-paragraph)" fillOpacity={0.7}>
           BF16, FP8, and FP4 ops weighted 1, 0.5, and 0.25
         </text>
       </g>
-    </svg>
+    </SceneFrame>
   );
 }
 
@@ -1055,13 +1042,7 @@ const REPLAY_LAYER_LINES = Array.from({length: 20}, (_, index) => 98 + index * 2
 
 function ReplayScene({alt}: {alt: string}) {
   return (
-    <svg
-      viewBox="0 0 400 225"
-      preserveAspectRatio="xMidYMid slice"
-      style={sceneFill}
-      role="img"
-      aria-label={alt}>
-      <rect width="400" height="225" fill="var(--dracula-bg-dark)" />
+    <SceneFrame label={alt}>
 
       <g fontFamily="var(--font-family-mono)" fontSize="10" textAnchor="middle">
         <rect
@@ -1074,7 +1055,7 @@ function ReplayScene({alt}: {alt: string}) {
           stroke="var(--dracula-comment)"
           strokeOpacity={0.35}
         />
-        <text x="118" y="52" fill="var(--dracula-comment)">
+        <text x="118" y="52" fill="var(--color-text-paragraph)">
           cached prefix
         </text>
         <rect
@@ -1100,7 +1081,7 @@ function ReplayScene({alt}: {alt: string}) {
           stroke="var(--dracula-comment)"
           strokeOpacity={0.35}
         />
-        <text x="305" y="52" fill="var(--dracula-comment)">
+        <text x="305" y="52" fill="var(--color-text-paragraph)">
           uncached suffix
         </text>
       </g>
@@ -1109,7 +1090,7 @@ function ReplayScene({alt}: {alt: string}) {
         y="80"
         fontFamily="var(--font-family-mono)"
         fontSize="10"
-        fill="var(--dracula-comment)">
+        fill="var(--color-text-paragraph)">
         a query at i attends to [max(s, i - W + 1), i]
       </text>
 
@@ -1133,7 +1114,7 @@ function ReplayScene({alt}: {alt: string}) {
         y="120"
         fontFamily="var(--font-family-mono)"
         fontSize="10"
-        fill="var(--dracula-comment)">
+        fill="var(--color-text-paragraph)">
         exact: every layer, L x n_win
       </text>
 
@@ -1152,7 +1133,7 @@ function ReplayScene({alt}: {alt: string}) {
         y="156"
         fontFamily="var(--font-family-mono)"
         fontSize="10"
-        fill="var(--dracula-comment)">
+        fill="var(--color-text-paragraph)">
         bounded: one window, n_win
       </text>
 
@@ -1161,11 +1142,11 @@ function ReplayScene({alt}: {alt: string}) {
         y="196"
         fontFamily="var(--font-family-mono)"
         fontSize="10"
-        fill="var(--dracula-comment)"
+        fill="var(--color-text-paragraph)"
         fillOpacity={0.7}>
         SWA KV leaves the persistent cache, misses stay cheap
       </text>
-    </svg>
+    </SceneFrame>
   );
 }
 
@@ -1192,19 +1173,13 @@ const MHC_BARS = [
 
 function MhcShiftScene({alt}: {alt: string}) {
   return (
-    <svg
-      viewBox="0 0 400 225"
-      preserveAspectRatio="xMidYMid slice"
-      style={sceneFill}
-      role="img"
-      aria-label={alt}>
-      <rect width="400" height="225" fill="var(--dracula-bg-dark)" />
+    <SceneFrame label={alt}>
       <text
         x="40"
         y="28"
         fontFamily="var(--font-family-mono)"
         fontSize="10"
-        fill="var(--dracula-comment)"
+        fill="var(--color-text-paragraph)"
         fillOpacity={0.85}>
         Residual traffic per block, n = 4
       </text>
@@ -1214,7 +1189,7 @@ function MhcShiftScene({alt}: {alt: string}) {
         fontFamily="var(--font-family-mono)"
         fontSize="10"
         textAnchor="end"
-        fill="var(--dracula-comment)"
+        fill="var(--color-text-paragraph)"
         fillOpacity={0.7}>
         shift: read A[l-1], not A[l]
       </text>
@@ -1225,7 +1200,7 @@ function MhcShiftScene({alt}: {alt: string}) {
             y={66 + position * 68}
             fontFamily="var(--font-family-mono)"
             fontSize="10"
-            fill="var(--dracula-comment)">
+            fill="var(--color-text-paragraph)">
             {bar.name}
           </text>
           <rect
@@ -1242,7 +1217,7 @@ function MhcShiftScene({alt}: {alt: string}) {
             y={112 + position * 68}
             fontFamily="var(--font-family-mono)"
             fontSize="10"
-            fill="var(--dracula-comment)">
+            fill="var(--color-text-paragraph)">
             {bar.detail}
           </text>
         </g>
@@ -1252,11 +1227,11 @@ function MhcShiftScene({alt}: {alt: string}) {
         y="208"
         fontFamily="var(--font-family-mono)"
         fontSize="10"
-        fill="var(--dracula-comment)"
+        fill="var(--color-text-paragraph)"
         fillOpacity={0.7}>
         use last block mixing weights, read the residual once
       </text>
-    </svg>
+    </SceneFrame>
   );
 }
 
@@ -1286,13 +1261,7 @@ const FP4_BASELINE = 176;
 
 function Fp4Scene({alt}: {alt: string}) {
   return (
-    <svg
-      viewBox="0 0 400 225"
-      preserveAspectRatio="xMidYMid slice"
-      style={sceneFill}
-      role="img"
-      aria-label={alt}>
-      <rect width="400" height="225" fill="var(--dracula-bg-dark)" />
+    <SceneFrame label={alt}>
       <path
         d={`M40 ${FP4_BASELINE} H360`}
         stroke="var(--dracula-comment)"
@@ -1332,7 +1301,7 @@ function Fp4Scene({alt}: {alt: string}) {
           </text>
         ))}
       </g>
-      <g fontFamily="var(--font-family-mono)" fontSize="10" fill="var(--dracula-comment)">
+      <g fontFamily="var(--font-family-mono)" fontSize="10" fill="var(--color-text-paragraph)">
         <text x="40" y="30" fillOpacity={0.85}>
           Main KV storage per value
         </text>
@@ -1340,7 +1309,7 @@ function Fp4Scene({alt}: {alt: string}) {
           four bits per value, same cache: ceiling 2688, largest seen about 10
         </text>
       </g>
-    </svg>
+    </SceneFrame>
   );
 }
 
@@ -1380,13 +1349,7 @@ const EVAL_BASELINE = 176;
 
 function EvalScene({alt}: {alt: string}) {
   return (
-    <svg
-      viewBox="0 0 400 225"
-      preserveAspectRatio="xMidYMid slice"
-      style={sceneFill}
-      role="img"
-      aria-label={alt}>
-      <rect width="400" height="225" fill="var(--dracula-bg-dark)" />
+    <SceneFrame label={alt}>
       <path
         d={`M40 ${EVAL_BASELINE} H360`}
         stroke="var(--dracula-comment)"
@@ -1426,7 +1389,7 @@ function EvalScene({alt}: {alt: string}) {
           </text>
         ))}
       </g>
-      <g fontFamily="var(--font-family-mono)" fontSize="10" fill="var(--dracula-comment)">
+      <g fontFamily="var(--font-family-mono)" fontSize="10" fill="var(--color-text-paragraph)">
         <text x="40" y="30" fillOpacity={0.85}>
           DeepSWE v1.1 resolved
         </text>
@@ -1434,7 +1397,7 @@ function EvalScene({alt}: {alt: string}) {
           74.2% beats the frontier at a quarter of the cache
         </text>
       </g>
-    </svg>
+    </SceneFrame>
   );
 }
 

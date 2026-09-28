@@ -46,7 +46,7 @@ const columns: TableColumn<Relic>[] = [
     key: 'status',
     header: 'Status',
     renderCell: (item: Relic) => (
-      <HStack gap={2} vAlign="center">
+      <HStack gap={1} vAlign="center">
         <StatusDot
           variant={STATUS_VARIANT[item.status]}
           label={STATUS_LABEL[item.status]}

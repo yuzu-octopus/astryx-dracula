@@ -530,9 +530,12 @@ function OutageHeatmap() {
       </Card>
       {/* Legend rows go through shared/chart-legend.tsx. The ramp itself stays
           local: it encodes SEVERITY (0/1/2/3+ against green/orange/red), which
-          is a status vocabulary, not a magnitude. heat-scale.ts is a sequential
-          magnitude ramp and would invert this one — on a dark page a high count
-          reads lighter, which is the opposite of "more is worse" here. */}
+          is a status vocabulary, not a magnitude. A sequential magnitude ramp
+          would invert this one — on a dark page a high count reads lighter,
+          which is the opposite of "more is worse" here. The --color-data-<family>-
+          1..5 steps remain in tokens.css for a consumer that genuinely needs
+          one; nothing in this kit does, which is why the module that wrapped
+          them is gone. */}
       <ChartLegend
         entries={HEAT_LEGEND}
         gap={2}

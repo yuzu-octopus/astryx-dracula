@@ -343,7 +343,14 @@ body {
   --color-tag-cyan: #8BE9FD;
   --color-tag-yellow: #F1FA8C;
   --color-tag-green: #50FA7B;
-  --color-tag-blue: #BD93F9;
+  --color-tag-purple: #BD93F9;
+  /* The token was named `tag-blue` and held purple. Dracula has no blue; the
+   * closest is Comment/Comment-dim, and Purple is what the rest of the kit
+   * already uses for a fourth accent -- so the VALUE was right and the NAME
+   * was the lie. Renamed, not repinned: a `blue` tag that paints purple is
+   * wrong in a way no contrast number catches, and a future author adding a
+   * real blue tag would have found the slot occupied. Verify no consumer
+   * returned with `grep -rn "tag-blue"` before shipping a rename. */
 }
 
 /* Dracula scrollbars. The spec defines no scrollbar token, so these follow its

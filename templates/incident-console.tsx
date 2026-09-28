@@ -405,7 +405,7 @@ function IncidentInspector({incident}: {incident: Incident}) {
   return (
     <VStack gap={4} style={styles.inspector}>
       <VStack gap={2}>
-        <HStack gap={2} vAlign="center">
+        <HStack gap={1} vAlign="center">
           <StatusDot
             variant={SEVERITY_DOT[incident.severity]}
             label={incident.severity.toUpperCase()}

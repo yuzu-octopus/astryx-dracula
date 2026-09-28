@@ -746,7 +746,7 @@ function TaskDetailPanel({
 
         <MetadataList label={{position: 'start'}}>
           <MetadataListItem label="Status">
-            <HStack gap={2} vAlign="center">
+            <HStack gap={1} vAlign="center">
               <StatusDot
                 variant={STATUS_DOT_VARIANT[task.status]}
                 label={STATUS_LABEL[task.status]}

@@ -502,7 +502,11 @@ function TimelineSection() {
   return (
     <Section>
       <VStack gap={4}>
-        <HStack vAlign="center">
+        {/* gap={2}, matching the byte-identical header rows at :338 and
+            :407. Core's Stack has no default gap (Stack.tsx:211, pass-through
+            at :255/:285), so this rendered 0px -- the heading and the Filters
+            button touched -- while both siblings render 8px. */}
+        <HStack gap={2} vAlign="center">
           <StackItem size="fill">
             <Heading level={2}>Timeline</Heading>
           </StackItem>
