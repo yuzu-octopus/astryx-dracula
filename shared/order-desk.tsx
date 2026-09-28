@@ -20,11 +20,19 @@ import {Table, proportional, pixel} from '@astryxdesign/core/Table';
 import type {TableColumn} from '@astryxdesign/core/Table';
 import {Filter, Download, Plus} from 'lucide-react';
 import {RevenueChart, ProductSwatch} from 'astryx-dracula/shared/revenue-chart';
+import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
 
 export interface OrderDeskProduct {
   name: string;
   category: string;
-  accent: string;
+  /**
+   * Per-product art tint, painted by `ProductSwatch`. Same remit as
+   * `SceneTile.hue` — an art treatment, not a data series — so it takes the
+   * same `SceneHue` union rather than a free-form string. Typing the boundary
+   * HERE is what makes the compile-error list the real list: typed only at the
+   * consumer, a raw string flows through untyped and the error never fires.
+   */
+  accent: SceneHue;
   price: number;
 }
 
@@ -45,13 +53,17 @@ export interface RevenueDatum {
   revenue: number;
 }
 
+// Vocabulary, not a hue choice: orange is attention and constants only
+// (principle 3), and an order being picked is routine in-flight work, not
+// attention. In-progress/activity is cyan (info). refunded stays red — that
+// is a real negative.
 const STATUS_TOKEN_COLOR: Record<
   OrderDeskRow['status'],
-  'green' | 'cyan' | 'orange' | 'red'
+  'green' | 'cyan' | 'red'
 > = {
   completed: 'green',
   shipped: 'cyan',
-  processing: 'orange',
+  processing: 'cyan',
   refunded: 'red',
 };
 
@@ -176,7 +188,7 @@ export function OrderDesk({
         <LayoutHeader hasDivider padding={6}>
           <HStack gap={2} vAlign="center">
             <StackItem size="fill">
-              <Heading level={1}>{title}</Heading>
+              <Heading level={1} type="display-2">{title}</Heading>
             </StackItem>
             <IconButton
               label="Filter"

@@ -309,13 +309,17 @@ const canvasStyle = (maxWidth: number): CSSProperties => ({
 const clickable: CSSProperties = {
   cursor: 'pointer',
 };
-// Selection ring on the active block — Card has no `isSelected` state. Ring
-// weight and inset both derive from the surface border token.
+// Selection ring on the active block — Card has no `isSelected` state. Use the
+// brand's own selection idiom rather than re-deriving it: same 2px inset
+// geometry and same Purple, at the token's translucency instead of fully
+// opaque, so the selected block no longer outshouts the focus ring a keyboard
+// user relies on. A box-shadow is also the only channel core leaves alone —
+// it assigns background-color inline on selected rows (2 sites across
+// core/src) but never box-shadow, so a wash here would be unreachable while
+// a ring is not. 1.4.11 is a documented non-claim at this colour: Comment
+// #6272A4 has a 2.51:1 ceiling on #343746 and cannot reach 3:1 at any alpha.
 const selectedCard: CSSProperties = {
-  outlineWidth: 'calc(var(--border-width) * 2)',
-  outlineStyle: 'solid',
-  outlineColor: 'var(--color-accent)',
-  outlineOffset: 'calc(var(--border-width) * -2)',
+  boxShadow: 'var(--shadow-inset-selected)',
 };
 // The sidebar keeps its width when the canvas is wider than the window.
 const panelShrink: CSSProperties = {flexShrink: 0};
@@ -821,7 +825,7 @@ export default function PageEditor() {
             // Mobile: the title, an Edit button that opens the customizations
             // dialog, and the primary action.
             <HStack gap={3} vAlign="center" hAlign="between">
-              <Heading level={1}>{pageTitle}</Heading>
+              <Heading level={1} type="display-2">{pageTitle}</Heading>
               <HStack gap={2} vAlign="center">
                 <Button
                   label="Edit"
@@ -850,7 +854,7 @@ export default function PageEditor() {
                   onBlur={() => setIsEditingTitle(false)}
                 />
               ) : (
-                <Heading level={1}>{pageTitle}</Heading>
+                <Heading level={1} type="display-2">{pageTitle}</Heading>
               )}
 
               <Toolbar

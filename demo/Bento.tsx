@@ -9,7 +9,6 @@ import {
   Grid,
   HStack,
   Heading,
-  ProgressBar,
   StatusDot,
   Switch,
   Table,
@@ -18,8 +17,9 @@ import {
   VStack,
 } from '@astryxdesign/core';
 import { Theme } from '@astryxdesign/core/theme';
+import { DataBar } from '../shared/data-bar';
 import { astryxDraculaTheme } from '../astryx-theme';
-import { BARS, ROUTES } from './fixtures';
+import { BARS, ROUTES, TrafficChart, RouteCell, StatusKey, type RouteRow } from './fixtures';
 
 const SNIPPET = `import { astryxDraculaTheme } from 'astryx-dracula';
 
@@ -99,27 +99,7 @@ export function Bento() {
                 <Heading level={2}>Traffic</Heading>
                 <Badge label="6 mo" variant="neutral" />
               </HStack>
-              <svg viewBox="0 0 460 150" width="100%" role="img" aria-label="Traffic bar chart">
-                {BARS.slice(0, 6).map((b, i) => {
-                  const h = (b.value / 100) * 105;
-                  const x = 16 + i * 74;
-                  return (
-                    <g key={b.month}>
-                      <rect x={x} y={120 - h} width={48} height={h} rx={4} fill={b.color} />
-                      <text
-                        x={x + 24}
-                        y={138}
-                        textAnchor="middle"
-                        fontSize={13}
-                        fill="var(--color-text-paragraph)"
-                        fontFamily="var(--font-family-mono)"
-                      >
-                        {b.month}
-                      </text>
-                    </g>
-                  );
-                })}
-              </svg>
+              <TrafficChart bars={BARS.slice(0, 6)} />
             </VStack>
           </Card>
 
@@ -143,15 +123,7 @@ export function Bento() {
                   {
                     key: 'page',
                     header: 'Route',
-                    renderCell: (row) => (
-                      <HStack gap={2} vAlign="center">
-                        <StatusDot
-                          variant={row.status === 'healthy' ? 'success' : 'warning'}
-                          label={String(row.status)}
-                        />
-                        <Text weight="semibold">{String(row.page)}</Text>
-                      </HStack>
-                    ),
+                    renderCell: (row) => <RouteCell row={row as RouteRow} />,
                   },
                   {
                     key: 'views',
@@ -204,20 +176,39 @@ export function Bento() {
                 <Badge label="orange" variant="orange" />
                 <Badge label="red" variant="red" />
               </HStack>
-              <HStack gap={2} vAlign="center">
-                <StatusDot variant="success" label="Healthy" isPulsing />
-                <StatusDot variant="warning" label="Degraded" />
-                <StatusDot variant="error" label="Down" />
-              </HStack>
+              <StatusKey
+                items={[
+                  {variant: 'success', label: 'Healthy'},
+                  {variant: 'warning', label: 'Degraded'},
+                  {variant: 'error', label: 'Down'},
+                ]}
+              />
             </VStack>
           </Card>
 
           <Card padding={4}>
             <VStack gap={3}>
-              <Heading level={2}>Progress</Heading>
-              <ProgressBar label="Build quota" value={62} variant="neutral" hasValueLabel />
-              <ProgressBar label="Error budget" value={91} variant="warning" hasValueLabel />
-              <ProgressBar label="Uptime" value={99} variant="success" hasValueLabel />
+              {/* Quota/budget/uptime are magnitudes against a 0-100 domain,
+                  not task completion — DataBar, not core's ProgressBar. */}
+              <Heading level={2}>Capacity</Heading>
+              <DataBar
+                label="Build quota"
+                segments={[{id: 'used', value: 62, color: 'var(--color-success)'}]}
+                hasValueLabel
+                formatValue={used => `${used}% used`}
+              />
+              <DataBar
+                label="Error budget"
+                segments={[{id: 'used', value: 91, color: 'var(--color-warning)'}]}
+                hasValueLabel
+                formatValue={used => `${used}% consumed`}
+              />
+              <DataBar
+                label="Uptime"
+                segments={[{id: 'used', value: 99, color: 'var(--color-success)'}]}
+                hasValueLabel
+                formatValue={used => `${used}%`}
+              />
             </VStack>
           </Card>
 

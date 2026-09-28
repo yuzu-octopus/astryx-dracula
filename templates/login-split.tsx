@@ -95,16 +95,16 @@ const LOGIN_SPLIT_CSS = `
 export default function LoginSplit() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loginFailed, setLoginFailed] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, startTransition] = useTransition();
   const [isSuccess, setIsSuccess] = useState(false);
 
   const handleLogin = () => {
     if (!email || !password) {
-      setLoginFailed(true);
+      setError(AUTH_ERROR_MESSAGE);
       return;
     }
-    setLoginFailed(false);
+    setError(null);
     startTransition(async () => {
       await demoLogin();
       setIsSuccess(true);
@@ -149,7 +149,7 @@ export default function LoginSplit() {
                       ) : (
                         <VStack gap={4} hAlign="stretch" width="100%">
                           <VStack gap={1}>
-                            <Heading level={1}>
+                            <Heading level={1} type="display-2">
                               {AUTH_HEADING}
                             </Heading>
                             <Text type="body" color="secondary">
@@ -167,10 +167,11 @@ export default function LoginSplit() {
                               value={email}
                               onChange={(v: string) => {
                                 setEmail(v);
-                                setLoginFailed(false);
+                                setError(null);
                               }}
                               size="lg"
                               onEnter={handleLogin}
+                              status={error ? {type: 'error', message: error} : undefined}
                             />
                             <VStack gap={1}>
                               <TextInput
@@ -182,21 +183,13 @@ export default function LoginSplit() {
                                 value={password}
                                 onChange={(v: string) => {
                                   setPassword(v);
-                                  setLoginFailed(false);
+                                  setError(null);
                                 }}
                                 size="lg"
                                 onEnter={handleLogin}
-                                status={
-                                  loginFailed
-                                    ? {
-                                        type: 'error',
-                                        message:
-                                          AUTH_ERROR_MESSAGE,
-                                      }
-                                    : undefined
-                                }
+                                status={error ? {type: 'error', message: error} : undefined}
                               />
-                              {loginFailed && (
+                              {error && (
                                 <VStack hAlign="end">
                                   <Link href="#/templates/login-split">
                                     {AUTH_FORGOT_PASSWORD}

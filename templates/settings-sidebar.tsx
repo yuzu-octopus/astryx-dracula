@@ -49,6 +49,8 @@ import {
   iconBox,
   actionNoWrap,
   sideNavHeading,
+  InfoRowItem,
+  ExpandableRow,
 } from 'astryx-dracula/shared/settings-rows';
 import type {InfoRow} from 'astryx-dracula/shared/settings-rows';
 
@@ -73,7 +75,7 @@ const SELF_HASH = '#/templates/settings-sidebar';
 // Section title shown beside the mobile back button (matches each section's
 // in-content heading, which is hidden on mobile to avoid a duplicate).
 const SECTION_TITLES: Record<string, string> = {
-  'Personal information': 'Personal info',
+  'Personal information': 'Personal information',
   'Login & security': 'Login & security',
   Privacy: 'Privacy',
   Notifications: 'Notifications',
@@ -94,121 +96,6 @@ const PAYOUT_ROWS: InfoRow[] = [
   {label: 'Past payouts', value: 'No tributes yet', action: 'View'},
 ];
 
-function InfoRowItem({label, value, action}: InfoRow) {
-  return (
-    <>
-      <HStack hAlign="between" vAlign="start" style={rowPadding}>
-        <VStack gap={0}>
-          <Text type="body" weight="semibold" display="block">
-            {label}
-          </Text>
-          <Text type="body" color="secondary" display="block">
-            {value}
-          </Text>
-        </VStack>
-        {action && (
-          <Link href={SELF_HASH} style={actionNoWrap}>
-            {action}
-          </Link>
-        )}
-      </HStack>
-      <Divider />
-    </>
-  );
-}
-
-interface ExpandableRowProps {
-  label: string;
-  value: string;
-  children: React.ReactNode;
-  isExpanded: boolean;
-  onEdit: () => void;
-  onCancel: () => void;
-  onSave: () => void;
-}
-
-function ExpandableRowEditing({
-  label,
-  children,
-  onCancel,
-  onSave,
-}: {
-  label: string;
-  children: React.ReactNode;
-  onCancel: () => void;
-  onSave: () => void;
-}) {
-  return (
-    <VStack gap={4} style={rowPadding}>
-      <Text type="body" weight="semibold" display="block">
-        {label}
-      </Text>
-      {children}
-      <HStack gap={2}>
-        <Button label="Save" variant="primary" onClick={onSave} />
-        <Button label="Cancel" variant="ghost" onClick={onCancel} />
-      </HStack>
-    </VStack>
-  );
-}
-
-function ExpandableRowViewing({
-  label,
-  value,
-  onEdit,
-}: {
-  label: string;
-  value: string;
-  onEdit: () => void;
-}) {
-  return (
-        <HStack hAlign="between" vAlign="start" style={rowPadding}>
-          <VStack gap={0}>
-            <Text type="body" weight="semibold" display="block">
-              {label}
-            </Text>
-            <Text type="body" color="secondary" display="block">
-              {value}
-            </Text>
-          </VStack>
-          <Link
-            href={SELF_HASH}
-            style={actionNoWrap}
-            onClick={(e: React.MouseEvent) => {
-              e.preventDefault();
-              onEdit();
-            }}>
-            Edit
-          </Link>
-        </HStack>
-  );
-}
-
-function ExpandableRow({
-  label,
-  value,
-  children,
-  isExpanded,
-  onEdit,
-  onCancel,
-  onSave,
-}: ExpandableRowProps) {
-  return (
-    <>
-      {isExpanded ? (
-        <ExpandableRowEditing
-          label={label}
-          onCancel={onCancel}
-          onSave={onSave}>
-          {children}
-        </ExpandableRowEditing>
-      ) : (
-        <ExpandableRowViewing label={label} value={value} onEdit={onEdit} />
-      )}
-      <Divider />
-    </>
-  );
-}
 
 const LANGUAGES = [
   {label: 'English (Canada)', value: 'en-CA'},
@@ -366,23 +253,33 @@ export default function SettingsSidebar() {
                 {activeTab === 'login' && (
                   <VStack gap={8}>
                     <VStack gap={0}>
-                      <Heading level={3}>Login</Heading>
+                      <Heading level={2}>Login</Heading>
                       <Divider />
                       {LOGIN_ROWS.map(row => (
-                        <InfoRowItem key={row.label} {...row} />
+                        <InfoRowItem
+                          key={row.label}
+                          {...row}
+                          href={SELF_HASH}
+                          style={rowPadding}
+                        />
                       ))}
                     </VStack>
 
                     <VStack gap={0}>
-                      <Heading level={3}>Social accounts</Heading>
+                      <Heading level={2}>Social accounts</Heading>
                       <Divider />
                       {SOCIAL_ROWS.map(row => (
-                        <InfoRowItem key={row.label} {...row} />
+                        <InfoRowItem
+                          key={row.label}
+                          {...row}
+                          href={SELF_HASH}
+                          style={rowPadding}
+                        />
                       ))}
                     </VStack>
 
                     <VStack gap={0}>
-                      <Heading level={3}>Device history</Heading>
+                      <Heading level={2}>Device history</Heading>
                       <Divider />
                       {DEVICE_ROWS.map((device) => (
                         <HStack
@@ -431,7 +328,7 @@ export default function SettingsSidebar() {
                     </VStack>
 
                     <VStack gap={0}>
-                      <Heading level={3}>Account</Heading>
+                      <Heading level={2}>Account</Heading>
                       <Divider />
                       <HStack
                         hAlign="between"
@@ -460,7 +357,7 @@ export default function SettingsSidebar() {
                 {activeTab === 'shared' && (
                   <VStack gap={8}>
                     <VStack gap={2}>
-                      <Heading level={3}>Shared access</Heading>
+                      <Heading level={2}>Shared access</Heading>
                       <Divider />
                       <Text type="body" color="secondary">
                         Review each request carefully before approving access.
@@ -508,7 +405,9 @@ export default function SettingsSidebar() {
                     isExpanded={expandedRow === 'language'}
                     onEdit={() => setExpandedRow('language')}
                     onCancel={() => setExpandedRow(null)}
-                    onSave={() => setExpandedRow(null)}>
+                    onSave={() => setExpandedRow(null)}
+                    href={SELF_HASH}
+                    style={rowPadding}>
                     <Selector
                       label="Language"
                       isLabelHidden
@@ -527,7 +426,9 @@ export default function SettingsSidebar() {
                     isExpanded={expandedRow === 'currency'}
                     onEdit={() => setExpandedRow('currency')}
                     onCancel={() => setExpandedRow(null)}
-                    onSave={() => setExpandedRow(null)}>
+                    onSave={() => setExpandedRow(null)}
+                    href={SELF_HASH}
+                    style={rowPadding}>
                     <Selector
                       label="Currency"
                       isLabelHidden
@@ -546,7 +447,9 @@ export default function SettingsSidebar() {
                     isExpanded={expandedRow === 'timezone'}
                     onEdit={() => setExpandedRow('timezone')}
                     onCancel={() => setExpandedRow(null)}
-                    onSave={() => setExpandedRow(null)}>
+                    onSave={() => setExpandedRow(null)}
+                    href={SELF_HASH}
+                    style={rowPadding}>
                     <Selector
                       label="Time zone"
                       isLabelHidden
@@ -562,7 +465,9 @@ export default function SettingsSidebar() {
 
             {activeNav === 'Personal information' && (
               <VStack gap={6}>
-                {!isNarrow && <Heading level={1}>Personal info</Heading>}
+                {!isNarrow && (
+                  <Heading level={1}>Personal information</Heading>
+                )}
                 <VStack gap={0}>
                   <ExpandableRow
                     label="Legal name"
@@ -570,7 +475,9 @@ export default function SettingsSidebar() {
                     isExpanded={expandedRow === 'legalName'}
                     onEdit={() => setExpandedRow('legalName')}
                     onCancel={() => setExpandedRow(null)}
-                    onSave={() => setExpandedRow(null)}>
+                    onSave={() => setExpandedRow(null)}
+                    href={SELF_HASH}
+                    style={rowPadding}>
                     <TextInput
                       label="Legal name"
                       isLabelHidden
@@ -584,7 +491,9 @@ export default function SettingsSidebar() {
                     isExpanded={expandedRow === 'preferredName'}
                     onEdit={() => setExpandedRow('preferredName')}
                     onCancel={() => setExpandedRow(null)}
-                    onSave={() => setExpandedRow(null)}>
+                    onSave={() => setExpandedRow(null)}
+                    href={SELF_HASH}
+                    style={rowPadding}>
                     <TextInput
                       label="Preferred first name"
                       isLabelHidden
@@ -598,7 +507,9 @@ export default function SettingsSidebar() {
                     isExpanded={expandedRow === 'email'}
                     onEdit={() => setExpandedRow('email')}
                     onCancel={() => setExpandedRow(null)}
-                    onSave={() => setExpandedRow(null)}>
+                    onSave={() => setExpandedRow(null)}
+                    href={SELF_HASH}
+                    style={rowPadding}>
                     <TextInput
                       label="Email address"
                       isLabelHidden
@@ -612,7 +523,9 @@ export default function SettingsSidebar() {
                     isExpanded={expandedRow === 'phone'}
                     onEdit={() => setExpandedRow('phone')}
                     onCancel={() => setExpandedRow(null)}
-                    onSave={() => setExpandedRow(null)}>
+                    onSave={() => setExpandedRow(null)}
+                    href={SELF_HASH}
+                    style={rowPadding}>
                     <TextInput
                       label="Phone number"
                       isLabelHidden
@@ -624,6 +537,8 @@ export default function SettingsSidebar() {
                     label="Identity verification"
                     value="Verified"
                     action=""
+                    href={SELF_HASH}
+                    style={rowPadding}
                   />
                   <ExpandableRow
                     label="Residential address"
@@ -631,7 +546,9 @@ export default function SettingsSidebar() {
                     isExpanded={expandedRow === 'address'}
                     onEdit={() => setExpandedRow('address')}
                     onCancel={() => setExpandedRow(null)}
-                    onSave={() => setExpandedRow(null)}>
+                    onSave={() => setExpandedRow(null)}
+                    href={SELF_HASH}
+                    style={rowPadding}>
                     <TextInput
                       label="Residential address"
                       isLabelHidden
@@ -645,7 +562,9 @@ export default function SettingsSidebar() {
                     isExpanded={expandedRow === 'mailingAddress'}
                     onEdit={() => setExpandedRow('mailingAddress')}
                     onCancel={() => setExpandedRow(null)}
-                    onSave={() => setExpandedRow(null)}>
+                    onSave={() => setExpandedRow(null)}
+                    href={SELF_HASH}
+                    style={rowPadding}>
                     <TextInput
                       label="Mailing address"
                       isLabelHidden
@@ -659,7 +578,9 @@ export default function SettingsSidebar() {
                     isExpanded={expandedRow === 'emergencyContact'}
                     onEdit={() => setExpandedRow('emergencyContact')}
                     onCancel={() => setExpandedRow(null)}
-                    onSave={() => setExpandedRow(null)}>
+                    onSave={() => setExpandedRow(null)}
+                    href={SELF_HASH}
+                    style={rowPadding}>
                     <TextInput
                       label="Emergency contact"
                       isLabelHidden
@@ -703,7 +624,7 @@ export default function SettingsSidebar() {
 
                 <VStack gap={8}>
                   <VStack gap={0}>
-                    <Heading level={3}>Messages</Heading>
+                    <Heading level={2}>Messages</Heading>
                     <VStack style={rowPadding}>
                       <Switch
                         label="Show people when I've read their messages."
@@ -723,7 +644,7 @@ export default function SettingsSidebar() {
                   </VStack>
 
                   <VStack gap={0}>
-                    <Heading level={3}>Listings</Heading>
+                    <Heading level={2}>Listings</Heading>
                     <VStack style={rowPadding}>
                       <Switch
                         label="List my wares in the scrying mirrors"
@@ -738,7 +659,7 @@ export default function SettingsSidebar() {
                   </VStack>
 
                   <VStack gap={4}>
-                    <Heading level={3}>Reviews</Heading>
+                    <Heading level={2}>Reviews</Heading>
                     <Text type="body" color="secondary">
                       Choose what&apos;s shared when you write a review.{' '}
                       <Link href={SELF_HASH} type="body">
@@ -783,7 +704,7 @@ export default function SettingsSidebar() {
                   </VStack>
 
                   <VStack gap={4}>
-                    <Heading level={3}>Data privacy</Heading>
+                    <Heading level={2}>Data privacy</Heading>
                     <Card>
                       <HStack hAlign="between" vAlign="center">
                         <Text type="body">Request my personal data</Text>
@@ -833,7 +754,7 @@ export default function SettingsSidebar() {
               <VStack gap={6}>
                 {!isNarrow && <Heading level={1}>Notifications</Heading>}
                 <VStack gap={0}>
-                  <Heading level={3}>Messages</Heading>
+                  <Heading level={2}>Messages</Heading>
                   <VStack style={rowPadding}>
                     <Switch
                       label="Email notifications"
@@ -864,10 +785,15 @@ export default function SettingsSidebar() {
               <VStack gap={6}>
                 {!isNarrow && <Heading level={1}>Taxes</Heading>}
                 <VStack gap={0}>
-                  <Heading level={3}>Tax scrolls</Heading>
+                  <Heading level={2}>Tax scrolls</Heading>
                   <Divider />
                   {TAX_ROWS.map(row => (
-                    <InfoRowItem key={row.label} {...row} />
+                    <InfoRowItem
+                          key={row.label}
+                          {...row}
+                          href={SELF_HASH}
+                          style={rowPadding}
+                        />
                   ))}
                 </VStack>
               </VStack>
@@ -877,10 +803,15 @@ export default function SettingsSidebar() {
               <VStack gap={6}>
                 {!isNarrow && <Heading level={1}>Payments</Heading>}
                 <VStack gap={0}>
-                  <Heading level={3}>Payout crypt</Heading>
+                  <Heading level={2}>Payout crypt</Heading>
                   <Divider />
                   {PAYOUT_ROWS.map(row => (
-                    <InfoRowItem key={row.label} {...row} />
+                    <InfoRowItem
+                          key={row.label}
+                          {...row}
+                          href={SELF_HASH}
+                          style={rowPadding}
+                        />
                   ))}
                 </VStack>
               </VStack>
@@ -890,7 +821,7 @@ export default function SettingsSidebar() {
               <VStack gap={6}>
                 {!isNarrow && <Heading level={1}>Travel for work</Heading>}
                 <VStack gap={0}>
-                  <Heading level={3}>Work haunts</Heading>
+                  <Heading level={2}>Work haunts</Heading>
                   <VStack style={rowPadding}>
                     <Switch
                       label="Show night-errand options at checkout"

@@ -14,6 +14,7 @@ import ChapteredDoc, {
   sceneFill,
   type ChapterGroup,
 } from 'astryx-dracula/shared/chaptered-doc';
+import {SceneFrame} from 'astryx-dracula/shared/scene-frame';
 
 import {
   Boxes,
@@ -702,13 +703,8 @@ const FOOTPRINT_BASELINE = 176;
 
 function FootprintScene({alt}: {alt: string}) {
   return (
-    <svg
-      viewBox="0 0 400 225"
-      preserveAspectRatio="xMidYMid slice"
-      style={sceneFill}
-      role="img"
-      aria-label={alt}>
-      <rect width="400" height="225" fill="var(--dracula-bg-dark)" />
+    <SceneFrame label={alt}>
+      {/* Axis line, not text: comment clears the 3:1 graphical floor here. */}
       <path
         d={`M40 ${FOOTPRINT_BASELINE} H360`}
         stroke="var(--dracula-comment)"
@@ -725,25 +721,29 @@ function FootprintScene({alt}: {alt: string}) {
             fill={bar.fill}
             fillOpacity={bar.opacity}
           />
+          {/* Value label: --color-text-highlight per visual.md ("values in
+              highlight"), at full opacity. It was bar.fill at 0.95, and
+              comment-family fills at that alpha measure 2.81-3.17:1, under
+              the 4.5:1 text floor. */}
           <text
             x={bar.x + 22}
             y={FOOTPRINT_BASELINE - bar.height - 9}
             fontFamily="var(--font-family-mono)"
             fontSize="11"
             textAnchor="middle"
-            fill={bar.fill}
-            fillOpacity={0.95}>
+            fill="var(--color-text-highlight)">
             {bar.value}
           </text>
         </g>
       ))}
       {/* Intentional exception: 10px dense diagram annotation inside an SVG
           figure (alt fallbacks on the wrapping role="img" carry the meaning),
-          not UI text — the 12px UI floor does not apply here. */}
+          not UI text — the 12px UI floor does not apply here. Still paragraph,
+          never comment, and never below full opacity. */}
       <g
         fontFamily="var(--font-family-mono)"
         fontSize="10"
-        fill="var(--dracula-comment)"
+        fill="var(--color-text-paragraph)"
         textAnchor="middle">
         {FOOTPRINT_BARS.map(bar => (
           <text key={bar.name} x={bar.x + 22} y={FOOTPRINT_BASELINE + 16}>
@@ -751,15 +751,18 @@ function FootprintScene({alt}: {alt: string}) {
           </text>
         ))}
       </g>
-      <g fontFamily="var(--font-family-mono)" fontSize="10" fill="var(--dracula-comment)">
-        <text x="40" y="30" fillOpacity={0.85}>
+      <g
+        fontFamily="var(--font-family-mono)"
+        fontSize="10"
+        fill="var(--color-text-paragraph)">
+        <text x="40" y="30">
           Global KV cache per token, log scale
         </text>
-        <text x="40" y="208" fillOpacity={0.6}>
+        <text x="40" y="208">
           about 4x below V4-Flash, 437x below V1
         </text>
       </g>
-    </svg>
+    </SceneFrame>
   );
 }
 
@@ -884,13 +887,7 @@ const INDEXER_CELLS = [0, 1, 2, 3, 4, 5, 6, 7];
 
 function IndexerScene({alt}: {alt: string}) {
   return (
-    <svg
-      viewBox="0 0 400 225"
-      preserveAspectRatio="xMidYMid slice"
-      style={sceneFill}
-      role="img"
-      aria-label={alt}>
-      <rect width="400" height="225" fill="var(--dracula-bg-dark)" />
+    <SceneFrame label={alt}>
 
       {INDEXER_ROWS.map(row =>
         row.picks.length > 0 ? (
@@ -901,9 +898,9 @@ function IndexerScene({alt}: {alt: string}) {
             width="276"
             height="13"
             rx="2"
-            fill="var(--dracula-cyan)"
+            fill="var(--color-data-categorical-cyan)"
             fillOpacity={0.12}
-            stroke="var(--dracula-cyan)"
+            stroke="var(--color-data-categorical-cyan)"
             strokeOpacity={0.45}
           />
         ) : null,
@@ -918,25 +915,49 @@ function IndexerScene({alt}: {alt: string}) {
             width="30"
             height="9"
             rx="1"
-            fill={row.picks.includes(cell) ? 'var(--dracula-green)' : 'var(--dracula-comment)'}
-            fillOpacity={row.picks.includes(cell) ? 1 : 0.3}
+            fill={
+              row.picks.includes(cell)
+                ? 'var(--color-data-categorical-green)'
+                : 'var(--dracula-comment)'
+            }
           />
         )),
       )}
 
-      <g fontFamily="var(--font-family-mono)" fontSize="10" fill="var(--dracula-comment)">
-        <text x="40" y="28" fillOpacity={0.85}>
+      {/* Scene text is paragraph, never comment. Comment is disabled text and
+          subtle border: it is 3.36:1 on this backdrop and the old
+          fillOpacity 0.7/0.85 pushed it to 2.48/3.17, under the 4.5:1 floor.
+          Axis and caption text is --color-text-paragraph at full opacity. */}
+      <g
+        fontFamily="var(--font-family-mono)"
+        fontSize="10"
+        fill="var(--color-text-paragraph)">
+        <text x="40" y="28">
           2,048 blocks of 8 positions, 16,384 candidates
         </text>
-        <text x="40" y="43" fillOpacity={0.7}>
+        <text x="40" y="43">
           score everything once, then search only the 16,384 survivors
         </text>
-        <rect x="40" y="196" width="8" height="8" rx="1" fill="var(--dracula-cyan)" fillOpacity={0.45} />
+        <rect
+          x="40"
+          y="196"
+          width="8"
+          height="8"
+          rx="1"
+          fill="var(--color-data-categorical-cyan)"
+        />
         <text x="54" y="204">block kept by its top score</text>
-        <rect x="230" y="196" width="8" height="8" rx="1" fill="var(--dracula-green)" />
+        <rect
+          x="230"
+          y="196"
+          width="8"
+          height="8"
+          rx="1"
+          fill="var(--color-data-categorical-green)"
+        />
         <text x="244" y="204">position in Top-512</text>
       </g>
-    </svg>
+    </SceneFrame>
   );
 }
 

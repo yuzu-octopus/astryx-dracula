@@ -7,12 +7,13 @@
  */
 
 import {OrderDesk, type OrderDeskRow} from 'astryx-dracula/shared/order-desk';
+import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
 
 // ============= DATA =============
 
 type ProductCategory = 'Matcha' | 'Coffee' | 'Tea' | 'Smoothie' | 'Specialty';
 
-const PRODUCTS: Array<{name: string; category: string; accent: string; price: number}> = [
+const PRODUCTS: Array<{name: string; category: string; accent: SceneHue; price: number}> = [
   {
     name: 'Ceremonial Matcha Latte',
     category: 'Matcha' as ProductCategory,
@@ -40,7 +41,7 @@ const PRODUCTS: Array<{name: string; category: string; accent: string; price: nu
   {
     name: 'Hojicha Latte',
     category: 'Specialty' as ProductCategory,
-    accent: 'var(--dracula-purple)',
+    accent: 'var(--dracula-pink)',
     price: 7,
   },
   {

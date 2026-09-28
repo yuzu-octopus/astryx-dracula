@@ -24,6 +24,7 @@ import {EmptyState} from '@astryxdesign/core/EmptyState';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Search} from 'lucide-react';
 import {SceneTile} from 'astryx-dracula/shared/scene-tile';
+import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
 
 interface LibraryItem {
   id: string;
@@ -36,7 +37,7 @@ interface LibraryItem {
 // One Dracula accent per category shelf. Purple stays out of the map: it is
 // reserved for interactive elements, and these hues only tint the thumbnail
 // dot, so each shelf takes a non-purple accent instead.
-const CATEGORY_HUES: Record<string, string> = {
+const CATEGORY_HUES: Record<string, SceneHue> = {
   Layout: 'var(--dracula-orange)',
   Forms: 'var(--dracula-cyan)',
   Navigation: 'var(--dracula-pink)',

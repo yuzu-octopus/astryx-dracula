@@ -11,6 +11,7 @@ import {Card} from '@astryxdesign/core/Card';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Square} from 'lucide-react';
 import {ChartLabel} from 'astryx-dracula/shared/chart-labels';
+import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
 
 // ============= SHARED CHART-PANEL CARD STYLE =============
 
@@ -27,7 +28,16 @@ export const CHART_PANEL_STYLE: CSSProperties = {
 const swatchStyle: CSSProperties = {flexShrink: 0};
 
 // Rounded product swatch: Dracula surface with a per-product accent glyph (one 36px size).
-export function ProductSwatch({accent, label}: {accent: string; label: string}) {
+// `accent` is an art treatment, so it takes the same `SceneHue` union as
+// `SceneTile.hue` — one art-treatment vocabulary, two consumers. A free-form
+// `string` here is what let `--dracula-purple` reach a product swatch.
+export function ProductSwatch({
+  accent,
+  label,
+}: {
+  accent: SceneHue;
+  label: string;
+}) {
   return (
     <svg
       viewBox="0 0 36 36"

@@ -39,18 +39,18 @@ import {
 export default function LoginCard() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loginFailed, setLoginFailed] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, startTransition] = useTransition();
 
   const handleLogin = () => {
     if (!email || !password) {
-      setLoginFailed(true);
+      setError(AUTH_ERROR_MESSAGE);
       return;
     }
-    setLoginFailed(false);
+    setError(null);
     startTransition(async () => {
       await demoLogin();
-      setLoginFailed(true);
+      setError(AUTH_ERROR_MESSAGE);
     });
   };
 
@@ -64,7 +64,9 @@ export default function LoginCard() {
           <VStack gap={4} hAlign="stretch">
             {/* Header */}
             <VStack gap={1} hAlign="center">
-              <Heading level={1}>{AUTH_HEADING}</Heading>
+              <Heading level={1} type="display-2">
+                {AUTH_HEADING}
+              </Heading>
               <Text type="body" color="secondary">
                 {AUTH_SUBTITLE}
               </Text>
@@ -81,10 +83,11 @@ export default function LoginCard() {
                 value={email}
                 onChange={(v: string) => {
                   setEmail(v);
-                  setLoginFailed(false);
+                  setError(null);
                 }}
                 size="lg"
                 onEnter={handleLogin}
+                status={error ? {type: 'error', message: error} : undefined}
               />
               <VStack gap={1}>
                 <TextInput
@@ -96,20 +99,13 @@ export default function LoginCard() {
                   value={password}
                   onChange={(v: string) => {
                     setPassword(v);
-                    setLoginFailed(false);
+                    setError(null);
                   }}
                   size="lg"
                   onEnter={handleLogin}
-                  status={
-                    loginFailed
-                      ? {
-                          type: 'error',
-                          message: AUTH_ERROR_MESSAGE,
-                        }
-                      : undefined
-                  }
+                  status={error ? {type: 'error', message: error} : undefined}
                 />
-                {loginFailed && (
+                {error && (
                   <VStack hAlign="end">
                     <Link
                       href="#/templates/login-card"

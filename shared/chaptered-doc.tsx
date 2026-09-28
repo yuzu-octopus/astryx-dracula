@@ -306,6 +306,7 @@ export default function ChapteredDoc({
       }>
       <Layout
         height="auto"
+        contentWidth={960}
         end={
           isNarrow ? undefined : (
             <LayoutPanel

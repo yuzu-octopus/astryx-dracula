@@ -14,6 +14,7 @@ import {
   Text,
   VStack,
 } from '@astryxdesign/core';
+import { DataBar } from '../shared/data-bar';
 
 export function Gallery() {
   return (
@@ -154,8 +155,17 @@ export function Gallery() {
           </HStack>
 
           <Grid columns={{ minWidth: 280, max: 2 }} gap={4}>
+            {/* "Build pipeline execution" stays a ProgressBar: a build running
+                to completion IS task progress, which is what that component is
+                for. "Network bandwidth headroom" is a capacity magnitude, so
+                it is a DataBar. Same card, two different questions. */}
             <ProgressBar label="Build pipeline execution" value={62} variant="neutral" hasValueLabel />
-            <ProgressBar label="Network bandwidth headroom" value={38} variant="success" hasValueLabel />
+            <DataBar
+              label="Network bandwidth headroom"
+              segments={[{id: 'used', value: 38, color: 'var(--color-success)'}]}
+              hasValueLabel
+              formatValue={used => `${used}% used`}
+            />
           </Grid>
 
           <Card

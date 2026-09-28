@@ -11,7 +11,7 @@ export default function BlankPage() {
       height="auto"
       content={
         <LayoutContent>
-          <Heading level={1}>A blank crypt awaits its story</Heading>
+          <Heading level={1} type="display-2">A blank crypt awaits its story</Heading>
         </LayoutContent>
       }
     />

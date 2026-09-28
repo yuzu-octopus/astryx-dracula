@@ -61,6 +61,7 @@ import {
   ChatMessageList,
   ChatSystemMessage,
 } from '@astryxdesign/core/Chat';
+import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
 
 // Styles passed to Astryx components via their `style` prop. Astryx components
 // forward the DOM `style` prop, so these work with no CSS compiler — in
@@ -213,9 +214,14 @@ const inlineStyles: Record<string, CSSProperties> = {
     paddingBottom: 'var(--spacing-4)',
   },
   // Center supplies the 32px box and the centering; only the paint stays here.
+  // Surface, not muted: --color-text-secondary #9AA1BC is 3.57:1 on
+  // --color-background-muted #44475A, under the 4.5:1 text floor. The chip is
+  // aria-hidden decorative art so it clears the 3:1 non-text bar as-is, but the
+  // surface fill carries the same 4.60:1 pairing at no cost and cannot drop
+  // under the floor if anything smaller is ever put in the box.
   activityIcon: {
     borderRadius: 'var(--radius-element)', // square chip: no circles except dots/avatars
-    backgroundColor: 'var(--color-background-muted)',
+    backgroundColor: 'var(--color-background-surface)',
     color: 'var(--color-text-secondary)',
     flexShrink: 0,
   },
@@ -958,6 +964,20 @@ function LatestActivityCard({isMobile}: {isMobile: boolean}) {
         </HStack>
 
         <VStack gap={1} style={styles.activityListFade}>
+          {/* The sign travels in the string (formatAmount prefixes U+2212), so
+              direction is never colour-alone and 1.4.1 holds without a tint.
+              A negative text role is not available here, and the reason is
+              worth recording rather than working around:
+                - TextColorMap is six keys (primary, secondary, disabled,
+                  placeholder, accent, inherit). No negative.
+                - `accent` is Purple in this theme, and principle 2 makes
+                  purple tappable-only, so a refund would read as a link.
+                - --color-negative #FF5555 measures 3.75:1 on this card
+                  #343746, under the 4.5:1 floor, so a style-prop tint would
+                  trade a weak signal for a real contrast failure.
+              secondary therefore stays and the minus sign is the signal. A
+              kit-wide negative text role needs a new token AND a colour that
+              clears 4.5:1 on a card — a human call, not a call-site one. */}
           {ACTIVITY.map(item => (
             <Item
               key={item.id}
@@ -999,7 +1019,7 @@ export interface InventoryRow extends Record<string, unknown> {
   available: number;
   location: string;
   tags: TagSpec[];
-  hue: string;
+  hue: SceneHue;
   selected: boolean;
 }
 

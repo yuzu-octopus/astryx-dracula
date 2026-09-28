@@ -711,7 +711,7 @@ export default function KanbanBoard() {
               gap={2}
               startContent={
                 <>
-                  <Heading level={1}>Sprint Board</Heading>
+                  <Heading level={1} type="display-2">Sprint Board</Heading>
                   <Badge label={items.length} variant="neutral" />
                 </>
               }
@@ -784,10 +784,11 @@ export default function KanbanBoard() {
       {drag && draggedItem ? (
         <Card
           padding={3}
-          elevation="high"
+          elevation="none"
           style={{
             ...floatingStyle,
             width: drag.width,
+            borderColor: 'var(--color-border-emphasized)',
             transform: `translate(${drag.pointerX - drag.offsetX}px, ${drag.pointerY - drag.offsetY}px)`,
           }}>
           <BoardCardBody item={draggedItem} onMove={() => {}} />

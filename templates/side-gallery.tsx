@@ -10,12 +10,13 @@ import {Grid} from '@astryxdesign/core/Grid';
 import {Divider} from '@astryxdesign/core/Divider';
 import {galleryImageClip} from 'astryx-dracula/shared/gallery-image';
 import {SceneTile, SCENE_TILE_ALTS} from 'astryx-dracula/shared/scene-tile';
+import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
 
 // ─── Gallery Data ─────────────────────────────────────────────────────────────
 
 // One Dracula accent per tile from the fixed categorical vocabulary; alts are
 // shared with classic-gallery via SCENE_TILE_ALTS.
-const GALLERY_SCENES = [
+const GALLERY_SCENES: Array<{alt: string; hue: SceneHue}> = [
   {alt: SCENE_TILE_ALTS[0], hue: 'var(--dracula-cyan)'},
   {alt: SCENE_TILE_ALTS[1], hue: 'var(--dracula-pink)'},
   {alt: SCENE_TILE_ALTS[2], hue: 'var(--dracula-yellow)'},

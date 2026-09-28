@@ -1,6 +1,7 @@
-import { Badge, Card, Grid, Heading, HStack, ProgressBar, StatusDot, Table, Text, VStack, proportional } from '@astryxdesign/core';
+import { Badge, Card, Grid, Heading, HStack, StatusDot, Table, Text, VStack, proportional } from '@astryxdesign/core';
+import { DataBar } from '../shared/data-bar';
 import { MetricDelta } from '../shared/metric-delta';
-import { BARS, ROUTES } from './fixtures';
+import { BARS, ROUTES, TrafficChart, RouteCell, type RouteRow } from './fixtures';
 
 function Kpi({
   label,
@@ -71,65 +72,8 @@ export function Dashboard() {
                 border: 'var(--border-width) solid var(--color-separator)',
               }}
             >
-              <svg
-                viewBox="0 0 540 180"
-                width="100%"
-                role="img"
-                aria-label="Monthly traffic bar chart displaying categorical data across Dracula theme colors"
-              >
-                {/* Horizontal guide lines */}
-                <line x1="20" y1="30" x2="520" y2="30" stroke="var(--color-separator)" strokeDasharray="3 3" opacity={0.5} />
-                <line x1="20" y1="80" x2="520" y2="80" stroke="var(--color-separator)" strokeDasharray="3 3" opacity={0.5} />
-                <line x1="20" y1="130" x2="520" y2="130" stroke="var(--color-separator)" />
-
-                {BARS.map((b, i) => {
-                  const h = (b.value / 100) * 110;
-                  const x = 32 + i * 70;
-                  return (
-                    <g key={b.month}>
-                      <rect
-                        x={x}
-                        y={130 - h}
-                        width={46}
-                        height={h}
-                        rx={4}
-                        fill={b.color}
-                      />
-                      <text
-                        x={x + 23}
-                        y={120 - h}
-                        textAnchor="middle"
-                        fontSize={13}
-                        fill="var(--color-text-highlight)"
-                        fontFamily="var(--font-family-mono)"
-                      >
-                        {b.value}k
-                      </text>
-                      <text
-                        x={x + 23}
-                        y={150}
-                        textAnchor="middle"
-                        fontSize={13}
-                        fill="var(--color-text-paragraph)"
-                        fontFamily="var(--font-family-mono)"
-                      >
-                        {b.month}
-                      </text>
-                    </g>
-                  );
-                })}
-              </svg>
+              <TrafficChart showValues />
             </Card>
-
-            <HStack gap={1.5} wrap="wrap" justify="center">
-              <Badge label="purple" variant="purple" />
-              <Badge label="pink" variant="pink" />
-              <Badge label="cyan" variant="cyan" />
-              <Badge label="green" variant="green" />
-              <Badge label="yellow" variant="yellow" />
-              <Badge label="orange" variant="orange" />
-              <Badge label="red" variant="red" />
-            </HStack>
           </VStack>
         </Card>
 
@@ -151,10 +95,33 @@ export function Dashboard() {
             </HStack>
 
             <VStack gap={4}>
-              <ProgressBar label="Build minutes quota" value={62} variant="neutral" hasValueLabel />
-              <ProgressBar label="Network egress bandwidth" value={38} variant="success" hasValueLabel />
-              <ProgressBar label="Monthly error budget" value={91} variant="warning" hasValueLabel />
-              <ProgressBar label="Memory pool allocation" value={45} variant="neutral" hasValueLabel />
+              {/* Quota/bandwidth/budget are magnitudes against a 0-100 domain,
+                  not task completion, so they are DataBar and not core's
+                  ProgressBar. See shared/data-bar.tsx for why. */}
+              <DataBar
+                label="Build minutes quota"
+                segments={[{id: 'used', value: 62, color: 'var(--color-success)'}]}
+                hasValueLabel
+                formatValue={used => `${used}% used`}
+              />
+              <DataBar
+                label="Network egress bandwidth"
+                segments={[{id: 'used', value: 38, color: 'var(--color-success)'}]}
+                hasValueLabel
+                formatValue={used => `${used}% used`}
+              />
+              <DataBar
+                label="Monthly error budget"
+                segments={[{id: 'used', value: 91, color: 'var(--color-warning)'}]}
+                hasValueLabel
+                formatValue={used => `${used}% used`}
+              />
+              <DataBar
+                label="Memory pool allocation"
+                segments={[{id: 'used', value: 45, color: 'var(--color-success)'}]}
+                hasValueLabel
+                formatValue={used => `${used}% used`}
+              />
             </VStack>
 
             <Card
@@ -200,15 +167,8 @@ export function Dashboard() {
                 key: 'page',
                 header: 'Route',
                 width: proportional(2),
-                renderCell: (row) => (
-                  <HStack gap={2} vAlign="center">
-                    <StatusDot
-                      variant={row.status === 'healthy' ? 'success' : 'warning'}
-                      label={row.status === 'healthy' ? 'Optimal' : 'Investigating'}
-                    />
-                    <Text weight="semibold">{String(row.page)}</Text>
-                  </HStack>
-                ),
+                renderCell: (row) => <RouteCell row={row as RouteRow} />,
+
               },
               {
                 key: 'views',

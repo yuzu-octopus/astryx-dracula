@@ -11,6 +11,7 @@ import {
   AUTH_SIGNUP_PROMPT,
   AUTH_SIGNUP_LINK,
   AUTH_FORGOT_PASSWORD,
+  AUTH_ERROR_MESSAGE,
   AUTH_EMAIL_PLACEHOLDER,
   AUTH_PASSWORD_PLACEHOLDER,
   AUTH_TERMS_PREFIX,
@@ -36,12 +37,12 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, startTransition] = useTransition();
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const handleSignIn = () => {
-    setError('');
+    setError(null);
     if (!email || !password) {
-      setError('Whisper both your email and password to enter the night.');
+      setError(AUTH_ERROR_MESSAGE);
       return;
     }
     startTransition(async () => {
@@ -58,7 +59,7 @@ export default function LoginPage() {
         <Card padding={4} width="100%">
           <VStack gap={4} hAlign="stretch">
             <VStack gap={1} hAlign="center">
-              <Heading level={1} justify="center">
+              <Heading level={1} type="display-2" justify="center">
                 {AUTH_HEADING}
               </Heading>
               <Text type="body" color="secondary">
@@ -70,12 +71,16 @@ export default function LoginPage() {
               label="Email"
               isLabelHidden
               value={email}
-              onChange={setEmail}
+              onChange={v => {
+                setEmail(v);
+                setError(null);
+              }}
               placeholder={AUTH_EMAIL_PLACEHOLDER}
               type="email"
               {...inputAutoComplete('email')}
               size="lg"
               onEnter={handleSignIn}
+              status={error ? {type: 'error', message: error} : undefined}
             />
 
             <VStack gap={1}>
@@ -83,20 +88,16 @@ export default function LoginPage() {
                 label="Password"
                 isLabelHidden
                 value={password}
-                onChange={setPassword}
+                onChange={v => {
+                  setPassword(v);
+                  setError(null);
+                }}
                 placeholder={AUTH_PASSWORD_PLACEHOLDER}
                 type="password"
                 {...inputAutoComplete('current-password')}
                 size="lg"
                 onEnter={handleSignIn}
-                status={
-                  error
-                    ? {
-                        type: 'error',
-                        message: error,
-                      }
-                    : undefined
-                }
+                status={error ? {type: 'error', message: error} : undefined}
               />
               {error && (
                 <VStack hAlign="end">

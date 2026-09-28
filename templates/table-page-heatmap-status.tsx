@@ -38,6 +38,7 @@ import {Link} from '@astryxdesign/core/Link';
 import {Table, proportional, pixel} from '@astryxdesign/core/Table';
 import type {TableColumn} from '@astryxdesign/core/Table';
 import {Filter, Download, RotateCw} from 'lucide-react';
+import {ChartLegend} from 'astryx-dracula/shared/chart-legend';
 import {ChartLabel} from 'astryx-dracula/shared/chart-labels';
 import {CHART_PANEL_STYLE} from 'astryx-dracula/shared/revenue-chart';
 
@@ -508,25 +509,21 @@ function OutageHeatmap() {
           ))}
         </svg>
       </Card>
-      <Text type="supporting" color="secondary">
-        Incidents by day and hour · Jan 12–18
-      </Text>
-      <HStack gap={4} vAlign="center">
-        {HEAT_LEGEND.map(entry => (
-          <HStack key={entry.label} gap={2} vAlign="center">
-            <svg
-              width={12}
-              height={12}
-              role="img"
-              aria-label={`${entry.label} incidents`}>
-              <rect width={12} height={12} rx={4} fill={entry.fill} />
-            </svg>
-            <Text type="supporting" color="secondary" hasTabularNumbers>
-              {entry.label}
-            </Text>
-          </HStack>
-        ))}
-      </HStack>
+      {/* Legend rows go through shared/chart-legend.tsx. The ramp itself stays
+          local: it encodes SEVERITY (0/1/2/3+ against green/orange/red), which
+          is a status vocabulary, not a magnitude. heat-scale.ts is a sequential
+          magnitude ramp and would invert this one — on a dark page a high count
+          reads lighter, which is the opposite of "more is worse" here. */}
+      <ChartLegend
+        entries={HEAT_LEGEND.map(entry => ({label: entry.label, color: entry.fill}))}
+        gap={2}
+        swatchSize={12}
+        caption={
+          <Text type="supporting" color="secondary">
+            Incidents by day and hour · Jan 12–18
+          </Text>
+        }
+      />
     </VStack>
   );
 }
@@ -541,7 +538,7 @@ export default function HeatmapTable() {
         <LayoutHeader hasDivider padding={6}>
           <HStack gap={2} vAlign="center">
             <StackItem size="fill">
-              <Heading level={1}>Status</Heading>
+              <Heading level={1} type="display-2">Status</Heading>
             </StackItem>
             <IconButton
               label="Filter"

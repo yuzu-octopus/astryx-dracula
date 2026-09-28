@@ -40,6 +40,8 @@ import {
   iconBox,
   actionNoWrap,
   sideNavHeading,
+  InfoRowItem,
+  ExpandableRow,
 } from 'astryx-dracula/shared/settings-rows';
 import type {DeviceRow, InfoTileData} from 'astryx-dracula/shared/settings-rows';
 
@@ -90,15 +92,6 @@ const TIMEZONES = [
   {label: '(GMT+01:00) London', value: 'GMT+1'},
 ];
 
-interface ExpandableRowProps {
-  label: string;
-  value: string;
-  children: React.ReactNode;
-  isExpanded: boolean;
-  onEdit: () => void;
-  onCancel: () => void;
-  onSave: () => void;
-}
 
 function InfoTile({icon, title, body}: InfoTileData) {
   return (
@@ -118,119 +111,6 @@ function InfoTile({icon, title, body}: InfoTileData) {
   );
 }
 
-function ExpandableRowViewing({
-  label,
-  value,
-  onEdit,
-}: {
-  label: string;
-  value: string;
-  onEdit: () => void;
-}) {
-  return (
-    <HStack hAlign="between" vAlign="start">
-      <VStack gap={0}>
-        <Text type="body" weight="semibold" display="block">
-          {label}
-        </Text>
-        <Text type="body" color="secondary" display="block">
-          {value}
-        </Text>
-      </VStack>
-      <Link
-        href={SELF_HASH}
-        style={actionNoWrap}
-        onClick={(e: React.MouseEvent) => {
-          e.preventDefault();
-          onEdit();
-        }}>
-        Edit
-      </Link>
-    </HStack>
-  );
-}
-
-function ExpandableRowEditing({
-  label,
-  children,
-  onCancel,
-  onSave,
-}: {
-  label: string;
-  children: React.ReactNode;
-  onCancel: () => void;
-  onSave: () => void;
-}) {
-  return (
-    <VStack gap={4}>
-      <Text type="body" weight="semibold" display="block">
-        {label}
-      </Text>
-      {children}
-      <HStack gap={2}>
-        <Button label="Save" variant="primary" onClick={onSave} />
-        <Button label="Cancel" variant="ghost" onClick={onCancel} />
-      </HStack>
-    </VStack>
-  );
-}
-
-function ExpandableRow({
-  label,
-  value,
-  children,
-  isExpanded,
-  onEdit,
-  onCancel,
-  onSave,
-}: ExpandableRowProps) {
-  return (
-    <>
-      {isExpanded ? (
-        <ExpandableRowEditing
-          label={label}
-          onCancel={onCancel}
-          onSave={onSave}>
-          {children}
-        </ExpandableRowEditing>
-      ) : (
-        <ExpandableRowViewing label={label} value={value} onEdit={onEdit} />
-      )}
-      <Divider />
-    </>
-  );
-}
-
-function InfoRowItem({
-  label,
-  value,
-  action,
-}: {
-  label: string;
-  value: string;
-  action: string;
-}) {
-  return (
-    <>
-      <HStack hAlign="between" vAlign="start">
-        <VStack gap={0}>
-          <Text type="body" weight="semibold" display="block">
-            {label}
-          </Text>
-          <Text type="body" color="secondary" display="block">
-            {value}
-          </Text>
-        </VStack>
-        {action && (
-          <Link href={SELF_HASH} style={actionNoWrap}>
-            {action}
-          </Link>
-        )}
-      </HStack>
-      <Divider />
-    </>
-  );
-}
 
 function DeviceRowItem({label, isCurrent, location, action}: DeviceRow) {
   return (
@@ -403,7 +283,8 @@ export default function SettingsDialog() {
                           isExpanded={expandedRow === 'legalName'}
                           onEdit={() => handleEdit('legalName')}
                           onCancel={handleCancel}
-                          onSave={handleSave}>
+                          onSave={handleSave}
+                          href={SELF_HASH}>
                           <TextInput
                             label="Legal name"
                             isLabelHidden
@@ -417,7 +298,8 @@ export default function SettingsDialog() {
                           isExpanded={expandedRow === 'preferredName'}
                           onEdit={() => handleEdit('preferredName')}
                           onCancel={handleCancel}
-                          onSave={handleSave}>
+                          onSave={handleSave}
+                          href={SELF_HASH}>
                           <TextInput
                             label="Preferred first name"
                             isLabelHidden
@@ -431,7 +313,8 @@ export default function SettingsDialog() {
                           isExpanded={expandedRow === 'email'}
                           onEdit={() => handleEdit('email')}
                           onCancel={handleCancel}
-                          onSave={handleSave}>
+                          onSave={handleSave}
+                          href={SELF_HASH}>
                           <TextInput
                             label="Email address"
                             isLabelHidden
@@ -445,7 +328,8 @@ export default function SettingsDialog() {
                           isExpanded={expandedRow === 'phone'}
                           onEdit={() => handleEdit('phone')}
                           onCancel={handleCancel}
-                          onSave={handleSave}>
+                          onSave={handleSave}
+                          href={SELF_HASH}>
                           <TextInput
                             label="Phone number"
                             isLabelHidden
@@ -457,6 +341,7 @@ export default function SettingsDialog() {
                           label="Identity verification"
                           value="Verified"
                           action=""
+                        href={SELF_HASH}
                         />
                         <ExpandableRow
                           label="Residential address"
@@ -464,7 +349,8 @@ export default function SettingsDialog() {
                           isExpanded={expandedRow === 'address'}
                           onEdit={() => handleEdit('address')}
                           onCancel={handleCancel}
-                          onSave={handleSave}>
+                          onSave={handleSave}
+                          href={SELF_HASH}>
                           <TextInput
                             label="Residential address"
                             isLabelHidden
@@ -478,7 +364,8 @@ export default function SettingsDialog() {
                           isExpanded={expandedRow === 'mailingAddress'}
                           onEdit={() => handleEdit('mailingAddress')}
                           onCancel={handleCancel}
-                          onSave={handleSave}>
+                          onSave={handleSave}
+                          href={SELF_HASH}>
                           <TextInput
                             label="Mailing address"
                             isLabelHidden
@@ -492,7 +379,8 @@ export default function SettingsDialog() {
                           isExpanded={expandedRow === 'emergencyContact'}
                           onEdit={() => handleEdit('emergencyContact')}
                           onCancel={handleCancel}
-                          onSave={handleSave}>
+                          onSave={handleSave}
+                          href={SELF_HASH}>
                           <TextInput
                             label="Emergency contact"
                             isLabelHidden
@@ -531,7 +419,7 @@ export default function SettingsDialog() {
                             <Heading level={3}>Login</Heading>
                             <Divider />
                             {LOGIN_ROWS.map(row => (
-                              <InfoRowItem key={row.label} {...row} />
+                              <InfoRowItem key={row.label} {...row} href={SELF_HASH} />
                             ))}
                           </VStack>
 
@@ -539,7 +427,7 @@ export default function SettingsDialog() {
                             <Heading level={3}>Social accounts</Heading>
                             <Divider />
                             {SOCIAL_ROWS.map(row => (
-                              <InfoRowItem key={row.label} {...row} />
+                              <InfoRowItem key={row.label} {...row} href={SELF_HASH} />
                             ))}
                           </VStack>
 
@@ -627,7 +515,8 @@ export default function SettingsDialog() {
                           isExpanded={expandedRow === 'language'}
                           onEdit={() => handleEdit('language')}
                           onCancel={handleCancel}
-                          onSave={handleSave}>
+                          onSave={handleSave}
+                          href={SELF_HASH}>
                           <Selector
                             label="Language"
                             isLabelHidden
@@ -646,7 +535,8 @@ export default function SettingsDialog() {
                           isExpanded={expandedRow === 'currency'}
                           onEdit={() => handleEdit('currency')}
                           onCancel={handleCancel}
-                          onSave={handleSave}>
+                          onSave={handleSave}
+                          href={SELF_HASH}>
                           <Selector
                             label="Currency"
                             isLabelHidden
@@ -665,7 +555,8 @@ export default function SettingsDialog() {
                           isExpanded={expandedRow === 'timezone'}
                           onEdit={() => handleEdit('timezone')}
                           onCancel={handleCancel}
-                          onSave={handleSave}>
+                          onSave={handleSave}
+                          href={SELF_HASH}>
                           <Selector
                             label="Time zone"
                             isLabelHidden
@@ -714,11 +605,13 @@ export default function SettingsDialog() {
                           label="Payout crypt"
                           value="Visa ending in 4821"
                           action=""
+                        href={SELF_HASH}
                         />
                         <InfoRowItem
                           label="Past payouts"
                           value="No tributes yet"
                           action=""
+                        href={SELF_HASH}
                         />
                       </VStack>
                     </VStack>
@@ -733,11 +626,13 @@ export default function SettingsDialog() {
                           label="Tax scrolls"
                           value="Not submitted"
                           action=""
+                        href={SELF_HASH}
                         />
                         <InfoRowItem
                           label="Past scrolls"
                           value="Available after your first tribute"
                           action=""
+                        href={SELF_HASH}
                         />
                       </VStack>
                     </VStack>
@@ -748,8 +643,8 @@ export default function SettingsDialog() {
                       <VStack gap={4}>
                         <Heading level={3}>Travel for work</Heading>
                         <Switch
-                          label="Show night-errand options"
-                          description="Adds a night-errand toggle at checkout."
+                          label="Show night-errand options at checkout"
+                          description="Adds a night-errand toggle to your account."
                           value={workTravel}
                           onChange={setWorkTravel}
                           labelPosition="start"

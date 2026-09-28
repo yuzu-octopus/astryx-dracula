@@ -601,7 +601,7 @@ function ComponentDetailView({activeNav}: {activeNav: string}) {
         <LayoutContent isScrollable={false} padding={8}>
           <VStack gap={8}>
             <VStack gap={2}>
-              <Heading level={1}>{getComponentName(activeNav)}</Heading>
+              <Heading level={1} type="display-2">{getComponentName(activeNav)}</Heading>
               <Text type="supporting" color="secondary" hasTabularNumbers>
                 March 30, 2026 · Updated 5:40 p.m. PST
               </Text>
@@ -638,6 +638,7 @@ function ComponentDetailView({activeNav}: {activeNav: string}) {
               <Table
                 data={docs.bestPractices as Record<string, unknown>[]}
                 dividers="none"
+                hasHover
                 columns={[
                   {
                     key: 'type',

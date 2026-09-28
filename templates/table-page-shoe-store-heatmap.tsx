@@ -7,13 +7,14 @@
  */
 
 import {OrderDesk, type OrderDeskRow} from 'astryx-dracula/shared/order-desk';
+import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
 
 // ============= DATA =============
 
 type ProductCategory =
   'Running' | 'Lifestyle' | 'Basketball' | 'Training' | 'Skateboarding';
 
-const PRODUCTS: Array<{name: string; category: string; accent: string; price: number}> = [
+const PRODUCTS: Array<{name: string; category: string; accent: SceneHue; price: number}> = [
   {
     name: 'Air Max 90',
     category: 'Lifestyle' as ProductCategory,
@@ -35,7 +36,7 @@ const PRODUCTS: Array<{name: string; category: string; accent: string; price: nu
   {
     name: 'Jordan 1 Retro',
     category: 'Basketball' as ProductCategory,
-    accent: 'var(--dracula-purple)',
+    accent: 'var(--dracula-red)',
     price: 180,
   },
   {

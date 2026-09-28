@@ -16,6 +16,7 @@ import {Layout, LayoutContent} from '@astryxdesign/core/Layout';
 import {Grid} from '@astryxdesign/core/Grid';
 import {SceneTile} from 'astryx-dracula/shared/scene-tile';
 import {galleryImageClip} from 'astryx-dracula/shared/gallery-image';
+import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
 
 // Negative margin offsets each card's 8px padding so the grid content stays
 // visually aligned while giving every card a padded hover/click target.
@@ -30,7 +31,7 @@ const SELF_HASH = '#/templates/documentation';
 // Decorative accent per grimoire shelf. None of them is purple: the sigils
 // are not interactive, and purple belongs to the things that are. Art lives
 // in shared/scene-tile (lg fork: centered glyph on a flat field).
-const SHELF_HUES: Record<string, string> = {
+const SHELF_HUES: Record<string, SceneHue> = {
   Core: 'var(--dracula-pink)',
   Layout: 'var(--dracula-cyan)',
   Navigation: 'var(--dracula-green)',

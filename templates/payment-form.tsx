@@ -23,7 +23,10 @@ import {TextArea} from '@astryxdesign/core/TextArea';
 import {Divider} from '@astryxdesign/core/Divider';
 import {Banner} from '@astryxdesign/core/Banner';
 import {Card} from '@astryxdesign/core/Card';
-import {SceneTile} from 'astryx-dracula/shared/scene-tile';
+import {
+  SceneTile,
+  type SceneHue,
+} from 'astryx-dracula/shared/scene-tile';
 import {Collapsible} from '@astryxdesign/core/Collapsible';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
 import {NumberInput} from '@astryxdesign/core/NumberInput';
@@ -105,8 +108,10 @@ const US_STATES = [
 ];
 
 // One Dracula accent per line item, from the fixed categorical vocabulary.
-// Art lives in shared/scene-tile (lg fork: centered glyph on a flat field).
-const ITEM_HUES: Record<string, string> = {
+// Art lives in shared/scene-tile (lg fork: centered glyph on a flat field), so
+// this map is typed `SceneHue`. `Record<string, string>` let any caller slip
+// purple through to a scene; the union is what stops the next one.
+const ITEM_HUES: Record<string, SceneHue> = {
   '1': 'var(--dracula-cyan)',
   '2': 'var(--dracula-pink)',
   '3': 'var(--dracula-yellow)',

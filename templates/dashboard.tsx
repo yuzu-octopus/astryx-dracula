@@ -21,6 +21,7 @@ import {Icon} from '@astryxdesign/core/Icon';
 // ============= ICONS =============
 
 import {RefreshCw, Square} from 'lucide-react';
+import {ChartLegend} from 'astryx-dracula/shared/chart-legend';
 import {CHART_HUES} from 'astryx-dracula/shared/chart-hues';
 import {MetricDelta} from 'astryx-dracula/shared/metric-delta';
 import {Sparkline, type SparkPoint} from 'astryx-dracula/shared/sparkline';
@@ -456,16 +457,8 @@ const chartColors = {
   mobile: CHART_HUES.cyan,
 };
 
-function ChartLegendItem({color, label}: {color: string; label: string}) {
-  return (
-    <HStack gap={2} vAlign="center">
-      <Icon icon={Square} size="xsm" style={{color}} />
-      <Text type="supporting" color="secondary">
-        {label}
-      </Text>
-    </HStack>
-  );
-}
+// Legend rows go through shared/chart-legend.tsx, which makes `label` a
+// REQUIRED field so a hue can never ship without the word that names it.
 
 function ActiveUsersChart() {
   // Downsample the 96 quarter-hour points to one bar per hour, stacking
@@ -535,13 +528,18 @@ function ActiveUsersChart() {
           })}
         </svg>
       </Card>
-      <Text type="supporting" color="secondary">
-        Hourly intervals · trailing 24 hours
-      </Text>
-      <HStack gap={6} vAlign="center">
-        <ChartLegendItem color={chartColors.desktop} label="Desktop" />
-        <ChartLegendItem color={chartColors.mobile} label="Mobile" />
-      </HStack>
+      <ChartLegend
+        entries={[
+          {label: 'Desktop', color: chartColors.desktop},
+          {label: 'Mobile', color: chartColors.mobile},
+        ]}
+        gap={4}
+        caption={
+          <Text type="supporting" color="secondary">
+            Hourly intervals · trailing 24 hours
+          </Text>
+        }
+      />
     </VStack>
   );
 }

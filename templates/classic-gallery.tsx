@@ -12,6 +12,7 @@ import {Grid} from '@astryxdesign/core/Grid';
 import {Section} from '@astryxdesign/core/Section';
 import {TabList, Tab} from '@astryxdesign/core/TabList';
 import {SceneTile, SCENE_TILE_ALTS} from 'astryx-dracula/shared/scene-tile';
+import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
 
 // ─── Styles ─────────────────────────────────────────────────────────────────
 
@@ -38,7 +39,7 @@ interface GalleryImage {
 }
 
 // Dracula accent per gallery shelf.
-const CATEGORY_HUES: Record<Exclude<Category, 'all'>, string> = {
+const CATEGORY_HUES: Record<Exclude<Category, 'all'>, SceneHue> = {
   scene: 'var(--dracula-cyan)',
   lifestyle: 'var(--dracula-pink)',
   home: 'var(--dracula-yellow)',

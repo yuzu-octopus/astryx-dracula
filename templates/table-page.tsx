@@ -407,7 +407,7 @@ export default function TablePage() {
         <LayoutHeader hasDivider padding={6}>
           <HStack gap={2} vAlign="center">
             <StackItem size="fill">
-              <Heading level={1}>Familiars</Heading>
+              <Heading level={1} type="display-2">Familiars</Heading>
             </StackItem>
             <IconButton
               label="Filter"

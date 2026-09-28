@@ -28,6 +28,7 @@ import {ProgressBar} from '@astryxdesign/core/ProgressBar';
 import {Collapsible} from '@astryxdesign/core/Collapsible';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Dialog, DialogHeader} from '@astryxdesign/core/Dialog';
+import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
 import {
   Calendar,
   Flag,
@@ -95,9 +96,15 @@ const PRODUCTS = [
   },
 ];
 
-// Dracula accent per product row.
-const PRODUCT_HUES = [
-  'var(--dracula-purple)',
+// Per-product art tint, read positionally out of a never-reordered array so
+// "Crypt Cup" keeps its hue for the life of the page. Typed `SceneHue` for two
+// reasons, not one: the union is the enforcement, and it also pins the key set
+// so the array cannot grow a sixth entry that silently reuses slot 1 (the old
+// `index % length` wrapped at n>5 — a latent bug, not a live one).
+// The art-treatment remit bans purple, so the leading entry changes to cyan on
+// the same pass.
+const PRODUCT_HUES: readonly SceneHue[] = [
+  'var(--dracula-cyan)',
   'var(--dracula-cyan)',
   'var(--dracula-pink)',
   'var(--dracula-yellow)',

@@ -20,7 +20,7 @@ export function TemplatesIndex() {
     <SiteShell ctaHref="#/">
       <VStack gap={6}>
         <VStack gap={1}>
-          <Heading level={1}>Templates in Dracula</Heading>
+          <Heading level={1} type="display-2">Templates in Dracula</Heading>
           <Text type="body" color="secondary">
             {TEMPLATES.length} Astryx pages, themed and retokened. Open one live, or scaffold it with
             bunx astryx template.
@@ -84,7 +84,7 @@ export function TemplateDetail({ id }: { id: string }) {
     return (
       <Theme theme={astryxDraculaTheme} mode="dark">
         <VStack gap={3} style={{ padding: '32px' }}>
-          <Heading level={1}>Unknown template</Heading>
+          <Heading level={1} type="display-2">Unknown template</Heading>
           <Text type="body" color="secondary">
             No template named {id}.
           </Text>

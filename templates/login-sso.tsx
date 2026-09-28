@@ -78,7 +78,7 @@ export default function LoginSso() {
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loginFailed, setLoginFailed] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isLoading, startTransition] = useTransition();
 
   const provider = getProvider(email);
@@ -86,8 +86,13 @@ export default function LoginSso() {
 
   const handleContinue = () => {
     if (!emailValid) {
+      // The Continue buttons stay enabled and explain themselves. Disabling
+      // them greyed the buttons out with no stated reason, so a malformed
+      // address produced silence rather than guidance.
+      setError('Enter a valid email address to continue.');
       return;
     }
+    setError(null);
     if (provider) {
       setStep('sso-confirm');
     } else {
@@ -97,18 +102,18 @@ export default function LoginSso() {
 
   const handleBack = () => {
     setStep('email');
-    setLoginFailed(false);
+    setError(null);
   };
 
   const handleSignIn = () => {
     if (!password) {
-      setLoginFailed(true);
+      setError(AUTH_ERROR_MESSAGE);
       return;
     }
-    setLoginFailed(false);
+    setError(null);
     startTransition(async () => {
       await demoLogin();
-      setLoginFailed(true);
+      setError(AUTH_ERROR_MESSAGE);
     });
   };
 
@@ -122,7 +127,9 @@ export default function LoginSso() {
           {step === 'email' && (
             <>
               <VStack gap={1} hAlign="center">
-                <Heading level={1}>{AUTH_HEADING}</Heading>
+                <Heading level={1} type="display-2">
+                  {AUTH_HEADING}
+                </Heading>
                 <Text type="body" color="secondary">
                   Whisper your details to enter the night
                 </Text>
@@ -137,7 +144,7 @@ export default function LoginSso() {
                 value={email}
                 onChange={(v: string) => {
                   setEmail(v);
-                  setLoginFailed(false);
+                  setError(null);
                 }}
                 size="lg"
                 onKeyDown={(e: React.KeyboardEvent) => {
@@ -145,6 +152,7 @@ export default function LoginSso() {
                     handleContinue();
                   }
                 }}
+                status={error ? {type: 'error', message: error} : undefined}
               />
 
               <Link href="#/templates/login-sso">
@@ -156,7 +164,6 @@ export default function LoginSso() {
                 variant="primary"
                 size="lg"
                 onClick={handleContinue}
-                isDisabled={!emailValid}
               />
 
               <Divider label={AUTH_SSO_DIVIDER} />
@@ -166,7 +173,6 @@ export default function LoginSso() {
                 variant="secondary"
                 size="lg"
                 onClick={handleContinue}
-                isDisabled={!emailValid}
               />
 
               <VStack hAlign="center">
@@ -185,7 +191,9 @@ export default function LoginSso() {
             <>
               <VStack gap={2} hAlign="center">
                 <Avatar name={provider.name} size={48} />
-                <Heading level={1}>Sign in with {provider.name}</Heading>
+                <Heading level={1} type="display-2">
+                  Sign in with {provider.name}
+                </Heading>
                 <Text type="body" color="secondary">
                   You will be redirected back after signing in.
                 </Text>
@@ -231,7 +239,9 @@ export default function LoginSso() {
           {step === 'password-fallback' && (
             <>
               <VStack gap={1} hAlign="center">
-                <Heading level={1}>{AUTH_HEADING}</Heading>
+                <Heading level={1} type="display-2">
+                  {AUTH_HEADING}
+                </Heading>
                 <Text type="body" color="secondary">
                   {email}
                 </Text>
@@ -247,19 +257,12 @@ export default function LoginSso() {
                     size="lg"
                     onChange={(v: string) => {
                       setPassword(v);
-                      setLoginFailed(false);
+                      setError(null);
                     }}
                     onEnter={handleSignIn}
-                    status={
-                      loginFailed
-                        ? {
-                            type: 'error',
-                            message: AUTH_ERROR_MESSAGE,
-                          }
-                        : undefined
-                    }
+                    status={error ? {type: 'error', message: error} : undefined}
                   />
-                  {loginFailed && (
+                  {error && (
                     <VStack hAlign="end">
                       <Link href="#/templates/login-sso">
                         {AUTH_FORGOT_PASSWORD}

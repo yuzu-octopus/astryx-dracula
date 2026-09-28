@@ -441,13 +441,27 @@ body {
 }
 
 /* Everything below this line is UNLAYERED on purpose, and that is load-bearing,
- * not a style choice. Unlayered author rules beat every core layer regardless of
+ * not a style choice. Unlayered author rules beat every core LAYER regardless of
  * specificity — verified in Chromium against the declared order
  * (`@layer reset, astryx-base, astryx-theme`, vite.config.ts) where an
  * unlayered (0,1,0) rule outranked core's (0,4,0) `:not(#):not(#):not(#)` rule
  * inside `@layer astryx-base`. scripts/check.ts asserts `@layer` count is 0 in
  * this file, so the next agent cannot "tidy" these rules into a layer and
  * silently break all of them at once.
+ *
+ * BOUNDARY, because the sentence above is true of layers and stops being true
+ * one step out: unlayered does NOT beat an INLINE style. But that is
+ * PER-PROPERTY, not per-element, and the difference decides real work:
+ *   - Core never assigns `box-shadow` inline — 0 occurrences across core. A
+ *     stylesheet RING therefore paints normally, over whatever background core
+ *     set. `--shadow-inset-selected` is reachable with no !important, no core
+ *     change and no version bump.
+ *   - Core DOES assign `el.style.backgroundColor` on selected table rows
+ *     (dist/Table/plugins/selection/useTableSelection.js:79). So a kit WASH on
+ *     that state is unreachable: the exits are `!important` (banned by the gate
+ *     below) or a core change (deferred by the 0.3.0 version ruling).
+ * Stated here so the next agent does not discover it the hard way, and so nobody
+ * reads the inline-style note as a blanket blocker and avoids box-shadow too.
 
 /* Reduced motion. Core gates its per-component motion on
  * `@media (prefers-reduced-motion: reduce)`, but each rule is inside

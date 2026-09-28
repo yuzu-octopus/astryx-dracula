@@ -3,23 +3,70 @@
 // product-gallery — centered glyph on a flat field. Small fork:
 // classic/side — full night landscape (stars, moon, hills) with a tighter
 // glyph frame. The glyph stroke stays comment so tiles stay on-brand in the
-// dark-only theme; purple never touches these scenes (purple means tappable).
+// dark-only theme.
 // Wave 2 owns the documentation + payment-form migration — those templates
 // keep their local glyphs until then.
+//
+// REMIT (art treatment, not data): this module's scenes take a `SceneHue` from
+// `SCENE_HUES` below. Purple is excluded because this module reserves it for
+// tappables — NOT because of contrast, which it passes (4.27:1 on the surface
+// tier at the disc's 0.9 opacity). This is a separate vocabulary from
+// `CHART_HUES` on purpose: that set is purple-free because purple must never
+// encode DATA, this one is purple-free because this module says so. Two sets,
+// two stated reasons. Reusing `CHART_HUES` here would make it purple-free for
+// a reason that has nothing to do with this rule.
+//
+// The type is the enforcement, not this comment. `hue: string` accepted any
+// `var(--dracula-*)` and every caller decided alone, which is how purple
+// reached a 34px disc. The union turns that into a compile error at the call
+// site with the exact offending value named.
 
 import {galleryImage} from 'astryx-dracula/shared/gallery-image';
 
 export type SceneTileSize = 'lg' | 'sm';
 
+/**
+ * Art-treatment hues for scene tiles. Purple-free by this module's remit.
+ * Membership is not a contrast decision — every candidate clears WCAG 1.4.11
+ * on both dark surfaces at the disc's 0.9 opacity, including purple.
+ */
+export const SCENE_HUES = {
+  muted: 'var(--dracula-comment)',
+  cyan: 'var(--dracula-cyan)',
+  green: 'var(--dracula-green)',
+  yellow: 'var(--dracula-yellow)',
+  orange: 'var(--dracula-orange)',
+  pink: 'var(--dracula-pink)',
+  red: 'var(--dracula-red)',
+} as const;
+
+export type SceneHue = (typeof SCENE_HUES)[keyof typeof SCENE_HUES];
+
+/**
+ * The union above constrains the KEY, not the value it resolves to. An entry
+ * rewritten to `var(--dracula-purple)` still typechecks. `scripts/check.ts`
+ * gates the values of this object; add the gate there if it is ever removed.
+ * A prose rule does not stop a caller — see the remit note above.
+ */
+export const SCENE_HUE_VALUES: readonly SceneHue[] = Object.values(SCENE_HUES);
+
 interface SceneTileProps {
-  /** Per-tile Dracula accent: moon wash (sm) and glyph dot (both forks). */
-  hue: string;
+  /**
+   * Per-tile accent: the sm fork paints it as the moon disc (`:70`, a 34px
+   * radius at 0.9 opacity) and as glyph dots; the lg fork paints the glyph.
+   * One prop, three areas of very different size — the split by role is a
+   * deliberate follow-up, not an oversight. Both areas clear 1.4.11 at the
+   * same `SceneHue`, so the split is about which role may take which subset,
+   * not about a second contrast axis.
+   */
+  hue: SceneHue;
   /** Accessible name for the tile art. */
   label: string;
   /** `lg` for grid thumbs, `sm` for the classic/side landscape tiles. */
   size?: SceneTileSize;
-  /** Star wash for the sm landscape. Decorative stars are never purple. */
-  stars?: string;
+  /** Star wash for the sm landscape. Decorative, and purple-free by the same
+   *  remit as `hue`, so it takes the same union. */
+  stars?: SceneHue;
   /** Positional seed so repeated sm tiles vary moon, hills, and star field.
    *  Ignored by the lg fork (one centered glyph, no variance). */
   index?: number;

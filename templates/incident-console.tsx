@@ -332,10 +332,13 @@ function IncidentRows({
       {groups.map(group => (
         <VStack gap={0} key={group.status}>
           <HStack gap={2} vAlign="center" style={styles.groupHeader}>
-            <Text type="label" color="secondary">
-              {STATUS_LABEL[group.status]}
-            </Text>
-            <Text type="supporting" color="secondary" hasTabularNumbers>
+            {/* Primary, not secondary: --color-text-secondary #9AA1BC on
+                --color-background-muted #44475A is 3.57:1, under the 4.5:1
+                floor. The group heading is the string this sidebar is scanned
+                for. Hierarchy comes from the two type roles (principle 6),
+                not from dimming the count. */}
+            <Text type="label">{STATUS_LABEL[group.status]}</Text>
+            <Text type="supporting" hasTabularNumbers>
               {group.items.length}
             </Text>
           </HStack>
@@ -346,11 +349,20 @@ function IncidentRows({
                 label={incident.title}
                 description={`${incident.id} · ${incident.service} · ${incident.impact}`}
                 startContent={
-                  <StatusDot
-                    variant={SEVERITY_DOT[incident.severity]}
-                    label={incident.severity.toUpperCase()}
-                    isPulsing={incident.status === 'investigating'}
-                  />
+                  // StatusDot's label is aria-label on a role="img" span
+                  // (core StatusDot.js:107-120), so it reaches assistive tech
+                  // and paints nothing. A bare dot leaves SEV1/2/3 as hue
+                  // alone. Dot and word travel together, as at :751-757.
+                  <HStack gap={1} vAlign="center">
+                    <StatusDot
+                      variant={SEVERITY_DOT[incident.severity]}
+                      label={incident.severity.toUpperCase()}
+                      isPulsing={incident.status === 'investigating'}
+                    />
+                    <Text type="supporting" color="secondary">
+                      {incident.severity.toUpperCase()}
+                    </Text>
+                  </HStack>
                 }
                 endContent={
                   <HStack gap={3} vAlign="center">
@@ -394,6 +406,9 @@ function IncidentInspector({incident}: {incident: Incident}) {
             label={incident.severity.toUpperCase()}
             isPulsing={incident.status === 'investigating'}
           />
+          <Text type="supporting" color="secondary">
+            {incident.severity.toUpperCase()}
+          </Text>
           <Text type="supporting" color="secondary">
             {incident.id}
           </Text>
@@ -503,7 +518,7 @@ export default function IncidentConsole() {
   );
   const titleGroup = (
     <HStack gap={2} vAlign="center">
-      <Heading level={1}>Night watch</Heading>
+      <Heading level={1} type="display-2">Night watch</Heading>
       <Text type="supporting" color="secondary" hasTabularNumbers>
         {openCount} investigating
       </Text>

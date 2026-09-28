@@ -31,7 +31,6 @@ import {Dialog, DialogHeader} from '@astryxdesign/core/Dialog';
 import {Popover} from '@astryxdesign/core/Popover';
 import {RadioList, RadioListItem} from '@astryxdesign/core/RadioList';
 import {DropdownMenu} from '@astryxdesign/core/DropdownMenu';
-import {Center} from '@astryxdesign/core/Center';
 import {Icon} from '@astryxdesign/core/Icon';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
 import {Divider} from '@astryxdesign/core/Divider';
@@ -873,7 +872,7 @@ export default function TableGrouped() {
             <VStack gap={4}>
               <HStack gap={3} vAlign="center">
                 <StackItem size="fill">
-                  <Heading level={1}>Night-shift issues</Heading>
+                  <Heading level={1} type="display-2">Night-shift issues</Heading>
                 </StackItem>
                 <Button
                   label="Raise issue"
@@ -980,13 +979,21 @@ export default function TableGrouped() {
                           key={task.id}
                           onClick={() => setSelectedTask(task)}>
                           <TableCell>
-                            <Center axis="horizontal">
+                            {/* StatusDot paints nothing but an 8px dot — its
+                                label is aria-label on a role="img" span — so
+                                four states here read as hue alone. Same
+                                dot-plus-word pairing as the summary row at
+                                :751-757. */}
+                            <HStack gap={1} vAlign="center">
                               <StatusDot
                                 variant={STATUS_DOT_VARIANT[task.status]}
                                 label={STATUS_LABEL[task.status]}
                                 isPulsing={task.status === 'in_progress'}
                               />
-                            </Center>
+                              <Text type="supporting" color="secondary">
+                                {STATUS_LABEL[task.status]}
+                              </Text>
+                            </HStack>
                           </TableCell>
                           <TableCell>
                             <HStack gap={3} vAlign="center" wrap="wrap">

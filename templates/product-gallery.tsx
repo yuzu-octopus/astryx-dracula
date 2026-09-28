@@ -11,6 +11,7 @@ import {Card} from '@astryxdesign/core/Card';
 import {Icon} from '@astryxdesign/core/Icon';
 import {ArrowRight} from 'lucide-react';
 import {SceneTile} from 'astryx-dracula/shared/scene-tile';
+import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
 
 // ─── Styles ─────────────────────────────────────────────────────────────────
 // Product tile art lives in shared/scene-tile (large fork); there is no Image
@@ -23,7 +24,7 @@ interface Product {
   name: string;
   description: string;
   price: number;
-  hue: string;
+  hue: SceneHue;
 }
 
 // One accent per product from the fixed badge vocabulary.
@@ -34,7 +35,7 @@ const PRODUCTS: Product[] = [
     description:
       'A hand-thrown mug that sits easy in the hand through the longest night watch.',
     price: 75.0,
-    hue: 'var(--dracula-purple)',
+    hue: 'var(--dracula-orange)',
   },
   {
     id: 2,
