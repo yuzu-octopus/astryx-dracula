@@ -145,11 +145,12 @@ README. Not required for this kit.
 - Never override `--color-*` in app `:root`. Brand changes live in `astryx-theme.ts` via `defineTheme`, then `bun run theme:build`.
 - Tokens for every value: `var(--color-*|--space-*|--radius-*)`. No raw hex or px in components.
 - Component styling: props first, then theme `components` overrides in `astryx-theme.ts`. No per-app CSS wars.
-- A chart mark takes a `--color-data-*` role token, never a `--dracula-*` primitive. The `chart-hues` / `chart-legend` / `data-bar` types reject anything else at compile time.
+- A chart mark takes a `--color-data-*` role token, never a `--dracula-*` primitive. The `chart-hues` / `chart-legend` / `data-bar` types reject anything else at compile time, and `bun run audit` tree-walks the chart modules. Values are byte-identical to the primitives, so this is vocabulary, not appearance. Scene ART is exempt and deliberately so: `SCENE_HUES` is a separate remit where purple is banned as a series identity but legitimate as pigment.
 - `--dracula-comment` is legal on a **graphical** mark (3.36:1 clears WCAG 1.4.11) and illegal on **text** (fails 4.5:1). Any `fillOpacity` under 0.9 makes it worse. Text in a scene uses `--color-text-paragraph`.
 - A `Layout height="fill"` needs `style={{height: '100dvh'}}` or it silently degrades to document scroll. `minHeight: '100%'` computes to 0 against an indefinite parent, so it is a no-op.
 - Derive any count a page prints from its data. Hardcoded numerals are how `documentation.tsx` came to say "twenty-eight components" over 31 entries.
 - A `.tsx` exports components only; shared data lives in a sibling `.ts`, so React Fast Refresh works.
+- **Do not add your own Tooltip override.** Core's `useTooltip` paints `background-color: var(--color-text-primary)` with `color: var(--color-background-surface)` — an inversion that only reads correctly on a light theme, and on dark it is a near-white box with light-grey text. This theme already overrides it (`components.tooltip.base` in `astryx-theme.ts`, shipping as `.astryx-tooltip` in `theme.css`) onto the popover tier with `--shadow-low`, at 9.06:1. Core renders the Tooltip internally, so this reaches `Selector`, `TimeInput`, `Typeahead`, `CheckboxInput`, `CheckboxList`, `Tokenizer`, `DateRangeInput` and `Tooltip` whether or not you use one. If you are carrying your own `.astryx-tooltip` rule, it is computing the same two values and can be deleted.
 
 ## Release checklist
 

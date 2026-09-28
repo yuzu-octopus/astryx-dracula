@@ -449,5 +449,43 @@ for (const f of ['tokens.css', 'astryx-theme.ts', ...lintFiles]) {
     }
   }
 }
+// Chart vocabulary: the chart modules must speak in --color-data-* ROLE tokens
+// and never reach for a --dracula-* primitive.
+//
+// SCOPED DELIBERATELY, and the scoping is the whole point. A blanket "no
+// --dracula-* anywhere in shared/" was proposed by a consumer and is WRONG: it
+// would flag ~40 legitimate sites in scene-castle.tsx and scene-tile.tsx, which
+// have a separate and stated remit (SCENE_HUES is art treatment, where purple
+// is banned as a series identity but legitimate as pigment). A gate that cries
+// wolf on 40 correct sites gets disabled on day one and then protects nothing.
+// So this covers the chart vocabulary, and the exemption is named rather than
+// silent so a future reader can see it was decided.
+//
+// WHY THIS EXISTS AT ALL: the previous gate read the CHART_HUES OBJECT, which
+// proves nothing about the rest of the tree. sparkline.tsx shipped a literal
+// `var(--dracula-green)` through 0.3.0 in the same release that banned them, so
+// a consumer vendoring two files had a test comparing their sparkline fill to
+// their CHART_HUES.green fail on a version bump — their code was fine, our two
+// files had stopped agreeing. Reading an object is not a tree walk.
+{
+  const CHART_MODULES = [
+    'shared/sparkline.tsx',
+    'shared/revenue-chart.tsx',
+    'shared/data-bar.tsx',
+    'shared/chart-legend.tsx',
+    'shared/chart-labels.tsx',
+    'shared/metric-delta.tsx',
+  ];
+  // scene-hues / scene-tile / scene-castle / scene-frame are scene ART, not
+  // chart marks: see the comment above before adding one of them here.
+  for (const f of CHART_MODULES) {
+    const src = (await Bun.file(f).text()).replace(/\/\*[\s\S]*?\*\//g, '');
+    for (const m of src.matchAll(/var\(--dracula-[a-z-]+\)/g)) {
+      const line = src.slice(0, m.index).split('\n').length;
+      fail(`${f}:${line} ${m[0]} on a chart mark — use a --color-data-* role token via shared/chart-hues (values are byte-identical; this is vocabulary, not appearance)`);
+    }
+  }
+}
+
 if (failed) process.exit(1);
 console.log('kit checks PASS');

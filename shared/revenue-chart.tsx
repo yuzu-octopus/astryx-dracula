@@ -6,6 +6,7 @@
 
 import type {CSSProperties} from 'react';
 import {CHART_PANEL_STYLE} from 'astryx-dracula/shared/chart-panel-style';
+import {CHART_HUES} from 'astryx-dracula/shared/chart-hues';
 import {VStack, HStack} from '@astryxdesign/core/Layout';
 import {Text} from '@astryxdesign/core/Text';
 import {Card} from '@astryxdesign/core/Card';
@@ -40,7 +41,10 @@ export function ProductSwatch({
       style={swatchStyle}
       role="img"
       aria-label={`${label} swatch`}>
-      <rect width={36} height={36} rx={5} fill="var(--dracula-bg-light)" />
+      {/* A surface, not a data mark: the plate behind a product swatch wears the
+          card tier. --color-background-card is byte-identical to the old
+          --dracula-bg-light (#343746). */}
+      <rect width={36} height={36} rx={5} fill="var(--color-background-card)" />
       <rect
         x={1}
         y={1}
@@ -64,7 +68,10 @@ export function ProductSwatch({
 
 // ============= REVENUE CHART =============
 
-const REVENUE_LINE = 'var(--dracula-cyan)';
+// Role token, not a --dracula-* primitive. Byte-identical (--color-data-
+// categorical-cyan IS #8BE9FD) and routed through chart-hues.ts so the line
+// colour is the sanctioned vocabulary rather than a literal decided here.
+const REVENUE_LINE = CHART_HUES.cyan;
 const CHART_W = 540;
 const CHART_H = 200;
 const CHART_PAD_LEFT = 44;
