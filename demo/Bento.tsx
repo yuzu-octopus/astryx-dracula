@@ -1,3 +1,4 @@
+import {BARS, ROUTES, type RouteRow} from './fixture-data';
 import { useState } from 'react';
 import {
   Avatar,
@@ -19,7 +20,7 @@ import {
 import { Theme } from '@astryxdesign/core/theme';
 import { DataBar } from '../shared/data-bar';
 import { astryxDraculaTheme } from '../astryx-theme';
-import { BARS, ROUTES, TrafficChart, RouteCell, StatusKey, type RouteRow } from './fixtures';
+import {TrafficChart, RouteCell, StatusKey} from './fixtures';
 
 const SNIPPET = `import { astryxDraculaTheme } from 'astryx-dracula';
 

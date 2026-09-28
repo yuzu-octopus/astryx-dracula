@@ -24,7 +24,7 @@ import {EmptyState} from '@astryxdesign/core/EmptyState';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Search} from 'lucide-react';
 import {SceneTile} from 'astryx-dracula/shared/scene-tile';
-import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
+import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
 
 interface LibraryItem {
   id: string;

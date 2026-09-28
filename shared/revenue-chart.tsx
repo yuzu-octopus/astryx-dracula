@@ -5,23 +5,17 @@
 // (wave 2): import CHART_PANEL_STYLE rather than restating it.
 
 import type {CSSProperties} from 'react';
+import {CHART_PANEL_STYLE} from 'astryx-dracula/shared/chart-panel-style';
 import {VStack, HStack} from '@astryxdesign/core/Layout';
 import {Text} from '@astryxdesign/core/Text';
 import {Card} from '@astryxdesign/core/Card';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Square} from 'lucide-react';
 import {ChartLabel} from 'astryx-dracula/shared/chart-labels';
-import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
+import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
 
 // ============= SHARED CHART-PANEL CARD STYLE =============
 
-// One chart-panel look for every hand-drawn SVG chart panel in this wave's
-// templates (dashboard, portfolio, chart, heatmap-status, shoe-store). Restate
-// nowhere: theme Card variant work lands in wave 2.
-export const CHART_PANEL_STYLE: CSSProperties = {
-  backgroundColor: 'var(--color-background)',
-  border: 'var(--border-width) solid var(--color-separator)',
-};
 
 // ============= PRODUCT SWATCH =============
 
@@ -79,7 +73,7 @@ const CHART_PAD_TOP = 12;
 const CHART_BASELINE = 164;
 const CHART_PLOT_W = CHART_W - CHART_PAD_LEFT - CHART_PAD_RIGHT;
 
-export interface RevenuePoint {
+interface RevenuePoint {
   date: string;
   revenue: number;
 }

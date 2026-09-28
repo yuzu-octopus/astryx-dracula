@@ -12,8 +12,9 @@ import {AspectRatio} from '@astryxdesign/core/AspectRatio';
 import {Grid} from '@astryxdesign/core/Grid';
 import {Divider} from '@astryxdesign/core/Divider';
 import {galleryImageClip} from 'astryx-dracula/shared/gallery-image';
-import {SceneTile, SCENE_TILE_ALTS} from 'astryx-dracula/shared/scene-tile';
-import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
+import {SceneTile} from 'astryx-dracula/shared/scene-tile';
+import {SCENE_TILE_ALTS} from 'astryx-dracula/shared/scene-hues';
+import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
 
 // ─── Gallery Data ─────────────────────────────────────────────────────────────
 

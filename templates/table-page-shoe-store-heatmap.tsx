@@ -7,7 +7,7 @@
  */
 
 import {OrderDesk, type OrderDeskRow} from 'astryx-dracula/shared/order-desk';
-import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
+import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
 
 // ============= DATA =============
 

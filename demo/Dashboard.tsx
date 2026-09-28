@@ -1,7 +1,8 @@
 import { Badge, Card, Grid, Heading, HStack, StatusDot, Table, Text, VStack, proportional } from '@astryxdesign/core';
 import { DataBar } from '../shared/data-bar';
 import { MetricDelta } from '../shared/metric-delta';
-import { BARS, ROUTES, TrafficChart, RouteCell, type RouteRow } from './fixtures';
+import {ROUTES, type RouteRow} from './fixture-data';
+import {TrafficChart, RouteCell} from './fixtures';
 
 function Kpi({
   label,

@@ -9,10 +9,8 @@
 import {Icon} from '@astryxdesign/core/Icon';
 import {Link} from '@astryxdesign/core/Link';
 import {Text} from '@astryxdesign/core/Text';
-import ChapteredDoc, {
-  ChapterArtFrame,
-  type ChapterGroup,
-} from 'astryx-dracula/shared/chaptered-doc';
+import ChapteredDoc, {ChapterArtFrame} from 'astryx-dracula/shared/chaptered-doc';
+import type {ChapterGroup} from 'astryx-dracula/shared/chaptered-doc-config';
 import {SceneFrame} from 'astryx-dracula/shared/scene-frame';
 
 import {

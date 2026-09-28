@@ -11,8 +11,9 @@ import {Text, Heading} from '@astryxdesign/core/Text';
 import {Grid} from '@astryxdesign/core/Grid';
 import {Section} from '@astryxdesign/core/Section';
 import {TabList, Tab} from '@astryxdesign/core/TabList';
-import {SceneTile, SCENE_TILE_ALTS} from 'astryx-dracula/shared/scene-tile';
-import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
+import {SceneTile} from 'astryx-dracula/shared/scene-tile';
+import {SCENE_TILE_ALTS} from 'astryx-dracula/shared/scene-hues';
+import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
 
 // ─── Styles ─────────────────────────────────────────────────────────────────
 

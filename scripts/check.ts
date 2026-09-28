@@ -388,5 +388,40 @@ for (const f of ['tokens.css', 'astryx-theme.ts', ...lintFiles]) {
     fail(`${f}:${src.slice(0, m.index).split('\n').length} !important — unlayered outranks every core layer; fix the layer, not the priority`);
   }
 }
+
+// package.json `exports` must agree with what is actually in shared/, in BOTH
+// directions. The map is hand-maintained, so the two drift silently:
+//   - a deleted module leaves an entry pointing at a file that no longer
+//     exists, and it ships in the published tarball because `files` globs
+//     shared/ independently of `exports`. That is exactly how
+//     shared/heat-scale.ts survived a deletion and stayed published.
+//   - a new module without an entry fails only in a CONSUMER's tsc, never in
+//     ours, so the breakage lands on someone else.
+// One gate, both directions, because the second failure is the expensive one:
+// it costs a downstream user a build error and costs us a bug report.
+{
+  const pkg = JSON.parse(await Bun.file('package.json').text());
+  const declared = new Map<string, string>();
+  for (const [k, v] of Object.entries(pkg.exports ?? {}) as [string, string][]) {
+    if (k.startsWith('./shared/')) declared.set(k, v);
+  }
+  // Keys are extensionless on BOTH sides: `exports` keys are specifiers
+  // ('./shared/scene-hues'), so comparing them to filenames would report
+  // every module as unexported.
+  const onDisk = new Set<string>();
+  for (const entry of [...new Bun.Glob('shared/*.{ts,tsx}').scanSync('.')]) {
+    onDisk.add(`./shared/${entry.slice('shared/'.length).replace(/\.tsx?$/, '')}`);
+  }
+  for (const [key, target] of declared) {
+    if (!(await Bun.file(target).exists())) {
+      fail(`package.json exports "${key}" -> ${target}, which does not exist`);
+    }
+  }
+  for (const key of onDisk) {
+    if (!declared.has(key)) {
+      fail(`${key} has no package.json exports entry — consumers cannot import it`);
+    }
+  }
+}
 if (failed) process.exit(1);
 console.log('kit checks PASS');

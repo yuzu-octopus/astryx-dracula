@@ -28,7 +28,7 @@ import {ProgressBar} from '@astryxdesign/core/ProgressBar';
 import {Collapsible} from '@astryxdesign/core/Collapsible';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Dialog, DialogHeader} from '@astryxdesign/core/Dialog';
-import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
+import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
 import {
   Calendar,
   Flag,

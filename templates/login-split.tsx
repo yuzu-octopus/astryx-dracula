@@ -3,7 +3,7 @@
 //   Ctr > V[g=4] > (Ctr.horizontal > C[p=0] > G[c={min:240} g=8 a=stretch] > (S[p=0] > V[g=4] > (H[g=2 a=center] > Ic + Tx"Castle Dracula"[t=body]) + (V[g=4] > (V[g=1] > Hd"Welcome back to the night"[level=1] + Tx"Sign in to your crypt"[t=body]) + (V[g=2] > TI"Email"[t=email] + (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?")) + B.primary"Enter the night" + D"Or continue with" + (G[c={min:200} g=3] > B.secondary"Login with Apple" + B.secondary"Login with Google")) + Tx"New to the castle?"[t=supporting]) + (C[p=0] > AR)) + (V[a=center] > Tx"By clicking continue, you agree to our Terms of service and Privacy policy"[t=supporting])
 
 import {useState, useTransition, type CSSProperties} from 'react';
-import {inputAutoComplete} from 'astryx-dracula/shared/auth-chrome';
+import {inputAutoComplete} from 'astryx-dracula/shared/auth-chrome-config';
 import {demoLogin} from 'astryx-dracula/shared/login-demo';
 import {AppleIcon, GoogleIcon} from 'astryx-dracula/shared/sso-icons';
 import {

@@ -17,7 +17,7 @@ import {Icon} from '@astryxdesign/core/Icon';
 import {Outline, type OutlineItem} from '@astryxdesign/core/Outline';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {Sparkles, ClipboardCopy, ChevronDown} from 'lucide-react';
-import {outlinePanel} from 'astryx-dracula/shared/chaptered-doc';
+import {outlinePanel} from 'astryx-dracula/shared/chaptered-doc-config';
 
 // ---------------------------------------------------------------------------
 // Main component

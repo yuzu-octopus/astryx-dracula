@@ -41,8 +41,8 @@ import type {TableColumn} from '@astryxdesign/core/Table';
 import {Filter, Download, RotateCw} from 'lucide-react';
 import {CHART_HUES} from 'astryx-dracula/shared/chart-hues';
 import {ChartLegend, type ChartLegendEntry} from 'astryx-dracula/shared/chart-legend';
+import {CHART_PANEL_STYLE} from 'astryx-dracula/shared/chart-panel-style';
 import {ChartLabel} from 'astryx-dracula/shared/chart-labels';
-import {CHART_PANEL_STYLE} from 'astryx-dracula/shared/revenue-chart';
 
 // ============= ICONS (verified lucide-react exports) =============
 // Filter ← FunnelIcon, Download ← ArrowDownTrayIcon, RotateCw ← ArrowPathIcon.

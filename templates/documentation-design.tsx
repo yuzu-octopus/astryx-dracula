@@ -35,7 +35,7 @@ import {Section} from '@astryxdesign/core/Section';
 import {Center} from '@astryxdesign/core/Center';
 import {Outline, type OutlineItem} from '@astryxdesign/core/Outline';
 import {Plus} from 'lucide-react';
-import {outlinePanel} from 'astryx-dracula/shared/chaptered-doc';
+import {outlinePanel} from 'astryx-dracula/shared/chaptered-doc-config';
 
 // Flush the tab list with the example card's 12px inset (Section padding 3).
 const tabListFlush: CSSProperties = {

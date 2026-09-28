@@ -23,10 +23,8 @@ import {TextArea} from '@astryxdesign/core/TextArea';
 import {Divider} from '@astryxdesign/core/Divider';
 import {Banner} from '@astryxdesign/core/Banner';
 import {Card} from '@astryxdesign/core/Card';
-import {
-  SceneTile,
-  type SceneHue,
-} from 'astryx-dracula/shared/scene-tile';
+import {type SceneHue} from 'astryx-dracula/shared/scene-hues';
+import {SceneTile} from 'astryx-dracula/shared/scene-tile';
 import {Collapsible} from '@astryxdesign/core/Collapsible';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
 import {NumberInput} from '@astryxdesign/core/NumberInput';

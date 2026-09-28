@@ -20,7 +20,7 @@ import {Layout, LayoutContent} from '@astryxdesign/core/Layout';
 import {Grid} from '@astryxdesign/core/Grid';
 import {SceneTile} from 'astryx-dracula/shared/scene-tile';
 import {galleryImageClip} from 'astryx-dracula/shared/gallery-image';
-import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
+import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
 
 // Negative margin offsets each card's 8px padding so the grid content stays
 // visually aligned while giving every card a padded hover/click target.

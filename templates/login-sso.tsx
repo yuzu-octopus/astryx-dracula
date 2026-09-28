@@ -34,7 +34,7 @@ import {Avatar} from '@astryxdesign/core/Avatar';
 // ============= ICONS (verified lucide-react exports) =============
 // ShieldCheck ← ShieldCheckIcon.
 import {ShieldCheck} from 'lucide-react';
-import {inputAutoComplete} from 'astryx-dracula/shared/auth-chrome';
+import {inputAutoComplete} from 'astryx-dracula/shared/auth-chrome-config';
 
 // ---------------------------------------------------------------------------
 // Styles

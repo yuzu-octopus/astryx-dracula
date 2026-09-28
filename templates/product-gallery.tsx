@@ -11,7 +11,7 @@ import {Card} from '@astryxdesign/core/Card';
 import {Icon} from '@astryxdesign/core/Icon';
 import {ArrowRight} from 'lucide-react';
 import {SceneTile} from 'astryx-dracula/shared/scene-tile';
-import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
+import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
 
 // ─── Styles ─────────────────────────────────────────────────────────────────
 // Product tile art lives in shared/scene-tile (large fork); there is no Image

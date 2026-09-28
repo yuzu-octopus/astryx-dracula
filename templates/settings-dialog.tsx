@@ -31,19 +31,9 @@ import {Icon} from '@astryxdesign/core/Icon';
 import {Center} from '@astryxdesign/core/Center';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {Lock, ShieldCheck, Monitor} from 'lucide-react';
-import {
-  NAV_ITEMS,
-  LOGIN_ROWS,
-  SOCIAL_ROWS,
-  DEVICE_ROWS,
-  INFO_TILES,
-  iconBox,
-  actionNoWrap,
-  sideNavHeading,
-  InfoRowItem,
-  ExpandableRow,
-} from 'astryx-dracula/shared/settings-rows';
-import type {DeviceRow, InfoTileData} from 'astryx-dracula/shared/settings-rows';
+import {NAV_ITEMS, LOGIN_ROWS, SOCIAL_ROWS, DEVICE_ROWS, INFO_TILES, iconBox, actionNoWrap, sideNavHeading} from 'astryx-dracula/shared/settings-data';
+import {InfoRowItem, ExpandableRow} from 'astryx-dracula/shared/settings-rows';
+import type {DeviceRow, InfoTileData} from 'astryx-dracula/shared/settings-data';
 
 // Sticky dialog header bar — no Astryx prop for sticky/background/z-index.
 // Inline + block padding comes from the parent LayoutContent `padding`.

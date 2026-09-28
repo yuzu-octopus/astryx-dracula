@@ -26,12 +26,8 @@ import {Button} from '@astryxdesign/core/Button';
 import {Card} from '@astryxdesign/core/Card';
 import {Link} from '@astryxdesign/core/Link';
 
-import {
-  authPageStyle as pageStyle,
-  authContentStyle as contentStyle,
-  inputAutoComplete,
-  LoginBrand,
-} from 'astryx-dracula/shared/auth-chrome';
+import {authPageStyle as pageStyle, authContentStyle as contentStyle, inputAutoComplete} from 'astryx-dracula/shared/auth-chrome-config';
+import {LoginBrand} from 'astryx-dracula/shared/auth-chrome';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');

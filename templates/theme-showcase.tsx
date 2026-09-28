@@ -61,7 +61,7 @@ import {
   ChatMessageList,
   ChatSystemMessage,
 } from '@astryxdesign/core/Chat';
-import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
+import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
 
 // Styles passed to Astryx components via their `style` prop. Astryx components
 // forward the DOM `style` prop, so these work with no CSS compiler — in

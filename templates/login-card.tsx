@@ -29,12 +29,8 @@ import {Card} from '@astryxdesign/core/Card';
 import {Link} from '@astryxdesign/core/Link';
 import {Divider} from '@astryxdesign/core/Divider';
 
-import {
-  authPageStyle as pageStyle,
-  authContentStyle as contentStyle,
-  inputAutoComplete,
-  LoginBrand,
-} from 'astryx-dracula/shared/auth-chrome';
+import {authPageStyle as pageStyle, authContentStyle as contentStyle, inputAutoComplete} from 'astryx-dracula/shared/auth-chrome-config';
+import {LoginBrand} from 'astryx-dracula/shared/auth-chrome';
 
 export default function LoginCard() {
   const [email, setEmail] = useState('');

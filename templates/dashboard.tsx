@@ -26,7 +26,7 @@ import {ChartLegend} from 'astryx-dracula/shared/chart-legend';
 import {CHART_HUES} from 'astryx-dracula/shared/chart-hues';
 import {MetricDelta} from 'astryx-dracula/shared/metric-delta';
 import {Sparkline, type SparkPoint} from 'astryx-dracula/shared/sparkline';
-import {CHART_PANEL_STYLE} from 'astryx-dracula/shared/revenue-chart';
+import {CHART_PANEL_STYLE} from 'astryx-dracula/shared/chart-panel-style';
 
 // ============= DATA =============
 

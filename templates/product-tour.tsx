@@ -20,11 +20,8 @@
  */
 
 import {Icon} from '@astryxdesign/core/Icon';
-import ChapteredDoc, {
-  ChapterArtFrame,
-  sceneFill,
-  type ChapterGroup,
-} from 'astryx-dracula/shared/chaptered-doc';
+import ChapteredDoc, {ChapterArtFrame} from 'astryx-dracula/shared/chaptered-doc';
+import {sceneFill, type ChapterGroup} from 'astryx-dracula/shared/chaptered-doc-config';
 
 import {
   Hash,

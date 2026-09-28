@@ -43,7 +43,7 @@ function ProductScene({hue, label}: {hue: SceneHue; label: string}) {
 }
 
 import {Minus, Plus, Star} from 'lucide-react';
-import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
+import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
 
 // ─── Star Rating ─────────────────────────────────────────────────────────────
 function StarRating({rating, count}: {rating: number; count: number}) {

@@ -40,19 +40,9 @@ import {
   ArrowLeft,
   ChevronRight,
 } from 'lucide-react';
-import {
-  NAV_ITEMS,
-  LOGIN_ROWS,
-  SOCIAL_ROWS,
-  DEVICE_ROWS,
-  INFO_TILES,
-  iconBox,
-  actionNoWrap,
-  sideNavHeading,
-  InfoRowItem,
-  ExpandableRow,
-} from 'astryx-dracula/shared/settings-rows';
-import type {InfoRow} from 'astryx-dracula/shared/settings-rows';
+import {NAV_ITEMS, LOGIN_ROWS, SOCIAL_ROWS, DEVICE_ROWS, INFO_TILES, iconBox, actionNoWrap, sideNavHeading} from 'astryx-dracula/shared/settings-data';
+import {InfoRowItem, ExpandableRow} from 'astryx-dracula/shared/settings-rows';
+import type {InfoRow} from 'astryx-dracula/shared/settings-data';
 
 // Anchor the page to the viewport height so the sidebar + content fill the
 // screen. Layout height="fill" is min-height:100% which collapses when the

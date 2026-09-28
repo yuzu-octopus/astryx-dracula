@@ -21,7 +21,7 @@ import {Table, proportional, pixel} from '@astryxdesign/core/Table';
 import type {TableColumn} from '@astryxdesign/core/Table';
 import {Filter, Download, Plus} from 'lucide-react';
 import {RevenueChart, ProductSwatch} from 'astryx-dracula/shared/revenue-chart';
-import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
+import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
 
 // Anchor for the page wrapper.
 //

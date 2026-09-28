@@ -22,7 +22,7 @@ import type {TableColumn} from '@astryxdesign/core/Table';
 import {Divider} from '@astryxdesign/core/Divider';
 import {MetricDelta} from 'astryx-dracula/shared/metric-delta';
 import {Sparkline, type SparkPoint} from 'astryx-dracula/shared/sparkline';
-import {CHART_PANEL_STYLE} from 'astryx-dracula/shared/revenue-chart';
+import {CHART_PANEL_STYLE} from 'astryx-dracula/shared/chart-panel-style';
 import {ChartLabel} from 'astryx-dracula/shared/chart-labels';
 
 // ============= DATA =============

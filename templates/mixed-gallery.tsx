@@ -8,7 +8,7 @@ import {AspectRatio} from '@astryxdesign/core/AspectRatio';
 import {Grid} from '@astryxdesign/core/Grid';
 import {galleryImageClip} from 'astryx-dracula/shared/gallery-image';
 import {SceneTile} from 'astryx-dracula/shared/scene-tile';
-import type {SceneHue} from 'astryx-dracula/shared/scene-tile';
+import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
 
 // ─── Styles ────────────────────────────────────────────────────────────────
 // Image fill + radius live in shared/gallery-image (no Image primitive in
