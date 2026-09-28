@@ -423,5 +423,31 @@ for (const f of ['tokens.css', 'astryx-theme.ts', ...lintFiles]) {
     }
   }
 }
+
+// The version string is baked into two templates as RENDERED text and again in
+// each one's XLE header — four copies of one number across two files, which is
+// the same hand-maintained-numeral trap as the exports map above and the same
+// one documentation.tsx fell into with "twenty-eight". Nothing connected them
+// to package.json, so a release could ship a showcase advertising a version
+// that no longer exists.
+//
+// Derived, not asserted by hand: this reads package.json and checks the
+// templates against it, so there is nothing to refresh at release time.
+{
+  const pkg = JSON.parse(await Bun.file('package.json').text());
+  const v = String(pkg.version);
+  for (const f of ['templates/product-tour.tsx', 'templates/centered-hero.tsx']) {
+    const src = await Bun.file(f).text();
+    const found = [...src.matchAll(/v(\d+\.\d+\.\d+)/g)].map(m => m[1]);
+    if (found.length === 0) {
+      fail(`${f} carries no version badge — expected "v${v}"`);
+    }
+    for (const seen of new Set(found)) {
+      if (seen !== v) {
+        fail(`${f} advertises v${seen} but package.json is ${v} — a release must not ship a showcase naming a version that does not exist`);
+      }
+    }
+  }
+}
 if (failed) process.exit(1);
 console.log('kit checks PASS');

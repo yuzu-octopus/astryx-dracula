@@ -95,7 +95,8 @@
     "dev": "vite",
     "preview": "vite preview",
     "theme:build": "bunx astryx theme build astryx-theme.ts -o theme.css",
-    "theme:check": "bunx astryx theme build astryx-theme.ts -o theme.css --check --json | bun -e 'const r = JSON.parse(await Bun.stdin.text()); if (r.type !== \"theme.build.check\") { console.error(\"theme:check: unexpected CLI response \" + JSON.stringify(r).slice(0, 200)); process.exit(1); } const stale = r.data.stale.filter(s => s.path !== \"astryx-dracula.js\"); for (const s of stale) console.error(\"stale: \" + s.path + \" (\" + s.reason + \")\"); if (stale.length) process.exit(1); const entry = await import(\"./astryx-dracula.js\"); if (!entry.astryxDraculaTheme || !entry.draculaIconRegistry) { console.error(\"astryx-dracula.js is missing its theme or icon registry export\"); process.exit(1); } console.log(\"theme outputs up to date; astryx-dracula.js (hand-maintained) loads and exports\");'"
+    "theme:check": "bunx astryx theme build astryx-theme.ts -o theme.css --check --json | bun -e 'const r = JSON.parse(await Bun.stdin.text()); if (r.type !== \"theme.build.check\") { console.error(\"theme:check: unexpected CLI response \" + JSON.stringify(r).slice(0, 200)); process.exit(1); } const stale = r.data.stale.filter(s => s.path !== \"astryx-dracula.js\"); for (const s of stale) console.error(\"stale: \" + s.path + \" (\" + s.reason + \")\"); if (stale.length) process.exit(1); const entry = await import(\"./astryx-dracula.js\"); if (!entry.astryxDraculaTheme || !entry.draculaIconRegistry) { console.error(\"astryx-dracula.js is missing its theme or icon registry export\"); process.exit(1); } console.log(\"theme outputs up to date; astryx-dracula.js (hand-maintained) loads and exports\");'",
+    "prepublishOnly": "bun run theme:check && bun run audit && tsc --noEmit && bunx react-doctor@latest --score"
   },
   "sideEffects": [
     "**/*.css"
@@ -105,5 +106,5 @@
     "@astryxdesign/cli"
   ],
   "type": "module",
-  "version": "0.2.1"
+  "version": "0.3.0"
 }

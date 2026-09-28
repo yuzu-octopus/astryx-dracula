@@ -156,6 +156,7 @@ README. Not required for this kit.
 Before tagging a release:
 
 1. Pin versions: `@astryxdesign/core` / `@astryxdesign/cli` in `package.json` match the showcase and CI.
-2. Refresh the version badges baked into `templates/product-tour.tsx` + `templates/centered-hero.tsx` (rendered text + XLE header) to match `package.json`.
+2. Nothing to refresh by hand: the version badges in `templates/product-tour.tsx` + `templates/centered-hero.tsx` (rendered text *and* XLE header) are gated against `package.json` by `bun run audit`, so bump the version and the audit tells you if you missed one.
 3. Rebuild and gate: `bun run theme:build`, then `bun run theme:check`, then `bun run audit`, then `bunx react-doctor@latest` (must stay 100/100).
 4. Counts in the docs are cited with the command that produces them, so there is nothing to refresh by hand. If you find a bare numeral, replace it with its command.
+5. `npm publish` runs the same four gates itself via `prepublishOnly`, so a tree that fails cannot reach the registry. There is no publish workflow in CI — publishing is deliberately a human step.
