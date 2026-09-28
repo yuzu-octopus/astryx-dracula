@@ -40,3 +40,14 @@ Kit import order in the app entry: `@astryxdesign/core/reset.css`, then `@astryx
 then `astryx-dracula/tokens.css`, then `astryx-dracula/theme.css` inside `<Theme theme={astryxDraculaTheme} mode="dark">`.
 Read `.agents/skills/astryx-dracula/SKILL.md` before styling anything (agent index: [AGENTS.snippet.md](AGENTS.snippet.md)).
 Scaffold pages with `bunx astryx template <id> --package astryx-dracula` — templates carry XLE headers.
+
+On "155 components" in the generated block above: that is the number of **exported
+component names** the CLI enumerates, not the number of component directories. The
+package ships **101** component directories — `find
+node_modules/@astryxdesign/core/src -maxdepth 1 -type d | tail -n +2 | wc -l` returns
+106, minus 5 infrastructure directories (`__tests__`, `hooks`, `i18n`, `theme`,
+`utils`) that are not components. The gap is compound parts the CLI lists
+individually (`AvatarGroup`, `AvatarStatusDot`, `ChatMessageBubble`,
+`CommandPaletteItem`, `DialogHeader`, `ToggleButtonGroup`, …), so the generated line is
+correct in its own terms and is not edited — but do not read it as a component count.
+Say which of the two you mean, and name the command.

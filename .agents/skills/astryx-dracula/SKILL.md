@@ -90,17 +90,82 @@ The theme scale is base 14, ratio 1.2: body and code 14, supporting 12, headings
 - `large` — long-form reading copy. `label` — form and group labels.
 - Nothing meaningful below 12px, ever. A 9–11px floor is a core scale artifact, not a license.
 
-Type carries hierarchy, so weight stays quiet: headings normal, `semibold` for emphasis and KPI values, never bold display type. Tabular numerals on every quantity (`hasTabularNumbers`). JetBrains Mono has a small x-height; when in doubt go one role larger, never smaller.
+Type carries hierarchy, so weight stays quiet: headings normal, `semibold` for emphasis and KPI values, never bold display type. Tabular numerals on every quantity (`hasTabularNumbers`). When in doubt go one role larger, never smaller — the reason is **thin weights, not x-height**: Apple's rule is "if you use a custom font with a thin weight, aim for larger than the recommended sizes", and we ship JetBrains Mono at `weightClass 400` (Regular). An earlier version of this line claimed JBM "has a small x-height"; measured from our shipped woff2 with fontTools, `sxHeight/upem` = **0.5500** against Inter 0.5459 and Roboto 0.5283 — the **highest** of the three, cap-height 0.7300 also highest. The instruction stands; the premise was false and is removed.
+
+## Evidence doctrine
+
+**A rule or capability stated from the evidence in front of you, rather than tested against every surface it will reach, is the recurring failure — and it is always a correct-sounding sentence that stops being true one scope out.** A doc that names a capability the API does not have is worse than a doc that says nothing, because it reads as verification. Three limbs, each with a checkable form:
+
+1. **Name the command and its expected output.** `bunx astryx component GridSpan --detail full` settles a capability question in one call. A capability sentence with a reproducible check behind it cannot drift the way prose can. Related tell: `bunx astryx component <Name>` returning **keyword suggestions instead of a component reliably means that component does not exist**.
+2. **Name what CLASSIFIES a site into the rule — and a site that fits but belongs to another class stays put.** The classifier is a property of the **site**, never of the string it contains. Every WCAG criterion governing a visual rule ships its own classifier inline: 2.5.8 enumerates five named exceptions including Inline, 1.4.11 states 3:1, and 1.4.8 Note 1 says the requirement is a *mechanism*, not the stated value. So this is principle, not house style.
+3. **For a state a substrate owns, name who owns it.** This one is not fixable by prose — no wording reaches a pixel the substrate sets inline. Upstream sets both precedents: the Dracula spec gates Functional Colors with "Do not use in editor or terminal applications" (a rule naming its consuming layer, `spec.mdx:131`), and `dracula/vim/colors/dracula_base.vim:28-30` bails unless termguicolors/GUI/256-colour, with `:233` branching the same token between a background fill and none (a rule whose delivery is substrate-conditional, authored in code).
+
+**The check that passes when it should fail, because it is the hardest instance to argue with.** Renaming a declaration while leaving its call sites is invisible to a presence check. In this repo `rg -c "loginFailed" file` returning `2` was read as "correctly retained" when the declaration had just been renamed — a false PASS, in a file we owned, on the change we had just made. **"Does this string exist?" and "is this identifier in scope?" are different questions, and only the second is a build-safety check.** A grep returning non-zero is not a result; it is a prompt to read it against what it is counting.
+
+**A rule stated in prose is a request; a rule stated in the type is a compiler error.** This repo's colour rules are the worked example: `shared/chart-hues.ts` exports a `ChartHue` union, and `shared/scene-tile.tsx` enforces "purple never touches these scenes" with a `SCENE_HUES` union typed at every hop, so a hand-rolled array fails the build instead of a review. When a rule keeps failing review, move it into a type before writing it down again.
+
+**Cite a count with the command that produces it, never from a research artifact.** A findings file's narrative is argued from sources and decays slowly; its tally is counted from a tree that keeps moving. Three successive h1 counts (38, 30, 29) came out of one findings file. Say the number, name the command. And cite **full paths** — `F1.md` collides across five research slices and `F5.md` across two.
 
 ## Layout doctrine
 
 1. **Frame first.** Pick the shell (AppShell, TopNav) and budget regions before content. Full page goes in AppShell; sidebar nav means SideNav.
-2. **Bento for showcases, rows for data.** Marketing and overview surfaces interlock: hero strip, wide feature (span 2), tall table (row span 2), metric cells. Astryx Grid has no span prop, so spans go through `style={{ gridColumn: 'span 2' }}`. Dense data stays rows: Table edge-to-edge, never Card-wrapped list items.
+2. **Bento for showcases, rows for data.** Marketing and overview surfaces interlock: hero strip, wide feature (span 2), tall table (row span 2), metric cells. Spans go through `<GridSpan>`, a core component: `<GridSpan columns={2}>`, `columns="full"` for a whole row, `rows={2}` for a row span. **An earlier version of this line said "Astryx Grid has no span prop" and routed spans through `style={{ gridColumn: 'span 2' }}` — that was false.** Verified in `core/src/Grid/GridSpan.tsx`, exported from `@astryxdesign/core/Grid`; confirm with `bunx astryx component GridSpan --detail full`. Dense data stays rows: Table edge-to-edge, never Card-wrapped list items.
 3. **Cards are widgets.** Dashboard widgets, galleries, settings groups, showcase cells. Outer padding 4, nested inset 3, everywhere, no exceptions. A padding-2 inset next to a padding-3 inset is a defect.
 4. **No raw layout elements.** No `<div>`, `<span>`, or `<a>` for layout or text. Card, Text, Link, Stack, Grid do all of it.
-5. **Touch targets are floored.** WCAG AA 24px minimum; 44px where touch matters. The `sm` Button stays in dense contexts with a caption; CTAs stay default size.
+The `sm` Button stays in dense contexts with a caption; CTAs stay default size.
 Map jobs to components, never to lookalikes: action goes to Button (never a nav-item class), navigation goes to SideNav or Link, count goes to Badge, status goes to StatusDot or Banner, label goes to Text type="label".
+5. **Touch targets are floored, and the two tiers are different criteria.** WCAG AA (2.5.8 Target Size (Minimum)) requires **24x24 CSS px**; WCAG AAA (2.5.5 Target Size (Enhanced)) requires 44x44. The familiar 44–48 figures are **Apple/Material/UWP platform guidelines, not the standard** — do not conflate them. Our rule: 24px minimum, 44px where touch matters, and W3C backs the two-tier shape — 2.5.8's own Understanding says "For important links/controls, consider aiming for the stricter 2.5.5", while AAA "is not recommended... as a general policy for entire sites". Two consequences worth stating because they settle most of the surface: our 36–44px table rows **pass 2.5.8 on size outright** and never need the Spacing exception, and an inline link inside a paragraph may be smaller than 24px because 2.5.8 enumerates Inline as a named exception. The `sm` Button's rendered height has **never been measured** — treat it as unmeasured, not as passing.
 
+## Contrast non-claim: the inset ring ships failing 1.4.11
+
+`--shadow-inset-hover` is Comment `#6272A4`. Its **ceiling** over the surface tier `#343746` is **2.51:1**, and WCAG 1.4.11 requires 3:1 — so it cannot reach the threshold at **any** alpha, including 100%. This is not "fails at the alphas we ship"; it is unreachable. `--shadow-inset-selected` is Purple, ceiling 4.89:1, and reaches 3:1 only at **65.7% alpha**, which is a heavy outline rather than a subtle affordance. Both values are `0x30` = **18.82%**, not the 30% an earlier version of this file claimed; the wash spine is a different family at `0x1A` = 10.2% and `0x4D` = 30.2%, and those two figures are correct. `scripts/check.ts` prints this gap in its own output — **passing that gate does not mean the ring is accessible.**
+
+**Both the wash and the ring are subject to 1.4.11.** Its first prong reads "user interface components **and states**", so a state wash is not exempt for not being a graphical object. Do not find a wash and conclude it is exempt.
+
+**Reachability is per-property, not per-element.** Core assigns `el.style.backgroundColor` on selected table rows (2 sites, `useTableSelection.tsx`) and `style.boxShadow` **nowhere** (`grep -rn "style.boxShadow" node_modules/@astryxdesign/core/src` → 0). A ring therefore paints over core's background; a wash does not. The boundary is exactly this: **a kit wash on a selected table row is unreachable**, exits being `!important` (banned by our own gate) or a core change (deferred by the version ruling). Nothing else is blocked, and stating it per-property stops a future agent avoiding `box-shadow` out of an over-generalised fear. The selected state itself needs no new rule — the human ruled to keep the existing brand-correct Purple wash.
+
+## The h1 is bound per surface class
+
+The page `h1` takes **one value per surface class**, and the classifier is a property of the **site**, never of the string it contains.
+
+- **The heading IS the page's own title or document's own title** → `--text-display-2-size` (35px). Covers a marketing hero and a utility page's `LayoutHeader` alike: `side-gallery.tsx:80`, `classic-gallery.tsx:91`, `mixed-gallery.tsx:64`, `settings.tsx:101`.
+- **A routed record or section inside a page that also carries other controls** → stays at `--text-heading-1-size` (24px). Covers `detail-page.tsx:220` and the ten section titles in `settings-sidebar.tsx`.
+
+**A string that fits is not the question.** `detail-page.tsx:220` is `#1001` — five characters, about 105px wide at 35px — and it is still correct at 24px, because the surface classifies it, not the length. Phrasing this rule as "a heading short enough to fit at the smaller size" reintroduces exactly the bug it fixes. Before this was bound the same job rendered at 24px, 35px and 42px across the template set; of 52 h1 sites, **29 change, 12 were already correct, 11 stay at 24px** — reproduce with `rg -c 'Heading level=\{1\}' templates/*.tsx demo/*.tsx` and read each site's container, never just the count. **Do not write "majority" or "most templates"**: 24px is the plurality at 38/52, and 35px is the majority only among sites that explicitly typed their h1.
+
+**Keep the two dense-panel exceptions apart, because only one is a defect.** `detail-page.tsx`'s ladder is complete (1 h1 / 3 h2 / 3 h3) and correctly sized. `settings-sidebar.tsx`'s has a **gap** (10 h1 / 0 h2 / 13 h3) and is mis-built — that is the one to fix. Folding them together as "the two dense-panel exceptions" would invite a future agent to "fix" the correct one.
+
+`--text-display-1-size` (42px) reaches **zero consumers** and `theme.css` ships no `.size-5xl` escape hatch, so 42px has no raw-size route. Whether to drop it or keep it GOV.UK-style for exceptional circumstances is **an open question, deliberately not answered here** — it is one decision ("is 42px reachable at all"), not two. `--text-display-3-size` (29px) is the KPI-numeral role and is never a heading.
+
+## What `check.ts` actually gates — and what it does not
+
+`bun run audit` runs 32 gates. Be precise about their reach, because a reader who over-trusts a gate file ships a defect it never claimed to catch.
+
+**It does gate:** palette purity, 24 contrast pairs, and a lint over template source for three literal string rules — `variant="section"`, `weight="bold"`, and `<Layout>` without an explicit height. Plus the zero-`!important` sweep over CSS sources and TSX (skipping the one line in `tokens.css` that states the rule in prose).
+
+**It does NOT gate, and you must check these yourself:**
+
+| Not gated | Why it matters | Check it with |
+|---|---|---|
+| **Raw hex in template source** | One off-palette hex ships with all 32 gates green | `grep -ri '#[0-9a-f]\{3,6\}' templates shared demo --include='*.tsx' --include='*.css'` |
+| **`--color-text-subdue` as a foreground** | `#4C5067` is **1.80:1** on body and **1.49:1** on the widget surface — below the 1.5 floor `check.ts` itself pins for that token, so the value would fail if it were ever used as text. It is chrome-only, and nothing enforces that | `grep -rn 'color: var(--color-text-subdue)' templates shared demo` |
+| **`weight="medium"`** | The operative rule is that neither `medium` nor `bold` may be used, since only 400 and 600 faces ship. The gate covers `bold` only. The token existing is precisely why the template must not reach for it | `rg -n 'weight="(medium|bold)"' templates demo shared` |
+
+The `!important` sweep has one exemption by design: `tokens.css` contains that literal inside the comment that states the rule, and a gate that fails on the documentation of the rule it enforces gets disabled on day one and then protects nothing.
+
+## Core state hooks: the mechanism exists, adoption is the gap
+
+**Core does emit `data-*` state hooks — a source grep cannot see it, and that is the trap.** `themeProps()` reflects *every* visual prop onto the element as a kebab-cased `data-*` attribute with **no allowlist** (`core/src/utils/themeProps.ts`, `themeDataAttributes` → `toDataAttributeName`), so `state: 'expanded'` becomes `data-state="expanded"`. Two greps both mislead here and both were reported as fact before being checked: `grep -rn "data-state" node_modules/@astryxdesign/core/src` returns only a *comment* in `DateInput.tsx:677` saying the attribute is not there, and `grep -o "data-state" core/dist/astryx.umd.js` returns nothing because the name is **built at runtime** and minified away. Verify with `bunx astryx component DateInput --detail`.
+
+The real gap is **adoption, not capability**: of 270 `themeProps(` call sites, 7 pass a `state` key. So the honest sentence is *core ships the mechanism and uses `state` at 7 of 270 sites* — not *core emits zero state attributes*, which was wrong and is retired. Two related facts, both measured: `aria-selected` **is** emitted on selected table rows (`useTableSelection.tsx:130`), so "no state attributes anywhere" was false on its face; and `data-custom` (x10) appears only in `.test.tsx` fixtures, never as a shipped prop. **Check the API, not the string** — this is limb 1 of the evidence doctrine, and it is why `data-custom` being test-only is a distinction worth carrying.
+
+When you need a kit rule to survive review, type it: `shared/chart-hues.ts` exports a `ChartHue` union and `shared/scene-tile.tsx` enforces its own "purple never touches these scenes" remit with a `SCENE_HUES` union **typed at every hop**, so a hand-rolled array fails the build instead of a reviewer. That is why purple, a value CoreInvertedPairAudit and the joint bucket both flagged, now surfaces as a compiler error rather than a finding.
+
+## Prose measure: 75 characters, voluntary
+
+Long-form reading copy is capped at `max-width: 75ch`, which is **630px at 14px JetBrains Mono**. Measured, not recalled: fontTools on the shipped woff2 gives upem 1000 and an advance of exactly `0.600em` for `0 i l . space M`, so a character is 8.4px at 14px. Our previous `maxWidth={680}` was **81.0 characters** and 720 was **85.7** — both past W3C's 80-character ceiling. `shared/chaptered-doc.tsx` uses it.
+
+**This is voluntary best practice, not conformance, and the skill must not imply otherwise.** SC 1.4.8 is **Level AAA** and its Note 1 says "Content is not required to use these values. The requirement is that a mechanism is available for users to change these presentation aspects." A doc that keeps the number and drops the mechanism has stated a value where the standard stated a scope.
 ## State doctrine
 
 - **Hover dims, never inverts.** Interactive surfaces darken 12% on hover, 20% on press, via the theme overlay tokens. A hover that goes transparent, dark-navy, or accent-colored means something overrode `--color-overlay-hover`.
@@ -139,8 +204,11 @@ Icon `--color-icon-primary` / `--color-icon-secondary` /
 `--color-icon-disabled` / `--color-icon-accent`.
 Border `--color-border` / `--color-border-emphasized`; flat-crisp shadow hue
 `--color-shadow` (`#21222C`, not Stone's cold blue); hover-tint bases
-`--color-tint-hover` / `--color-on-dark` (white, dark-mode side) /
-`--color-on-light` (black).
+`--color-tint-hover` (**still `#FFFFFF`, un-ruled** — the spec has no pure white, and
+this one is entangled with the overlay-hover decision; do not document it as correct) /
+`--color-on-dark` (spec Foreground `#F8F8F2`, **not white** — the pair is
+**deliberately asymmetric** with `--color-on-light` (spec black) and must not be
+"fixed" into two greys) /
 Radius `--radius-element` / `--radius-inner` / `--radius-container` /
 `--radius-page` / `--radius-chat` (5px everywhere — chat bubbles read as
 widgets, not pills) / `--border-radius` (legacy alias, same 5px).
@@ -172,27 +240,60 @@ Overlays `--color-overlay` / `--color-overlay-hover` /
 and `--color-text-<...>` accents. Spec fills `--color-functional-<red|orange|green|cyan|purple>`
 (token-compat pins for spec parity; shipped components consume the accent
 ring instead — never encode status in these). Tag accents
-`--color-tag-<orange|pink|cyan|yellow|green|blue>` (blue reads Purple:
-purple means tappable, never data). Inverted surfaces
+`--color-tag-<orange|pink|cyan|yellow|green|blue>` (**open question: the `blue` tag is a
+misnomer and a rename to `purple` is proposed but NOT done** — the token still ships as
+`--color-tag-blue` and its value is `#BD93F9`, byte-identical to `--color-accent`, i.e.
+spec Purple. It was never blue. Do not read this list as describing a blue accent and do
+not "correct" the value to a blue; the pending change is the *name*, it is the human's
+decision, and the theme files and this line move together when it lands. Note the trap:
+`blue` is also the name of six *other* tokens that genuinely are Comment `#6272A4`
+(`--color-background-blue`, `-border-`, `-icon-`, `-text-`,
+`--color-data-categorical-blue`, and the `--color-data-blue-1..5` ramp), so a
+repo-wide find/replace on "blue" would silently repoint all six at Purple).
+Inverted surfaces
 `--color-background-inverted` (`#F8F8F2`) /
 `--color-background-error-inverted` (`#FFD5CC`, pale error surface the spec
 palette does not supply; consumed by the error Toast). Skeleton/track
 `--color-skeleton` / `--color-track`.
-Charts: `--color-data-categorical-<blue|orange|purple|green|pink|cyan|red|teal|brown|indigo>`
+Charts: `--color-data-categorical-<blue|orange|green|pink|cyan|red|teal|indigo>`
 (blue goes comment; teal ANSI bright cyan `#A4FFFF`, indigo ANSI bright blue
-`#D6ACFF`, brown reuses orange), `--color-data-neutral` (`#8C939B`, Stone gray
-reads fine on dark — deliberate), and 45 sequential ramps
+`#D6ACFF`, brown reuses orange), `--color-data-neutral` (`#8C939B` — **inherited
+from core, not chosen here**: core declares it as `light-dark(#8494A3, #8C939B)`
+in `core/src/theme/domainTokens/dataTokens.ts`, and it is off-palette, sitting
+neither on a Dracula hex nor on our own gray ramp, whose L60 computes to
+`#8A8EA8`. An earlier version of this line called it "Stone gray reads fine on
+dark — deliberate"; whether "Stone" is a real Astryx brand name is an **open
+question** — `grep -ril stone node_modules/@astryxdesign/` hits only a separate
+`@astryxdesign/theme-stone` package, not this value — but the value's origin and
+its off-palette status are not in doubt, and it stays because it reads fine on
+dark), and 45 sequential ramps
 `--color-data-<purple|pink|red|orange|yellow|teal|blue|shamrock|gray>-<1-5>`
 (lightness 28/44/60/74/88, constant hue/saturation per family).
+**Purple is sanctioned here and barred only from categorical use.** There is no
+`--color-data-categorical-purple`; the prohibition is a **module rule**, enforced
+by `shared/chart-hues.ts` exporting a purple-free `CHART_HUES` and the
+`ChartHue` union — not by token absence. Do not read this list as self-policing:
+the set offers the ramp, and one module keeps it out of categorical charts. A
+magnitude ramp claims an order, not an identity, which is why purple survives in
+the sequential family while it cannot name a data series. `references/visual.md`
+draws the same line in one sentence.
 Type `--font-family-mono` (+ `--font-family-<body|heading|code>` aliases),
 `--font-size-base` / `--font-size-h1` … `--font-size-h6` (compat pins h1 24 /
 h2 20 / h3 16 / h4 14 / h5 13 / h6 12; `Heading` resolves the 14-base 1.2
 scale roles instead) plus the full `--font-size-<4xs…5xl>` scale and
 `--text-<body|large|label|code|supporting|display-1…3|heading-1…6>-<size|weight|leading>`
-roles (label pins semibold — only 400 + 600 faces ship, never restore
-medium), motion `--duration-<fast|medium|slow>(-min|-max)?` + `--ease-standard`
+roles (label pins semibold — **only 400 + 600 font faces ship, so templates must not
+opt into `weight="medium"` or `weight="bold"`**. This is a rule about the *label role*,
+NOT about deleting the weight tokens: core declares and consumes
+`--font-weight-medium` in roughly 20 shipped components via `fontWeightVars`, so
+removing it from the mirror would leave Button, Kbd, TabList, FieldLabel,
+MetadataList and CodeBlock with an unresolvable
+`font-weight: var(--font-weight-medium)` — a visible typography regression. The token
+stays; the usage ban is the rule), motion `--duration-<fast|medium|slow>(-min|-max)?` +
 (core defaults), shadows `--shadow-<low|med|high>` /
-`--shadow-inset-<hover|selected|success|warning|error>` (selected Purple 30%).
+`--shadow-inset-<hover|selected|success|warning|error>` (all five at **18.82%** alpha —
+`0x30` = 48/255, **not the 30% an earlier version of this line claimed**; see the
+contrast non-claim above, which is not optional).
 Nothing else exists. For Astryx tokens beyond the kit, `bunx astryx docs tokens`.
 
 ## Precedence (binding)
@@ -228,6 +329,13 @@ comment at the site of the choice.
 - A hover state you designed instead of the dim
 - A second font family, a new radius, a custom shadow
 - A route you would not screenshot for the org
+
+## Conformance statements worth stating once
+
+- **Truncation must reveal.** When copy is truncated, the full value has to be reachable — SC 1.4.10 (Reflow) and **1.4.12 (Text Spacing)** both require it, and this is a conformance obligation, not a nicety. Core implements it: `Text` truncation plus `useTruncation` plus `Tooltip` plus `EmptyState`. A `maxLines` with no reveal path is a defect.
+- **Motion: the criterion that bites is 2.2.2 Pause, Stop, Hide (Level A), not SC 2.3.3.** 2.3.3 Animation from Interactions is **Level AAA**; several docs state it as AA. An auto-animating indicator — a pulsing in-progress `StatusDot` — is governed by 2.2.2, which is the one that requires it to be pausable.
+- **WCAG 1.4.1 Use of Color has no exceptions in WCAG 2.2.** The familiar three-part exception wording (incidental, decorative, logo) appears nowhere on the criterion or its Understanding page. An earlier version of this file implied exceptions and it was wrong. Consequence for this brand: colour is never the only channel — a `StatusDot` is paired with a visible word, because a label that reaches a screen reader but paints nothing leaves a sighted user with the hue alone.
+- **EmptyState heading default.** Core renders the empty-state title as `h3`; Mantine and shadcn default to a `div`. If a page needs the empty state at a different tier, wrap it — do not assume the default is configurable.
 
 ## Troubleshooting
 

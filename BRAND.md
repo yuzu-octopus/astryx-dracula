@@ -73,8 +73,8 @@ Radii flat and crisp (5px elements, 4px inner). Everything below is a core defau
 - One runtime dependency: `lucide-react` (icons render from it at runtime, both the theme `draculaIconRegistry` in `icons.tsx` and every template's direct imports — `bun run audit` fails when a registered glyph stops resolving to a real export). Everything else is defined here.
 - Derived AA lifts (not spec hexes, same hues): secondary text #9AA1BC, muted text #8288A6, paragraph #B0B3C4. Subdue #4C5067 is chrome, below every text floor.
 - Icon glyphs from Lucide in `icons.tsx` (MIT). The theme also sets icon colors (primary, secondary, disabled, accent).
-- onDark: generated defaults inherited. Dark-surface content resolves from the same ramp.
-- `--color-data-neutral`: default gray reads fine on dark.
+- onDark: `--color-on-dark` is repinned to spec Foreground `#F8F8F2` — the spec has **no pure white**, so a `#FFFFFF` here is off-palette. The pair is **deliberately asymmetric** and should not be "fixed" into symmetry: on-dark = spec Foreground `#F8F8F2`, on-light = spec black `#000000`. `--color-tint-hover` is **still `#FFFFFF`** and remains entangled with the overlay-hover decision — treat it as un-ruled, not as corrected.
+- `--color-data-neutral`: `#8C939B`, **inherited from core** (core declares `light-dark(#8494A3, #8C939B)` in `core/src/theme/domainTokens/dataTokens.ts`) and off-palette — neither a Dracula hex nor on our gray ramp, whose L60 computes to `#8A8EA8`. It stays because it reads fine on dark. An earlier line here called it "default gray reads fine on dark"; whether "Stone" is a real Astryx brand name is an **open question** — `grep -ril stone node_modules/@astryxdesign/` hits only a separate `@astryxdesign/theme-stone` package, not this value.
 - No color-scale config: HCT generation would fight the pinned hexes. No light mode, ever.
 
 ## Dims

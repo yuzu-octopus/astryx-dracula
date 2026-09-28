@@ -80,7 +80,7 @@ Copy-paste skeletons distilled from the showcase (`demo/`). Same vocabulary ever
 
 ## Bento overview (dense showcase, `#/bento` route)
 
-Fixed `columns={4}` with spans through `style` (Grid has no span prop). Size equals importance: hero strip, wide feature span 2, tall table row-span 2, metric cells.
+Fixed `columns={4}` with `<GridSpan>` for spans — core ships it (`bunx astryx component GridSpan --detail full`), so the old `style={{ gridColumn: 'span 2' }}` workaround is not needed. Size equals importance: hero strip, wide feature span 2, tall table row-span 2, metric cells.
 
 ```tsx
 <Card padding={4}>{/* hero strip */}
@@ -93,8 +93,8 @@ Fixed `columns={4}` with spans through `style` (Grid has no span prop). Size equ
   </HStack>
 </Card>
 <Grid columns={4} gap={4}>
-  <Card padding={4} style={{ gridColumn: 'span 2' }}>{/* wide: chart */}</Card>
-  <Card padding={4} style={{ gridRow: 'span 2' }}>{/* tall: table */}</Card>
+  <GridSpan columns={2}><Card padding={4}>{/* wide: chart */}</Card></GridSpan>
+  <GridSpan rows={2}><Card padding={4}>{/* tall: table */}</Card></GridSpan>
   <Card padding={4}>{/* metric */}</Card>
   {/* ...metric cells fill the remaining tracks... */}
 </Grid>
