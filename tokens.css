@@ -8,6 +8,19 @@
  * paragraph #B0B3C4 and base-muted #8288A6 are same-hue lifts, #4C5067
  * (subdue) is chrome only and never text, and theme.css adds #FFD5CC as the
  * pale inverted error surface. Do not revert any of them to spec hexes.
+ * Two categorical data hues are deliberately ABSENT from the list below, do not
+ * re-add them: `brown` (was byte-identical to orange, and a categorical series
+ * set is a palette where distinctness IS the contract) and `purple` (purple
+ * means tappable, never data). The purple ban is a MODULE rule —
+ * `shared/chart-hues.ts` is purple-free by construction — so the SEQUENTIAL
+ * `--color-data-purple-1..5` ramp below SURVIVES and is sanctioned; only the
+ * categorical half is revoked. Rationale lives in astryx-theme.ts.
+ * `--color-data-teal-1..5` derives off `--color-data-categorical-teal` (#A4FFFF,
+ * an ANSI bright, not a spec token) rather than spec Cyan #8BE9FD; provenance
+ * fix only, nothing renders the ramp today (HeatScale is shamrock).
+ * `--color-on-dark` is the spec Foreground #F8F8F2, NOT pure white — Dracula has
+ * no #FFFFFF, and the dark media scope repins text/icon-primary onto it. It
+ * must stay a 6-digit hex literal: core's Spinner concatenates an alpha onto it.
  * Fonts: copy `fonts/` to your app's served static dir (Vite: `public/fonts/`). */
 
 @font-face {
@@ -177,7 +190,7 @@ body {
   --color-border-emphasized: #6272A4;
   --color-neutral: #F8F8F21A;
   --color-tint-hover: #FFFFFF;
-  --color-on-dark: #FFFFFF;
+  --color-on-dark: #F8F8F2;
   --color-on-light: #000000;
   --color-shadow: #21222C;
   --color-track: #6272A4;
@@ -257,13 +270,11 @@ body {
   --color-text-yellow: #F1FA8C;
   --color-data-categorical-blue: #6272A4;
   --color-data-categorical-orange: #FFB86C;
-  --color-data-categorical-purple: #BD93F9;
   --color-data-categorical-green: #50FA7B;
   --color-data-categorical-pink: #FF79C6;
   --color-data-categorical-cyan: #8BE9FD;
   --color-data-categorical-red: #FF5555;
   --color-data-categorical-teal: #A4FFFF;
-  --color-data-categorical-brown: #FFB86C;
   --color-data-categorical-indigo: #D6ACFF;
   --color-data-neutral: #8C939B;
   --color-data-purple-5: hsl(264.71 89.47% 28%);
@@ -291,11 +302,11 @@ body {
   --color-data-yellow-3: hsl(64.91 91.67% 60%);
   --color-data-yellow-2: hsl(64.91 91.67% 74%);
   --color-data-yellow-1: hsl(64.91 91.67% 88%);
-  --color-data-teal-5: hsl(190.53 96.61% 28%);
-  --color-data-teal-4: hsl(190.53 96.61% 44%);
-  --color-data-teal-3: hsl(190.53 96.61% 60%);
-  --color-data-teal-2: hsl(190.53 96.61% 74%);
-  --color-data-teal-1: hsl(190.53 96.61% 88%);
+  --color-data-teal-5: hsl(180 100% 28%);
+  --color-data-teal-4: hsl(180 100% 44%);
+  --color-data-teal-3: hsl(180 100% 60%);
+  --color-data-teal-2: hsl(180 100% 74%);
+  --color-data-teal-1: hsl(180 100% 88%);
   --color-data-blue-5: hsl(225.45 26.61% 28%);
   --color-data-blue-4: hsl(225.45 26.61% 44%);
   --color-data-blue-3: hsl(225.45 26.61% 60%);
@@ -427,4 +438,58 @@ body {
   top: 50%;
   bottom: auto;
   height: 100%;
+}
+
+/* Everything below this line is UNLAYERED on purpose, and that is load-bearing,
+ * not a style choice. Unlayered author rules beat every core layer regardless of
+ * specificity — verified in Chromium against the declared order
+ * (`@layer reset, astryx-base, astryx-theme`, vite.config.ts) where an
+ * unlayered (0,1,0) rule outranked core's (0,4,0) `:not(#):not(#):not(#)` rule
+ * inside `@layer astryx-base`. scripts/check.ts asserts `@layer` count is 0 in
+ * this file, so the next agent cannot "tidy" these rules into a layer and
+ * silently break all of them at once.
+
+/* Reduced motion. Core gates its per-component motion on
+ * `@media (prefers-reduced-motion: reduce)`, but each rule is inside
+ * `@layer astryx-base`, so an unlayered blanket here wins on layer order alone —
+ * no !important, no specificity arms race. Deliberately narrow: it touches only
+ * duration and iteration count, and NEVER `scrollbar-width`, because core's
+ * carousel relies on a layered `scrollbar-width: none` to hide its bar and a
+ * universal rule here would un-hide it (the one scrollbar-width in the stack). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.01ms;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Sticky-header focus and in-page anchor offset. AppShell in `auto` mode pins
+ * the header with `position: sticky` (dist/AppShell/AppShell.js:398, 630-632),
+ * so anything scrolled to `block: 'start'` lands underneath it — the focus ring
+ * renders perfectly and is simply off-screen. Two paths hit this: keyboard focus
+ * on a long `height="auto"` documentation page, and the four in-page outline
+ * navigations that call `scrollIntoView({ block: 'start' })`
+ * (shared/chaptered-doc.tsx, documentation-design.tsx, documentation-technical.tsx,
+ * product-gallery.tsx).
+ *
+ * Declared on the TARGET, not the scroller, and that is the deliberate choice.
+ * `scroll-padding-top` on `:root` cannot work here: a document scroller's
+ * scroll-padding must be declared on the root, but core measures the header and
+ * publishes it as `--appshell-header-height` on the SHELL element
+ * (AppShell.js:276-291, via ResizeObserver), and a custom property set on a
+ * descendant never reaches the root. A static number at `:root` would be exactly
+ * the unmeasured guess this repo refuses to ship. `scroll-margin-block` on the
+ * target resolves at a DESCENDANT, so it reads core's real measured height —
+ * correct at every viewport width and in both AppShell modes — with
+ * `--spacing-8` only as the fallback for pages that have no sticky header at all. */
+:where(:focus-visible, h1, h2, h3, h4, [id]) {
+  scroll-margin-block: var(--appshell-header-height, var(--spacing-8))
+    var(--space-viewport);
 }

@@ -76,11 +76,6 @@ const containerStyle = {
   gap: 8,
   padding: 16,
 };
-const counterStyle = {
-  fontSize: 48,
-  fontWeight: 700,
-  fontVariantNumeric: 'tabular-nums',
-};
 
 export default function NightCounter() {
   const [count, setCount] = useState(0);
@@ -96,7 +91,7 @@ export default function NightCounter() {
   return (
     <Stack direction="vertical" gap={2} style={containerStyle}>
       <Text type="label">Night counter</Text>
-      <Text style={counterStyle}>
+      <Text type="display-1" hasTabularNumbers>
         {count}
       </Text>
       <Button label="Increment" onClick={increment} />

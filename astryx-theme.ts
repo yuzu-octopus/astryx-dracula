@@ -91,10 +91,30 @@ const tokens: Record<string, TokenValue> = {
   '--shadow-med': '0 2px 4px #191A210D, 0 4px 12px #191A211A',
   '--shadow-high': '0 4px 6px #191A211A, 0 12px 24px #191A2126',
   '--shadow-inset-hover': 'inset 0px 0px 0px 2px #6272A430',
-  // Selected ring: Purple 30%. Stone's default blue has no Dracula meaning;
-  // hover already owns Current Line, so selected takes the accent (verified:
-  // no other consumer reads this token in core 0.3.0 — Field rings use
-  // hover/success/warning/error).
+  // Current Line ring, the hover affordance. Deliberately subtle at 0x30
+  // (18.82%). Composited over the surface tier #343746 it measures 1.19:1 and
+  // FAILS WCAG 1.4.11 (needs 3:1). KNOWN, DOCUMENTED GAP — accepted by the
+  // human, not an oversight, and NOT discharged by any gate in this repo.
+  //
+  // DO NOT RAISE THE ALPHA TO FIX IT. Comment #6272A4 has a CEILING of 2.51:1
+  // against #343746: compositing can never exceed the pure-colour ratio, so no
+  // alpha reaches 3:1 on surface, popover or muted. The colour is the limit,
+  // not the value. Repinning the alpha cannot resolve this, and no gate exists
+  // here precisely because a floor on an unreachable ceiling would be a
+  // permanently-passing build certifying an impossible value. The selected ring
+  // below IS gated, because Purple's ceiling (4.89:1) is reachable.
+  // Selected ring: Purple at 0x30 alpha (48/255 = 18.82%, NOT 30% — 0x33 would
+  // be 20%). This number was carried as "Purple 30%" through three rulings
+  // before anyone computed the byte, so it is stated as the byte. Stone's
+  // default blue has no Dracula meaning; hover already owns Current Line, so
+  // selected takes the accent (verified: no other consumer reads this token in
+  // core 0.3.0 — Field rings use hover/success/warning/error).
+  //
+  // Known gap, documented not hidden: composited over the surface tier #343746
+  // this ring measures 1.38:1, under WCAG 1.4.11's 3:1 non-text floor. Purple's
+  // ceiling over that surface is 4.89:1, so 3:1 IS reachable (at 65.7% alpha) —
+  // this is an under-shoot, not a dead colour. scripts/check.ts holds a
+  // regression floor at the measured ratio and does NOT discharge the gap.
   '--shadow-inset-selected': 'inset 0px 0px 0px 2px #BD93F930',
   '--shadow-inset-success': 'inset 0px 0px 0px 2px #50FA7B30',
   '--shadow-inset-warning': 'inset 0px 0px 0px 2px #F1FA8C30',
@@ -106,9 +126,15 @@ const tokens: Record<string, TokenValue> = {
   // switch/link hovers. Pin white (dark-mode side) so hover dims lighten —
   // never black, which would fight the dim doctrine on dark.
   '--color-tint-hover': pin('#FFFFFF'),
-  // Thumb/track tint base: same white, consumed by Thumbnail/Lightbox/Spinner
-  // overlays on dark imagery.
-  '--color-on-dark': pin('#FFFFFF'),
+  // Thumb/track tint base, consumed by Thumbnail/Lightbox/Spinner overlays on
+  // dark imagery. Pinned to the spec Foreground, not pure white: Dracula has no
+  // #FFFFFF, and the dark media scope repins --color-text-primary and
+  // --color-icon-primary onto this token, so a pure white here leaked pure
+  // white into every Toast's text. MUST stay a 6-digit hex literal: core's
+  // Spinner (dist/Spinner/Spinner.js:140,146) string-concatenates an alpha onto
+  // it, so a light-dark()/oklch()/var() form would silently break the Spinner
+  // track at runtime, in a component no template renders and no gate would see.
+  '--color-on-dark': pin('#F8F8F2'),
   '--color-on-light': pin('#000000'),
   // Flat-crisp brand: shadows resolve through this Dracula-hued token, not
   // Stone's cold blue. Table sticky-column edges use it directly.
@@ -165,21 +191,34 @@ const tokens: Record<string, TokenValue> = {
   '--color-functional-green': pin('#089108'),
   '--color-functional-cyan': pin('#0081D6'),
   '--color-functional-purple': pin('#815CD6'),
-  // Charts: categorical series in nearest Dracula hues (ANSI brights keep
-  // teal/indigo distinct; brown reuses orange, its closest hue)
+  // Charts: categorical series in nearest Dracula hues. ANSI brights keep
+  // teal (#A4FFFF) and indigo (#D6ACFF) distinct from their spec bases.
+  //
+  // Two entries are deliberately ABSENT:
+  //   brown  — was byte-identical to orange. A categorical series set is a
+  //            palette where distinctness IS the contract, so two names on one
+  //            hex is a broken legend, not a near-duplicate. Reusing orange is
+  //            fine as a documented alias, never as a second series name.
+  //   purple — purple means tappable, never data, so it is barred from
+  //            categorical identity. This is a MODULE rule: shared/chart-hues.ts
+  //            is purple-free by construction. The SEQUENTIAL --color-data-purple-1..5
+  //            ramp SURVIVES and is sanctioned — a magnitude ramp claims an order,
+  //            not an identity. Revoking the ramp is a separate decision that
+  //            needs the same treatment as this token.
   '--color-data-categorical-blue': pin(DRA.comment),
   '--color-data-categorical-orange': pin(DRA.orange),
-  '--color-data-categorical-purple': pin(DRA.purple),
   '--color-data-categorical-green': pin(DRA.green),
   '--color-data-categorical-pink': pin(DRA.pink),
   '--color-data-categorical-cyan': pin(DRA.cyan),
   '--color-data-categorical-red': pin(DRA.red),
   '--color-data-categorical-teal': pin('#A4FFFF'),
-  '--color-data-categorical-brown': pin(DRA.orange),
   '--color-data-categorical-indigo': pin('#D6ACFF'),
   // Categorical tints: 10% accent wash backgrounds, 30% borders, full accents
-  // for text and icons. Stone badge, banner, and field-status scopes resolve
-  // these, so all status surfaces follow Dracula with zero per-scope hacks.
+  // for text and icons. This 10/30 family is a DIFFERENT family from the
+  // --shadow-inset-* family above, which sits at 0x30 = 18.82%, not 30%. A
+  // repo-wide sweep for "30%" would break this true statement — leave both.
+  // Stone badge, banner, and field-status scopes resolve these, so all status
+  // surfaces follow Dracula with zero per-scope hacks.
   '--color-background-blue': pin('#6272A41A'),
   '--color-border-blue': pin('#6272A44D'),
   '--color-icon-blue': pin(DRA.comment),
@@ -247,11 +286,21 @@ const tokens: Record<string, TokenValue> = {
   '--color-data-yellow-3': pin('hsl(64.91 91.67% 60%)'),
   '--color-data-yellow-2': pin('hsl(64.91 91.67% 74%)'),
   '--color-data-yellow-1': pin('hsl(64.91 91.67% 88%)'),
-  '--color-data-teal-5': pin('hsl(190.53 96.61% 28%)'),
-  '--color-data-teal-4': pin('hsl(190.53 96.61% 44%)'),
-  '--color-data-teal-3': pin('hsl(190.53 96.61% 60%)'),
-  '--color-data-teal-2': pin('hsl(190.53 96.61% 74%)'),
-  '--color-data-teal-1': pin('hsl(190.53 96.61% 88%)'),
+  // Teal ramp derives off --color-data-categorical-teal (#A4FFFF, ANSI bright
+  // cyan), the family's own named base. It previously derived off
+  // hsl(190.53 96.61%) = #8BE9FD (spec Cyan), so one token name carried two
+  // bases that differ by 10.5° of hue, not merely lightness. This is a
+  // PROVENANCE fix only: HeatScale's family is shamrock (the human ruled), so
+  // no live consumer depends on this ramp today and nothing renders the change.
+  // Note the saturation: #A4FFFF is S=100% L=82%, so these steps read more
+  // saturated than the S=96.61% ramps. At a glance L=74% is the step that reads
+  // as "the colour changed" rather than "the ramp lightened", because it sits
+  // nearest the old spec teal. Revisit if a consumer ever lands.
+  '--color-data-teal-5': pin('hsl(180 100% 28%)'),
+  '--color-data-teal-4': pin('hsl(180 100% 44%)'),
+  '--color-data-teal-3': pin('hsl(180 100% 60%)'),
+  '--color-data-teal-2': pin('hsl(180 100% 74%)'),
+  '--color-data-teal-1': pin('hsl(180 100% 88%)'),
   '--color-data-blue-5': pin('hsl(225.45 26.61% 28%)'),
   '--color-data-blue-4': pin('hsl(225.45 26.61% 44%)'),
   '--color-data-blue-3': pin('hsl(225.45 26.61% 60%)'),
@@ -397,6 +446,15 @@ export const astryxDraculaTheme: DefinedTheme = defineTheme({
       'variant:error': {
         backgroundColor: DRA.red,
       },
+      // Neutral/disabled fill borrowed a TEXT token (core `.x16fr6go` =
+      // var(--color-text-disabled)). Both resolve to #6272A4 so this is a
+      // zero-delta token-hygiene fix: the bar stops depending on a text role.
+      'variant:neutral': {
+        backgroundColor: 'var(--color-progress-value)',
+      },
+      'variant:disabled': {
+        backgroundColor: 'var(--color-progress-value)',
+      },
     },
     'text-input': INPUT_STATUS,
     textarea: INPUT_STATUS,
@@ -437,6 +495,43 @@ export const astryxDraculaTheme: DefinedTheme = defineTheme({
       backgroundColor: 'var(--color-background-red)',
     },
   },
+    // Tooltip: core hardcodes an inverted pair with no mode branch
+    // (dist/astryx.css:587 `.x19aspcf` = background-color var(--color-text-primary),
+    // :656 `.xrkvqaz` = color var(--color-background-surface)), while useTooltip's
+    // own JSDoc promises "dark background, light text" — an inversion that only
+    // holds on a LIGHT theme. On our dark-only brand it rendered a #F8F8F2 box
+    // on a #282A36 page. Repainted as the floater tier Popover already uses
+    // (#424450) with Popover's own depth cue (--shadow-low); the tooltip
+    // container has no shadow class in core, so without it a #424450 rect
+    // reads as a pale patch at 1.48:1 rather than a floater. 9.06:1 on text.
+    tooltip: {
+      base: {
+        backgroundColor: 'var(--color-background-popover)',
+        color: 'var(--color-text-primary)',
+        boxShadow: 'var(--shadow-low)',
+      },
+    },
+    // HoverCard is a floater but core paints it on the CHROME tier
+    // (`.x10xzikg` = var(--color-background-surface), #343746), not the popover
+    // tier Popover/ContextMenu/DropdownMenu use. Opened from inside a #343746
+    // SideNav it had 1:1 surface separation and only --shadow-med to read as
+    // floating. Promoted to the floater tier. Known: --color-text-secondary
+    // drops 4.60:1 -> 3.77:1 inside a HoverCard. Latent, not live — no template
+    // renders <HoverCard>; the three "HoverCard" hits are catalog metadata.
+    hovercard: {
+      base: {
+        backgroundColor: 'var(--color-background-popover)',
+      },
+    },
+    // Text on a status fill is always #21222C via --color-on-*, per dracula-ui
+    // and the brand's on-fill rule. StatusDot already does this (core
+    // `.xri61p4` / `.x1m024r3`); AvatarStatusDot inherited
+    // `--color-background-surface` (#343746) instead — a chrome tier used as
+    // on-fill text. Same variant slot StatusDot uses, so both dots agree.
+    'avatar-status-dot': {
+      'variant:success': { color: 'var(--color-on-success)' },
+      'variant:error': { color: 'var(--color-on-error)' },
+    },
   },
   // Inverted-surface passthrough: core's MediaTheme defaults collapse accent
   // to white on dark surfaces, which would un-purple every button/link inside

@@ -21,5 +21,14 @@ declare module '@astryxdesign/core/ProgressBar' {
     'success': true;
     'warning': true;
     'error': true;
+    'neutral': true;
+    'disabled': true;
+  }
+}
+
+declare module '@astryxdesign/core/Avatar' {
+  interface AvatarStatusDotVariantMap {
+    'success': true;
+    'error': true;
   }
 }
