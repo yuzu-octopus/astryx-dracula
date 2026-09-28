@@ -62,7 +62,7 @@ import '../tokens.css';
 ```
 
 Then use `var(--color-primary)`, `var(--dracula-purple)`, `var(--space-gap)`.
-`tokens.css` sets real `:root` values with `color-scheme: dark`, so first paint is correct with no runtime. It is a full plain-CSS mirror of the theme (289 `:root` vars, unlayered by design so it beats core layers with zero `!important`); edit the theme, not this file, then re-mirror.
+`tokens.css` sets real `:root` values with `color-scheme: dark`, so first paint is correct with no runtime. It is a full plain-CSS mirror of the theme (`grep -c "^  --" tokens.css` `:root` vars, unlayered by design so it beats core layers with zero `!important`); edit the theme, not this file, then re-mirror.
 
 ## Migrating an existing site
 
@@ -82,7 +82,7 @@ bunx astryx template dashboard --package astryx-dracula
 ```
 
 View them all live at `/astryx-dracula/#/templates` on the showcase (agent index: [AGENTS.snippet.md](AGENTS.snippet.md)). Pack rules: templates
-import `@astryxdesign/core`, `lucide-react`, and the kit's own shared modules (`astryx-dracula/shared/*`: auth-copy, chaptered-doc, chart-hues, chart-labels, gallery-image, login-demo, metric-delta, revenue-chart, scene-castle, scene-tile, settings-rows, sparkline, sso-icons), no chart libraries.
+import `@astryxdesign/core`, `lucide-react`, and the kit's own shared modules (`astryx-dracula/shared/*`: auth-copy, auth-chrome-config, chaptered-doc, chaptered-doc-config, chart-hues, chart-labels, chart-panel-style, gallery-image, login-demo, metric-delta, revenue-chart, scene-castle, scene-hues, scene-tile, settings-data, settings-rows, sparkline, sso-icons), no chart libraries.
 
 ## Fonts
 
@@ -145,11 +145,17 @@ README. Not required for this kit.
 - Never override `--color-*` in app `:root`. Brand changes live in `astryx-theme.ts` via `defineTheme`, then `bun run theme:build`.
 - Tokens for every value: `var(--color-*|--space-*|--radius-*)`. No raw hex or px in components.
 - Component styling: props first, then theme `components` overrides in `astryx-theme.ts`. No per-app CSS wars.
+- A chart mark takes a `--color-data-*` role token, never a `--dracula-*` primitive. The `chart-hues` / `chart-legend` / `data-bar` types reject anything else at compile time.
+- `--dracula-comment` is legal on a **graphical** mark (3.36:1 clears WCAG 1.4.11) and illegal on **text** (fails 4.5:1). Any `fillOpacity` under 0.9 makes it worse. Text in a scene uses `--color-text-paragraph`.
+- A `Layout height="fill"` needs `style={{height: '100dvh'}}` or it silently degrades to document scroll. `minHeight: '100%'` computes to 0 against an indefinite parent, so it is a no-op.
+- Derive any count a page prints from its data. Hardcoded numerals are how `documentation.tsx` came to say "twenty-eight components" over 31 entries.
+- A `.tsx` exports components only; shared data lives in a sibling `.ts`, so React Fast Refresh works.
 
 ## Release checklist
 
 Before tagging a release:
 
 1. Pin versions: `@astryxdesign/core` / `@astryxdesign/cli` in `package.json` match the showcase and CI.
-2. Refresh the approximate template counts in `README.md` / `USAGE.md` (no gate asserts them) and the version badges baked into `templates/product-tour.tsx` + `templates/centered-hero.tsx` (rendered text + XLE header) to match `package.json`.
-3. Rebuild and gate: `bun run theme:build`, then `bun run theme:check`, then `bun run audit`.
+2. Refresh the version badges baked into `templates/product-tour.tsx` + `templates/centered-hero.tsx` (rendered text + XLE header) to match `package.json`.
+3. Rebuild and gate: `bun run theme:build`, then `bun run theme:check`, then `bun run audit`, then `bunx react-doctor@latest` (must stay 100/100).
+4. Counts in the docs are cited with the command that produces them, so there is nothing to refresh by hand. If you find a bare numeral, replace it with its command.

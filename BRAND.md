@@ -15,7 +15,7 @@ Source of truth is `astryx-theme.ts`. Do not add hexes; `bun run audit` enforces
 | Background Dark | #21222C | shadows, on-fill text |
 | Darker | #191A21 | shadow washes only (never a surface: `--shadow-*` alpha blends) |
 | Foreground | #F8F8F2 | primary text on dark |
-| Comment | #6272A4 | disabled text, subtle borders |
+| Comment | #6272A4 | subtle borders, empty cells, disabled text[^comment] |
 | Cyan | #8BE9FD | info, secondary links |
 | Green | #50FA7B | positive, success |
 | Orange | #FFB86C | attention, constants (never warning) |
@@ -25,6 +25,8 @@ Source of truth is `astryx-theme.ts`. Do not add hexes; `bun run audit` enforces
 | Yellow | #F1FA8C | tags, chips, warning states |
 | Inverted error | #FFD5CC | pale surface for the inverted error Toast (not a spec hex) |
 
+[^comment]: Comment sits **between** the two WCAG floors on the scene backdrop `#21222C`: 3.36:1 clears 1.4.11's **graphical** floor and fails the **text** floor, and any `fillOpacity` below 0.9 is worse (0.85 → 2.81). So Comment is correct on an empty cell or a subtle grid line and **never** on a `<text fill>`. Scene text uses `--color-text-paragraph` (7.59:1). Do not "improve" an empty cell to `--color-separator`: its ceiling on `#21222C` is 1.73:1 at full opacity and 1.32:1 at 0.55, and a grid whose empty cells have vanished is not a grid.
+
 [^current-line]: Upstream pins both Current Line and Comment to #6272A4. This kit follows suit for line affordances, including scrollbar thumbs in `tokens.css`. Do not "correct" one of them to #44475A.
 
 ## Semantic map (glimpse)
@@ -33,9 +35,13 @@ Source of truth is `astryx-theme.ts`. Do not add hexes; `bun run audit` enforces
 - Green positive and success. Red negative and error. Yellow tags, chips, and warning states (`--color-warning` ships Yellow; Orange never carries warning). Cyan info and secondary links. Pink flair. Orange attention and constants.
 - Subdue #4C5067 for separators and hairline chrome, never text (1.8:1 on the page background, 1.5:1 on cards). Not a Dracula hex; derived from the glimpse ramp for chrome hierarchy.
 
+## Borders
+
+`--color-border` is Comment `#6272A4`. `--color-border-emphasized` is **`#9AA1BC`**, repinned from Comment: core tone-bumps that token to ≥3:1 for form-control boundaries, but `pin()` returns a literal so that guarantee is inert here, and the old value cleared *no* surface tier at 3:1 while the new one clears all four (5.56 / 4.60 / 3.77 / 3.57). `DropdownMenuRadioItem` reads it on a popover, so the popover tier is a real consumer. Known shortfall: the inverted surface at 2.40, which has no live consumer — recorded, not certified.
+
 ## Charts
 
-Categorical series use nearest Dracula hues: blue goes comment, orange orange, purple purple (compat token only — purple means tappable, never encode data),
+A chart mark takes a `--color-data-*` **role token**, never a `--dracula-*` primitive, and the types enforce it — widening `ChartLegendEntry.color` and `DataBarSegment.color` from `string` to template-literal unions caught ten real violations at compile time, including eight demo bars painting `--color-success` on a data mark. Categorical series use nearest Dracula hues: blue goes comment, orange orange, purple purple (compat token only — purple means tappable, never encode data; the ban is a **module rule** enforced by `chart-hues.ts`, not token absence),
 green green, pink pink, cyan cyan, red red. Teal uses ANSI bright cyan #A4FFFF and indigo
 ANSI bright blue #D6ACFF; brown has no spectral match and reuses orange. Sequential ramps cover 9 families (purple, pink, red,
 orange, yellow, teal, blue, shamrock, gray) with 5 lightness steps each (28/44/60/74/88),
@@ -73,8 +79,9 @@ Radii flat and crisp (5px elements, 4px inner). Everything below is a core defau
 - One runtime dependency: `lucide-react` (icons render from it at runtime, both the theme `draculaIconRegistry` in `icons.tsx` and every template's direct imports — `bun run audit` fails when a registered glyph stops resolving to a real export). Everything else is defined here.
 - Derived AA lifts (not spec hexes, same hues): secondary text #9AA1BC, muted text #8288A6, paragraph #B0B3C4. Subdue #4C5067 is chrome, below every text floor.
 - Icon glyphs from Lucide in `icons.tsx` (MIT). The theme also sets icon colors (primary, secondary, disabled, accent).
-- onDark: `--color-on-dark` is repinned to spec Foreground `#F8F8F2` — the spec has **no pure white**, so a `#FFFFFF` here is off-palette. The pair is **deliberately asymmetric** and should not be "fixed" into symmetry: on-dark = spec Foreground `#F8F8F2`, on-light = spec black `#000000`. `--color-tint-hover` is **still `#FFFFFF`** and remains entangled with the overlay-hover decision — treat it as un-ruled, not as corrected.
-- `--color-data-neutral`: `#8C939B`, **inherited from core** (core declares `light-dark(#8494A3, #8C939B)` in `core/src/theme/domainTokens/dataTokens.ts`) and off-palette — neither a Dracula hex nor on our gray ramp, whose L60 computes to `#8A8EA8`. It stays because it reads fine on dark. An earlier line here called it "default gray reads fine on dark"; whether "Stone" is a real Astryx brand name is an **open question** — `grep -ril stone node_modules/@astryxdesign/` hits only a separate `@astryxdesign/theme-stone` package, not this value.
+- onDark: `--color-on-dark` is repinned to spec Foreground `#F8F8F2` — the spec has **no pure white**, so a `#FFFFFF` here is off-palette. The pair is **deliberately asymmetric** and should not be "fixed" into symmetry: on-dark = spec Foreground `#F8F8F2`, on-light = spec black `#000000`. `--color-tint-hover` is **`#FFFFFF` and ruled correct — do not repaint.** It looks like a second pure white next to the line above, and it is not: core only ever reads it as a `color-mix` **partner** at 5–20% (`CheckboxInput.tsx:115-138`, `Slider.tsx:252`), never as a paint, and it is core's own dark value (`tokens.stylex.ts:81`, `light-dark(black, white)`). Retinting it to a Dracula grey would silently change every mix core builds and break the only thing it is for. `#FFFFFF` is not on-palette; the *token* is.
+- `--color-data-neutral`: `#8C939B`, **inherited from core** (core declares `light-dark(#8494A3, #8C939B)` in `core/src/theme/domainTokens/dataTokens.ts`) and off-palette — neither a Dracula hex nor on our gray ramp, whose L60 computes to `#8A8EA8`. It stays because it reads fine on dark. The "Stone" label in an earlier line here was never an Astryx brand name: `grep -ril stone node_modules/@astryxdesign/` hits only a separate `@astryxdesign/theme-stone` package, not this value. **Open question, deliberately not answered:** the value is off-palette and we could ship a gray ramp step instead — but it is core's own default, and diverging from core on a data role buys brand purity at the cost of surprising anyone who ports a core chart. That trade is the human's.
+- Tag accents: `--color-tag-<orange|pink|cyan|yellow|green|purple>`. The purple tag was **renamed from `blue`** — it always held `#BD93F9` (spec Purple) and never a blue. Dracula has no blue, so the value was right and the name was the lie. Historical trap for anyone who greps: `blue` is also the name of six *other* tokens that genuinely are Comment (`--color-background-blue`, `-border-`, `-icon-`, `-text-`, `--color-data-categorical-blue`, `--color-data-blue-1..5`), so a repo-wide find/replace on "blue" would silently repoint all six at Purple. A name that contradicts its own value is invisible to every contrast gate, which is why this needed a ruling rather than a threshold.
 - No color-scale config: HCT generation would fight the pinned hexes. No light mode, ever.
 
 ## Dims

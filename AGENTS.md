@@ -41,6 +41,18 @@ then `astryx-dracula/tokens.css`, then `astryx-dracula/theme.css` inside `<Theme
 Read `.agents/skills/astryx-dracula/SKILL.md` before styling anything (agent index: [AGENTS.snippet.md](AGENTS.snippet.md)).
 Scaffold pages with `bunx astryx template <id> --package astryx-dracula` — templates carry XLE headers.
 
+Three rules that are cheap to get wrong and expensive to debug, all settled with evidence in SKILL.md:
+
+- **A `Layout height="fill"` needs a definite ancestor or the document scrolls instead.** Use
+  `style={{height: '100dvh'}}` on the Layout. Never `minHeight: '100%'` — a percentage min-height
+  against an indefinite containing block computes to 0 (CSS 2.1 §10.5), so it is a no-op that
+  looks like a fix. Do not add it inside an `AppShell`, which is already `100dvh`.
+- **A count a page prints must be derived from the data, never written as a numeral.** `documentation.tsx`
+  shipped "twenty-eight components" against 31 entries and its XLE said 15 for a category of 18.
+- **A `.tsx` exports components only; data lives in a sibling `.ts`.** A file exporting both breaks
+  React Fast Refresh. `bun run audit` gates `package.json` `exports` against `shared/` in both
+  directions, so a new shared module needs an entry and a deleted one loses it.
+
 On "155 components" in the generated block above: that is the number of **exported
 component names** the CLI enumerates, not the number of component directories. The
 package ships **101** component directories — `find

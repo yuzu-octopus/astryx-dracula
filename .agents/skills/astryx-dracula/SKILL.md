@@ -65,7 +65,7 @@ Live at `/astryx-dracula/#/templates` on the showcase,
 where `demo/Templates.tsx` renders each page bare inside a viewer iframe
 and keeps the `Templates / <name>` bar plus its `<Theme>` provider outside it.
 That bar, the provider, and the frame are viewer chrome, not page content:
-never copy them into a `templates/` file. Pack rules: templates import `@astryxdesign/core`, `lucide-react`, and the kit's own shared modules (`astryx-dracula/shared/*`: auth-copy, chaptered-doc, chart-hues, chart-labels, gallery-image, login-demo, metric-delta, revenue-chart, scene-castle, scene-tile, settings-rows, sparkline, sso-icons), no chart libraries; no default `React` import in 43 templates (JSX transform — 11 omit `react` entirely, the rest use named hook/type imports) — only `settings-dialog` and `table-grouped` carry a default `React` import for the `React.*` namespace (`React.ReactNode`, `React.useEffect`, `React.Fragment`); every template carries its `<id>.template.mjs` spec. IDs: dashboard, table-grouped, table-page, kanban-board, settings-sidebar, settings, payment-form, login-card, file-explorer, ai-chat-landing, library, centered-hero, ai-chat, classic-gallery, contact-form, dashboard-portfolio, detail-page, documentation, documentation-design, documentation-technical, editor, form-two-column, gallery-hero, ide, login, mixed-gallery, product-detail, product-gallery, product-tour, settings-dialog, shell-nav, shell-side-nav, shell-…
+never copy them into a `templates/` file. Pack rules: templates import `@astryxdesign/core`, `lucide-react`, and the kit's own shared modules (`astryx-dracula/shared/*`: auth-copy, auth-chrome-config, chaptered-doc, chaptered-doc-config, chart-hues, chart-labels, chart-panel-style, gallery-image, login-demo, metric-delta, revenue-chart, scene-castle, scene-hues, scene-tile, settings-data, settings-rows, sparkline, sso-icons), no chart libraries; no default `React` import in 43 templates (JSX transform — 11 omit `react` entirely, the rest use named hook/type imports) — only `settings-dialog` and `table-grouped` carry a default `React` import for the `React.*` namespace (`React.ReactNode`, `React.useEffect`, `React.Fragment`); every template carries its `<id>.template.mjs` spec. IDs: dashboard, table-grouped, table-page, kanban-board, settings-sidebar, settings, payment-form, login-card, file-explorer, ai-chat-landing, library, centered-hero, ai-chat, classic-gallery, contact-form, dashboard-portfolio, detail-page, documentation, documentation-design, documentation-technical, editor, form-two-column, gallery-hero, ide, login, mixed-gallery, product-detail, product-gallery, product-tour, settings-dialog, shell-nav, shell-side-nav, shell-…
 
 ## Brand principles
 
@@ -102,7 +102,11 @@ Type carries hierarchy, so weight stays quiet: headings normal, `semibold` for e
 
 **The check that passes when it should fail, because it is the hardest instance to argue with.** Renaming a declaration while leaving its call sites is invisible to a presence check. In this repo `rg -c "loginFailed" file` returning `2` was read as "correctly retained" when the declaration had just been renamed — a false PASS, in a file we owned, on the change we had just made. **"Does this string exist?" and "is this identifier in scope?" are different questions, and only the second is a build-safety check.** A grep returning non-zero is not a result; it is a prompt to read it against what it is counting.
 
-**A rule stated in prose is a request; a rule stated in the type is a compiler error.** This repo's colour rules are the worked example: `shared/chart-hues.ts` exports a `ChartHue` union, and `shared/scene-tile.tsx` enforces "purple never touches these scenes" with a `SCENE_HUES` union typed at every hop, so a hand-rolled array fails the build instead of a review. When a rule keeps failing review, move it into a type before writing it down again.
+**A rule stated in prose is a request; a rule stated in the type is a compiler error.** This repo's colour rules are the worked example: `shared/chart-hues.ts` exports a `ChartHue` union, and `shared/scene-hues.ts` enforces "purple never touches these scenes" with a `SCENE_HUES` union typed at every hop, so a hand-rolled array fails the build instead of a review. When a rule keeps failing review, move it into a type before writing it down again.
+
+**Then widen the type until it catches what is already wrong, not only what you imagined.** The `ChartHue` union was already there and still let ten violations through, because eight demo `DataBar`s passed `color: string` to a prop typed `string`, and the legend accepted `(string & {})`. Widening those to `` ChartHue | `var(--color-data-${string})` `` turned all ten into compile errors on the spot. A type that only admits the right values by convention is decoration; a type that rejects the wrong values you actually shipped is enforcement. **Then measure the damage before shipping it** — a type change is a breaking change for consumers, and the honest cost of a stricter union is stated, not assumed.
+
+**A name that contradicts its own value is invisible to every threshold, so it needs a ruling rather than a gate.** `--color-tag-blue` held spec Purple and no contrast check could see it, because the number was never wrong — only the label was. The same shape retired `--color-border-emphasized`: the value passed the gate it had (1.5) while failing the floor the token is actually held to (3:1), so the fix was to move the **gate** to the real criterion and then move the value, not to argue about the value alone. When auditing a token, ask both questions: *is this number right?* and *is this the question we should be asking?*
 
 **Cite a count with the command that produces it, never from a research artifact.** A findings file's narrative is argued from sources and decays slowly; its tally is counted from a tree that keeps moving. Three successive h1 counts (38, 30, 29) came out of one findings file. Say the number, name the command. And cite **full paths** — `F1.md` collides across five research slices and `F5.md` across two.
 
@@ -115,6 +119,47 @@ Type carries hierarchy, so weight stays quiet: headings normal, `semibold` for e
 The `sm` Button stays in dense contexts with a caption; CTAs stay default size.
 Map jobs to components, never to lookalikes: action goes to Button (never a nav-item class), navigation goes to SideNav or Link, count goes to Badge, status goes to StatusDot or Banner, label goes to Text type="label".
 5. **Touch targets are floored, and the two tiers are different criteria.** WCAG AA (2.5.8 Target Size (Minimum)) requires **24x24 CSS px**; WCAG AAA (2.5.5 Target Size (Enhanced)) requires 44x44. The familiar 44–48 figures are **Apple/Material/UWP platform guidelines, not the standard** — do not conflate them. Our rule: 24px minimum, 44px where touch matters, and W3C backs the two-tier shape — 2.5.8's own Understanding says "For important links/controls, consider aiming for the stricter 2.5.5", while AAA "is not recommended... as a general policy for entire sites". Two consequences worth stating because they settle most of the surface: our 36–44px table rows **pass 2.5.8 on size outright** and never need the Spacing exception, and an inline link inside a paragraph may be smaller than 24px because 2.5.8 enumerates Inline as a named exception. The `sm` Button's rendered height has **never been measured** — treat it as unmeasured, not as passing.
+
+6. **A `fill` Layout needs a definite ancestor, and `100dvh` is the only one
+   that works.** `Layout height="fill"` is `height: 100%` (`Layout.tsx:58-63`),
+   which resolves against its parent's *definite* height; against a
+   content-sized host it resolves to `auto`, the Layout grows, and the document
+   scrolls — a `fill` page silently degrading to document scroll in a
+   consumer's app. Anchor it with `style={{height: '100dvh'}}` **on the Layout**,
+   never `minHeight: '100%'`: a percentage min-height resolves against the
+   containing block's definite height and computes to **0** when that is
+   indefinite (CSS 2.1 §10.5), so it is a no-op that looks like a fix. Every
+   working instance in the kit uses viewport units, which are absolute and need
+   no ancestor: `editor.tsx:302`, `file-explorer.tsx:265`,
+   `messaging-shell.tsx:67`, `ai-chat.tsx:64`, `kanban-board.tsx:704`. Anchor a
+   **shared** module once, not once per caller — `shared/order-desk.tsx` is used
+   by three templates and three `100dvh` boxes would stack. Do **not** apply it
+   to a page already inside an `AppShell` (`shell-nav`, `shell-side-nav`):
+   `AppShell` is already `100dvh`, and a second one overflows by the header
+   height, converting a soft failure into a hard one. The definite height is
+   also not a cost to argue about: `LayoutContent` is `overflow: auto`
+   (`LayoutContent.tsx:36-39`), so a definite ancestor makes the content pane
+   **scroll** rather than clip. There is no shape that gives a `fill` Layout a
+   definite ancestor without a scroller — that is what `fill` means.
+7. **A count a template prints must be derived, never written.** Hardcoded
+   numerals drift the moment data changes, and the failure is a page lying about
+   its own size. `templates/documentation.tsx` shipped a hero reading
+   "twenty-eight components" against **31** entries while its XLE header said
+   `15 spells` for a category of **18**. Both now read `COMPONENT_CATEGORIES`:
+   the prose takes `COMPONENT_TOTAL`, each shelf takes `category.items.length`.
+   The same reasoning drives the XLE `*N` assertions — in 45 templates the
+   **array** drifted twice and the **header** never once, so the header is the
+   tiebreak when the two disagree.
+8. **Components and constants live in different files.** A `.tsx` that exports
+   both breaks React Fast Refresh: editing a constant remounts the whole module
+   instead of hot-updating. `react-doctor/only-export-components` gates it and
+   the kit is at **100/100**. The shape is uniform: components stay in the
+   `.tsx`, data moves to a sibling `.ts` that the component imports —
+   `scene-hues.ts`, `chart-hues.ts`, `settings-data.ts`,
+   `chaptered-doc-config.ts`, `auth-chrome-config.ts`, `chart-panel-style.ts`.
+   This is not architecture for its own sake: a *type* is the stronger version of
+   the same idea (limb 3 below), and a *split file* is what you reach for when
+   the data is genuinely shared and the rule cannot be expressed as a type.
 
 ## Contrast non-claim: the inset ring ships failing 1.4.11
 
@@ -139,15 +184,36 @@ The page `h1` takes **one value per surface class**, and the classifier is a pro
 
 ## What `check.ts` actually gates — and what it does not
 
-`bun run audit` runs 32 gates. Be precise about their reach, because a reader who over-trusts a gate file ships a defect it never claimed to catch.
+`bun run audit` runs 32 gate checks (`grep -c "fail(" scripts/check.ts`). Be precise about their reach, because a reader who over-trusts a gate file ships a defect it never claimed to catch.
 
-**It does gate:** palette purity, 24 contrast pairs, and a lint over template source for three literal string rules — `variant="section"`, `weight="bold"`, and `<Layout>` without an explicit height. Plus the zero-`!important` sweep over CSS sources and TSX (skipping the one line in `tokens.css` that states the rule in prose).
+**It does gate:** palette purity, 28 contrast pairs (`sed -n '/^const pairs/,/^];/p' scripts/check.ts | grep -c "^  \['"`), a lint over template source
+for three literal string rules — `variant="section"`, `weight="bold"`, and
+`<Layout>` without an explicit height — plus the zero-`!important` sweep over
+CSS sources and TSX (skipping the one line in `tokens.css` that states the rule
+in prose), plus a **two-directional gate that `package.json` `exports` agrees
+with `shared/`**.
+
+That last one is worth knowing why it exists. The map is hand-maintained, so it
+drifts silently in both directions, and each direction has a different blast
+radius. A **deleted** module leaves an entry pointing at a file that no longer
+exists *and still ships*, because `files` globs `shared/` independently of
+`exports` — that is exactly how `shared/heat-scale.ts` survived its own
+deletion and stayed published. A **new** module with no entry fails only in a
+*consumer's* `tsc`, never in ours, so the breakage lands on someone else and
+costs a bug report. The second direction is the expensive one.
+
+Compare keys **extensionless on both sides**: `exports` keys are specifiers
+(`./shared/scene-hues`), so comparing them to filenames reports every module as
+unexported. And do not put a dot in a config module's name —
+`chaptered-doc.config` does not resolve, because TypeScript's bundler
+resolution reads the trailing `.config` as a file extension. It is
+`chaptered-doc-config`.
 
 **It does NOT gate, and you must check these yourself:**
 
 | Not gated | Why it matters | Check it with |
 |---|---|---|
-| **Raw hex in template source** | One off-palette hex ships with all 32 gates green | `grep -ri '#[0-9a-f]\{3,6\}' templates shared demo --include='*.tsx' --include='*.css'` |
+| **Raw hex in template source** | One off-palette hex ships with every gate green | `grep -ri '#[0-9a-f]\{3,6\}' templates shared demo --include='*.tsx' --include='*.css'` |
 | **`--color-text-subdue` as a foreground** | `#4C5067` is **1.80:1** on body and **1.49:1** on the widget surface — below the 1.5 floor `check.ts` itself pins for that token, so the value would fail if it were ever used as text. It is chrome-only, and nothing enforces that | `grep -rn 'color: var(--color-text-subdue)' templates shared demo` |
 | **`weight="medium"`** | The operative rule is that neither `medium` nor `bold` may be used, since only 400 and 600 faces ship. The gate covers `bold` only. The token existing is precisely why the template must not reach for it | `rg -n 'weight="(medium|bold)"' templates demo shared` |
 
@@ -159,7 +225,7 @@ The `!important` sweep has one exemption by design: `tokens.css` contains that l
 
 The real gap is **adoption, not capability**: of 270 `themeProps(` call sites, 7 pass a `state` key. So the honest sentence is *core ships the mechanism and uses `state` at 7 of 270 sites* — not *core emits zero state attributes*, which was wrong and is retired. Two related facts, both measured: `aria-selected` **is** emitted on selected table rows (`useTableSelection.tsx:130`), so "no state attributes anywhere" was false on its face; and `data-custom` (x10) appears only in `.test.tsx` fixtures, never as a shipped prop. **Check the API, not the string** — this is limb 1 of the evidence doctrine, and it is why `data-custom` being test-only is a distinction worth carrying.
 
-When you need a kit rule to survive review, type it: `shared/chart-hues.ts` exports a `ChartHue` union and `shared/scene-tile.tsx` enforces its own "purple never touches these scenes" remit with a `SCENE_HUES` union **typed at every hop**, so a hand-rolled array fails the build instead of a reviewer. That is why purple, a value CoreInvertedPairAudit and the joint bucket both flagged, now surfaces as a compiler error rather than a finding.
+When you need a kit rule to survive review, type it: `shared/chart-hues.ts` exports a `ChartHue` union and `shared/scene-hues.ts` enforces its own "purple never touches these scenes" remit with a `SCENE_HUES` union **typed at every hop**, so a hand-rolled array fails the build instead of a reviewer. That is why purple, a value CoreInvertedPairAudit and the joint bucket both flagged, now surfaces as a compiler error rather than a finding.
 
 ## Prose measure: 75 characters, voluntary
 
@@ -182,11 +248,12 @@ Long-form reading copy is capped at `max-width: 75ch`, which is **630px at 14px 
 
 ## Exact token names (use these verbatim)
 
-200 source keys in `astryx-theme.ts` (281 unique custom properties in the
-prebuilt `theme.css` across 319 declaration lines incl. scoped repeats =
-278 public + 3 private `--_*-radius` aliases; `tokens.css` is a full
-plain-CSS mirror, 289 `:root` vars, unlayered by design so it beats core
-layers with zero `!important`). No gate asserts these counts;
+`astryx-theme.ts` is the source of record and the counts are cited rather than
+written, because they drift: `grep -c "pin(" astryx-theme.ts` for the pins,
+`grep -o "^  --[a-z-]*:" theme.css | sort -u | wc -l` for the public props in the
+prebuilt output, `grep -c "^  --" tokens.css` for the plain-CSS mirror.
+`tokens.css` is unlayered by design so it beats core layers with zero
+`!important`. No gate asserts the counts;
 `bun run theme:check` asserts freshness, `bun run audit`
 asserts palette purity and contrast floors.
 
@@ -202,10 +269,27 @@ Text `--color-text-primary` / `--color-text-secondary` /
 text).
 Icon `--color-icon-primary` / `--color-icon-secondary` /
 `--color-icon-disabled` / `--color-icon-accent`.
-Border `--color-border` / `--color-border-emphasized`; flat-crisp shadow hue
+Border `--color-border` (Comment `#6272A4`) / `--color-border-emphasized`
+(**`#9AA1BC`, repinned from Comment**). Core tone-bumps `-emphasized` to ≥3:1
+for form-control boundaries (`expandColorScale.ts:22-24`), but `pin()` returns a
+literal, so that guarantee is inert by construction on this theme — the old
+Comment value cleared **no** surface tier at 3:1 (3.03/2.51/2.05/1.94) and the
+new one clears all four (5.56/4.60/3.77/3.57). `DropdownMenuRadioItem.tsx:84`
+reads this token and `DropdownMenu` paints `--color-background-popover`, so the
+popover tier is a real consumer, not a hypothetical. Known shortfall: the
+inverted surface (`#F8F8F2`) at 2.40, which has **no live consumer** — only
+`Toast.tsx` paints it and its one control is a `Button`, which reads
+`--color-border`, not `-emphasized`. Recorded at the site, not certified.
+`scripts/check.ts` gates all three tiers at the real 3:1 floor, not the old 1.5
+rubber-stamp. Flat-crisp shadow hue
 `--color-shadow` (`#21222C`, not Stone's cold blue); hover-tint bases
-`--color-tint-hover` (**still `#FFFFFF`, un-ruled** — the spec has no pure white, and
-this one is entangled with the overlay-hover decision; do not document it as correct) /
+`--color-tint-hover` (**`#FFFFFF`, ruled correct — do not repaint**). The
+question was whether pure white violates "the spec has no pure white". It does
+not, because core only ever reads this token as a `color-mix` **partner** at
+5–20% (`CheckboxInput.tsx:115-138`, `Slider.tsx:252`), never as a paint. It is
+core's own dark value (`tokens.stylex.ts:81`, `light-dark(black, white)`), so
+repainting it to a Dracula grey would silently retint every mix core builds and
+break the only thing it is for) /
 `--color-on-dark` (spec Foreground `#F8F8F2`, **not white** — the pair is
 **deliberately asymmetric** with `--color-on-light` (spec black) and must not be
 "fixed" into two greys) /
@@ -240,16 +324,18 @@ Overlays `--color-overlay` / `--color-overlay-hover` /
 and `--color-text-<...>` accents. Spec fills `--color-functional-<red|orange|green|cyan|purple>`
 (token-compat pins for spec parity; shipped components consume the accent
 ring instead — never encode status in these). Tag accents
-`--color-tag-<orange|pink|cyan|yellow|green|blue>` (**open question: the `blue` tag is a
-misnomer and a rename to `purple` is proposed but NOT done** — the token still ships as
-`--color-tag-blue` and its value is `#BD93F9`, byte-identical to `--color-accent`, i.e.
-spec Purple. It was never blue. Do not read this list as describing a blue accent and do
-not "correct" the value to a blue; the pending change is the *name*, it is the human's
-decision, and the theme files and this line move together when it lands. Note the trap:
-`blue` is also the name of six *other* tokens that genuinely are Comment `#6272A4`
-(`--color-background-blue`, `-border-`, `-icon-`, `-text-`,
-`--color-data-categorical-blue`, and the `--color-data-blue-1..5` ramp), so a
-repo-wide find/replace on "blue" would silently repoint all six at Purple).
+`--color-tag-<orange|pink|cyan|yellow|green|purple>`. The purple tag was
+**renamed from `blue`** — the token always held `#BD93F9`, byte-identical to
+`--color-accent` (spec Purple), and never held a blue. Dracula has no blue, so
+the *value* was right and the *name* was the lie; the rename landed in both
+`tokens.css` and `astryx-theme.ts` (`theme.css` is generated from the latter).
+The historical trap, for anyone who greps: `blue` is also the name of six
+*other* tokens that genuinely are Comment `#6272A4` (`--color-background-blue`,
+`-border-`, `-icon-`, `-text-`, `--color-data-categorical-blue`, and the
+`--color-data-blue-1..5` ramp), so a repo-wide find/replace on "blue" would
+silently repoint all six at Purple. Only the tag moved. A name that contradicts
+its own value is invisible to every contrast gate, which is why it needed a
+human ruling rather than a threshold.
 Inverted surfaces
 `--color-background-inverted` (`#F8F8F2`) /
 `--color-background-error-inverted` (`#FFD5CC`, pale error surface the spec
