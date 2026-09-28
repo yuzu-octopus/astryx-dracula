@@ -344,13 +344,21 @@ body {
   --color-tag-yellow: #F1FA8C;
   --color-tag-green: #50FA7B;
   --color-tag-purple: #BD93F9;
-  /* The token was named `tag-blue` and held purple. Dracula has no blue; the
-   * closest is Comment/Comment-dim, and Purple is what the rest of the kit
-   * already uses for a fourth accent -- so the VALUE was right and the NAME
-   * was the lie. Renamed, not repinned: a `blue` tag that paints purple is
-   * wrong in a way no contrast number catches, and a future author adding a
-   * real blue tag would have found the slot occupied. Verify no consumer
-   * returned with `grep -rn "tag-blue"` before shipping a rename. */
+  /* Renamed in 0.3.0 from `tag-blue`, which held this same #BD93F9. Dracula
+   * has no blue; Purple is what the rest of the kit already uses for a fourth
+   * accent, so the VALUE was right and the NAME was the lie. Renamed rather
+   * than repinned, because a `blue` tag that paints purple is wrong in a way
+   * no contrast number catches, and a future author adding a real blue tag
+   * would have found the slot occupied.
+   *
+   * Migrating: s/--color-tag-blue/--color-tag-purple/ in your own CSS. The
+   * rename is silent -- a stale reference resolves to nothing rather than
+   * erroring -- and it ships with no deprecated alias, so nothing falls back
+   * for you. Note that `blue` is also the name of six OTHER tokens that really
+   * are Comment #6272A4 (--color-background-blue, -border-, -icon-, -text-,
+   * --color-data-categorical-blue, and the --color-data-blue-1..5 ramp), so a
+   * repo-wide replace on "blue" repoints all six at Purple. Target the tag
+   * token by name. */
 }
 
 /* Dracula scrollbars. The spec defines no scrollbar token, so these follow its
