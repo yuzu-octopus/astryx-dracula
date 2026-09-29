@@ -12,7 +12,7 @@ import {Text} from '@astryxdesign/core/Text';
 import {Card} from '@astryxdesign/core/Card';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Square} from 'lucide-react';
-import {ChartLabel} from 'astryx-dracula/shared/chart-labels';
+import {ChartLabel, CHART_LABEL_SIZE} from 'astryx-dracula/shared/chart-labels';
 import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
 
 // ============= SHARED CHART-PANEL CARD STYLE =============
@@ -80,6 +80,23 @@ const CHART_PAD_TOP = 12;
 const CHART_BASELINE = 164;
 const CHART_PLOT_W = CHART_W - CHART_PAD_LEFT - CHART_PAD_RIGHT;
 
+// X-axis label budget, counted in ticks rather than baked into a stride: five
+// intervals is the most the 484-unit plot carries with a tick-width of air
+// still between neighbours — a sixth drops the tightest pair to ~20px on a
+// 390px viewport, and the final pair needs room on top of that. Six ticks is
+// the ceiling, and the stride comes from the point count.
+const CHART_MAX_X_TICKS = 6;
+// A tick is as wide as its own text — the mono face advances 0.6em a glyph, so
+// `Jan 1` and `Jan 13` are different widths, and the last pair is decided by
+// that difference. Measured, not assumed.
+const CHART_TICK_ADVANCE = 0.6 * CHART_LABEL_SIZE;
+// The final tick is end-anchored here instead of centred on its own point,
+// which is what buys it room inside the right pad. The price is the
+// `CHART_TICK_PIN` it hangs back plus half a tick box of approach from the
+// left, and that is the air the grid below has to leave it.
+const CHART_LAST_TICK_X = CHART_W - CHART_PAD_RIGHT - 2;
+const CHART_TICK_PIN = CHART_PAD_LEFT + CHART_PLOT_W - CHART_LAST_TICK_X;
+
 interface RevenuePoint {
   date: string;
   revenue: number;
@@ -88,6 +105,48 @@ interface RevenuePoint {
 // Axis ticks switch to thousands once the scale leaves the hundreds.
 function formatRevenueTick(tick: number): string {
   return tick >= 1000 ? `$${tick / 1000}k` : `$${tick}`;
+}
+
+// Which points get a date tick. A fixed stride cannot answer this: `i % 3`
+// plus a forced final tick puts that final tick 0–1 slots from its neighbour
+// for two point counts in three, and one slot is `Jan 13` and `Jan 15` set
+// solid. So the stride comes from the point count, and the final point only
+// joins the axis once the pin has left it its air; when it has not, the
+// crowded grid tick gives way instead, so the axis ends on a gap wider than
+// every other one rather than on the narrowest one.
+function xTickIndices(dates: string[]): number[] {
+  const last = dates.length - 1;
+  if (last < 1) return [last];
+  const step = CHART_PLOT_W / last;
+  const width = (i: number) => dates[i].length * CHART_TICK_ADVANCE;
+  // Clear space between two ticks: `slots` apart, less the half-box each side
+  // shows. The final tick is the exception — it shows its whole box to the left
+  // of its anchor, so its pair is the one that has to clear the most.
+  const gap = (a: number, b: number) =>
+    (b - a) * step -
+    (width(a) + width(b)) / 2 -
+    (b === last ? CHART_TICK_PIN + width(b) / 2 : 0);
+  const stride = Math.max(1, Math.ceil(last / (CHART_MAX_X_TICKS - 1)));
+  // The grid, minus whatever the pinned final tick has crowded out. Every
+  // step of `end` down leaves the grid spacing even and gives the last pair
+  // one stride more room, so the first grid that clears is the one to keep.
+  let ticks = [0, last];
+  for (let end = Math.floor(last / stride) * stride; end >= 0; end -= stride) {
+    const grid: number[] = [];
+    for (let i = 0; i <= end; i += stride) grid.push(i);
+    if (grid[grid.length - 1] !== last) grid.push(last);
+    // Every pair, in order, so the last one can be held to the tightest of
+    // the rest instead of to the average.
+    const gaps = grid
+      .slice(0, -1)
+      .map((t, k) => gap(t, grid[k + 1]));
+    const interior = gaps.slice(0, -1);
+    if (interior.length === 0 || gaps[gaps.length - 1] >= Math.min(...interior)) {
+      ticks = grid;
+      break;
+    }
+  }
+  return ticks;
 }
 
 export function RevenueChart({
@@ -109,6 +168,7 @@ export function RevenueChart({
     x: CHART_PAD_LEFT + (i / (data.length - 1)) * CHART_PLOT_W,
     y: CHART_BASELINE - (d.revenue / chartMax) * plotH,
   }));
+  const dateTicks = new Set(xTickIndices(data.map(d => d.date)));
   const linePath = points
     .map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`)
     .join(' ');
@@ -151,14 +211,10 @@ export function RevenueChart({
           />
           {points.map(
             (p, i) =>
-              (i % 3 === 0 || i === points.length - 1) && (
+              dateTicks.has(i) && (
                 <ChartLabel
                   key={p.date}
-                  x={
-                    i === points.length - 1
-                      ? CHART_W - CHART_PAD_RIGHT - 2
-                      : p.x
-                  }
+                  x={i === points.length - 1 ? CHART_LAST_TICK_X : p.x}
                   y={CHART_H - 8}
                   textAnchor={i === points.length - 1 ? 'end' : 'middle'}>
                   {p.date}
