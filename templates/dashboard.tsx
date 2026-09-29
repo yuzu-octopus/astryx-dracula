@@ -19,6 +19,10 @@ import {Divider} from '@astryxdesign/core/Divider';
 import {Link} from '@astryxdesign/core/Link';
 import {Icon} from '@astryxdesign/core/Icon';
 
+// Same-route hash: demo links stay focusable anchors without escaping the
+// template through the hash router (bare "#" would drop back to the home page).
+const SELF_HASH = '#/templates/dashboard';
+
 // ============= ICONS =============
 
 import {RefreshCw, Square} from 'lucide-react';
@@ -632,7 +636,7 @@ function StackedBarCard({
         {/* Legend */}
         <HStack gap={4} wrap="wrap">
           {data.map(d => (
-            <VStack key={d.label} gap={0}>
+            <VStack key={d.label} gap={1}>
               <HStack gap={2} vAlign="center">
                 <Icon icon={Square} size="xsm" style={{color: d.color}} />
                 <Text type="supporting" color="secondary">{d.label}</Text>
@@ -756,14 +760,14 @@ export default function DashboardTemplate() {
               <TableCard
                 title="Top pages"
                 linkLabel="All pages"
-                linkHref="#"
+                linkHref={SELF_HASH}
                 data={topPagesData}
                 columns={topPagesColumns}
               />
               <TableCard
                 title="Top events"
                 linkLabel="All events"
-                linkHref="#"
+                linkHref={SELF_HASH}
                 data={topEventsData}
                 columns={topEventsColumns}
               />
