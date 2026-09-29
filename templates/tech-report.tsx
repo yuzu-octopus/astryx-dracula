@@ -1476,7 +1476,7 @@ export default function TechReport() {
       footer={
         <Text type="supporting" color="secondary">
           Checkpoints and the full report:{' '}
-          <Link href={REPORT_URL} target="_blank" type="supporting">
+          <Link href={REPORT_URL} target="_blank" type="supporting" hasUnderline>
             huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash
           </Link>
         </Text>

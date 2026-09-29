@@ -238,7 +238,7 @@ export default function TwoColumnForm() {
                   <Text type="supporting" color="secondary">
                     {col.label}
                   </Text>
-                  <Link href={`mailto:${col.email}`}>
+                  <Link href={`mailto:${col.email}`} hasUnderline>
                     {col.email}
                   </Link>
                 </VStack>
