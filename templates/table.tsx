@@ -5,9 +5,18 @@
 import {Layout, LayoutHeader, LayoutContent, HStack} from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
 import {Button} from '@astryxdesign/core/Button';
-import {Table} from '@astryxdesign/core/Table';
+import {Table, pixel} from '@astryxdesign/core/Table';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
 import type {TableColumn} from '@astryxdesign/core/Table';
+import type {CSSProperties} from 'react';
+
+// Each column below declares the width its own content needs, so the table
+// takes that sum instead of splitting the viewport four ways and leaving a
+// quarter of the page empty after a ten-character name and 290px of empty
+// table to the right of an Edit button. `width: auto` is what lets the pixel
+// widths survive — under the default `width: 100%` the fixed table layout
+// hands the leftover space back to every column and the voids return.
+const tableHugsContent: CSSProperties = {width: 'auto'};
 
 type Relic = {
   id: string;
@@ -36,6 +45,7 @@ const columns: TableColumn<Relic>[] = [
   {
     key: 'name',
     header: 'Name',
+    width: pixel(144),
     renderCell: (item: Relic) => (
       <Text type="body" weight="semibold">
         {item.name}
@@ -45,6 +55,7 @@ const columns: TableColumn<Relic>[] = [
   {
     key: 'status',
     header: 'Status',
+    width: pixel(112),
     renderCell: (item: Relic) => (
       <HStack gap={1} vAlign="center">
         <StatusDot
@@ -60,6 +71,7 @@ const columns: TableColumn<Relic>[] = [
   {
     key: 'updatedAt',
     header: 'Updated',
+    width: pixel(112),
     renderCell: (item: Relic) => (
       <Text type="body" color="secondary" hasTabularNumbers>
         {item.updatedAt}
@@ -69,6 +81,7 @@ const columns: TableColumn<Relic>[] = [
   {
     key: 'actions',
     header: 'Actions',
+    width: pixel(96),
     renderCell: (item: Relic) => (
       <Button label={`Edit ${item.name}`} variant="secondary" size="sm">
         Edit
@@ -93,7 +106,13 @@ export default function SimpleTable() {
       }
       content={
         <LayoutContent>
-          <Table<Relic> data={data} columns={columns} idKey="id" hasHover />
+          <Table<Relic>
+            data={data}
+            columns={columns}
+            idKey="id"
+            hasHover
+            style={tableHugsContent}
+          />
         </LayoutContent>
       }
     />

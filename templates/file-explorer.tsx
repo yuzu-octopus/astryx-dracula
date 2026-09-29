@@ -436,6 +436,15 @@ export default function FileExplorer() {
     return item?.type === 'file' ? item : null;
   }, [selectedPath]);
 
+  // Narrow mode is one pane at a time, the same master→detail shape the
+  // folder columns already use: the deepest column, or the file preview when
+  // the selection ends on a file. Beside each other the column and the
+  // preview need 240 + 320 = 560px, so in a 390px pane the preview was cut at
+  // the viewport edge with nothing to scroll it into view. "Go back" (:464)
+  // pops the selected file off the path, so it is also the way back from the
+  // preview to the column.
+  const isPreviewPane = isNarrow && selectedFile != null;
+
   const handleSelect = (columnIndex: number, itemId: string) => {
     setSelectedPath([...selectedPath.slice(0, columnIndex), itemId]);
   };
@@ -508,81 +517,84 @@ export default function FileExplorer() {
             File Explorer
           </VisuallyHidden>
           <HStack height="100%" style={columnRow}>
-            {visibleColumns.map((col, colIndex) => {
-              const trueIndex = columnOffset + colIndex;
-              const showDivider =
-                trueIndex < columns.length - 1 || selectedFile != null;
-              return (
-                <Section
-                  key={col.id}
-                  width={240}
-                  padding={2}
-                  variant="transparent"
-                  dividers={showDivider ? ['end'] : undefined}
-                  style={{...scrollable, ...fixedColumn}}
-                  role="region"
-                  aria-label={`Folder column ${trueIndex + 1}`}
-                  tabIndex={0}>
-                  {col.items.length === 0 ? (
-                    <EmptyState
-                      title="Quiet in the crypt"
-                      description="This folder holds no scrolls yet."
-                      isCompact
-                    />
-                  ) : (
-                  <List density="compact" hasDividers={false}>
-                    {col.items.map(item => {
-                      const isSelected = col.selectedId === item.id;
-                      const hasChildren =
-                        item.type === 'folder' &&
-                        item.children != null &&
-                        item.children.length > 0;
-                      return (
-                        <ListItem
-                          key={item.id}
-                          label={
-                            <Text type="body" maxLines={1}>
-                              {item.name}
-                            </Text>
-                          }
-                          startContent={
-                            <Icon
-                              icon={
-                                item.type === 'folder'
-                                  ? Folder
-                                  : FileText
-                              }
-                              color={
-                                item.type === 'folder' ? 'accent' : 'secondary'
-                              }
-                              size="sm"
-                            />
-                          }
-                          endContent={
-                            hasChildren ? (
+            {!isPreviewPane &&
+              visibleColumns.map((col, colIndex) => {
+                const trueIndex = columnOffset + colIndex;
+                const showDivider =
+                  trueIndex < columns.length - 1 || selectedFile != null;
+                return (
+                  <Section
+                    key={col.id}
+                    width={240}
+                    padding={2}
+                    variant="transparent"
+                    dividers={showDivider ? ['end'] : undefined}
+                    style={{...scrollable, ...fixedColumn}}
+                    role="region"
+                    aria-label={`Folder column ${trueIndex + 1}`}
+                    tabIndex={0}>
+                    {col.items.length === 0 ? (
+                      <EmptyState
+                        title="Quiet in the crypt"
+                        description="This folder holds no scrolls yet."
+                        isCompact
+                      />
+                    ) : (
+                    <List density="compact" hasDividers={false}>
+                      {col.items.map(item => {
+                        const isSelected = col.selectedId === item.id;
+                        const hasChildren =
+                          item.type === 'folder' &&
+                          item.children != null &&
+                          item.children.length > 0;
+                        return (
+                          <ListItem
+                            key={item.id}
+                            label={
+                              <Text type="body" maxLines={1}>
+                                {item.name}
+                              </Text>
+                            }
+                            startContent={
                               <Icon
-                                icon={ChevronRight}
-                                size="xsm"
-                                color="secondary"
+                                icon={
+                                  item.type === 'folder'
+                                    ? Folder
+                                    : FileText
+                                }
+                                color={
+                                  item.type === 'folder'
+                                    ? 'accent'
+                                    : 'secondary'
+                                }
+                                size="sm"
                               />
-                            ) : undefined
-                          }
-                          onClick={() => handleSelect(trueIndex, item.id)}
-                          isSelected={isSelected}
-                        />
-                      );
-                    })}
-                  </List>
-                  )}
-                </Section>
-              );
-            })}
+                            }
+                            endContent={
+                              hasChildren ? (
+                                <Icon
+                                  icon={ChevronRight}
+                                  size="xsm"
+                                  color="secondary"
+                                />
+                              ) : undefined
+                            }
+                            onClick={() => handleSelect(trueIndex, item.id)}
+                            isSelected={isSelected}
+                          />
+                        );
+                      })}
+                    </List>
+                    )}
+                  </Section>
+                );
+              })}
             {selectedFile && (
               <Section
-                width={320}
-                // 16px, not 24. The sibling column at :519 is padding={2}
+                width={isPreviewPane ? '100%' : 320}
+                // 16px, not 24. The sibling column at :529 is padding={2}
                 // (8px) because it holds a dense compact List, and these two
-                // sit in one HStack (:510) as columns of the same view --
+                // sit in one HStack (:519) as columns of the same view --
                 // 24 beside 8 made the compact column look broken rather
                 // than compact. 16 is the outer-inset value this repo already
                 // uses for exactly this (scaffolds.md new-site recipe).
