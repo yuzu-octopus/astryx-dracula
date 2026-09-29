@@ -394,7 +394,6 @@ export const astryxDraculaTheme: DefinedTheme = defineTheme({
     link: {
       base: {
         color: 'var(--color-text-accent)',
-        textDecoration: 'underline',
         ':hover': { color: 'var(--color-text-highlight)' },
       },
     },
