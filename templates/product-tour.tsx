@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   A[cp=0 @sideNav=(SN > (SNS"Getting started" > (SNI"Introduction"! + SNI"Install")) + (SNS"The brand" > (SNI"Palette" + SNI"Type and shape")) + (SNS"In practice" > (SNI"Components" + SNI"Templates")) + (SNS"Reference" > (SNI"Tokens" + SNI"Migrating")))] > L[h=auto] > (LC[p=8 !scroll] > V[g=8] > (V[g=2] > (H[g=2 a=center] > MNT + Tx[t=supporting]) + Hd"Introduction"[level=1 t=display-2] + Tx"v0.3.1"[t=supporting]) + Tx"Intro"[t=large] + AR + (V[g=8] > (V[g=3] > Hd"What it is"[level=2] + Tx"Body"[t=body] + UL + Cd)*2) + D + (H[j=between] > B.secondary"Previous" + B.secondary"Next")) + (LP[!scroll] > Outline)
+//   A[cp=0 @sideNav=(SN > (SNS"Getting started" > (SNI"Introduction"! + SNI"Install")) + (SNS"The brand" > (SNI"Palette" + SNI"Type and shape")) + (SNS"In practice" > (SNI"Components" + SNI"Templates")) + (SNS"Reference" > (SNI"Tokens" + SNI"Migrating")))] > L[h=auto] > (LC[p=8 !scroll] > V[g=8] > (V[g=2] > (H[g=2 a=center] > MNT + Tx[t=supporting]) + Hd"Introduction"[level=1 t=display-2] + Tx"v0.4.0"[t=supporting]) + Tx"Intro"[t=large] + AR + (V[g=8] > (V[g=3] > Hd"What it is"[level=2] + Tx"Body"[t=body] + UL + Cd)*2) + D + (H[j=between] > B.secondary"Previous" + B.secondary"Next")) + (LP[!scroll] > Outline)
 
 /**
  * Product Tour — a chaptered walkthrough of this theme.
@@ -909,7 +909,7 @@ export default function ProductTour() {
       railHref={SELF_HASH}
       railIcon={<Icon icon={Sparkles} size="sm" />}
       eyebrow="Documentation"
-      badge={() => 'astryx-dracula v0.3.1'}
+      badge={() => 'astryx-dracula v0.4.0'}
       art={chapterId => <ChapterArt chapterId={chapterId} />}
     />
   );
