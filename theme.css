@@ -470,7 +470,6 @@
 
   .astryx-link {
     color: var(--color-text-accent);
-    text-decoration: underline;
   }
 
   .astryx-link:hover {
