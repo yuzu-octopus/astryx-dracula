@@ -83,7 +83,7 @@ if (built === null) {
   fail('theme.css is missing or unreadable — run `bun run theme:build`; the dark-only invariant and every other build-output check below are unverifiable without it');
 }
 
-// Dark-only invariant: every light-dark() tuple the build emits must have
+// Dark-only invariant: every light-dark() tuple OUR layer emits must have
 // identical branches. Nothing else enforces it, so a future pin() that drifts to
 // a real light value would ship a half-light brand silently.
 //
@@ -93,8 +93,8 @@ if (built === null) {
 // gate ships red on day one. A red-by-design gate gets disabled within a week
 // and then protects nothing. Also fails a tuple whose argument count is not 2,
 // since a 1- or 3-tuple silently drops a branch.
-const lightDarkTuples = (src: string): string[][] => {
-  const out: string[][] = [];
+const lightDarkTuples = (src: string): { at: number; parts: string[] }[] => {
+  const out: { at: number; parts: string[] }[] = [];
   for (const m of src.matchAll(/light-dark\(/g)) {
     let i = m.index! + m[0].length;
     let depth = 1;
@@ -107,25 +107,56 @@ const lightDarkTuples = (src: string): string[][] => {
       if (c === ',' && depth === 1) { parts.push(cur); cur = ''; continue; }
       cur += c;
     }
-    out.push(parts.map((p) => p.trim()));
+    out.push({ at: m.index!, parts: parts.map((p) => p.trim()) });
   }
   return out;
+};
+
+// Inner span of every `@layer <name> { … }` block. The depth counter, not the
+// first `}`, decides where a layer ends, so a nested @scope or :root brace
+// cannot truncate it; comments and quoted strings are skipped so a brace inside
+// either cannot desync the count. An unterminated block runs to EOF: scanning
+// too much fails the gate on core's tuples, scanning too little would pass it
+// while checking nothing.
+const layerSpans = (src: string, name: string): Array<[number, number]> => {
+  const spans: Array<[number, number]> = [];
+  for (const m of src.matchAll(new RegExp(`@layer\\s+${name}\\s*\\{`, 'g'))) {
+    const start = m.index + m[0].length;
+    let depth = 1;
+    let i = start;
+    for (; i < src.length; i++) {
+      const c = src[i];
+      if (c === '/' && src[i + 1] === '*') { const e = src.indexOf('*/', i + 2); i = e < 0 ? src.length : e + 1; continue; }
+      if (c === '"' || c === "'") { const e = src.indexOf(c, i + 1); i = e < 0 ? src.length : e; continue; }
+      if (c === '{') depth++;
+      else if (c === '}' && --depth === 0) { i++; break; }
+    }
+    spans.push([start, i]);
+  }
+  return spans;
 };
 // The tuple self-check below is reachable only because the read above now
 // fails loudly. Under `if (built)` it sat inside the very guard that would
 // have triggered it: a present-but-empty or truncated theme.css reached the
 // gate, produced zero tuples, and the `!tuples.length` line meant to catch
 // exactly that was dead code. Do not reintroduce a truthiness guard here.
+// The gate is scoped to `@layer astryx-theme`, not the whole file. Since CLI
+// 0.6.3 `theme build` emits core's entire default palette as a baseline in
+// `@layer astryx-base` ahead of ours, and layer order makes our values win, the
+// brand invariant is a statement about what WE emit — core's baseline is not
+// ours to assert on. If a future CLI stops emitting that baseline, this scoping
+// degrades to checking everything we emit, which is the same rule as before.
 if (built !== null) {
   if (!built.includes('astryx-dracula')) fail('theme.css stale: rebuild with `bun run theme:build`');
-  const tuples = lightDarkTuples(built);
-  if (!tuples.length) fail('no light-dark() tuples found in theme.css — dark-only invariant unverified');
-  for (const t of tuples) {
+  const theme = layerSpans(built, 'astryx-theme');
+  const tuples = lightDarkTuples(built).filter((t) => theme.some(([s, e]) => t.at >= s && t.at < e));
+  if (!tuples.length) fail('no light-dark() tuples found in @layer astryx-theme of theme.css — dark-only invariant unverified');
+  for (const { parts: t } of tuples) {
     if (t.length !== 2) fail(`malformed light-dark(${t.join(', ')}): expected 2 branches, got ${t.length} — a wrong arity silently drops one`);
     else if (t[0].toLowerCase() !== t[1].toLowerCase())
-      fail(`asymmetric light-dark(${t[0]}, ${t[1]}) in theme.css — dark-only brand: both branches must be identical`);
+      fail(`asymmetric light-dark(${t[0]}, ${t[1]}) in @layer astryx-theme of theme.css — dark-only brand: both branches must be identical`);
   }
-  console.log(`PASS light-dark symmetry ${tuples.length} tuples (dark-only)`);
+  console.log(`PASS light-dark symmetry ${tuples.length} tuples (@layer astryx-theme, dark-only)`);
 }
 
 // tokens.css must stay UNLAYERED. Its scrollbar rules, the reduced-motion block

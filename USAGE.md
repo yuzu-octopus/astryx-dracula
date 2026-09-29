@@ -139,6 +139,27 @@ README. Not required for this kit.
 - Wrong colors after a theme edit: rebuild with `bun run theme:build`; `bun run theme:check` confirms staleness (it ignores `astryx-dracula.js` by design — that file is a build artifact, not a freshness signal).
 - Old `:root` `--color-*` overrides winning: delete them.
 
+## Known upstream defects in `@astryxdesign/core@0.6.3`
+
+This kit carries local patches for three defects in core, committed under `patches/` and wired through
+`patchedDependencies`. **Read this before assuming the patches reach you: they do not.** Bun and npm
+honour `patchedDependencies` only from the *root* project of an install. The patches apply when you
+clone or work in this repository; they do **not** propagate to a downstream app that installs
+`astryx-dracula` from npm, because core resolves through your own dependency tree. If you hit one of
+these in your own app, the fix is yours to carry.
+
+| Defect | Symptom | Workaround |
+|---|---|---|
+| `ChatToolCalls` discards its `label` prop | The `label` prop is typed and documented ("Auto-generated from count if omitted") but the expanded group header always renders `"{count} tool calls"`. The prop is destructured away, so it cannot reach the DOM either. | Render your own header above the component, or wrap it. The internal header markup is not exported. |
+| `ToggleButton` drops `className` | A `className` passed to `ToggleButton` never reaches the DOM, even though `BaseProps` documents that it is kept. A sweep of all of core's `dist` found this to be the only component doing it, so it reads as an oversight rather than policy. | Style via `style` or `xstyle`, both of which do forward. Or use `Button` with `aria-pressed`, which honours `className`. |
+| `ChatToolCalls` `defaultIsExpanded` JSDoc is wrong | The type comment claims "true for ≤3 calls, false for >3". The implementation is an unconditional `?? false`. The behaviour is the JSDoc that is wrong, so no action is needed. | None. Documented so nobody codes against the comment. |
+
+If you want the patches, copy `patches/@astryxdesign%2Fcore@0.6.3.patch` from the repository into
+your own root `package.json` under `patchedDependencies`. They are version-locked to `0.6.3`, so
+upgrading core makes them stop applying rather than silently mis-apply — which is the intended
+signal to delete them. Each hunk carries a comment naming the defect, so they are easy to drop once
+upstream ships a fix.
+
 ## Rules
 
 - Never invent hexes. New color need goes through `astryx-theme.ts` + audit, not a one-off.

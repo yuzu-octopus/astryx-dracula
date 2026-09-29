@@ -913,8 +913,8 @@ export default function TableGrouped() {
 
   const detailPanel = useResizable({
     defaultSize: 360,
-    minSizePx: 280,
-    maxSizePx: 500,
+    minSize: 280,
+    maxSize: 500,
   });
 
   const COL_COUNT = columns.length;
