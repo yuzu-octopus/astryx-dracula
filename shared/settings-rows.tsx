@@ -26,28 +26,50 @@ import {
   SquarePen,
   Share2,
 } from 'lucide-react';
-import type {CSSProperties, MouseEvent, ReactNode} from 'react';
+import type {CSSProperties, ReactNode} from 'react';
 import {VStack, HStack} from '@astryxdesign/core/Layout';
 import {Text} from '@astryxdesign/core/Text';
-import {Link} from '@astryxdesign/core/Link';
 import {Button} from '@astryxdesign/core/Button';
 import {Divider} from '@astryxdesign/core/Divider';
 
 // ─── Row components ──────────────────────────────────────────────────────────
 // The row renderers themselves, moved here from both templates. The two copies
-// were byte-identical apart from two things that genuinely differ per
-// template, so those are props rather than forks: `href` (each template anchors
-// its Links to its own route) and `style` (the sidebar pads its rows, the
-// dialog does not). Verified by hash before the move — the row BODIES matched
-// exactly; only these two call-site differences remained.
+// were byte-identical apart from things that genuinely differ per template, so
+// those are props rather than forks: `style` (the sidebar pads its rows, the
+// dialog does not) and `hasDivider` (each template draws its own group
+// boundaries). Verified by hash before the move — the row BODIES matched
+// exactly; only these call-site differences remained.
+//
+// TWO RULES these rows are built around, from USAGE.md "Rules":
+//  - A link is a destination, a button is an action. Every trailing control
+//    here ("Create", "Disconnect", "Edit") changes state in place, so all three
+//    are `Button`s. `secondary`, not `primary`: a row action must not outrank
+//    the panel's own primary, and a filled accent button in a trailing column
+//    is what made these panels read as a form.
+//  - A divider is a section boundary, not a row background. Rows therefore
+//    render one ONLY when the caller marks `hasDivider` at a real group
+//    boundary; without it the row leaves the rhythm to the caller's own
+//    `Stack gap` / row padding rather than adding a rule of its own.
+//
+// `href` is retained as an accepted-but-unused prop on both public rows. It
+// existed only to anchor the Links this file no longer renders, so nothing
+// reads it now; removing it would break every call site that still passes it,
+// and the renderers must stay strictly backward-compatible. It can go once no
+// caller passes it.
 
 export function InfoRowItem({
   label,
   value,
   action,
-  href,
   style,
-}: InfoRow & {href: string; style?: CSSProperties}) {
+  hasDivider = true,
+}: InfoRow & {
+  /** Accepted for call-site compatibility; unused — the action is a Button. */
+  href?: string;
+  style?: CSSProperties;
+  /** Draw a Divider after the row. True only at a group boundary. */
+  hasDivider?: boolean;
+}) {
   return (
     <>
       <HStack hAlign="between" vAlign="start" style={style}>
@@ -60,12 +82,16 @@ export function InfoRowItem({
           </Text>
         </VStack>
         {action && (
-          <Link href={href} style={actionNoWrap}>
-            {action}
-          </Link>
+          <Button
+            label={action}
+            variant="secondary"
+            size="sm"
+            style={actionNoWrap}
+            onClick={() => {}}
+          />
         )}
       </HStack>
-      <Divider />
+      {hasDivider && <Divider />}
     </>
   );
 }
@@ -101,13 +127,11 @@ function ExpandableRowViewing({
   label,
   value,
   onEdit,
-  href,
   style,
 }: {
   label: string;
   value: string;
   onEdit: () => void;
-  href: string;
   style?: CSSProperties;
 }) {
   return (
@@ -120,15 +144,13 @@ function ExpandableRowViewing({
           {value}
         </Text>
       </VStack>
-      <Link
-        href={href}
+      <Button
+        label="Edit"
+        variant="secondary"
+        size="sm"
         style={actionNoWrap}
-        onClick={(e: MouseEvent) => {
-          e.preventDefault();
-          onEdit();
-        }}>
-        Edit
-      </Link>
+        onClick={onEdit}
+      />
     </HStack>
   );
 }
@@ -141,8 +163,8 @@ export function ExpandableRow({
   onEdit,
   onCancel,
   onSave,
-  href,
   style,
+  hasDivider = true,
 }: {
   label: string;
   value: string;
@@ -151,8 +173,11 @@ export function ExpandableRow({
   onEdit: () => void;
   onCancel: () => void;
   onSave: () => void;
-  href: string;
+  /** Accepted for call-site compatibility; unused — see the note above. */
+  href?: string;
   style?: CSSProperties;
+  /** Draw a Divider after the row. True only at a group boundary. */
+  hasDivider?: boolean;
 }) {
   return (
     <>
@@ -169,11 +194,10 @@ export function ExpandableRow({
           label={label}
           value={value}
           onEdit={onEdit}
-          href={href}
           style={style}
         />
       )}
-      <Divider />
+      {hasDivider && <Divider />}
     </>
   );
 }
