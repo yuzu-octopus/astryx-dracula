@@ -113,7 +113,11 @@ export function Dashboard() {
               />
               <DataBar
                 label="Monthly error budget"
-                segments={[{id: 'used', value: 91, color: 'var(--color-data-categorical-yellow)'}]}
+                // No --color-data-categorical-yellow ships. Nearest real one is
+                // the ramp's step 2, #F0F980, 2.5 L from the spec yellow
+                // #F1FA8C; the DataBar contract admits a --color-data-<family>-N
+                // step as well as a categorical.
+                segments={[{id: 'used', value: 91, color: 'var(--color-data-yellow-2)'}]}
                 hasValueLabel
                 formatValue={used => `${used}% used`}
               />
