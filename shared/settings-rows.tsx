@@ -30,6 +30,7 @@ import type {CSSProperties, ReactNode} from 'react';
 import {VStack, HStack} from '@astryxdesign/core/Layout';
 import {Text} from '@astryxdesign/core/Text';
 import {Button} from '@astryxdesign/core/Button';
+import {Link} from '@astryxdesign/core/Link';
 import {Divider} from '@astryxdesign/core/Divider';
 
 // ─── Row components ──────────────────────────────────────────────────────────
@@ -41,11 +42,15 @@ import {Divider} from '@astryxdesign/core/Divider';
 // exactly; only these call-site differences remained.
 //
 // THREE RULES these rows are built around, from USAGE.md "Rules":
-//  - A link is a destination, a button is an action. Every trailing control
-//    here ("Create", "Disconnect", "Edit") changes state in place, so all three
-//    are `Button`s. `secondary`, not `primary`: a row action must not outrank
-//    the panel's own primary, and a filled accent button in a trailing column
-//    is what made these panels read as a form.
+//  - A link is a destination, a button is an action. The trailing control is
+//    whichever it actually is, and the caller says which via `actionHref`:
+//    with it, the row's action column goes somewhere and is a `Link` ("View"
+//    on a list of past records); without it, the control changes state in
+//    place and is a `Button` ("Create", "Disconnect"). Getting this backwards
+//    is the failure this pass exists to remove, so it is a prop rather than a
+//    guess. Buttons are `secondary`, not `primary`: a row action must not
+//    outrank the panel's own primary, and a filled accent button in a
+//    trailing column is what made these panels read as a form.
 //  - A divider is a section boundary, not a row background. Rows therefore
 //    render one ONLY when the caller marks `hasDivider` at a real group
 //    boundary; without it the row leaves the rhythm to the caller's own
@@ -56,21 +61,28 @@ import {Divider} from '@astryxdesign/core/Divider';
 //    the page reads tighter than its neighbours.
 //
 // `href` is retained as an accepted-but-unused prop on both public rows. It
-// existed only to anchor the Links this file no longer renders, so nothing
-// reads it now; removing it would break every call site that still passes it,
-// and the renderers must stay strictly backward-compatible. It can go once no
-// caller passes it.
+// was the anchor for Links this file no longer renders unconditionally, so
+// nothing reads it; deleting it would break every in-flight call site that
+// still passes it. `actionHref` is the live signal for a destination action —
+// deliberately a different name, because `href` is inert and must not be
+// confused with a real one. Both can go once no caller passes them.
 
 export function InfoRowItem({
   label,
   value,
   action,
   style,
+  actionHref,
   hasDivider = true,
 }: InfoRow & {
-  /** Accepted for call-site compatibility; unused — the action is a Button. */
+  /** Accepted for call-site compatibility; unused — see the note above. */
   href?: string;
   style?: CSSProperties;
+  /**
+   * Destination for the trailing control: present means it navigates and
+   * renders a `Link`, absent means it acts in place and renders a `Button`.
+   */
+  actionHref?: string;
   /** Draw a Divider after the row. True only at a group boundary. */
   hasDivider?: boolean;
 }) {
@@ -85,15 +97,20 @@ export function InfoRowItem({
             {value}
           </Text>
         </VStack>
-        {action && (
-          <Button
-            label={action}
-            variant="secondary"
-            size="sm"
-            style={actionNoWrap}
-            onClick={() => {}}
-          />
-        )}
+        {action &&
+          (actionHref ? (
+            <Link href={actionHref} style={actionNoWrap}>
+              {action}
+            </Link>
+          ) : (
+            <Button
+              label={action}
+              variant="secondary"
+              size="sm"
+              style={actionNoWrap}
+              onClick={() => {}}
+            />
+          ))}
       </HStack>
       {hasDivider && <Divider />}
     </>
