@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LP[p=0] > V[g=4] > Tx"Account settings"[t=label] + (UL > LI*8) + D + LI"Professional hosting tools") + (LC[p=6] > V[g=0] > (Tbar > B.ghost + Hd"Personal info"[level=1]) + Hd"Personal info"[level=1] + (V[g=0] > (H[j=between a=start] > (V[g=0] > Tx"Legal name"[weight=semibold] + Tx"Vlad Dracul"[t=supporting]) + Lk"Edit")*7) + (C.muted > V[g=4] > (H[g=3 a=start] > Ic + (V[g=1] > Tx"Why is info hidden?"[weight=semibold] + Tx[t=supporting]))*3))
+//   L > (LP[p=0] > V[g=4] > Tx"Account settings"[t=label] + (UL > LI*8) + D + LI"Professional hosting tools") + (LC[p=6] > V[g=0] > (Tbar > B.ghost + Hd"Personal info"[level=1]) + Hd"Personal info"[level=1] + (V[g=0] > (H[j=between a=start] > (V[g=1] > Tx"Legal name"[weight=semibold] + Tx"Vlad Dracul"[t=supporting]) + B.secondary"Edit")*7) + (C.muted > V[g=4] > (H[g=3 a=start] > Ic + (V[g=1] > Tx"Why is info hidden?"[weight=semibold] + Tx[t=supporting]))*3))
 
 /**
  * Settings Panels — account sections with a nav panel and spaced rows.  Frame: Layout nav panel (fill) | content column of section views. One (Frame/responsive/container: see XLE header above.)
@@ -76,18 +76,26 @@ const SECTION_TITLES: Record<string, string> = {
   'Professional hosting tools': 'Hosting tools',
 };
 
-// "View" on these rows is a destination (it opens the list); "Add" acts in
-// place. The row renders whichever its action asks for, hence the call-site
-// test rather than a flag on every row object.
-
 const TAX_ROWS: InfoRow[] = [
   {label: 'Tax scrolls', value: 'Not provided', action: 'Add'},
-  {label: 'Past scrolls', value: 'No scrolls yet', action: 'View'},
+  {
+    label: 'Past scrolls',
+    value: 'No scrolls yet',
+    action: 'View',
+    actionKind: 'destination',
+    href: SELF_HASH,
+  },
 ];
 
 const PAYOUT_ROWS: InfoRow[] = [
   {label: 'Payout crypt', value: 'Not set up', action: 'Add'},
-  {label: 'Past payouts', value: 'No tributes yet', action: 'View'},
+  {
+    label: 'Past payouts',
+    value: 'No tributes yet',
+    action: 'View',
+    actionKind: 'destination',
+    href: SELF_HASH,
+  },
 ];
 
 
@@ -793,7 +801,6 @@ export default function SettingsSidebar() {
                     <InfoRowItem
                           key={row.label}
                           {...row}
-                          actionHref={row.action === 'View' ? SELF_HASH : undefined}
                           hasDivider={false}
                           style={rowPadding}
                         />
@@ -811,7 +818,6 @@ export default function SettingsSidebar() {
                     <InfoRowItem
                           key={row.label}
                           {...row}
-                          actionHref={row.action === 'View' ? SELF_HASH : undefined}
                           hasDivider={false}
                           style={rowPadding}
                         />

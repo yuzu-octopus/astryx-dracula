@@ -46,6 +46,15 @@ export interface InfoRow {
   label: string;
   value: string;
   action: string;
+  /**
+   * What `action` actually is. 'action' (the default) changes state in place
+   * and renders a Button; 'destination' navigates and renders a Link. Stated
+   * in the data rather than inferred from `href` or read off the label, so
+   * renaming "View" cannot silently turn a destination back into an action.
+   */
+  actionKind?: 'action' | 'destination';
+  /** Where a 'destination' action goes. Read only when actionKind is 'destination'. */
+  href?: string;
 }
 
 export const LOGIN_ROWS: InfoRow[] = [
