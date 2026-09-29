@@ -8,7 +8,8 @@
   },
   "description": "Pure Dracula brand theme for Astryx React sites. Dark-only tokens, syntax highlighting, and chart colors with prebuilt CSS.",
   "devDependencies": {
-    "@astryxdesign/cli": "^0.3.0",
+    "@astryxdesign/cli": "0.6.3",
+    "@astryxdesign/core": "0.6.3",
     "@types/bun": "^1.4.2",
     "@types/node": "^26.5.1",
     "@types/react": "^19.3.0",
@@ -42,8 +43,8 @@
     "./shared/sparkline": "./shared/sparkline.tsx",
     "./shared/sso-icons": "./shared/sso-icons.tsx",
     ".": {
-      "default": "./astryx-dracula.js",
-      "types": "./astryx-dracula.d.ts"
+      "types": "./astryx-dracula.d.ts",
+      "default": "./astryx-dracula.js"
     },
     "./astryx.integration.mjs": "./astryx.integration.mjs",
     "./package.json": "./package.json",
@@ -60,6 +61,7 @@
     "astryx-dracula.js",
     "astryx-dracula.variants.d.ts",
     "fonts/",
+    "icons.mjs",
     "icons.tsx",
     "shared/",
     "theme.css",
@@ -80,7 +82,7 @@
   "license": "MIT",
   "name": "astryx-dracula",
   "peerDependencies": {
-    "@astryxdesign/core": "^0.3.0",
+    "@astryxdesign/core": "^0.6.3",
     "lucide-react": "^1.45.0",
     "react": ">=19.0.0",
     "react-dom": ">=19.0.0"
@@ -94,9 +96,12 @@
     "build": "tsc --noEmit && vite build",
     "dev": "vite",
     "preview": "vite preview",
-    "theme:build": "bunx astryx theme build astryx-theme.ts -o theme.css",
-    "theme:check": "bunx astryx theme build astryx-theme.ts -o theme.css --check --json | bun -e 'const r = JSON.parse(await Bun.stdin.text()); if (r.type !== \"theme.build.check\") { console.error(\"theme:check: unexpected CLI response \" + JSON.stringify(r).slice(0, 200)); process.exit(1); } const stale = r.data.stale.filter(s => s.path !== \"astryx-dracula.js\"); for (const s of stale) console.error(\"stale: \" + s.path + \" (\" + s.reason + \")\"); if (stale.length) process.exit(1); const entry = await import(\"./astryx-dracula.js\"); if (!entry.astryxDraculaTheme || !entry.draculaIconRegistry) { console.error(\"astryx-dracula.js is missing its theme or icon registry export\"); process.exit(1); } console.log(\"theme outputs up to date; astryx-dracula.js (hand-maintained) loads and exports\");'",
-    "prepublishOnly": "bun run theme:check && bun run audit && tsc --noEmit && bunx react-doctor@latest --score"
+    "theme:build": "bun run icons:build && bunx astryx theme build astryx-theme.ts -o theme.css --icons-specifier ./icons.mjs",
+    "icons:build": "bun build icons.tsx --outfile icons.mjs --format esm --external react --external lucide-react",
+    "theme:check": "bun run icons:check && bunx astryx theme build astryx-theme.ts -o theme.css --icons-specifier ./icons.mjs --check --json | bun -e 'const r = JSON.parse(await Bun.stdin.text()); if (r.type !== \"theme.build.check\") { console.error(\"theme:check: unexpected CLI response \" + JSON.stringify(r).slice(0, 200)); process.exit(1); } const stale = r.data.stale.filter(s => s.path !== \"astryx-dracula.js\"); for (const s of stale) console.error(\"stale: \" + s.path + \" (\" + s.reason + \")\"); if (stale.length) process.exit(1); const entry = await import(\"./astryx-dracula.js\"); if (!entry.astryxDraculaTheme || !entry.draculaIconRegistry) { console.error(\"astryx-dracula.js is missing its theme or icon registry export\"); process.exit(1); } console.log(\"theme outputs up to date; astryx-dracula.js (hand-maintained) loads and exports\");' && bun run entry:check",
+    "icons:check": "bun build icons.tsx --outfile .tmp-icons.mjs --format esm --external react --external lucide-react; s=$?; cmp -s .tmp-icons.mjs icons.mjs; c=$?; rm -f .tmp-icons.mjs; [ $s -eq 0 ] && [ $c -eq 0 ] || { echo 'stale: icons.mjs (rerun bun run icons:build)'; exit 1; }",
+    "entry:check": "node -e \"const{pathToFileURL}=require('url');const{resolve}=require('path');import(pathToFileURL(resolve('astryx-dracula.js')).href).then(m=>{if(!m.astryxDraculaTheme||!m.draculaIconRegistry){console.error('astryx-dracula.js is missing its theme or icon registry export');process.exit(1)}console.log('astryx-dracula.js loads under plain Node ESM')}).catch(e=>{console.error('astryx-dracula.js is not importable by Node ESM: '+e.message);process.exit(1)})\"",
+    "prepublishOnly": "bun run theme:check && bun run icons:check && bun run entry:check && bun run audit && tsc --noEmit && bunx react-doctor@latest --score"
   },
   "sideEffects": [
     "**/*.css"
@@ -106,5 +111,8 @@
     "@astryxdesign/cli"
   ],
   "type": "module",
-  "version": "0.3.1"
+  "version": "0.3.1",
+  "patchedDependencies": {
+    "@astryxdesign/core@0.6.3": "patches/@astryxdesign%2Fcore@0.6.3.patch"
+  }
 }

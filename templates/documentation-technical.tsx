@@ -30,7 +30,7 @@ import {outlinePanel} from 'astryx-dracula/shared/chaptered-doc-config';
 // Same prompt in the copy action and the visible body: one string, so the
 // two can never drift.
 const SETUP_PROMPT =
-  'Help me get set up with Astryx Dracula. Based on my project, do the following: 1. Install @astryxdesign/core and the StyleX compiler. 2. Wrap my app in ThemeProvider. 3. Replace one existing component with an Astryx equivalent. After setup, suggest relevant next steps based on my project.';
+  'Help me get set up with Astryx Dracula. Based on my project, do the following: 1. Install @astryxdesign/core and the StyleX compiler. 2. Wrap my app in the Theme component. 3. Replace one existing component with an Astryx equivalent. After setup, suggest relevant next steps based on my project.';
 
 // Copies the setup prompt in the shape each tool wants to receive it. The
 // menu cannot navigate anywhere from a static template, so the action says
@@ -138,8 +138,8 @@ export default function DocumentationTechnical() {
                 <Text type="body" color="secondary">
                   Help me get set up with Astryx Dracula. Based on my project,
                   do the following: 1. Install @astryxdesign/core and the
-                  StyleX compiler. 2. Wrap my app in ThemeProvider. 3. Replace
-                  one existing component with an Astryx equivalent.
+                  StyleX compiler. 2. Wrap my app in the Theme component. 3.
+                  Replace one existing component with an Astryx equivalent.
                 </Text>
               </VStack>
             </Card>
@@ -225,17 +225,19 @@ export default function App() {
               </Heading>
               <Text type="body">
                 Astryx ships with a default theme that works out of the box. To
-                customize colors, typography, and spacing, wrap your app in a
-                theme provider.
+                customize colors, typography, and spacing, wrap your app in the
+                Theme component.
               </Text>
               <CodeBlock
-                code={`import { ThemeProvider } from '@astryxdesign/core/Theme';
+                code={`import { type ReactNode } from 'react';
+import { Theme } from '@astryxdesign/core/theme';
+import { astryxDraculaTheme } from 'astryx-dracula';
 
-export default function App({ children }) {
+export default function App({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider theme="default">
+    <Theme theme={astryxDraculaTheme} mode="dark">
       {children}
-    </ThemeProvider>
+    </Theme>
   );
 }`}
                 language="tsx"

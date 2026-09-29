@@ -1,0 +1,87 @@
+diff --git a/dist/Chat/ChatToolCalls.d.ts b/dist/Chat/ChatToolCalls.d.ts
+index ce0dbdac1f84772a78225e2863145b7fc25a204e..7272ebe456a15b88520e34af4a7416d415dd3a02 100644
+--- a/dist/Chat/ChatToolCalls.d.ts
++++ b/dist/Chat/ChatToolCalls.d.ts
+@@ -54,7 +54,11 @@ export interface ChatToolCallsProps extends BaseProps<HTMLDivElement> {
+     label?: string;
+     /** Whether the group is expanded. Uncontrolled by default. */
+     isExpanded?: boolean;
+-    /** Default expanded state. @default true for ≤3 calls, false for >3. */
++    // Upstream core@0.6.3 defect: the implementation is an unconditional
++    // `defaultIsExpanded ?? false` with no count branch, so this note described
++    // behaviour that never shipped. Temporary local patch — delete once core's
++    // doc comment matches its code.
++    /** Default expanded state. @default false. */
+     defaultIsExpanded?: boolean;
+     /** Callback when expanded state changes. */
+     onExpandedChange?: (isExpanded: boolean) => void;
+diff --git a/dist/Chat/ChatToolCalls.js b/dist/Chat/ChatToolCalls.js
+index 3c457d112a9c156ed810f407da80b70d91d24d14..65a6332770c189a00a05ab02b6599b5372ce42f5 100644
+--- a/dist/Chat/ChatToolCalls.js
++++ b/dist/Chat/ChatToolCalls.js
+@@ -264,7 +264,10 @@ export function ChatToolCalls(props) {
+   const t = useTranslator();
+   const {
+     calls,
+-    label: _customLabel,
++    // Upstream core@0.6.3 defect: `label` was destructured to `_customLabel`
++    // and never read, so a documented, promised prop was silently discarded.
++    // Temporary local patch — delete once core honours `label` upstream.
++    label: customLabel,
+     isExpanded: controlledExpanded,
+     defaultIsExpanded,
+     onExpandedChange,
+@@ -339,7 +342,10 @@ export function ChatToolCalls(props) {
+           ...{
+             className: "x141an7d x1ltkj2j x9ynric x1e4wzip xv1l7n4"
+           },
+-          children: t('@astryx.chatToolCalls.groupLabel', {
++          // Same defect as the destructure above: the caller's `label` reached
++          // neither the DOM nor this header. Use it when supplied, otherwise
++          // keep the locale fallback with its {count} interpolation.
++          children: customLabel ?? t('@astryx.chatToolCalls.groupLabel', {
+             count: calls.length
+           })
+         })]
+diff --git a/dist/ToggleButton/ToggleButton.d.ts b/dist/ToggleButton/ToggleButton.d.ts
+index 8b0d68265d0d413a750dd1534704a943ed8c6fe6..e54e6786a0927600c353bc220cd907c84bd61dcc 100644
+--- a/dist/ToggleButton/ToggleButton.d.ts
++++ b/dist/ToggleButton/ToggleButton.d.ts
+@@ -149,7 +149,10 @@ export interface ToggleButtonProps extends BaseProps<HTMLButtonElement> {
+  * />
+  * ```
+  */
+-export declare function ToggleButton({ ref, label, isPressed: isPressedProp, onPressedChange: onPressedChangeProp, pressedChangeAction, size: sizeProp, elevation, isDisabled: isDisabledProp, isLoading, icon, isIconOnly, pressedIcon, children, tooltip, value, xstyle, className: _className, style, ...props }: ToggleButtonProps): ReactNode;
++// Upstream core@0.6.3 defect: the declared signature still names the dropped
++// `className: _className` from the same dead destructure fixed in
++// ToggleButton.js. Temporary local patch — delete alongside that fix.
++export declare function ToggleButton({ ref, label, isPressed: isPressedProp, onPressedChange: onPressedChangeProp, pressedChangeAction, size: sizeProp, elevation, isDisabled: isDisabledProp, isLoading, icon, isIconOnly, pressedIcon, children, tooltip, value, xstyle, className, style, ...props }: ToggleButtonProps): ReactNode;
+ export declare namespace ToggleButton {
+     var displayName: string;
+ }
+diff --git a/dist/ToggleButton/ToggleButton.js b/dist/ToggleButton/ToggleButton.js
+index 13895d70ca12e091ad44840cd4a6cf0b8f66463e..2491936cf86f25c579f57074d0ed8299cc7577a3 100644
+--- a/dist/ToggleButton/ToggleButton.js
++++ b/dist/ToggleButton/ToggleButton.js
+@@ -92,7 +92,10 @@ export function ToggleButton({
+   tooltip,
+   value,
+   xstyle,
+-  className: _className,
++  // Upstream core@0.6.3 defect: `className` was destructured to `_className`
++  // and dropped, so the BaseProps-documented className never reached the inner
++  // Button. Temporary local patch — delete once core forwards it.
++  className,
+   style,
+   ...props
+ }) {
+@@ -189,6 +192,9 @@ export function ToggleButton({
+       elevation
+     }),
+     xstyle: [isPressed ? pressedStyles.background : undefined, xstyle],
++    // Forwarded per the fix above; Button merges it into its own mergeProps
++    // exactly as ToggleButton's callers expect.
++    className: className,
+     style: style,
+     onClick: handleClick,
+     clickAction: clickAction,
