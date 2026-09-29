@@ -87,26 +87,27 @@ export default function LoginPage() {
               />
 
               <VStack gap={1}>
-              <TextInput
-                label="Password"
-                isLabelHidden
-                value={password}
-                onChange={v => {
-                  setPassword(v);
-                  setError(null);
-                }}
-                placeholder={AUTH_PASSWORD_PLACEHOLDER}
-                type="password"
-                {...inputAutoComplete('current-password')}
-                size="lg"
-                onEnter={handleSignIn}
-                status={error ? {type: 'error', message: error} : undefined}
-              />
+                <TextInput
+                  label="Password"
+                  isLabelHidden
+                  value={password}
+                  onChange={v => {
+                    setPassword(v);
+                    setError(null);
+                  }}
+                  placeholder={AUTH_PASSWORD_PLACEHOLDER}
+                  type="password"
+                  {...inputAutoComplete('current-password')}
+                  size="lg"
+                  onEnter={handleSignIn}
+                  status={error ? {type: 'error', message: error} : undefined}
+                />
                 {error && (
                   <VStack hAlign="end">
                     <Link
                       href="#/templates/login"
-                      color="secondary">
+                      color="secondary"
+                      isStandalone>
                       {AUTH_FORGOT_PASSWORD}
                     </Link>
                   </VStack>
@@ -122,11 +123,13 @@ export default function LoginPage() {
               onClick={handleSignIn}
             />
 
-            {/* Sign up link */}
+            {/* Prose links. A link inside a sentence needs a persistent
+                underline — colour alone is not a cue (WCAG 1.4.1 / F73),
+                and the kit underlines on hover only. */}
             <VStack hAlign="center">
               <Text type="supporting" color="secondary">
                 {AUTH_SIGNUP_PROMPT}{' '}
-                <Link href="#/templates/login" type="supporting">
+                <Link href="#/templates/login" type="supporting" hasUnderline>
                   {AUTH_SIGNUP_LINK}
                 </Link>
               </Text>
@@ -138,11 +141,11 @@ export default function LoginPage() {
         <VStack hAlign="center" width="100%">
           <Text type="supporting" color="secondary" justify="center">
             {AUTH_TERMS_PREFIX}{' '}
-            <Link href="#/templates/login" type="supporting">
+            <Link href="#/templates/login" type="supporting" hasUnderline>
               {AUTH_TERMS_SERVICE}
             </Link>{' '}
             and{' '}
-            <Link href="#/templates/login" type="supporting">
+            <Link href="#/templates/login" type="supporting" hasUnderline>
               {AUTH_TERMS_PRIVACY}
             </Link>
             .

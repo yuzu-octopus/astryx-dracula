@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   Ctr > C[p=4 mw=400] > V[g=4] > ((V[g=1 a=center] > Hd"Welcome back to the night"[level=1] + Tx"Whisper your details to enter the night"[t=body]) + TI"Work email"[t=email] + Lk"Having trouble signing in?" + B.primary"Continue" + D"Or continue with" + B.secondary"Continue with SSO" + (V[a=center] > Tx"New to the castle?"[t=supporting] + Lk"Request access") + (V[g=2 a=center] > Av + Hd"Sign in with Google Workspace"[level=1] + Tx"You will be redirected back after signing in."[t=body]) + (C[p=0] > S[p=4 muted] > (H[g=2 a=center] > Ic + (V[g=0] > Tx"Google Workspace"[t=label] + Tx"vlad@castle.ro"[t=supporting]))) + (V[g=3] > B.primary"Continue with Google Workspace" + B.ghost"Use a different email") + (V[g=1 a=center] > Hd"Welcome back to the night"[level=1] + Tx"vlad@castle.ro"[t=body]) + (V[g=4] > (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?") + B.primary"Enter the night" + B.ghost"Use a different email") + (V[a=center] > Tx"By clicking continue, you agree to our Terms of service and Privacy policy"[t=supporting]))
+//   Ctr > C[p=4 mw=400] > V[g=4] > ((V[g=1 a=center] > Hd"Welcome back to the night"[level=1] + Tx"Whisper your details to enter the night"[t=body]) + (V[g=1] > TI"Work email"[t=email] + Lk"Having trouble signing in?") + B.primary"Continue" + D"Or continue with" + B.secondary"Continue with SSO" + (V[a=center] > Tx"New to the castle?"[t=supporting] + Lk"Request access") + (V[g=2 a=center] > Av + Hd"Sign in with Google Workspace"[level=1] + Tx"You will be redirected back after signing in."[t=body]) + (C[p=0] > S[p=4 muted] > (H[g=2 a=center] > Ic + (V[g=0] > Tx"Google Workspace"[t=label] + Tx"vlad@castle.ro"[t=supporting]))) + (V[g=3] > B.primary"Continue with Google Workspace" + B.ghost"Use a different email") + (V[g=1 a=center] > Hd"Welcome back to the night"[level=1] + Tx"vlad@castle.ro"[t=body]) + (V[g=4] > (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?") + (V[g=3] > B.primary"Enter the night" + B.ghost"Use a different email")) + (V[a=center] > Tx"By clicking continue, you agree to our Terms of service and Privacy policy"[t=supporting]))
 
 //   Step-conditional h1: the email and SSO-confirm steps each render their own
 //   h1 (email entry vs provider confirm); the password fallback reuses the
@@ -135,29 +135,35 @@ export default function LoginSso() {
                 </Text>
               </VStack>
 
-              <TextInput
-                label="Work email"
-                isLabelHidden
-                type="email"
-                {...inputAutoComplete('email')}
-                placeholder={AUTH_EMAIL_PLACEHOLDER}
-                value={email}
-                onChange={(v: string) => {
-                  setEmail(v);
-                  setError(null);
-                }}
-                size="lg"
-                onKeyDown={(e: React.KeyboardEvent) => {
-                  if (e.key === 'Enter') {
-                    handleContinue();
-                  }
-                }}
-                status={error ? {type: 'error', message: error} : undefined}
-              />
+              {/* The helper link belongs to the field above it, so the two
+                  share a gap={1} group — as the password step below groups
+                  its own. As siblings in the outer gap={4} flow it read as
+                  one more control in the button column, 16px from each. */}
+              <VStack gap={1}>
+                <TextInput
+                  label="Work email"
+                  isLabelHidden
+                  type="email"
+                  {...inputAutoComplete('email')}
+                  placeholder={AUTH_EMAIL_PLACEHOLDER}
+                  value={email}
+                  onChange={(v: string) => {
+                    setEmail(v);
+                    setError(null);
+                  }}
+                  size="lg"
+                  onKeyDown={(e: React.KeyboardEvent) => {
+                    if (e.key === 'Enter') {
+                      handleContinue();
+                    }
+                  }}
+                  status={error ? {type: 'error', message: error} : undefined}
+                />
 
-              <Link href="#/templates/login-sso">
-                Having trouble signing in?
-              </Link>
+                <Link href="#/templates/login-sso" isStandalone>
+                  Having trouble signing in?
+                </Link>
+              </VStack>
 
               <Button
                 label="Continue"
@@ -175,10 +181,13 @@ export default function LoginSso() {
                 onClick={handleContinue}
               />
 
+              {/* Prose link: colour alone is not a cue inside a sentence
+                  (WCAG 1.4.1 / F73), so it asks for the underline the kit
+                  only gives on hover. */}
               <VStack hAlign="center">
                 <Text type="supporting" color="secondary">
                   {AUTH_SIGNUP_PROMPT}{' '}
-                  <Link href="#/templates/login-sso" type="supporting">
+                  <Link href="#/templates/login-sso" type="supporting" hasUnderline>
                     Request access
                   </Link>
                 </Text>
@@ -271,26 +280,33 @@ export default function LoginSso() {
                   />
                   {error && (
                     <VStack hAlign="end">
-                      <Link href="#/templates/login-sso">
+                      <Link href="#/templates/login-sso" isStandalone>
                         {AUTH_FORGOT_PASSWORD}
                       </Link>
                     </VStack>
                   )}
                 </VStack>
 
-                <Button
-                  label={AUTH_PRIMARY_CTA}
-                  variant="primary"
-                  size="lg"
-                  isLoading={isLoading}
-                  onClick={handleSignIn}
-                />
-                <Button
-                  label="Use a different email"
-                  variant="ghost"
-                  size="lg"
-                  onClick={handleBack}
-                />
+                {/* gap={3} is the family rhythm for a button pair: the
+                    primary/ghost pair in the confirm step above, the social
+                    pairs in login-card and login-split. At the outer gap={4}
+                    the same two buttons sat 4px further apart in this step
+                    than in the step above it. */}
+                <VStack gap={3}>
+                  <Button
+                    label={AUTH_PRIMARY_CTA}
+                    variant="primary"
+                    size="lg"
+                    isLoading={isLoading}
+                    onClick={handleSignIn}
+                  />
+                  <Button
+                    label="Use a different email"
+                    variant="ghost"
+                    size="lg"
+                    onClick={handleBack}
+                  />
+                </VStack>
               </VStack>
             </>
           )}
@@ -299,14 +315,14 @@ export default function LoginSso() {
           <VStack hAlign="center" width="100%">
             <Text type="supporting" color="secondary" justify="center">
               {AUTH_TERMS_PREFIX}{' '}
-              <Link href="#/templates/login-sso" type="supporting">
+              <Link href="#/templates/login-sso" type="supporting" hasUnderline>
                 {AUTH_TERMS_SERVICE}
               </Link>{' '}
               and{' '}
-              <Link href="#/templates/login-sso" type="supporting">
+              <Link href="#/templates/login-sso" type="supporting" hasUnderline>
                 {AUTH_TERMS_PRIVACY}
               </Link>
-              .
+            .
             </Text>
           </VStack>
         </VStack>

@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   Ctr > V[g=4] > (Ctr.horizontal > C[p=0] > G[c={min:240} g=8 a=stretch] > (S[p=0] > V[g=4] > (H[g=2 a=center] > Ic + Tx"Castle Dracula"[t=body]) + (V[g=4] > (V[g=1] > Hd"Welcome back to the night"[level=1] + Tx"Sign in to your crypt"[t=body]) + (V[g=2] > TI"Email"[t=email] + (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?")) + B.primary"Enter the night" + D"Or continue with" + (G[c={min:200} g=3] > B.secondary"Login with Apple" + B.secondary"Login with Google")) + Tx"New to the castle?"[t=supporting]) + (C[p=0] > AR)) + (V[a=center] > Tx"By clicking continue, you agree to our Terms of service and Privacy policy"[t=supporting])
+//   Ctr > V[g=4] > (Ctr.horizontal > C[p=0] > G[c={min:240} g=8 a=stretch] > (S[p=0] > V[g=4] > (H[g=2 a=center] > Ic + Tx"Castle Dracula"[t=body]) + (V[g=4] > (V[g=1] > Hd"Welcome back to the night"[level=1] + Tx"Sign in to your crypt"[t=body]) + (V[g=2] > TI"Email"[t=email] + (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?")) + B.primary"Enter the night" + D"Or continue with" + (G[c={min:200} g=3] > B.secondary"Login with Apple" + B.secondary"Login with Google")) + (V[a=center] > Tx"New to the castle?"[t=supporting] + Lk"Sign up")) + (C[p=0] > AR)) + (V[a=center] > Tx"By clicking continue, you agree to our Terms of service and Privacy policy"[t=supporting])
 
 import {useState, useTransition, type CSSProperties} from 'react';
 import {inputAutoComplete} from 'astryx-dracula/shared/auth-chrome-config';
@@ -191,7 +191,9 @@ export default function LoginSplit() {
                               />
                               {error && (
                                 <VStack hAlign="end">
-                                  <Link href="#/templates/login-split">
+                                  <Link
+                                    href="#/templates/login-split"
+                                    isStandalone>
                                     {AUTH_FORGOT_PASSWORD}
                                   </Link>
                                 </VStack>
@@ -234,13 +236,20 @@ export default function LoginSplit() {
                     </Center>
                   </StackItem>
 
+                  {/* Prose link: colour alone is not a cue inside a sentence
+                      (WCAG 1.4.1 / F73), so it asks for the underline the kit
+                      only gives on hover. The VStack centres the line, as the
+                      other three login templates do — it was sitting flush
+                      left under a left-aligned form. */}
                   {!isSuccess && (
-                    <Text type="supporting" color="secondary">
-                      {AUTH_SIGNUP_PROMPT}{' '}
-                      <Link href="#/templates/login-split" type="supporting">
-                        {AUTH_SIGNUP_LINK}
-                      </Link>
-                    </Text>
+                    <VStack hAlign="center">
+                      <Text type="supporting" color="secondary">
+                        {AUTH_SIGNUP_PROMPT}{' '}
+                        <Link href="#/templates/login-split" type="supporting" hasUnderline>
+                          {AUTH_SIGNUP_LINK}
+                        </Link>
+                      </Text>
+                    </VStack>
                   )}
                 </VStack>
               </Section>
@@ -259,14 +268,14 @@ export default function LoginSplit() {
           </Card>
         </Center>
 
-        <VStack hAlign="center">
-          <Text type="supporting" color="secondary">
+        <VStack hAlign="center" width="100%">
+          <Text type="supporting" color="secondary" justify="center">
             {AUTH_TERMS_PREFIX}{' '}
-            <Link href="#/templates/login-split" type="supporting">
+            <Link href="#/templates/login-split" type="supporting" hasUnderline>
               {AUTH_TERMS_SERVICE}
             </Link>{' '}
             and{' '}
-            <Link href="#/templates/login-split" type="supporting">
+            <Link href="#/templates/login-split" type="supporting" hasUnderline>
               {AUTH_TERMS_PRIVACY}
             </Link>
             .

@@ -105,7 +105,8 @@ export default function LoginCard() {
                   <VStack hAlign="end">
                     <Link
                       href="#/templates/login-card"
-                      color="secondary">
+                      color="secondary"
+                      isStandalone>
                       {AUTH_FORGOT_PASSWORD}
                     </Link>
                   </VStack>
@@ -141,11 +142,13 @@ export default function LoginCard() {
               />
             </VStack>
 
-            {/* Sign up link */}
+            {/* Prose links. A link inside a sentence needs a persistent
+                underline — colour alone is not a cue (WCAG 1.4.1 / F73),
+                and the kit underlines on hover only. */}
             <VStack hAlign="center">
               <Text type="supporting" color="secondary">
                 {AUTH_SIGNUP_PROMPT}{' '}
-                <Link href="#/templates/login-card" type="supporting">
+                <Link href="#/templates/login-card" type="supporting" hasUnderline>
                   {AUTH_SIGNUP_LINK}
                 </Link>
               </Text>
@@ -157,11 +160,11 @@ export default function LoginCard() {
         <VStack hAlign="center" width="100%">
           <Text type="supporting" color="secondary" justify="center">
             {AUTH_TERMS_PREFIX}{' '}
-            <Link href="#/templates/login-card" type="supporting">
+            <Link href="#/templates/login-card" type="supporting" hasUnderline>
               {AUTH_TERMS_SERVICE}
             </Link>{' '}
             and{' '}
-            <Link href="#/templates/login-card" type="supporting">
+            <Link href="#/templates/login-card" type="supporting" hasUnderline>
               {AUTH_TERMS_PRIVACY}
             </Link>
             .
