@@ -389,6 +389,124 @@ for (const f of ['tokens.css', 'astryx-theme.ts', ...lintFiles]) {
   }
 }
 
+// ── Link, underline and divider discipline ─────────────────────────────────
+//
+// Three rules a review does not hold, because each is a plausible-looking LOCAL
+// fix for a problem that is actually a token problem: hand-rolling
+// textDecoration, painting a Button as a Link, reaching for a Divider where a
+// Stack gap belongs. They are one block because they share a walk.
+
+// Comments are blanked rather than deleted, so every newline survives and a
+// match still reports the line it is really on. This is the !important gate's
+// exemption applied to a second rule: each of these rules has to be statable
+// in prose somewhere, and a gate that fails on the documentation of the rule it
+// enforces gets disabled on day one and then protects nothing.
+const stripComments = (src: string): string => {
+  let out = '';
+  let prev = ''; // last non-whitespace character emitted
+  for (let i = 0; i < src.length; i++) {
+    const c = src[i];
+    // `//` after a `:` is a URL scheme, not a comment — the one place a JSX
+    // attribute or a string legitimately carries two slashes.
+    if (c === '/' && src[i + 1] === '/' && prev !== ':') {
+      while (i < src.length && src[i] !== '\n') { out += ' '; i++; }
+      i--;
+      continue;
+    }
+    if (c === '/' && src[i + 1] === '*') {
+      for (i += 2; i < src.length && !(src[i] === '*' && src[i + 1] === '/'); i++) out += src[i] === '\n' ? '\n' : ' ';
+      out += '  ';
+      i++;
+      continue;
+    }
+    if (c !== ' ' && c !== '\t') prev = c;
+    out += c;
+  }
+  return out;
+};
+
+// 1. NO HAND-ROLLED UNDERLINE. astryx-theme.ts overrode `link.base` with
+// `textDecoration: 'underline'`, which shipped as `.astryx-link { text-decoration:
+// underline }`: every link in all 45 templates became permanently underlined and
+// core's documented `hasUnderline` prop went inert — silently, with every other
+// gate green. The property is the symptom and the theme override was the cause,
+// so this sweeps the SAME file set as the !important gate above, astryx-theme.ts
+// and tokens.css included, not only template source. Banned outright, value and
+// all: the prop is `hasUnderline` in running prose, and nothing in navigation.
+for (const f of ['tokens.css', 'astryx-theme.ts', ...lintFiles]) {
+  const code = stripComments(await Bun.file(f).text());
+  for (const m of code.matchAll(/text-?decoration/gi)) {
+    fail(`${f}:${code.slice(0, m.index).split('\n').length} hand-rolled text-decoration — core's Link already carries it; pass hasUnderline in prose and nothing in navigation`);
+  }
+}
+
+// 2. NO <Link> RENDERING AN ACTION. A link is a destination; a button is an
+// action. A Button painted as a Link announces "link" to a screen reader for
+// something that acts, and hands it the navigation affordance.
+//
+// An EXPLICIT VERB LIST matched on the label's FIRST WORD, not a pattern over
+// all the text. "Billing address" and "History of edits" are navigation labels
+// no verb reaches, and a gate that cries wolf on correct sites is worse than no
+// gate — the same tradeoff the !important and chart gates state about their own
+// scope. What it costs is stated at ACTION_LINK_ALLOW: a nav label that really
+// does open with an imperative verb needs one entry there. Extend the list by
+// adding a verb; do not generalise it.
+const ACTION_VERBS = ['Create', 'Delete', 'Disconnect', 'Log out', 'Deactivate', 'Request', 'Remove', 'Save', 'Submit', 'Edit', 'Add', 'Cancel', 'Confirm'];
+const actionVerbs = ACTION_VERBS.map((v) => [v, new RegExp(`^${v}\\b`, 'i')] as const);
+
+// The escape hatch, and the ONLY one: one human ruling per site, keyed
+// `file:line` — the same string the message prints, so a site is found and
+// added with one grep. It exempts BOTH tiers, which matters because a
+// navigation label like "Edit history" is a true positive on the verb and a
+// false positive on the rule, and "remove the verb" is not an answer to that.
+// A line that moves falls out of the table, which is the intent and not a bug:
+// the sentence around it changed, so somebody should read it again.
+const ACTION_LINK_ALLOW: Record<string, true> = {
+  // Prose, not a control: it closes AUTH_SIGNUP_PROMPT inside a sentence, and
+  // asks for hasUnderline because colour alone is not a cue inline (1.4.1/F73).
+  'templates/login-sso.tsx:190': true,
+};
+
+for (const f of lintFiles.sort()) {
+  const src = await Bun.file(f).text();
+  for (const m of src.matchAll(/<Link(?=[\s>])/g)) {
+    const end = findTagEnd(src, m.index! + '<Link'.length);
+    if (end === -1) continue;
+    const at = `${f}:${src.slice(0, m.index).split('\n').length}`;
+    // Literal text only. A label behind {…} is unknown to a source walk, and
+    // guessing at it is how a gate starts failing on sites it cannot read.
+    const label = (src.slice(end + 1).match(/^\s*([^<{][^<]{0,60})/)?.[1] ?? '').replace(/\s+/g, ' ').trim();
+    const verb = actionVerbs.find(([, re]) => re.test(label))?.[0];
+    if (!verb) continue;
+    if (at in ACTION_LINK_ALLOW) continue;
+    // hasUnderline means the site sits in running prose, where the verb
+    // describes the sentence rather than being the affordance. That downgrades
+    // a hard fail to a human review; it does not silence it.
+    if (!/hasUnderline/.test(src.slice(m.index, end + 1))) {
+      fail(`${at} <Link> labelled "${label}" renders an action as a destination — use Button, or if this is genuinely navigation add '${at}' to ACTION_LINK_ALLOW in scripts/check.ts`);
+    } else {
+      console.log(`REVIEW ${at} <Link> labelled "${verb}…" with hasUnderline — prose or control? if prose, add '${at}' to ACTION_LINK_ALLOW in scripts/check.ts`);
+    }
+  }
+}
+
+// 3. DIVIDER DENSITY. A divider is a section boundary, not a row background —
+// one at most inside a panel, never one per row. Counted per authored file.
+//
+// Threshold read off the tree rather than off taste: of 45 templates, 36 hold
+// 0–1 <Divider>, none holds 5 or more, and the maximum is 4
+// (templates/payment-form.tsx, then demo/App.tsx) — 43 across the whole tree.
+// Six is above every site we ship, so the gate is green on day one and a
+// template must reach 1.5x the worst current one before it speaks. Raise it
+// only against a number, never against a hunch.
+const DIVIDER_DENSITY_MAX = 6;
+for (const f of lintFiles.sort()) {
+  const n = [...(await Bun.file(f).text()).matchAll(/<Divider(?=[\s>/])/g)].length;
+  if (n > DIVIDER_DENSITY_MAX) {
+    fail(`${f} has ${n} <Divider> (max ${DIVIDER_DENSITY_MAX}) — a divider is a section boundary, not a row background; a settings panel is a handful of groups, not a rule per row`);
+  }
+}
+
 // package.json `exports` must agree with what is actually in shared/, in BOTH
 // directions. The map is hand-maintained, so the two drift silently:
 //   - a deleted module leaves an entry pointing at a file that no longer
