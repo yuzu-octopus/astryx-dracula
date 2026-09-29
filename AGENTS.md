@@ -77,6 +77,14 @@ each one is recorded here.
   template is invisible to the other — which is why an earlier pass could not clear the clutter
   from either template. `href` survives on both rows as accepted-but-unread so existing call sites
   still compile; `hasDivider` defaults to `true`.
+- **A row's action kind is declared on the data, not recovered at the callsite.** `InfoRow` carries
+  `actionKind: 'action' | 'destination'` — one mechanism, stating the fact where the row is written.
+  The `actionHref` prop and the `actionHref={row.action === 'View' ? SELF_HASH : undefined}`
+  callsites it served are deleted; do not reinstate them, and do not string-match a row's `action`
+  string to recover the kind. If a data field fails to arrive through a `{...row}` spread, the
+  cause is TypeScript excess-property checks on the row literal, not the spread: `InfoRow` declared
+  only `label`/`value`/`action`, so the extra key was rejected at the literal. Fix the interface
+  and a data-side signal reaches every renderer with zero template edits.
 
 Templates are the reference implementation. Read the closest `templates/<id>.template.mjs` — it
 names the page and blocks it is built from — before writing a new pattern. Core's `.d.ts` describes
