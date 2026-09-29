@@ -15,6 +15,7 @@ One dark Dracula identity for every Astryx site. Dark-only, no light mode exists
 - `references/scaffolds.md` — copy-paste skeletons: showcase shell, hero, bento, dashboard, steps, spec grid, responsive rules.
 - `references/spacing.md` — canonical spacing values with provenance, card insets, type floors, touch targets, table density.
 - `references/visual.md` — color semantics, charts, code highlighting, motion, scrollbars, surfaces.
+- `references/semantics.md` — binding rules for link vs button, the underline, divider density, and spacing, each cited to the template that obeys it.
 
 ## Get the kit
 
@@ -91,6 +92,29 @@ The theme scale is base 14, ratio 1.2: body and code 14, supporting 12, headings
 - Nothing meaningful below 12px, ever. A 9–11px floor is a core scale artifact, not a license.
 
 Type carries hierarchy, so weight stays quiet: headings normal, `semibold` for emphasis and KPI values, never bold display type. Tabular numerals on every quantity (`hasTabularNumbers`). When in doubt go one role larger, never smaller — the reason is **thin weights, not x-height**: Apple's rule is "if you use a custom font with a thin weight, aim for larger than the recommended sizes", and we ship JetBrains Mono at `weightClass 400` (Regular). An earlier version of this line claimed JBM "has a small x-height"; measured from our shipped woff2 with fontTools, `sxHeight/upem` = **0.5500** against Inter 0.5459 and Roboto 0.5283 — the **highest** of the three, cap-height 0.7300 also highest. The instruction stands; the premise was false and is removed.
+
+## Control semantics (binding when authoring or reviewing a template)
+
+Four rules decide what a control **is**, where a rule belongs, and where a
+number comes from: a destination is a `Link` and an action is a `Button`
+(`SELF_HASH` stands in for a real destination only, never for "Create",
+"Delete", "Disconnect", "Log out", "Deactivate" or "Request"); the underline
+follows context, `hasUnderline` in running prose and nothing in navigation
+(header, sidebar, tab list, breadcrumb, pagination, settings rail, card header,
+table row label), with anything ambiguous treated as prose because colour alone
+fails WCAG 1.4.1 / F73; a divider marks a group boundary rather than a row
+background, one at most inside a panel; and spacing comes from `Stack gap` or
+a kit layout prop, never a tuned pixel. `references/semantics.md` carries the
+detail and the citations.
+
+**The 45 templates in `templates/` are the reference implementations.** Each
+rule there is cited to a real file and line in this repo, so a rule with an
+exemplar can be checked and a rule without one cannot. Before writing a new
+template, read the closest existing one and copy its answer; do not invent a
+pattern the tree already settles. `shared/settings-rows.tsx` is the pattern
+worth copying most often: it states the link-vs-button decision as a typed
+`actionKind` field in the data and branches on it once, so the same label
+cannot drift between templates.
 
 ## Evidence doctrine
 
@@ -184,7 +208,10 @@ The page `h1` takes **one value per surface class**, and the classifier is a pro
 
 ## What `check.ts` actually gates — and what it does not
 
-`bun run audit` runs 32 gate checks (`grep -c "fail(" scripts/check.ts`). Be precise about their reach, because a reader who over-trusts a gate file ships a defect it never claimed to catch.
+`bun run audit` runs 38 gate checks (`grep -c "fail(" scripts/check.ts`). That
+count is every `fail(` call site, not a tally of distinct gates, so treat it as
+an upper bound. Be precise about their reach either way, because a reader who
+over-trusts a gate file ships a defect it never claimed to catch.
 
 **It does gate:** palette purity, 28 contrast pairs (`sed -n '/^const pairs/,/^];/p' scripts/check.ts | grep -c "^  \['"`), a lint over template source
 for three literal string rules — `variant="section"`, `weight="bold"`, and
@@ -209,6 +236,17 @@ unexported. And do not put a dot in a config module's name —
 resolution reads the trailing `.config` as a file extension. It is
 `chaptered-doc-config`.
 
+It also gates the semantics rules in `references/semantics.md`, each scoped
+narrowly on purpose: a sweep for hand-rolled `text-decoration` across
+`astryx-theme.ts`, `tokens.css` and every authored source file, with comments
+blanked so a comment stating the rule is exempt; a `<Link>` whose literal
+label starts with one of the verbs in `ACTION_VERBS`, where `hasUnderline`
+downgrades a hard fail to a REVIEW rather than silencing it and
+`ACTION_LINK_ALLOW` (keyed `file:line`) is the one human-ruling escape hatch;
+and a per-file `Divider` count failing above `DIVIDER_DENSITY_MAX = 6`, a
+number read off the tree rather than off taste: 43 across it, max 4 in any one
+file. Find them with `rg -n 'ACTION_VERBS|ACTION_LINK_ALLOW|DIVIDER_DENSITY_MAX' scripts/check.ts`.
+
 **It does NOT gate, and you must check these yourself:**
 
 | Not gated | Why it matters | Check it with |
@@ -216,6 +254,16 @@ resolution reads the trailing `.config` as a file extension. It is
 | **Raw hex in template source** | One off-palette hex ships with every gate green | `grep -ri '#[0-9a-f]\{3,6\}' templates shared demo --include='*.tsx' --include='*.css'` |
 | **`--color-text-subdue` as a foreground** | `#4C5067` is **1.80:1** on body and **1.49:1** on the widget surface — below the 1.5 floor `check.ts` itself pins for that token, so the value would fail if it were ever used as text. It is chrome-only, and nothing enforces that | `grep -rn 'color: var(--color-text-subdue)' templates shared demo` |
 | **`weight="medium"`** | The operative rule is that neither `medium` nor `bold` may be used, since only 400 and 600 faces ship. The gate covers `bold` only. The token existing is precisely why the template must not reach for it | `rg -n 'weight="(medium|bold)"' templates demo shared` |
+| **The rendered underline** | The sweep matches the `text-decoration` property in authored source, not the rendered result, so a link that is underlined because some other token changed passes it | render it, or `rg -n 'text-?decoration' templates shared demo astryx-theme.ts tokens.css` |
+| **An action drawn as `<a>` instead of `<Link>`** | The verb gate walks `<Link` openings only, so the same action in a raw anchor is invisible to it. A raw anchor already breaks the no-raw-elements rule, which is why the two are separate limits | `rg -n '<a ' templates shared demo` |
+| **A label behind `{…}`** | Verb matching is literal text, because guessing at a computed label is how a gate starts failing on sites it cannot read | read the site |
+
+**Divider density is a smell threshold, not a judgement about boundaries.** Six
+per file is chosen to sit above every site we ship so the gate is green on day
+one; four dividers in one settings panel, each between two groups that are
+genuinely different, passes while still reading as a form grid. The rule in
+`references/semantics.md` §3, not the gate, is what decides whether a boundary
+is real.
 
 The `!important` sweep has one exemption by design: `tokens.css` contains that literal inside the comment that states the rule, and a gate that fails on the documentation of the rule it enforces gets disabled on day one and then protects nothing.
 
@@ -236,7 +284,7 @@ Long-form reading copy is capped at `max-width: 75ch`, which is **630px at 14px 
 
 - **Hover dims, never inverts.** Interactive surfaces darken 12% on hover, 20% on press, via the theme overlay tokens. A hover that goes transparent, dark-navy, or accent-colored means something overrode `--color-overlay-hover`.
 - **Focus is accent.** 2px accent ring, beat Functional Purple on contrast. Never remove it.
-- **Links underline always**, resolve to foreground on hover. Inline links inherit the surrounding text size; a link that renders larger than its sentence is the fixed external icon at small sizes, drop `isExternalLink` and keep `target="_blank"`.
+- **The underline follows the context.** Prose links pass `hasUnderline`; navigation links pass nothing and take core's hover-only underline. An earlier version of this bullet said "Links underline always", which was the shipped symptom of a `link.base` override that also made `hasUnderline` inert for every consumer. Full rule and citations in `references/semantics.md` §2. Inline links inherit the surrounding text size; a link that renders larger than its sentence is the fixed external icon at small sizes, drop `isExternalLink` and keep `target="_blank"`.
 - **Table rows lift on hover.** Scrollbars are Dracula (Current Line thumb, Purple hover) via `tokens.css`. A visible scrollbar on a comfortable table means a redundant `overflowX` wrapper fighting Table's own scroll container; delete yours. A document-level scrollbar on a `height="fill"` page means no definite-height ancestor (`height: 100%` resolves to content height); wrap the page in a `height: 100dvh` ancestor instead of styling the scrollbar.
 
 ## Migrating a codebase
