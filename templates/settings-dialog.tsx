@@ -1,12 +1,12 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC > Ctr[h=80vh] > B.primary"Open settings"[opens=#settings] ;; Dlg#settings > L > (LP[w=280 divider p=3] > V[g=4] > Tx"Account settings"[t=label] + (UL > LI"Personal information"*8)) + (LC[p=6] > V[g=6] > DH"Account" + SE"Settings section" + (V[g=0] > TabList + (V[g=0] > Hd"Login"[level=3] + D + (H[j=between a=start] > (V[g=0] > Tx"Password"[weight=semibold] + Tx"Not created"[t=supporting]) + Lk"Create") + (H[g=3 a=start] > Ic + (V[g=0] > (H[g=2 a=center wrap] > Tx"OS X 10.15.7 Chrome"[weight=semibold] + SD) + Tx"March 30, 2026"[t=supporting])))))
+//   L > LC > Ctr[h=80vh] > B.primary"Open settings"[opens=#settings] ;; Dlg#settings > L > (LP[w=280 divider p=3] > V[g=4] > Tx"Account settings"[t=label] + (UL > LI"Personal information"*8)) + (LC[p=6] > V[g=6] > DH"Account" + SE"Settings section" + (V[g=0] > TabList + (V[g=0] > Hd"Login"[level=3] + (H[j=between a=start] > (V[g=0] > Tx"Password"[weight=semibold] + Tx"Not created"[t=supporting]) + B"Create") + (H[g=3 a=start] > Ic + (V[g=0] > (H[g=2 a=center wrap] > Tx"OS X 10.15.7 Chrome"[weight=semibold] + SD) + Tx"March 30, 2026"[t=supporting])))))
 
 /**
  * Settings Dialog — account sections inside one modal.  Frame: the trigger page, then a Dialog that sizes to (Frame/responsive/container: see XLE header above.)
  */
 
-import React, {useState, type CSSProperties} from 'react';
+import {useState, type CSSProperties} from 'react';
 import {
   VStack,
   HStack,
@@ -19,7 +19,6 @@ import {Text, Heading} from '@astryxdesign/core/Text';
 import {Button} from '@astryxdesign/core/Button';
 import {Dialog, DialogHeader} from '@astryxdesign/core/Dialog';
 import {List, ListItem} from '@astryxdesign/core/List';
-import {Divider} from '@astryxdesign/core/Divider';
 import {Selector} from '@astryxdesign/core/Selector';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {Card} from '@astryxdesign/core/Card';
@@ -31,7 +30,7 @@ import {Icon} from '@astryxdesign/core/Icon';
 import {Center} from '@astryxdesign/core/Center';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {Lock, ShieldCheck, Monitor} from 'lucide-react';
-import {NAV_ITEMS, LOGIN_ROWS, SOCIAL_ROWS, DEVICE_ROWS, INFO_TILES, iconBox, actionNoWrap, sideNavHeading} from 'astryx-dracula/shared/settings-data';
+import {NAV_ITEMS, LOGIN_ROWS, SOCIAL_ROWS, DEVICE_ROWS, INFO_TILES, iconBox, sideNavHeading} from 'astryx-dracula/shared/settings-data';
 import {InfoRowItem, ExpandableRow} from 'astryx-dracula/shared/settings-rows';
 import type {DeviceRow, InfoTileData} from 'astryx-dracula/shared/settings-data';
 
@@ -89,7 +88,7 @@ function InfoTile({icon, title, body}: InfoTileData) {
       <Center width={48} height={48} style={iconBox}>
         <Icon icon={icon} />
       </Center>
-      <VStack gap={0}>
+      <VStack gap={1}>
         <Text type="body" weight="semibold" display="block">
           {title}
         </Text>
@@ -104,43 +103,37 @@ function InfoTile({icon, title, body}: InfoTileData) {
 
 function DeviceRowItem({label, isCurrent, location, action}: DeviceRow) {
   return (
-    <>
-      <HStack gap={3} vAlign="start">
-        <Icon icon={Monitor} />
-        <StackItem size="fill">
-          <VStack gap={0}>
-            {/* wrap: the label plus the session status exceed the compact
-                content width (~280px). */}
-            <HStack gap={2} vAlign="center" wrap="wrap">
-              <Text type="body" weight="semibold">
-                {label}
-              </Text>
-              {isCurrent && (
-                <HStack gap={1} vAlign="center">
-                  <StatusDot variant="success" label="Current session" />
-                  <Text type="supporting" color="secondary">
-                    Current session
-                  </Text>
-                </HStack>
-              )}
-            </HStack>
-            <Text
-              type="supporting"
-              color="secondary"
-              display="block"
-              hasTabularNumbers>
-              {location}
+    <HStack gap={3} vAlign="start">
+      <Icon icon={Monitor} />
+      <StackItem size="fill">
+        <VStack gap={1}>
+          {/* wrap: the label plus the session status exceed the compact
+              content width (~280px). */}
+          <HStack gap={2} vAlign="center" wrap="wrap">
+            <Text type="body" weight="semibold">
+              {label}
             </Text>
-          </VStack>
-        </StackItem>
-        {action && (
-          <Link href={SELF_HASH} style={actionNoWrap}>
-            {action}
-          </Link>
-        )}
-      </HStack>
-      <Divider />
-    </>
+            {isCurrent && (
+              <HStack gap={1} vAlign="center">
+                <StatusDot variant="success" label="Current session" />
+                <Text type="supporting" color="secondary">
+                  Current session
+                </Text>
+              </HStack>
+            )}
+          </HStack>
+          <Text
+            type="supporting"
+            color="secondary"
+            display="block"
+            hasTabularNumbers>
+            {location}
+          </Text>
+        </VStack>
+      </StackItem>
+      {/* Ending a session changes state in place — a Button, not a Link. */}
+      {action && <Button label={action} variant="secondary" size="sm" />}
+    </HStack>
   );
 }
 
@@ -274,7 +267,7 @@ export default function SettingsDialog() {
                           onEdit={() => handleEdit('legalName')}
                           onCancel={handleCancel}
                           onSave={handleSave}
-                          href={SELF_HASH}>
+                          hasDivider={false}>
                           <TextInput
                             label="Legal name"
                             isLabelHidden
@@ -289,7 +282,7 @@ export default function SettingsDialog() {
                           onEdit={() => handleEdit('preferredName')}
                           onCancel={handleCancel}
                           onSave={handleSave}
-                          href={SELF_HASH}>
+                          hasDivider={false}>
                           <TextInput
                             label="Preferred first name"
                             isLabelHidden
@@ -304,7 +297,7 @@ export default function SettingsDialog() {
                           onEdit={() => handleEdit('email')}
                           onCancel={handleCancel}
                           onSave={handleSave}
-                          href={SELF_HASH}>
+                          hasDivider={false}>
                           <TextInput
                             label="Email address"
                             isLabelHidden
@@ -319,7 +312,7 @@ export default function SettingsDialog() {
                           onEdit={() => handleEdit('phone')}
                           onCancel={handleCancel}
                           onSave={handleSave}
-                          href={SELF_HASH}>
+                          hasDivider={false}>
                           <TextInput
                             label="Phone number"
                             isLabelHidden
@@ -331,7 +324,7 @@ export default function SettingsDialog() {
                           label="Identity verification"
                           value="Verified"
                           action=""
-                        href={SELF_HASH}
+                          hasDivider={false}
                         />
                         <ExpandableRow
                           label="Residential address"
@@ -340,7 +333,7 @@ export default function SettingsDialog() {
                           onEdit={() => handleEdit('address')}
                           onCancel={handleCancel}
                           onSave={handleSave}
-                          href={SELF_HASH}>
+                          hasDivider={false}>
                           <TextInput
                             label="Residential address"
                             isLabelHidden
@@ -355,7 +348,7 @@ export default function SettingsDialog() {
                           onEdit={() => handleEdit('mailingAddress')}
                           onCancel={handleCancel}
                           onSave={handleSave}
-                          href={SELF_HASH}>
+                          hasDivider={false}>
                           <TextInput
                             label="Mailing address"
                             isLabelHidden
@@ -370,7 +363,7 @@ export default function SettingsDialog() {
                           onEdit={() => handleEdit('emergencyContact')}
                           onCancel={handleCancel}
                           onSave={handleSave}
-                          href={SELF_HASH}>
+                          hasDivider={false}>
                           <TextInput
                             label="Emergency contact"
                             isLabelHidden
@@ -380,13 +373,12 @@ export default function SettingsDialog() {
                         </ExpandableRow>
                       </VStack>
 
+                      {/* One divider at most per panel: the tiles are one
+                          group, so `gap` carries the rhythm. */}
                       <Card padding={4}>
                         <VStack gap={4}>
-                          {INFO_TILES.map((tile, i) => (
-                            <React.Fragment key={tile.title}>
-                              {i > 0 && <Divider />}
-                              <InfoTile {...tile} />
-                            </React.Fragment>
+                          {INFO_TILES.map(tile => (
+                            <InfoTile key={tile.title} {...tile} />
                           ))}
                         </VStack>
                       </Card>
@@ -403,27 +395,27 @@ export default function SettingsDialog() {
                         <Tab value="shared" label="Shared access" />
                       </TabList>
 
+                      {/* Four genuinely different groups, each with its own
+                          heading: `gap` is the boundary, so no rule between
+                          them and none after the last row. */}
                       {activeTab === 'login' && (
                         <VStack gap={8}>
-                          <VStack gap={0}>
+                          <VStack gap={2}>
                             <Heading level={3}>Login</Heading>
-                            <Divider />
                             {LOGIN_ROWS.map(row => (
-                              <InfoRowItem key={row.label} {...row} href={SELF_HASH} />
+                              <InfoRowItem key={row.label} {...row} hasDivider={false} />
                             ))}
                           </VStack>
 
-                          <VStack gap={0}>
+                          <VStack gap={2}>
                             <Heading level={3}>Social accounts</Heading>
-                            <Divider />
                             {SOCIAL_ROWS.map(row => (
-                              <InfoRowItem key={row.label} {...row} href={SELF_HASH} />
+                              <InfoRowItem key={row.label} {...row} hasDivider={false} />
                             ))}
                           </VStack>
 
-                          <VStack gap={0}>
+                          <VStack gap={2}>
                             <Heading level={3}>Device history</Heading>
-                            <Divider />
                             {DEVICE_ROWS.map(device => (
                               <DeviceRowItem
                                 key={device.location}
@@ -432,11 +424,10 @@ export default function SettingsDialog() {
                             ))}
                           </VStack>
 
-                          <VStack gap={0}>
+                          <VStack gap={2}>
                             <Heading level={3}>Account</Heading>
-                            <Divider />
                             <HStack hAlign="between" vAlign="start">
-                              <VStack gap={0}>
+                              <VStack gap={1}>
                                 <Text
                                   type="body"
                                   weight="semibold"
@@ -450,9 +441,13 @@ export default function SettingsDialog() {
                                   This action cannot be undone
                                 </Text>
                               </VStack>
-                              <Link href={SELF_HASH}>Deactivate</Link>
+                              {/* Deactivating changes state in place. */}
+                              <Button
+                                label="Deactivate"
+                                variant="destructive"
+                                size="sm"
+                              />
                             </HStack>
-                            <Divider />
                           </VStack>
                         </VStack>
                       )}
@@ -461,7 +456,6 @@ export default function SettingsDialog() {
                         <VStack gap={8}>
                           <VStack gap={2}>
                             <Heading level={3}>Shared access</Heading>
-                            <Divider />
                             <Text type="body" color="secondary">
                               Review each request carefully before approving
                               access. We&apos;ll email your kin or coven-mate
@@ -506,7 +500,7 @@ export default function SettingsDialog() {
                           onEdit={() => handleEdit('language')}
                           onCancel={handleCancel}
                           onSave={handleSave}
-                          href={SELF_HASH}>
+                          hasDivider={false}>
                           <Selector
                             label="Language"
                             isLabelHidden
@@ -526,7 +520,7 @@ export default function SettingsDialog() {
                           onEdit={() => handleEdit('currency')}
                           onCancel={handleCancel}
                           onSave={handleSave}
-                          href={SELF_HASH}>
+                          hasDivider={false}>
                           <Selector
                             label="Currency"
                             isLabelHidden
@@ -546,7 +540,7 @@ export default function SettingsDialog() {
                           onEdit={() => handleEdit('timezone')}
                           onCancel={handleCancel}
                           onSave={handleSave}
-                          href={SELF_HASH}>
+                          hasDivider={false}>
                           <Selector
                             label="Time zone"
                             isLabelHidden
@@ -572,7 +566,6 @@ export default function SettingsDialog() {
                           labelPosition="start"
                           labelSpacing="spread"
                         />
-                        <Divider />
                         <Switch
                           label="Push notifications"
                           description="Time-sensitive alerts, delivered by raven."
@@ -581,7 +574,6 @@ export default function SettingsDialog() {
                           labelPosition="start"
                           labelSpacing="spread"
                         />
-                        <Divider />
                       </VStack>
                     </VStack>
                   )}
@@ -590,18 +582,17 @@ export default function SettingsDialog() {
                     <VStack gap={6}>
                       <VStack gap={4}>
                         <Heading level={3}>Payments</Heading>
-                        <Divider />
                         <InfoRowItem
                           label="Payout crypt"
                           value="Visa ending in 4821"
                           action=""
-                        href={SELF_HASH}
+                          hasDivider={false}
                         />
                         <InfoRowItem
                           label="Past payouts"
                           value="No tributes yet"
                           action=""
-                        href={SELF_HASH}
+                          hasDivider={false}
                         />
                       </VStack>
                     </VStack>
@@ -611,18 +602,17 @@ export default function SettingsDialog() {
                     <VStack gap={6}>
                       <VStack gap={4}>
                         <Heading level={3}>Taxes</Heading>
-                        <Divider />
                         <InfoRowItem
                           label="Tax scrolls"
                           value="Not submitted"
                           action=""
-                        href={SELF_HASH}
+                          hasDivider={false}
                         />
                         <InfoRowItem
                           label="Past scrolls"
                           value="Available after your first tribute"
                           action=""
-                        href={SELF_HASH}
+                          hasDivider={false}
                         />
                       </VStack>
                     </VStack>
@@ -640,7 +630,6 @@ export default function SettingsDialog() {
                           labelPosition="start"
                           labelSpacing="spread"
                         />
-                        <Divider />
                       </VStack>
                     </VStack>
                   )}
@@ -663,7 +652,6 @@ export default function SettingsDialog() {
                             </Text>
                             <Link href={SELF_HASH}>View</Link>
                           </HStack>
-                          <Divider />
                         </VStack>
 
                         <VStack gap={4}>
@@ -676,14 +664,15 @@ export default function SettingsDialog() {
                             labelPosition="start"
                             labelSpacing="spread"
                           />
-                          <Divider />
                         </VStack>
 
                         <VStack gap={4}>
                           <Heading level={3}>Reviews</Heading>
                           <Text type="body" color="secondary">
                             Choose what&apos;s shared when you write a review.{' '}
-                            <Link href={SELF_HASH}>Learn more</Link>
+                            <Link href={SELF_HASH} hasUnderline>
+                              Learn more
+                            </Link>
                           </Text>
                           <VStack gap={4}>
                             <Switch
@@ -719,7 +708,6 @@ export default function SettingsDialog() {
                               labelSpacing="spread"
                             />
                           </VStack>
-                          <Divider />
                         </VStack>
 
                         <VStack gap={4}>
@@ -727,7 +715,12 @@ export default function SettingsDialog() {
                           <Card>
                             <HStack hAlign="between" vAlign="center">
                               <Text type="body">Request my personal data</Text>
-                              <Link href={SELF_HASH}>Request</Link>
+                              {/* A request is submitted in place, so it acts. */}
+                              <Button
+                                label="Request"
+                                variant="secondary"
+                                size="sm"
+                              />
                             </HStack>
                           </Card>
                           <Switch
@@ -741,7 +734,11 @@ export default function SettingsDialog() {
                           <Card>
                             <HStack hAlign="between" vAlign="center">
                               <Text type="body">Delete my account</Text>
-                              <Link href={SELF_HASH}>Delete</Link>
+                              <Button
+                                label="Delete"
+                                variant="destructive"
+                                size="sm"
+                              />
                             </HStack>
                           </Card>
                           <Card variant="muted">
@@ -756,7 +753,7 @@ export default function SettingsDialog() {
                                 <Text type="body" color="secondary">
                                   We&apos;re committed to keeping your data
                                   protected. See details in our{' '}
-                                  <Link href={SELF_HASH}>
+                                  <Link href={SELF_HASH} hasUnderline>
                                     Privacy Policy
                                   </Link>
                                   .
