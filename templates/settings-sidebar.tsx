@@ -76,6 +76,10 @@ const SECTION_TITLES: Record<string, string> = {
   'Professional hosting tools': 'Hosting tools',
 };
 
+// "View" on these rows is a destination (it opens the list); "Add" acts in
+// place. The row renders whichever its action asks for, hence the call-site
+// test rather than a flag on every row object.
+
 const TAX_ROWS: InfoRow[] = [
   {label: 'Tax scrolls', value: 'Not provided', action: 'Add'},
   {label: 'Past scrolls', value: 'No scrolls yet', action: 'View'},
@@ -789,6 +793,7 @@ export default function SettingsSidebar() {
                     <InfoRowItem
                           key={row.label}
                           {...row}
+                          actionHref={row.action === 'View' ? SELF_HASH : undefined}
                           hasDivider={false}
                           style={rowPadding}
                         />
@@ -806,6 +811,7 @@ export default function SettingsSidebar() {
                     <InfoRowItem
                           key={row.label}
                           {...row}
+                          actionHref={row.action === 'View' ? SELF_HASH : undefined}
                           hasDivider={false}
                           style={rowPadding}
                         />
