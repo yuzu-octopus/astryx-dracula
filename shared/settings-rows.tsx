@@ -42,15 +42,18 @@ import {Divider} from '@astryxdesign/core/Divider';
 // exactly; only these call-site differences remained.
 //
 // THREE RULES these rows are built around, from USAGE.md "Rules":
-//  - A link is a destination, a button is an action. The trailing control is
-//    whichever it actually is, and the caller says which via `actionHref`:
-//    with it, the row's action column goes somewhere and is a `Link` ("View"
-//    on a list of past records); without it, the control changes state in
-//    place and is a `Button` ("Create", "Disconnect"). Getting this backwards
-//    is the failure this pass exists to remove, so it is a prop rather than a
-//    guess. Buttons are `secondary`, not `primary`: a row action must not
-//    outrank the panel's own primary, and a filled accent button in a
-//    trailing column is what made these panels read as a form.
+//  - A link is a destination, a button is an action. The trailing control is a
+//    `Button` when the row acts in place and a `Link` when it navigates, and
+//    the row data says which: `actionKind` is `'action'` (the default) for
+//    "Create"/"Disconnect", `'destination'` for "View" on a list of past
+//    records, with `href` carrying the destination. It is stated in the data
+//    rather than guessed from the label, because reading the English verb off
+//    the row is what made "View" a button. The Link takes the kit's
+//    hover-only underline — it jumps out of the panel, which is the
+//    navigation case, not prose — and never a hand-rolled `textDecoration`.
+//    Buttons stay `secondary`, not `primary`: a row action must not outrank
+//    the panel's own primary, and a filled accent button in a trailing column
+//    is what made these panels read as a form.
 //  - A divider is a section boundary, not a row background. Rows therefore
 //    render one ONLY when the caller marks `hasDivider` at a real group
 //    boundary; without it the row leaves the rhythm to the caller's own
@@ -60,29 +63,22 @@ import {Divider} from '@astryxdesign/core/Divider';
 //    builds itself (device history, Deactivate, the info tiles) so no row on
 //    the page reads tighter than its neighbours.
 //
-// `href` is retained as an accepted-but-unused prop on both public rows. It
-// was the anchor for Links this file no longer renders unconditionally, so
-// nothing reads it; deleting it would break every in-flight call site that
-// still passes it. `actionHref` is the live signal for a destination action —
-// deliberately a different name, because `href` is inert and must not be
-// confused with a real one. Both can go once no caller passes them.
+// `href` is a real field on `InfoRow`: where a `'destination'` action goes,
+// read only when `actionKind` says the row navigates. The inert `href` prop on
+// `ExpandableRow` stays for call-site compatibility — it anchored Links this
+// file no longer renders, nothing reads it now, and removing it would break
+// any caller that still passes it.
 
 export function InfoRowItem({
   label,
   value,
   action,
+  actionKind,
+  href,
   style,
-  actionHref,
   hasDivider = true,
 }: InfoRow & {
-  /** Accepted for call-site compatibility; unused — see the note above. */
-  href?: string;
   style?: CSSProperties;
-  /**
-   * Destination for the trailing control: present means it navigates and
-   * renders a `Link`, absent means it acts in place and renders a `Button`.
-   */
-  actionHref?: string;
   /** Draw a Divider after the row. True only at a group boundary. */
   hasDivider?: boolean;
 }) {
@@ -98,8 +94,8 @@ export function InfoRowItem({
           </Text>
         </VStack>
         {action &&
-          (actionHref ? (
-            <Link href={actionHref} style={actionNoWrap}>
+          (actionKind === 'destination' && href ? (
+            <Link href={href} style={actionNoWrap}>
               {action}
             </Link>
           ) : (
