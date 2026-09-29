@@ -45,3 +45,6 @@ coverage/
 .tmp-samp/
 .superpowers/
 local/
+
+# Scratch worktrees created by visual-regression checks; never committed.
+.visual-*/

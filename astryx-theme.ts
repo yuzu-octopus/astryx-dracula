@@ -220,6 +220,19 @@ const tokens: Record<string, TokenValue> = {
   '--color-data-categorical-pink': pin(DRA.pink),
   '--color-data-categorical-cyan': pin(DRA.cyan),
   '--color-data-categorical-red': pin(DRA.red),
+  // The 0.6.3 CLI force-emits the whole core data palette into
+  // @layer astryx-base, including these two, which 0.3.0 deliberately
+  // removed. Its values are off-brand: #6B1EFD is not Dracula Purple
+  // (#BD93F9) and #965E03 is a brown the spec does not define. Pinned here so
+  // they cannot ship off-palette, and to on-brand values that match what our
+  // own docs already say: brown has no spectral match and reuses orange.
+  //
+  // The categorical-purple ban does NOT depend on this token being absent --
+  // it is enforced as a module rule by chart-hues.ts exporting a purple-free
+  // CHART_HUES, and the ChartHue union. That is why re-purpling it here is
+  // safe. Before 0.6.3 the token simply was not emitted.
+  '--color-data-categorical-purple': pin(DRA.purple),
+  '--color-data-categorical-brown': pin(DRA.orange),
   '--color-data-categorical-teal': pin('#A4FFFF'),
   '--color-data-categorical-indigo': pin('#D6ACFF'),
   // Categorical tints: 10% accent wash backgrounds, 30% borders, full accents
