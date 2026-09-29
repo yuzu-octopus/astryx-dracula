@@ -403,8 +403,9 @@ its off-palette status are not in doubt, and it stays because it reads fine on
 dark), and 45 sequential ramps
 `--color-data-<purple|pink|red|orange|yellow|teal|blue|shamrock|gray>-<1-5>`
 (lightness 28/44/60/74/88, constant hue/saturation per family).
-**Purple is sanctioned here and barred only from categorical use.** There is no
-`--color-data-categorical-purple`; the prohibition is a **module rule**, enforced
+**Purple is sanctioned here and barred only from categorical use.** The token
+`--color-data-categorical-purple` EXISTS and is pinned to spec Purple `#BD93F9`;
+the prohibition is a **module rule**, enforced
 by `shared/chart-hues.ts` exporting a purple-free `CHART_HUES` and the
 `ChartHue` union — not by token absence. Do not read this list as self-policing:
 the set offers the ramp, and one module keeps it out of categorical charts. A

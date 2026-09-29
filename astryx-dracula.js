@@ -6,7 +6,7 @@
  * Core: @astryxdesign/core@0.6.3
  */
 
-import { draculaIconRegistry } from './icons.mjs';
+import { draculaIconRegistry } from "./icons.mjs";
 /**
  * astryx-dracula theme — built by `bunx astryx theme build`
  * Import the CSS file alongside this module:
@@ -179,6 +179,8 @@ export const astryxDraculaTheme = {
     "--color-data-categorical-pink": "light-dark(#FF79C6, #FF79C6)",
     "--color-data-categorical-cyan": "light-dark(#8BE9FD, #8BE9FD)",
     "--color-data-categorical-red": "light-dark(#FF5555, #FF5555)",
+    "--color-data-categorical-purple": "light-dark(#BD93F9, #BD93F9)",
+    "--color-data-categorical-brown": "light-dark(#FFB86C, #FFB86C)",
     "--color-data-categorical-teal": "light-dark(#A4FFFF, #A4FFFF)",
     "--color-data-categorical-indigo": "light-dark(#D6ACFF, #D6ACFF)",
     "--color-background-blue": "light-dark(#6272A41A, #6272A41A)",
