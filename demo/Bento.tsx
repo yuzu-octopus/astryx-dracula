@@ -200,7 +200,9 @@ export function Bento() {
               />
               <DataBar
                 label="Error budget"
-                segments={[{id: 'used', value: 91, color: 'var(--color-data-categorical-yellow)'}]}
+                // See Dashboard.tsx:116 — no categorical yellow ships, so the
+                // nearest real one is the yellow ramp's step 2, #F0F980.
+                segments={[{id: 'used', value: 91, color: 'var(--color-data-yellow-2)'}]}
                 hasValueLabel
                 formatValue={used => `${used}% consumed`}
               />
