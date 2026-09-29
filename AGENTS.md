@@ -53,6 +53,35 @@ Three rules that are cheap to get wrong and expensive to debug, all settled with
   React Fast Refresh. `bun run audit` gates `package.json` `exports` against `shared/` in both
   directions, so a new shared module needs an entry and a deleted one loses it.
 
+## Links, buttons, dividers (USAGE.md → Rules carries the rules; this is the evidence)
+
+The templates shipped with mistakes that read as deliberate design, so the evidence that settles
+each one is recorded here.
+
+- **A link is a destination; a button is an action.** `shared/settings-rows.tsx` rendered "Create",
+  "Disconnect" and "Edit" as `Link`s — "Edit" even carried an `e.preventDefault()` because it never
+  navigated. A `preventDefault` on a `Link` is the tell that the element is really an action.
+- **`hasUnderline` is per-link and opt-in.** Prose links pass it; navigation links pass nothing.
+  `astryx-theme.ts` no longer sets `textDecoration` on `link.base` and must not start again: it
+  shipped as `.astryx-link { text-decoration: underline }`, which made core's documented
+  `@default false` (hover-only) unreachable and every link in every template permanently
+  underlined. The brand look was never what it was doing — it overrode the one prop that can
+  express an underline per link.
+- **A divider is a section boundary, not a row background.** The shared rows drew one after every
+  row while both templates already draw their own group boundary with `Heading` + `Divider`, so the
+  panels read as a form grid. One divider inside a panel at most; the rest is `Stack gap`.
+- **A settings row is edited in `shared/`, not in a template.** `settings-sidebar.tsx` and
+  `settings-dialog.tsx` both render `InfoRowItem` / `ExpandableRow` from
+  `shared/settings-rows.tsx` over content from `shared/settings-data.ts`. The row bodies were
+  byte-identical when they were forked, so a divider or a `Link`→`Button` fix made inside one
+  template is invisible to the other — which is why an earlier pass could not clear the clutter
+  from either template. `href` survives on both rows as accepted-but-unread so existing call sites
+  still compile; `hasDivider` defaults to `true`.
+
+Templates are the reference implementation. Read the closest `templates/<id>.template.mjs` — it
+names the page and blocks it is built from — before writing a new pattern. Core's `.d.ts` describes
+the API; it does not describe how this brand uses it.
+
 On "155 components" in the generated block above: that is the number of **exported
 component names** the CLI enumerates, not the number of component directories. The
 package ships **101** component directories — `find
