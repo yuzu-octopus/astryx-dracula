@@ -216,7 +216,9 @@ function PageHeader({
       <VStack gap={3}>
         <HStack gap={4} vAlign="start">
           <StackItem size="fill">
-            <VStack gap={0}>
+            {/* gap={2}: the breadcrumb is a control, not a text-baseline
+                pairing, so it needs separation from the H1 rather than 0. */}
+            <VStack gap={2}>
               <Link href="#/templates/detail-page">
                 <HStack gap={1} vAlign="center">
                   <Icon icon={ArrowLeft} size="sm" color="inherit" />
@@ -502,8 +504,8 @@ function TimelineSection() {
   return (
     <Section>
       <VStack gap={4}>
-        {/* gap={2}, matching the byte-identical header rows at :338 and
-            :407. Core's Stack has no default gap (Stack.tsx:211, pass-through
+        {/* gap={2}, matching the byte-identical header rows at :340 and
+            :408. Core's Stack has no default gap (Stack.tsx:211, pass-through
             at :255/:285), so this rendered 0px -- the heading and the Filters
             button touched -- while both siblings render 8px. */}
         <HStack gap={2} vAlign="center">
@@ -582,11 +584,16 @@ function PanelContent() {
   return (
     <VStack gap={4}>
       <Collapsible trigger={<Heading level={3}>Notes</Heading>}>
+        {/* "Show more" closes the sentence inside the Text below, so it is
+            prose and asks for `hasUnderline` — colour alone is not a
+            sufficient cue inline (1.4.1 / F73). `type="inherit"` adopts the
+            paragraph's size and leading. The two links in the header are
+            navigation, so they pass neither. */}
         <Text type="body">
           Customer is a repeat buyer, 3rd order this quarter. Prefers
           moonlight and sage glazes. Requested gift wrapping for the mug set.
           Ships to a residential address in CA.{' '}
-          <Link href="#/templates/detail-page">
+          <Link href="#/templates/detail-page" hasUnderline type="inherit">
             Show more
           </Link>
         </Text>
