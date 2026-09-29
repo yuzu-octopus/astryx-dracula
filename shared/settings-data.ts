@@ -42,6 +42,14 @@ export const NAV_ITEMS: SettingsNavItem[] = [
   {label: 'Travel for work', icon: Briefcase},
 ];
 
+/**
+ * How a row's trailing Button reads. Deliberately narrower than core's
+ * `ButtonVariant`: a trailing row control is not a place to choose freely, and
+ * two of core's four options can never be right here — `primary` would
+ * outrank the panel's own primary, `ghost` would leave an action with no
+ * affordance at all. Only the two that can be are offered.
+ */
+export type RowActionVariant = 'secondary' | 'destructive';
 export interface InfoRow {
   label: string;
   value: string;
@@ -55,14 +63,39 @@ export interface InfoRow {
   actionKind?: 'action' | 'destination';
   /** Where a 'destination' action goes. Read only when actionKind is 'destination'. */
   href?: string;
+  /**
+   * Visual weight of the trailing Button. `secondary` is the default and the
+   * right answer for almost every row. `destructive` is for a row whose action
+   * ends or destroys something — disconnecting an account, deleting data — so
+   * that control agrees with the templates' inline Deactivate/Delete buttons
+   * instead of rendering identically to "Create" sitting above it. Stated
+   * here for the same reason `actionKind` is: the renderer cannot recover it
+   * from the label without reading the English verb off the row, which is how
+   * "View" became a button in the first place. Ignored for a `'destination'`
+   * row, which renders a Link and takes no variant.
+   */
+  variant?: RowActionVariant;
+  /**
+   * What the Button does, when something wants it to. Optional on purpose: a
+   * row with no `onAction` renders an inert control, which is the honest
+   * default for a showcase with no backend — better than a toggle that flips
+   * "Connected" to "Disconnected" and pretends a call happened. A consumer
+   * that has a real handler passes one and the row goes live. Nothing here
+   * simulates a result or invents state to make the button look busy.
+   */
+  onAction?: () => void;
 }
 
 export const LOGIN_ROWS: InfoRow[] = [
   {label: 'Password', value: 'Not created', action: 'Create'},
 ];
 
+// Disconnecting ends an account link the user set up on purpose, so it is the
+// one destructive row in this file — marked here, from the verb, not by
+// position. LOGIN_ROWS' "Create" is the opposite (it adds a password) and
+// keeps the default `secondary`.
 export const SOCIAL_ROWS: InfoRow[] = [
-  {label: 'Google', value: 'Connected', action: 'Disconnect'},
+  {label: 'Google', value: 'Connected', action: 'Disconnect', variant: 'destructive'},
 ];
 
 export interface DeviceRow {

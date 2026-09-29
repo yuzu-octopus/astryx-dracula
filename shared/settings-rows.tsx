@@ -41,7 +41,7 @@ import {Divider} from '@astryxdesign/core/Divider';
 // boundaries). Verified by hash before the move — the row BODIES matched
 // exactly; only these call-site differences remained.
 //
-// THREE RULES these rows are built around, from USAGE.md "Rules":
+// FOUR RULES these rows are built around, from USAGE.md "Rules":
 //  - A link is a destination, a button is an action. The trailing control is a
 //    `Button` when the row acts in place and a `Link` when it navigates, and
 //    the row data says which: `actionKind` is `'action'` (the default) for
@@ -51,9 +51,17 @@ import {Divider} from '@astryxdesign/core/Divider';
 //    the row is what made "View" a button. The Link takes the kit's
 //    hover-only underline — it jumps out of the panel, which is the
 //    navigation case, not prose — and never a hand-rolled `textDecoration`.
-//    Buttons stay `secondary`, not `primary`: a row action must not outrank
-//    the panel's own primary, and a filled accent button in a trailing column
-//    is what made these panels read as a form.
+//  - The Button is configured from the row data, never from a constant here.
+//    `variant` defaults to `secondary` and a row opts into `destructive` when
+//    its action ends or destroys something, so a trailing "Disconnect" reads
+//    like the panels' own inline Deactivate/Delete controls instead of like
+//    the "Create" sitting above it. It is never `primary`: a row action must
+//    not outrank the panel's own primary, and a filled accent button in a
+//    trailing column is what made these panels read as a form.
+//    `onAction` becomes the Button's `onClick` and is optional — with no
+//    handler the Button renders inert, which is the honest default for a
+//    showcase with no backend. A consumer with a real handler passes one and
+//    the row goes live; nothing here fabricates state to make it look live.
 //  - A divider is a section boundary, not a row background. Rows therefore
 //    render one ONLY when the caller marks `hasDivider` at a real group
 //    boundary; without it the row leaves the rhythm to the caller's own
@@ -75,6 +83,8 @@ export function InfoRowItem({
   action,
   actionKind,
   href,
+  variant = 'secondary',
+  onAction,
   style,
   hasDivider = true,
 }: InfoRow & {
@@ -101,10 +111,10 @@ export function InfoRowItem({
           ) : (
             <Button
               label={action}
-              variant="secondary"
+              variant={variant}
               size="sm"
               style={actionNoWrap}
-              onClick={() => {}}
+              onClick={onAction}
             />
           ))}
       </HStack>
