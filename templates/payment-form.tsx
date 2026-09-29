@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC[p=0] > Ctr > S.transparent[p=6 mw=1100] > V[g=5] > (V[g=6] > (V[g=2] > (Hd"Payment Request"[level=1 t=display-2] + Tx"Review your order"[t=body]) + D) + H[g=8] > (SI > V[g=8] > (V[g=1] > (H[j=between] > (Hd"Sign in to check out"[level=2] + B"Sign in") + Tx"Sign in to track your order"[t=body]) + V[g=3] > (Hd"Contact information"[level=2] + TI"Email" + CB"Email offers") + V[g=3] > (Hd"Shipping information"[level=2] + G[c=2 g=3] > (TI"First Name" + TI"Last Name") + TI"Address" + G[c=2 g=3] > (TI"City" + TI"ZIP Code") + SE"State" + TI"Phone Number" + CB"Save information") + V[g=3] > (V[g=1] > (Hd"Delivery"[level=2] + Tx"Processing time"[t=body]) + RL"Delivery method" > RLI*2) + V[g=3] > (V[g=1] > (Hd"Payment method"[level=2] + Tx"Encrypted"[t=body]) + G[c=2 g=3] > (B"PayPal" + B"Google Pay") + D"Or pay with card" + TI"Card Number" + G[c=3 g=3] > (SE"Expiry Month" + SE"Expiry Year" + TI"CVC") + TI"Name on Card" + CB"Billing address") + V[g=3] > (Hd"Promo code"[level=2] + H[g=2] > (TI"Promo code" + B"Apply")) + V[g=3] > (Hd"Gift options"[level=2] + CB"Gift message" + TA"Gift message") + V[g=4] > (H[g=5] > (H[g=1] > (Ic + Tx))*3 + V[g=2] > (B"Place order"[primary] + B"Continue shopping") + D + H[g=4] > (Lk"Refund policy" + Lk"Privacy policy" + Lk"Terms" + Lk"Cancellations"))) + SI > C[p=4] > Col"Order Summary" > V[g=4] > (V[g=3] > V[g=3] > (H[g=3] > (Tmb + V[g=1] > (Tx"Obsidian Ritual Chalice" + Tx"Hand-carved"[t=supporting])) + D)*3 + V[g=3] > (Hd"Order Total"[level=3] + H[j=between] > (Tx"Subtotal" + Tx"$91.20") + D + H[j=between] > (Tx"Total"[t=large] + Tx"$91.20"[t=large]) + Bn"Free shipping over $300"))))
+//   L > LC[p=0] > Ctr > S.transparent[p=6 mw=1100] > V[g=5] > (V[g=6] > (V[g=2] > (Hd"Payment Request"[level=1 t=display-2] + Tx"Review your order"[t=body]) + D) + H[g=8] > (SI > V[g=8] > (V[g=1] > (H[j=between] > (Hd"Sign in to check out"[level=2] + B"Sign in") + Tx"Sign in to track your order"[t=body]) + V[g=3] > (Hd"Contact information"[level=2] + TI"Email" + CB"Email offers") + V[g=3] > (Hd"Shipping information"[level=2] + G[c=2 g=3] > (TI"First Name" + TI"Last Name") + TI"Address" + G[c=2 g=3] > (TI"City" + TI"ZIP Code") + SE"State" + TI"Phone Number" + CB"Save information") + V[g=3] > (V[g=1] > (Hd"Delivery"[level=2] + Tx"Processing time"[t=body]) + RL"Delivery method" > RLI*2) + V[g=3] > (V[g=1] > (Hd"Payment method"[level=2] + Tx"Encrypted"[t=body]) + G[c=2 g=3] > (B"PayPal" + B"Google Pay") + D"Or pay with card" + TI"Card Number" + G[c=3 g=3] > (SE"Expiry Month" + SE"Expiry Year" + TI"CVC") + TI"Name on Card" + CB"Billing address") + V[g=3] > (Hd"Promo code"[level=2] + H[g=2] > (TI"Promo code" + B"Apply")) + V[g=3] > (Hd"Gift options"[level=2] + CB"Gift message" + TA"Gift message") + V[g=4] > (H[g=5] > (H[g=1] > (Ic + Tx))*3 + V[g=2] > (B"Place order"[primary] + B"Continue shopping") + D + H[g=4] > (Lk"Refund policy" + Lk"Privacy policy" + Lk"Terms" + Lk"Cancellations"))) + SI > C[p=4] > Col"Order Summary" > V[g=4] > (V[g=3] > H[g=3] > (Tmb + V[g=1] > (Tx"Obsidian Ritual Chalice" + Tx"Hand-carved"[t=supporting])))*3 + V[g=3] > (Hd"Order Total"[level=3] + H[j=between] > (Tx"Subtotal" + Tx"$91.20") + D + H[j=between] > (Tx"Total"[t=large] + Tx"$91.20"[t=large]) + Bn"Free shipping over $300"))))
 
 import {useState, type CSSProperties} from 'react';
 import {
@@ -202,53 +202,47 @@ function OrderLineItem({
   onChangeQty: (v: number) => void;
 }) {
   return (
-    <VStack gap={3}>
-      <HStack gap={3} vAlign="start">
-        <OrderItemPhoto item={item} />
-        <StackItem size="fill">
-          <VStack gap={1}>
-            <HStack gap={2} hAlign="between" vAlign="start">
-              <HStack gap={2} vAlign="center" wrap="wrap">
-                <Text type="body" weight="semibold">
-                  {item.name}
-                </Text>
-                {item.limited && (
-                  <HStack gap={1} vAlign="center">
-                    <StatusDot variant="warning" label="Limited edition" />
-                    <Text type="supporting" color="secondary">
-                      Limited edition
-                    </Text>
-                  </HStack>
-                )}
-              </HStack>
-              <Text type="body" hasTabularNumbers>
-                {fmt(item.price)}
+    <HStack gap={3} vAlign="start">
+      <OrderItemPhoto item={item} />
+      <StackItem size="fill">
+        <VStack gap={1}>
+          <HStack gap={2} hAlign="between" vAlign="start">
+            <HStack gap={2} vAlign="center" wrap="wrap">
+              <Text type="body" weight="semibold">
+                {item.name}
               </Text>
+              {item.limited && (
+                <HStack gap={1} vAlign="center">
+                  <StatusDot variant="warning" label="Limited edition" />
+                  <Text type="supporting" color="secondary">
+                    Limited edition
+                  </Text>
+                </HStack>
+              )}
             </HStack>
-            <Text type="supporting" color="secondary">
-              {item.variant}
+            <Text type="body" hasTabularNumbers>
+              {fmt(item.price)}
             </Text>
-            <HStack gap={2} vAlign="end" wrap="wrap">
-              <NumberInput
-                label="Qty"
-                value={qty}
-                onChange={onChangeQty}
-                min={1}
-                max={10}
-                isIntegerOnly
-              />
-              <Link href={SELF_HREF} type="supporting">
-                Remove
-              </Link>
-              <Link href={SELF_HREF} type="supporting">
-                Save
-              </Link>
-            </HStack>
-          </VStack>
-        </StackItem>
-      </HStack>
-      <Divider />
-    </VStack>
+          </HStack>
+          <Text type="supporting" color="secondary">
+            {item.variant}
+          </Text>
+          <HStack gap={2} vAlign="end" wrap="wrap">
+            <NumberInput
+              label="Qty"
+              value={qty}
+              onChange={onChangeQty}
+              min={1}
+              max={10}
+              isIntegerOnly
+            />
+            {/* Editing the order in place — an action, never a destination. */}
+            <Button label="Remove" variant="ghost" onClick={() => {}} />
+            <Button label="Save" variant="ghost" onClick={() => {}} />
+          </HStack>
+        </VStack>
+      </StackItem>
+    </HStack>
   );
 }
 

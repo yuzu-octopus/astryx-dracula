@@ -16,7 +16,6 @@ import {
 } from '@astryxdesign/core/SegmentedControl';
 import {Token} from '@astryxdesign/core/Token';
 import {Banner} from '@astryxdesign/core/Banner';
-import {Divider} from '@astryxdesign/core/Divider';
 import {Collapsible, CollapsibleGroup} from '@astryxdesign/core/Collapsible';
 import {AspectRatio} from '@astryxdesign/core/AspectRatio';
 import {SelectableCard} from '@astryxdesign/core/SelectableCard';
@@ -282,8 +281,10 @@ function ProductInfo() {
           }
         />
       </VStack>
-      <CollapsibleGroup type="multiple" defaultValue={['composition']}>
-        <Divider />
+      <CollapsibleGroup
+        type="multiple"
+        defaultValue={['composition']}
+        hasDividers>
         <Collapsible
           value="composition"
           trigger={
@@ -293,7 +294,6 @@ function ProductInfo() {
           }>
           <Text type="body">{PRODUCT.composition}</Text>
         </Collapsible>
-        <Divider />
         <Collapsible
           value="delivery"
           defaultIsOpen={false}
@@ -304,7 +304,6 @@ function ProductInfo() {
           }>
           <Text type="body">{PRODUCT.deliveryReturns}</Text>
         </Collapsible>
-        <Divider />
         <Collapsible
           value="dimensions"
           defaultIsOpen={false}
@@ -317,7 +316,6 @@ function ProductInfo() {
             {PRODUCT.dimensions}
           </Text>
         </Collapsible>
-        <Divider />
       </CollapsibleGroup>
     </VStack>
   );
