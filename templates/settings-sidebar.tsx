@@ -3,10 +3,10 @@
 //   L > (LP[p=0] > V[g=4] > Tx"Account settings"[t=label] + (UL > LI*8) + D + LI"Professional hosting tools") + (LC[p=6] > V[g=0] > (Tbar > B.ghost + Hd"Personal info"[level=1]) + Hd"Personal info"[level=1] + (V[g=0] > (H[j=between a=start] > (V[g=0] > Tx"Legal name"[weight=semibold] + Tx"Vlad Dracul"[t=supporting]) + Lk"Edit")*7) + (C.muted > V[g=4] > (H[g=3 a=start] > Ic + (V[g=1] > Tx"Why is info hidden?"[weight=semibold] + Tx[t=supporting]))*3))
 
 /**
- * Settings Panels — account sections with a nav panel and divided rows.  Frame: Layout nav panel (fill) | content column of section views. One (Frame/responsive/container: see XLE header above.)
+ * Settings Panels — account sections with a nav panel and spaced rows.  Frame: Layout nav panel (fill) | content column of section views. One (Frame/responsive/container: see XLE header above.)
  */
 
-import {Fragment, useState, type CSSProperties} from 'react';
+import {useState, type CSSProperties} from 'react';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {
   VStack,
@@ -248,35 +248,32 @@ export default function SettingsSidebar() {
 
                 {activeTab === 'login' && (
                   <VStack gap={8}>
-                    <VStack gap={0}>
+                    <VStack gap={2}>
                       <Heading level={2}>Login</Heading>
-                      <Divider />
                       {LOGIN_ROWS.map(row => (
                         <InfoRowItem
                           key={row.label}
                           {...row}
-                          href={SELF_HASH}
+                          hasDivider={false}
                           style={rowPadding}
                         />
                       ))}
                     </VStack>
 
-                    <VStack gap={0}>
+                    <VStack gap={2}>
                       <Heading level={2}>Social accounts</Heading>
-                      <Divider />
                       {SOCIAL_ROWS.map(row => (
                         <InfoRowItem
                           key={row.label}
                           {...row}
-                          href={SELF_HASH}
+                          hasDivider={false}
                           style={rowPadding}
                         />
                       ))}
                     </VStack>
 
-                    <VStack gap={0}>
+                    <VStack gap={2}>
                       <Heading level={2}>Device history</Heading>
-                      <Divider />
                       {DEVICE_ROWS.map((device) => (
                         <HStack
                           key={device.location}
@@ -285,7 +282,7 @@ export default function SettingsSidebar() {
                           style={rowPadding}>
                           <Icon icon={Monitor} />
                           <StackItem size="fill">
-                            <VStack gap={0}>
+                            <VStack gap={1}>
                               {/* wrap: the label plus the session status
                                   exceed the content width on a phone. */}
                               <HStack gap={2} vAlign="center" wrap="wrap">
@@ -314,23 +311,25 @@ export default function SettingsSidebar() {
                             </VStack>
                           </StackItem>
                           {device.action && (
-                            <Link href={SELF_HASH} style={actionNoWrap}>
-                              {device.action}
-                            </Link>
+                            <Button
+                              label={device.action}
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => {}}
+                              style={actionNoWrap}
+                            />
                           )}
                         </HStack>
                       ))}
-                      <Divider />
                     </VStack>
 
-                    <VStack gap={0}>
+                    <VStack gap={2}>
                       <Heading level={2}>Account</Heading>
-                      <Divider />
                       <HStack
                         hAlign="between"
                         vAlign="start"
                         style={rowPadding}>
-                        <VStack gap={0}>
+                        <VStack gap={1}>
                           <Text type="body" weight="semibold" display="block">
                             Deactivate your account
                           </Text>
@@ -341,11 +340,14 @@ export default function SettingsSidebar() {
                             This action cannot be undone
                           </Text>
                         </VStack>
-                        <Link href={SELF_HASH} style={actionNoWrap}>
-                          Deactivate
-                        </Link>
+                        <Button
+                          label="Deactivate"
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => {}}
+                          style={actionNoWrap}
+                        />
                       </HStack>
-                      <Divider />
                     </VStack>
                   </VStack>
                 )}
@@ -354,7 +356,6 @@ export default function SettingsSidebar() {
                   <VStack gap={8}>
                     <VStack gap={2}>
                       <Heading level={2}>Shared access</Heading>
-                      <Divider />
                       <Text type="body" color="secondary">
                         Review each request carefully before approving access.
                         We&apos;ll email your kin or coven-mate a 4-digit
@@ -402,7 +403,7 @@ export default function SettingsSidebar() {
                     onEdit={() => setExpandedRow('language')}
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}
-                    href={SELF_HASH}
+                    hasDivider={false}
                     style={rowPadding}>
                     <Selector
                       label="Language"
@@ -423,7 +424,7 @@ export default function SettingsSidebar() {
                     onEdit={() => setExpandedRow('currency')}
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}
-                    href={SELF_HASH}
+                    hasDivider={false}
                     style={rowPadding}>
                     <Selector
                       label="Currency"
@@ -444,7 +445,7 @@ export default function SettingsSidebar() {
                     onEdit={() => setExpandedRow('timezone')}
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}
-                    href={SELF_HASH}
+                    hasDivider={false}
                     style={rowPadding}>
                     <Selector
                       label="Time zone"
@@ -472,7 +473,7 @@ export default function SettingsSidebar() {
                     onEdit={() => setExpandedRow('legalName')}
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}
-                    href={SELF_HASH}
+                    hasDivider={false}
                     style={rowPadding}>
                     <TextInput
                       label="Legal name"
@@ -488,7 +489,7 @@ export default function SettingsSidebar() {
                     onEdit={() => setExpandedRow('preferredName')}
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}
-                    href={SELF_HASH}
+                    hasDivider={false}
                     style={rowPadding}>
                     <TextInput
                       label="Preferred first name"
@@ -504,7 +505,7 @@ export default function SettingsSidebar() {
                     onEdit={() => setExpandedRow('email')}
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}
-                    href={SELF_HASH}
+                    hasDivider={false}
                     style={rowPadding}>
                     <TextInput
                       label="Email address"
@@ -520,7 +521,7 @@ export default function SettingsSidebar() {
                     onEdit={() => setExpandedRow('phone')}
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}
-                    href={SELF_HASH}
+                    hasDivider={false}
                     style={rowPadding}>
                     <TextInput
                       label="Phone number"
@@ -533,7 +534,7 @@ export default function SettingsSidebar() {
                     label="Identity verification"
                     value="Verified"
                     action=""
-                    href={SELF_HASH}
+                    hasDivider={false}
                     style={rowPadding}
                   />
                   <ExpandableRow
@@ -543,7 +544,7 @@ export default function SettingsSidebar() {
                     onEdit={() => setExpandedRow('address')}
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}
-                    href={SELF_HASH}
+                    hasDivider={false}
                     style={rowPadding}>
                     <TextInput
                       label="Residential address"
@@ -559,7 +560,7 @@ export default function SettingsSidebar() {
                     onEdit={() => setExpandedRow('mailingAddress')}
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}
-                    href={SELF_HASH}
+                    hasDivider={false}
                     style={rowPadding}>
                     <TextInput
                       label="Mailing address"
@@ -575,7 +576,7 @@ export default function SettingsSidebar() {
                     onEdit={() => setExpandedRow('emergencyContact')}
                     onCancel={() => setExpandedRow(null)}
                     onSave={() => setExpandedRow(null)}
-                    href={SELF_HASH}
+                    hasDivider={false}
                     style={rowPadding}>
                     <TextInput
                       label="Emergency contact"
@@ -588,26 +589,20 @@ export default function SettingsSidebar() {
 
                 <Card padding={4}>
                   <VStack gap={4}>
-                    {INFO_TILES.map((tile, i) => (
-                      <Fragment key={tile.title}>
-                        {i > 0 && <Divider />}
-                        <HStack gap={3} vAlign="start">
-                          <Center width={48} height={48} style={iconBox}>
-                            <Icon icon={tile.icon} />
-                          </Center>
-                          <VStack gap={0}>
-                            <Text type="body" weight="semibold" display="block">
-                              {tile.title}
-                            </Text>
-                            <Text
-                              type="body"
-                              color="secondary"
-                              display="block">
-                              {tile.body}
-                            </Text>
-                          </VStack>
-                        </HStack>
-                      </Fragment>
+                    {INFO_TILES.map(tile => (
+                      <HStack key={tile.title} gap={3} vAlign="start">
+                        <Center width={48} height={48} style={iconBox}>
+                          <Icon icon={tile.icon} />
+                        </Center>
+                        <VStack gap={1}>
+                          <Text type="body" weight="semibold" display="block">
+                            {tile.title}
+                          </Text>
+                          <Text type="body" color="secondary" display="block">
+                            {tile.body}
+                          </Text>
+                        </VStack>
+                      </HStack>
                     ))}
                   </VStack>
                 </Card>
@@ -619,7 +614,7 @@ export default function SettingsSidebar() {
                 {!isNarrow && <Heading level={1}>Privacy</Heading>}
 
                 <VStack gap={8}>
-                  <VStack gap={0}>
+                  <VStack gap={2}>
                     <Heading level={2}>Messages</Heading>
                     <VStack style={rowPadding}>
                       <Switch
@@ -636,10 +631,9 @@ export default function SettingsSidebar() {
                       </Text>
                       <Link href={SELF_HASH}>View</Link>
                     </HStack>
-                    <Divider />
                   </VStack>
 
-                  <VStack gap={0}>
+                  <VStack gap={2}>
                     <Heading level={2}>Listings</Heading>
                     <VStack style={rowPadding}>
                       <Switch
@@ -651,14 +645,13 @@ export default function SettingsSidebar() {
                         labelSpacing="spread"
                       />
                     </VStack>
-                    <Divider />
                   </VStack>
 
                   <VStack gap={4}>
                     <Heading level={2}>Reviews</Heading>
                     <Text type="body" color="secondary">
                       Choose what&apos;s shared when you write a review.{' '}
-                      <Link href={SELF_HASH} type="body">
+                      <Link href={SELF_HASH} type="body" hasUnderline>
                         Learn more
                       </Link>
                     </Text>
@@ -696,7 +689,6 @@ export default function SettingsSidebar() {
                         labelSpacing="spread"
                       />
                     </VStack>
-                    <Divider />
                   </VStack>
 
                   <VStack gap={4}>
@@ -704,7 +696,13 @@ export default function SettingsSidebar() {
                     <Card>
                       <HStack hAlign="between" vAlign="center">
                         <Text type="body">Request my personal data</Text>
-                        <Link href={SELF_HASH}>Request</Link>
+                        <Button
+                          label="Request"
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => {}}
+                          style={actionNoWrap}
+                        />
                       </HStack>
                     </Card>
                     <Switch
@@ -718,7 +716,13 @@ export default function SettingsSidebar() {
                     <Card>
                       <HStack hAlign="between" vAlign="center">
                         <Text type="body">Delete my account</Text>
-                        <Link href={SELF_HASH}>Delete</Link>
+                        <Button
+                          label="Delete"
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => {}}
+                          style={actionNoWrap}
+                        />
                       </HStack>
                     </Card>
                     <Card variant="muted">
@@ -733,7 +737,10 @@ export default function SettingsSidebar() {
                           <Text type="body" color="secondary">
                             We&apos;re committed to keeping your data protected.
                             See details in our{' '}
-                            <Link href={SELF_HASH} type="supporting">
+                            <Link
+                              href={SELF_HASH}
+                              type="supporting"
+                              hasUnderline>
                               Privacy Policy
                             </Link>
                             .
@@ -749,9 +756,9 @@ export default function SettingsSidebar() {
             {activeNav === 'Notifications' && (
               <VStack gap={6}>
                 {!isNarrow && <Heading level={1}>Notifications</Heading>}
-                <VStack gap={0}>
+                <VStack gap={2}>
                   <Heading level={2}>Messages</Heading>
-                  <VStack style={rowPadding}>
+                  <VStack gap={4} style={rowPadding}>
                     <Switch
                       label="Email notifications"
                       description="Coven updates, journey reminders, and crypt activity."
@@ -760,9 +767,6 @@ export default function SettingsSidebar() {
                       labelPosition="start"
                       labelSpacing="spread"
                     />
-                  </VStack>
-                  <Divider />
-                  <VStack style={rowPadding}>
                     <Switch
                       label="Push notifications"
                       description="Swift ravens for messages and booking requests."
@@ -772,7 +776,6 @@ export default function SettingsSidebar() {
                       labelSpacing="spread"
                     />
                   </VStack>
-                  <Divider />
                 </VStack>
               </VStack>
             )}
@@ -780,14 +783,13 @@ export default function SettingsSidebar() {
             {activeNav === 'Taxes' && (
               <VStack gap={6}>
                 {!isNarrow && <Heading level={1}>Taxes</Heading>}
-                <VStack gap={0}>
+                <VStack gap={2}>
                   <Heading level={2}>Tax scrolls</Heading>
-                  <Divider />
                   {TAX_ROWS.map(row => (
                     <InfoRowItem
                           key={row.label}
                           {...row}
-                          href={SELF_HASH}
+                          hasDivider={false}
                           style={rowPadding}
                         />
                   ))}
@@ -798,14 +800,13 @@ export default function SettingsSidebar() {
             {activeNav === 'Payments' && (
               <VStack gap={6}>
                 {!isNarrow && <Heading level={1}>Payments</Heading>}
-                <VStack gap={0}>
+                <VStack gap={2}>
                   <Heading level={2}>Payout crypt</Heading>
-                  <Divider />
                   {PAYOUT_ROWS.map(row => (
                     <InfoRowItem
                           key={row.label}
                           {...row}
-                          href={SELF_HASH}
+                          hasDivider={false}
                           style={rowPadding}
                         />
                   ))}
@@ -816,7 +817,7 @@ export default function SettingsSidebar() {
             {activeNav === 'Travel for work' && (
               <VStack gap={6}>
                 {!isNarrow && <Heading level={1}>Travel for work</Heading>}
-                <VStack gap={0}>
+                <VStack gap={2}>
                   <Heading level={2}>Work haunts</Heading>
                   <VStack style={rowPadding}>
                     <Switch
@@ -828,7 +829,6 @@ export default function SettingsSidebar() {
                       labelSpacing="spread"
                     />
                   </VStack>
-                  <Divider />
                 </VStack>
               </VStack>
             )}
