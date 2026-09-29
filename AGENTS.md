@@ -75,16 +75,16 @@ each one is recorded here.
   `shared/settings-rows.tsx` over content from `shared/settings-data.ts`. The row bodies were
   byte-identical when they were forked, so a divider or a `Link`→`Button` fix made inside one
   template is invisible to the other — which is why an earlier pass could not clear the clutter
-  from either template. `href` survives on both rows as accepted-but-unread so existing call sites
-  still compile; `hasDivider` defaults to `true`.
+  from either template. The rows' own `href` prop survives as accepted-but-unread — a callsite
+  compatibility shim, and a different thing from `InfoRow.href` on the data side — while
+  `hasDivider` defaults to `true`.
 - **A row's action kind is declared on the data, not recovered at the callsite.** `InfoRow` carries
-  `actionKind: 'action' | 'destination'` — one mechanism, stating the fact where the row is written.
-  The `actionHref` prop and the `actionHref={row.action === 'View' ? SELF_HASH : undefined}`
-  callsites it served are deleted; do not reinstate them, and do not string-match a row's `action`
-  string to recover the kind. If a data field fails to arrive through a `{...row}` spread, the
-  cause is TypeScript excess-property checks on the row literal, not the spread: `InfoRow` declared
-  only `label`/`value`/`action`, so the extra key was rejected at the literal. Fix the interface
-  and a data-side signal reaches every renderer with zero template edits.
+  `actionKind: 'action' | 'destination'` — one mechanism, stating the fact where the row is written,
+  so every renderer reading that data can see it. Do not reinstate the `actionHref` prop and do not
+  string-match a row's `action` string to recover the kind. If a data field fails to arrive through
+  a `{...row}` spread, the cause is TypeScript excess-property checks on the row literal, not the
+  spread: `InfoRow` declared only `label`/`value`/`action`, so the extra key was rejected at the
+  literal. Fix the interface and a data-side signal reaches every renderer with zero template edits.
 
 Templates are the reference implementation. Read the closest `templates/<id>.template.mjs` — it
 names the page and blocks it is built from — before writing a new pattern. Core's `.d.ts` describes
