@@ -126,6 +126,19 @@ cannot drift between templates.
 
 **The check that passes when it should fail, because it is the hardest instance to argue with.** Renaming a declaration while leaving its call sites is invisible to a presence check. In this repo `rg -c "loginFailed" file` returning `2` was read as "correctly retained" when the declaration had just been renamed — a false PASS, in a file we owned, on the change we had just made. **"Does this string exist?" and "is this identifier in scope?" are different questions, and only the second is a build-safety check.** A grep returning non-zero is not a result; it is a prompt to read it against what it is counting.
 
+**A declared token is not an applied token.** Until core+CLI 0.6.3,
+`--text-display-2-size` was defined in this theme and applied by nothing:
+core 0.3.0's `Heading` emitted no `data-type`, and the 0.3.0 CLI emitted no
+`.astryx-heading[data-type]` rule. **24 templates asked for `type="display-2"`
+and every one rendered at core's 24px level-1 default instead of the 35px they
+declared.** It looked right, it was right in light mode, no build failed, no
+review caught it, and three consumers did not notice — only a pixel diff
+between two builds found it. Every other gate checks that a value is *correct*;
+this one checks it can *reach* the element at all, which is the failure mode
+that passes every other check. `bun run audit` now fails if any `display-N`
+this repo consumes lacks a matching `[data-type]` rule in `theme.css`. So
+before you trust a size, check it is applied, not just declared.
+
 **A rule stated in prose is a request; a rule stated in the type is a compiler error.** This repo's colour rules are the worked example: `shared/chart-hues.ts` exports a `ChartHue` union, and `shared/scene-hues.ts` enforces "purple never touches these scenes" with a `SCENE_HUES` union typed at every hop, so a hand-rolled array fails the build instead of a review. When a rule keeps failing review, move it into a type before writing it down again.
 
 **Then widen the type until it catches what is already wrong, not only what you imagined.** The `ChartHue` union was already there and still let ten violations through, because eight demo `DataBar`s passed `color: string` to a prop typed `string`, and the legend accepted `(string & {})`. Widening those to `` ChartHue | `var(--color-data-${string})` `` turned all ten into compile errors on the spot. A type that only admits the right values by convention is decoration; a type that rejects the wrong values you actually shipped is enforcement. **Then measure the damage before shipping it** — a type change is a breaking change for consumers, and the honest cost of a stricter union is stated, not assumed.

@@ -52,6 +52,11 @@ Three rules that are cheap to get wrong and expensive to debug, all settled with
 - **A `.tsx` exports components only; data lives in a sibling `.ts`.** A file exporting both breaks
   React Fast Refresh. `bun run audit` gates `package.json` `exports` against `shared/` in both
   directions, so a new shared module needs an entry and a deleted one loses it.
+- **A declared token is not an applied token.** 24 templates asked for `type="display-2"` (35px) and
+  every one rendered 24px for the package's entire life: no `.astryx-heading[data-type]` rule existed
+  to apply the size, so core's level-1 default leaked through. It looked right, no build failed, and
+  only a pixel diff between two builds found it. `bun run audit` now fails if a `display-N` this repo
+  consumes has no matching rule in `theme.css`. Check a size is **applied**, not just declared.
 
 ## Links, buttons, dividers (USAGE.md → Rules carries the rules; this is the evidence)
 

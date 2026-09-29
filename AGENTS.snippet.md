@@ -9,6 +9,11 @@ with `<Theme theme mode="dark">` from `@astryxdesign/core/theme` for the full th
 `minHeight:'100%'`, which computes to 0 against an indefinite parent and changes nothing. Derive any
 count a page prints from its data; never write the numeral. A `.tsx` exports components only (data
 lives in a sibling `.ts`) so React Fast Refresh works.
+A DECLARED token is not an APPLIED token: 24 templates asked for `type="display-2"` (35px)
+and all rendered 24px for the package's whole life, because no `.astryx-heading[data-type]`
+rule existed to apply it. It looked correct and no build failed. `bun run audit` now fails
+if a consumed `display-N` has no matching rule in `theme.css` — check a size is applied, not
+just declared.
 A link navigates, a button acts: save/delete/toggle is a `Button`, and `hasUnderline` marks a prose link only.
 Chart marks take `--color-data-*` role tokens (via `shared/chart-hues` / `chart-legend` / `data-bar`
 types, which reject anything else at compile time), never `--dracula-*` primitives. Comment #6272A4

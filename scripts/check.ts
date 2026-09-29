@@ -821,5 +821,35 @@ for (const f of lintFiles.sort()) {
   }
 }
 
+// A declared token is not an applied token.
+//
+// Until core+CLI 0.6.3, --text-display-2-size was defined in the theme and
+// applied by NOTHING: core 0.3.0's Heading emitted no data-type, and the 0.3.0
+// CLI emitted no .astryx-heading[data-type] rule. 24 templates asked for
+// type="display-2" and every one of them rendered at core's 24px level-1
+// default instead of the 35px they declared. It looked correct, it was
+// correct in light mode, three consumers did not notice, and only a pixel
+// diff between two builds found it.
+//
+// Every other gate here checks that a value is CORRECT. This one checks that
+// the value can REACH the element at all, which is the failure mode that
+// passes every other check, every build, and every code review.
+{
+  const built = await Bun.file('theme.css').text();
+  const used = new Set<string>();
+  for (const entry of [...new Bun.Glob('{templates,shared}/*.tsx').scanSync('.')]) {
+    const src = await Bun.file(entry).text();
+    for (const m of src.matchAll(/<(Heading|Text)\b[^>]*?type="(display-[0-9])"/g)) {
+      used.add(`${m[1]}|${m[2]}`);
+    }
+  }
+  for (const use of [...used].sort()) {
+    const [el, type] = use.split('|');
+    if (!built.includes(`.astryx-${el.toLowerCase()}[data-type="${type}"]`)) {
+      fail(`${type} is consumed on <${el}> in this repo but theme.css has no .astryx-${el.toLowerCase()}[data-type="${type}"] rule — the size is DECLARED but UNREACHABLE, so the component silently falls back to its default. Add the rule, or stop consuming the type.`);
+    }
+  }
+}
+
 if (failed) process.exit(1);
 console.log('kit checks PASS');
