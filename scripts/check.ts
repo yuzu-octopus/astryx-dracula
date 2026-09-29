@@ -71,8 +71,17 @@ for (const dir of ['fonts', 'public/fonts']) {
   }
 }
 if (css.includes("url('/fonts/")) fail("tokens.css @font-face must be base-scoped (/astryx-dracula/fonts/), not bare /fonts/");
-const built = await Bun.file('theme.css').text().catch(() => '');
-if (built && !built.includes('astryx-dracula')) fail('theme.css stale: rebuild with `bun run theme:build`');
+// A MISSING theme.css is a hard failure, not a skipped check. This used to
+// read `const built = ...catch(() => '')` and then guard the entire dark-only
+// invariant on `if (built)`, so `rm theme.css && bun scripts/check.ts` printed
+// "kit checks PASS" and exited 0: the one file every other build-output gate
+// below reasons about, deleted, and the gate certified its absence. A guard
+// that turns "I could not read the evidence" into "nothing to check" is the
+// worst shape an enforcement gate can take, because it reads as coverage.
+const built = await Bun.file('theme.css').text().catch(() => null);
+if (built === null) {
+  fail('theme.css is missing or unreadable — run `bun run theme:build`; the dark-only invariant and every other build-output check below are unverifiable without it');
+}
 
 // Dark-only invariant: every light-dark() tuple the build emits must have
 // identical branches. Nothing else enforces it, so a future pin() that drifts to
@@ -102,7 +111,13 @@ const lightDarkTuples = (src: string): string[][] => {
   }
   return out;
 };
-if (built) {
+// The tuple self-check below is reachable only because the read above now
+// fails loudly. Under `if (built)` it sat inside the very guard that would
+// have triggered it: a present-but-empty or truncated theme.css reached the
+// gate, produced zero tuples, and the `!tuples.length` line meant to catch
+// exactly that was dead code. Do not reintroduce a truthiness guard here.
+if (built !== null) {
+  if (!built.includes('astryx-dracula')) fail('theme.css stale: rebuild with `bun run theme:build`');
   const tuples = lightDarkTuples(built);
   if (!tuples.length) fail('no light-dark() tuples found in theme.css — dark-only invariant unverified');
   for (const t of tuples) {
@@ -137,52 +152,138 @@ for (const [name, element] of Object.entries(draculaIconRegistry)) {
 }
 
 // Contrast floors per the Dracula spec (WCAG 2.1 AA 4.5 for body text).
-// --color-text-subdue is the one token below every text floor: it is a legacy
-// glance compat value for chrome (separators, hairline rules), never text, so
-// it is pinned to chrome minimums instead of an AA threshold.
-const pairs: Array<[string, string, string, number]> = [
-  ['text-primary/bg', '#F8F8F2', '#282A36', 4.5],
-  ['text-secondary/bg', '#9AA1BC', '#282A36', 4.5],
-  ['text-secondary/surface', '#9AA1BC', '#343746', 4.5],
-  ['text-disabled/bg', '#6272A4', '#282A36', 2.5],
-  ['text-accent/bg', '#BD93F9', '#282A36', 3.0],
-  ['text-paragraph/bg', '#B0B3C4', '#282A36', 4.5],
-  ['text-muted/bg', '#8288A6', '#282A36', 3.0],
-  ['text-subdue/bg (chrome only, never text)', '#4C5067', '#282A36', 1.5],
-  ['text-subdue/card (chrome only, never text)', '#4C5067', '#343746', 1.3],
-  ['on-accent/accent', '#21222C', '#BD93F9', 3.0],
-  ['on-success/success', '#21222C', '#50FA7B', 3.0],
-  ['on-warning/warning', '#21222C', '#F1FA8C', 3.0],
-  ['on-error/error', '#21222C', '#FF5555', 3.0],
-  ['on-info/info', '#21222C', '#8BE9FD', 3.0],
-  // Navigation/state pairs: visited secondary on body, accent focus ring on
-  // both tiers, dark text on the error/red fills (destructive + banners).
-  ['visited/body', '#9AA1BC', '#282A36', 4.5],
-  ['focus-accent/body', '#BD93F9', '#282A36', 3.0],
-  ['focus-accent/surface', '#BD93F9', '#343746', 3.0],
-  ['destructive/error', '#21222C', '#FF5555', 3.0],
-  ['on-error/pale-error', '#21222C', '#FFD5CC', 4.5],
-  ['on-inverted/inverted', '#21222C', '#F8F8F2', 4.5],
-  ['separator/bg', '#44475A', '#282A36', 1.3],
+//
+// EVERY COLOUR BELOW IS A LOOKUP, never a literal. This table used to hardcode
+// both hexes of all 28 pairs, which meant the gate could not fail on ANY
+// theme change: repin --color-text-secondary to a 2.25:1 value, run the
+// documented `bun run theme:build`, and the gate still printed
+// `PASS text-secondary/bg 5.56` — a number for a colour the page does not
+// ship — then `kit checks PASS`, exit 0, while `theme:check` said upToDate. It
+// was certifying a table, not the theme. A gate that cannot fail is worse than
+// no gate, because it is trusted. So each row names two tokens and the ratio
+// is computed from the theme's own values.
+//
+// A name that does not resolve is a FAILURE, never a skip. That is what
+// catches a wrong token name: the old `text-muted/bg` row measured
+// `--color-text-muted`, which does not exist — the real token is
+// --color-text-base-muted — and a literal could not tell. It is also what
+// stops the next rename from quietly deleting a row's coverage.
+//
+// Dynamic import, not a static one: check.ts runs standalone via bun and the
+// theme module must load from the working tree at check time. Read here
+// because the contrast rows are the first consumer; the pin-symmetry check
+// further down reuses the same map.
+const themeImport = await import('../astryx-theme.js');
+const inputTokens = (themeImport.astryxDraculaTheme.__inputTokens ?? {}) as Record<string, [string, string] | string>;
+
+// Resolves a token to #RRGGBB or #RRGGBBAA, following a var() indirection.
+// Returns null for an unknown name, an hsl() ramp or a reference cycle, so the
+// caller fails loudly rather than measuring a substitute colour.
+const tokenHex = (name: string, seen = new Set<string>()): string | null => {
+  const v = inputTokens[name];
+  if (v === undefined) return null;
+  const raw = (Array.isArray(v) ? v[0] : v).trim();
+  const ref = raw.match(/^var\(\s*(--[a-z0-9-]+)\s*\)$/);
+  if (ref) {
+    if (seen.has(ref[1])) return null;
+    seen.add(ref[1]);
+    return tokenHex(ref[1], seen);
+  }
+  return /^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/.test(raw) ? raw.toUpperCase() : null;
+};
+const solid = (h: string) => h.slice(0, 7);
+const alphaOf = (h: string) => (h.length === 9 ? parseInt(h.slice(7, 9), 16) / 255 : 1);
+
+// wash: the background token carries an alpha and is composited over the card
+// tier, exactly as the browser does it. The alpha comes from the token's own
+// byte (0x1A = 26/255 = 10.2%), so repinning the wash is now a gate event
+// instead of a silent visual change.
+type ContrastRow = { name: string; fg: string; bg: string; floor: number; wash?: boolean };
+const pairs: ContrastRow[] = [
+  { name: 'text-primary/bg', fg: '--color-text-primary', bg: '--color-background-body', floor: 4.5 },
+  { name: 'text-secondary/bg', fg: '--color-text-secondary', bg: '--color-background-body', floor: 4.5 },
+  { name: 'text-secondary/surface', fg: '--color-text-secondary', bg: '--color-background-surface', floor: 4.5 },
+  // Disabled text is chrome by definition and exempt from 1.4.3, so it carries
+  // a 2.5 floor rather than an AA one.
+  { name: 'text-disabled/bg', fg: '--color-text-disabled', bg: '--color-background-body', floor: 2.5 },
+  { name: 'text-accent/bg', fg: '--color-text-accent', bg: '--color-background-body', floor: 3.0 },
+  { name: 'text-paragraph/bg', fg: '--color-text-paragraph', bg: '--color-background-body', floor: 4.5 },
+  { name: 'text-base-muted/bg', fg: '--color-text-base-muted', bg: '--color-background-body', floor: 3.0 },
+  // --color-text-subdue is the one token below every text floor: it is a legacy
+  // glance compat value for chrome (separators, hairline rules), never text,
+  // so it is pinned to chrome minimums instead of an AA threshold.
+  { name: 'text-subdue/bg (chrome only, never text)', fg: '--color-text-subdue', bg: '--color-background-body', floor: 1.5 },
+  { name: 'text-subdue/card (chrome only, never text)', fg: '--color-text-subdue', bg: '--color-background-card', floor: 1.3 },
+  { name: 'on-accent/accent', fg: '--color-on-accent', bg: '--color-accent', floor: 3.0 },
+  { name: 'on-success/success', fg: '--color-on-success', bg: '--color-success', floor: 3.0 },
+  { name: 'on-warning/warning', fg: '--color-on-warning', bg: '--color-warning', floor: 3.0 },
+  { name: 'on-error/error', fg: '--color-on-error', bg: '--color-error', floor: 3.0 },
+  { name: 'on-info/info', fg: '--color-on-info', bg: '--color-info', floor: 3.0 },
+  // Accent focus ring on both tiers. core paints it as
+  // `outline: 2px solid var(--color-accent)` (astryx.css, :focus-visible), so
+  // the non-text 1.4.11 floor of 3.0 is the right one.
+  //
+  // The old `visited/body` row is GONE, and the lookup is what proved it had
+  // to go: it measured #9AA1BC on #282A36, and there is no visited token to
+  // resolve that to — core 0.6.3 emits no `:visited` rule anywhere (zero hits
+  // across dist/) and this theme pins no visited value, so a visited link
+  // renders in --color-text-accent like every other link. The row was a
+  // hardcoded certificate for a state the page never paints, which is the
+  // defect this table just had. A visited state that ships one day needs a
+  // real token and a row here.
+  { name: 'focus-accent/body', fg: '--color-accent', bg: '--color-background-body', floor: 3.0 },
+  { name: 'focus-accent/surface', fg: '--color-accent', bg: '--color-background-surface', floor: 3.0 },
+  // Destructive Button: .x1pjz0fi fills var(--color-error) and .x1m024r3 paints
+  // var(--color-on-error), so this resolves to the same pair as on-error/error
+  // above. Kept as its own row because it names a distinct component, and it
+  // is the row that would move first if the Button's on-fill token were split
+  // from the status-dot one.
+  { name: 'destructive/error', fg: '--color-on-error', bg: '--color-error', floor: 3.0 },
+  // The two INVERTED rows used to measure #21222C, which this theme does not
+  // paint on either surface: the toast rules resolve to --color-on-light
+  // (astryx-theme.ts, toast type:info / type:error). Reading the token instead
+  // of the literal is what exposed that, and the corrected pair is the one the
+  // page actually renders.
+  { name: 'on-light/pale-error', fg: '--color-on-light', bg: '--color-background-error-inverted', floor: 4.5 },
+  { name: 'on-light/inverted', fg: '--color-on-light', bg: '--color-background-inverted', floor: 4.5 },
+  { name: 'separator/bg', fg: '--color-separator', bg: '--color-background-body', floor: 1.3 },
   // border-em: 3.0, not 1.5. The floor is the WCAG 1.4.11 tier core's own
   // expandColorScale.ts:22-24 promises for form-control boundaries, which
-  // pin() makes inert. 3.0 passes at 4.60 and would have been RED at 2.51
-  // before the repin, so the gate now carries evidence instead of rubber-
-  // stamping. Popover is a REAL adjacent tier, not a hypothetical one:
+  // pin() makes inert. Popover is a REAL adjacent tier, not a hypothetical one:
   // DropdownMenuRadioItem.tsx:84 reads this token and DropdownMenu paints
   // --color-background-popover. Muted is included for the same reason.
-  ['border-em/card',    '#9AA1BC', '#343746', 3.0],
-  ['border-em/popover', '#9AA1BC', '#424450', 3.0],
-  ['border-em/muted',   '#9AA1BC', '#44475A', 3.0],
-  ['banner-info/text', '#8BE9FD', mix('#8BE9FD', 0.1, '#343746'), 3.0],
-  ['banner-success/text', '#50FA7B', mix('#50FA7B', 0.1, '#343746'), 3.0],
-  ['banner-warning/text', '#F1FA8C', mix('#F1FA8C', 0.1, '#343746'), 3.0],
-  ['banner-error/text', '#FF5555', mix('#FF5555', 0.1, '#343746'), 3.0],
+  { name: 'border-em/card',    fg: '--color-border-emphasized', bg: '--color-background-card',    floor: 3.0 },
+  { name: 'border-em/popover', fg: '--color-border-emphasized', bg: '--color-background-popover', floor: 3.0 },
+  { name: 'border-em/muted',   fg: '--color-border-emphasized', bg: '--color-background-muted',   floor: 3.0 },
+  // Status text on a status wash: core paints --color-text-cyan
+  // (astryx.css .x1txnczv) over the --color-background-<hue> wash this theme
+  // feeds the Banner status scopes. Renamed from `banner-*/text`, which named
+  // a component the banner does not paint that way — the Banner's own base
+  // rule sets --color-text-primary — so the old name described a pair nothing
+  // rendered, which is the same defect as a hardcoded hex.
+  { name: 'status-info/wash',    fg: '--color-text-cyan',   bg: '--color-background-cyan',   floor: 3.0, wash: true },
+  { name: 'status-success/wash', fg: '--color-text-green',  bg: '--color-background-green',  floor: 3.0, wash: true },
+  { name: 'status-warning/wash', fg: '--color-text-yellow', bg: '--color-background-yellow', floor: 3.0, wash: true },
+  { name: 'status-error/wash',   fg: '--color-text-red',    bg: '--color-background-red',    floor: 3.0, wash: true },
 ];
-for (const [name, fg, bg, floor] of pairs) {
-  const r = ratio(fg, bg);
-  if (r < floor) fail(`FAIL ${name} ${r.toFixed(2)} (floor ${floor})`);
-  else console.log(`PASS ${name} ${r.toFixed(2)}`);
+{
+  const card = tokenHex('--color-background-card');
+  for (const row of pairs) {
+    const fgHex = tokenHex(row.fg);
+    const bgHex = tokenHex(row.bg);
+    if (!fgHex) { fail(`FAIL ${row.name}: ${row.fg} is not a theme token carrying a hex value`); continue; }
+    if (!bgHex) { fail(`FAIL ${row.name}: ${row.bg} is not a theme token carrying a hex value`); continue; }
+    if (alphaOf(fgHex) < 1) {
+      fail(`FAIL ${row.name}: ${row.fg} is translucent (#${fgHex.slice(1)}); a foreground over an unknown backdrop is not measurable`);
+      continue;
+    }
+    const alpha = alphaOf(bgHex);
+    if (alpha < 1 && !card) { fail(`FAIL ${row.name}: ${row.bg} is a wash and --color-background-card will not resolve`); continue; }
+    const bg = alpha < 1 ? mix(solid(bgHex), alpha, solid(card!)) : solid(bgHex);
+    const r = ratio(solid(fgHex), bg);
+    if (r < row.floor) fail(`FAIL ${row.name} ${r.toFixed(2)} (floor ${row.floor}, ${row.fg} on ${row.bg})`);
+    else console.log(`PASS ${row.name} ${r.toFixed(2)} (${row.fg} on ${row.bg})`);
+  }
 }
 
 // Selected-ring regression floor. Composited from the token's OWN hex over the
@@ -207,29 +308,34 @@ for (const [name, fg, bg, floor] of pairs) {
 // fail a passing build. The next alpha step (0x4D) measures 1.68:1, so a real
 // regression is a 0.3 jump — far outside this tolerance.
 const RING_FLOOR = 1.37;
-const SURFACE_TIER = '#343746';
+// The surface tier is a token lookup, not a literal: pinning '#343746' here
+// meant a repin of --color-background-card left this gate measuring against a
+// surface the page no longer paints, which is the same defect the contrast
+// table just had.
+const SURFACE_TIER = tokenHex('--color-background-card');
+if (!SURFACE_TIER) fail('FAIL cannot resolve --color-background-card to compute the ring regression floor');
 const ringHex = themeSrc.match(/'--shadow-inset-selected':\s*'inset 0px 0px 0px 2px #([0-9A-Fa-f]{8})'/);
-if (ringHex) {
+// Both halves are guarded, so neither measurement can be skipped: the surface
+// lookup above and the ring's own alpha byte. A guard on only one of them is
+// how this file used to certify a ring it never measured.
+if (ringHex && SURFACE_TIER) {
   const rgb = `#${ringHex[1].slice(0, 6)}`;
   const alphaByte = parseInt(ringHex[1].slice(6, 8), 16);
   const alphaPct = (alphaByte / 255) * 100;
   const composited = mix(rgb, alphaByte / 255, SURFACE_TIER);
   const r = ratio(composited, SURFACE_TIER);
   if (r < RING_FLOOR) fail(`FAIL inset-selected/ring ${r.toFixed(2)}:1 over ${SURFACE_TIER} (regression floor ${RING_FLOOR}; alpha byte 0x${ringHex[1].slice(6, 8)} = ${alphaPct.toFixed(2)}%) — does NOT meet 1.4.11, which needs 3:1`);
-  else console.log(`PASS inset-selected/ring ${r.toFixed(2)}:1 (alpha 0x${ringHex[1].slice(6, 8)} = ${alphaPct.toFixed(2)}%, below the 3:1 1.4.11 floor — documented gap, not discharged here)`);
-} else fail('FAIL cannot read --shadow-inset-selected alpha to compute the ring regression floor');
+  else console.log(`PASS inset-selected/ring ${r.toFixed(2)}:1 over ${SURFACE_TIER} (alpha 0x${ringHex[1].slice(6, 8)} = ${alphaPct.toFixed(2)}%, below the 3:1 1.4.11 floor — documented gap, not discharged here)`);
+} else fail('FAIL cannot read --shadow-inset-selected alpha and --color-background-card to compute the ring regression floor');
 // Theme provenance gates: read astryx-theme.ts source (never built output).
 // Pins are counted here; the symmetry check itself runs further down against
-// the built theme's input map, where the tuples actually live.
+// the theme's input map, loaded above for the contrast table.
 const pins = [...themeSrc.matchAll(/pin\(\s*(['"])(.*?)\1\s*\)/g)].map((m) => m[2]);
 if (!pins.length) fail('no pin() tuples found in astryx-theme.ts');
 console.log(`PASS pin() tuples ${pins.length} (symmetric dark-only)`);
 // Tuple symmetry: every theme token tuple must pin the same hex twice
-// (dark-only). Checked against the built theme input map.
-// Static import cannot work here: check.ts runs standalone via bun, and the
-// theme module must load from the working tree at check time.
-const themeImport = await import('../astryx-theme.js');
-const inputTokens = themeImport.astryxDraculaTheme.__inputTokens as Record<string, [string, string] | string> | undefined;
+// (dark-only). Checked against the same input map the contrast table reads.
+if (!Object.keys(inputTokens).length) fail('theme input map is empty — pin() symmetry unverified');
 for (const [k, v] of Object.entries(inputTokens ?? {})) {
   if (Array.isArray(v) && v[0] !== v[1]) fail(`asymmetric tuple ${k}: ${v[0]} vs ${v[1]} (dark-only: pin both slots)`);
 }
@@ -440,19 +546,50 @@ for (const f of ['tokens.css', 'astryx-theme.ts', ...lintFiles]) {
   }
 }
 
-// 2. NO <Link> RENDERING AN ACTION. A link is a destination; a button is an
+// 2a. NO RAW <a>. A raw anchor is a BYPASS, not a style choice. It paints the
+// browser's default link colour and its own underline on a #282A36 page, so
+// the palette claim in BRAND.md stops holding the moment one ships; and it
+// evades every verb check in 2b below, because that walk only reads <Link.
+// `core`'s <Link> IS an anchor — it just carries the theme's colour, the
+// hasUnderline contract and the gate. No exception is carved: the tree
+// carries zero raw anchors today, so the gate is green on day one and the
+// first one to appear is a real finding. Comments are blanked first for the
+// reason the underline gate above states — the rule has to be statable in
+// prose somewhere, and a gate that fails on its own documentation gets
+// disabled on day one.
+//
+// 2b. NO <Link> RENDERING AN ACTION. A link is a destination; a button is an
 // action. A Button painted as a Link announces "link" to a screen reader for
 // something that acts, and hands it the navigation affordance.
 //
-// An EXPLICIT VERB LIST matched on the label's FIRST WORD, not a pattern over
-// all the text. "Billing address" and "History of edits" are navigation labels
-// no verb reaches, and a gate that cries wolf on correct sites is worse than no
-// gate — the same tradeoff the !important and chart gates state about their own
-// scope. What it costs is stated at ACTION_LINK_ALLOW: a nav label that really
-// does open with an imperative verb needs one entry there. Extend the list by
-// adding a verb; do not generalise it.
-const ACTION_VERBS = ['Create', 'Delete', 'Disconnect', 'Log out', 'Deactivate', 'Request', 'Remove', 'Save', 'Submit', 'Edit', 'Add', 'Cancel', 'Confirm'];
-const actionVerbs = ACTION_VERBS.map((v) => [v, new RegExp(`^${v}\\b`, 'i')] as const);
+// The verb list is DERIVED FROM THE SPACE OF ACTIONS, not from the settings
+// copy this repo happens to ship. Each word has to survive one test: could
+// this same word, as the first word of a link label, name a PLACE? If yes it
+// is a destination far more often than it is an operation, and a gate that
+// hard-fails on it cries wolf on correct sites — which is how a gate gets
+// disabled and then protects nothing while still reading as coverage.
+//
+//   dropped as destinations: Create ("Create a free account" — the commonest
+//     marketing CTA there is, and a Link by this repo's own semantics.md §1),
+//     Edit ("Edit profile"), Add ("Add to calendar"), Request ("Request a
+//     quote"), Confirm ("Confirm your email"). Five of the old thirteen.
+//   kept as actions: Delete, Remove, Save, Submit, Cancel, Disconnect,
+//     Deactivate, Log out.
+//   added, because a real action uses them and the old list could not see it:
+//     Update, Change, Upgrade, Download, Copy, Share, Send, Publish, Archive,
+//     Restore, Reset, Import, Export, Approve, Reject, Enable, Disable.
+//
+// The boundary is (?=\s|$) and NOT \b. A word boundary matches between "Add"
+// and the hyphen in "Add-ons", so the old pattern flagged a compound noun;
+// requiring whitespace or end-of-label admits "Delete account" and "Log out"
+// while refusing "Add-ons" and "Address".
+const ACTION_VERBS = [
+  'Approve', 'Archive', 'Cancel', 'Change', 'Copy', 'Deactivate', 'Delete',
+  'Disable', 'Disconnect', 'Download', 'Enable', 'Export', 'Import', 'Log out',
+  'Publish', 'Reject', 'Remove', 'Reset', 'Restore', 'Save', 'Send', 'Share',
+  'Submit', 'Update', 'Upgrade',
+];
+const actionVerbs = ACTION_VERBS.map((v) => [v, new RegExp(`^${v}(?=\\s|$)`, 'i')] as const);
 
 // The escape hatch, and the ONLY one: one human ruling per site, keyed
 // `file:line` — the same string the message prints, so a site is found and
@@ -460,15 +597,43 @@ const actionVerbs = ACTION_VERBS.map((v) => [v, new RegExp(`^${v}\\b`, 'i')] as 
 // navigation label like "Edit history" is a true positive on the verb and a
 // false positive on the rule, and "remove the verb" is not an answer to that.
 // A line that moves falls out of the table, which is the intent and not a bug:
-// the sentence around it changed, so somebody should read it again.
+// the sentence around it changed, so somebody should read it again. That is
+// also why the dead-key check below exists — a key that matches nothing is a
+// ruling that has silently stopped ruling.
 const ACTION_LINK_ALLOW: Record<string, true> = {
-  // Prose, not a control: it closes AUTH_SIGNUP_PROMPT inside a sentence, and
-  // asks for hasUnderline because colour alone is not a cue inline (1.4.1/F73).
-  'templates/login-sso.tsx:190': true,
+  // Currently EMPTY, and that is a result rather than an oversight.
+  // templates/login-sso.tsx:190 ("Request access", prose) was the one entry
+  // and needed no longer be exempt: "Request" left ACTION_VERBS above because
+  // "Request a quote" is a destination, so that site no longer trips the
+  // verb gate at all. A stale key would have been the rottable-exemption case
+  // the check below now reports, so it is gone rather than left to rot.
 };
+
+// The two tiers, and why the second one cannot fail.
+//
+// Tier 1 hard-fails: a <Link> whose first word is an action verb and which does
+// not ask for hasUnderline is a control painted as a destination. Tier 2 is a
+// REVIEW: same verb, but hasUnderline, which means the site sits inside running
+// prose where the verb describes the sentence rather than being the affordance.
+//
+// THIS TIER CANNOT FAIL, and that is the correct trade rather than an
+// oversight. Hard-failing prose would leave the author two bad options —
+// drop the underline, losing the 1.4.1/F73 cue that colour alone is not enough
+// inline, or bend the copy to dodge a verb list. Both costs land on whoever
+// ships the fix, so the honest outcome is a signal a human reads, not a red
+// build. The signal is the point: every tier-2 site is collected and printed,
+// then counted in one summary line, so it cannot scroll past and
+// "kit checks PASS" cannot quietly hide a prose link nobody has ruled on.
+// Grep for ^REVIEW to list them; an allowlist entry is the ruling.
+const reviewTier: string[] = [];
+const allowHits = new Set<string>();
 
 for (const f of lintFiles.sort()) {
   const src = await Bun.file(f).text();
+  const code = stripComments(src);
+  for (const m of code.matchAll(/<a(?=[\s>])/g)) {
+    fail(`${f}:${code.slice(0, m.index).split('\n').length} raw <a> — use core's <Link>, which carries the Dracula link colour, the hasUnderline contract and the action-verb gate below; a raw anchor paints the browser default on the page and bypasses all three`);
+  }
   for (const m of src.matchAll(/<Link(?=[\s>])/g)) {
     const end = findTagEnd(src, m.index! + '<Link'.length);
     if (end === -1) continue;
@@ -478,16 +643,36 @@ for (const f of lintFiles.sort()) {
     const label = (src.slice(end + 1).match(/^\s*([^<{][^<]{0,60})/)?.[1] ?? '').replace(/\s+/g, ' ').trim();
     const verb = actionVerbs.find(([, re]) => re.test(label))?.[0];
     if (!verb) continue;
-    if (at in ACTION_LINK_ALLOW) continue;
+    if (at in ACTION_LINK_ALLOW) {
+      allowHits.add(at);
+      continue;
+    }
     // hasUnderline means the site sits in running prose, where the verb
     // describes the sentence rather than being the affordance. That downgrades
     // a hard fail to a human review; it does not silence it.
     if (!/hasUnderline/.test(src.slice(m.index, end + 1))) {
       fail(`${at} <Link> labelled "${label}" renders an action as a destination — use Button, or if this is genuinely navigation add '${at}' to ACTION_LINK_ALLOW in scripts/check.ts`);
     } else {
-      console.log(`REVIEW ${at} <Link> labelled "${verb}…" with hasUnderline — prose or control? if prose, add '${at}' to ACTION_LINK_ALLOW in scripts/check.ts`);
+      reviewTier.push(`REVIEW ${at} <Link> labelled "${verb}…" with hasUnderline — prose or control? if prose, add '${at}' to ACTION_LINK_ALLOW in scripts/check.ts`);
     }
   }
+}
+
+// A dead allowlist key is a ruling that stopped ruling: the line moved, the
+// label changed, or the verb left the list, and the table still claims a
+// human said yes. Keyed by file:line, any edit above a key invalidates it, so
+// nothing else in this file would ever notice.
+for (const key of Object.keys(ACTION_LINK_ALLOW)) {
+  if (!allowHits.has(key)) {
+    fail(`ACTION_LINK_ALLOW key "${key}" matched no site — the line moved, the label changed, or the verb left ACTION_VERBS; delete the key or re-check the site at that line`);
+  }
+}
+
+if (reviewTier.length) {
+  for (const line of reviewTier) console.log(line);
+  console.log(`REVIEW ${reviewTier.length} prose <Link>(s) awaiting a human ruling — ships green by design, see the comment above; grep ^REVIEW to list them`);
+} else {
+  console.log('REVIEW 0 prose <Link>(s)');
 }
 
 // 3. DIVIDER DENSITY. A divider is a section boundary, not a row background —
