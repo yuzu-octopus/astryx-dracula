@@ -1,6 +1,14 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LH > H[g3 a=center] > (H[g2 a=center] > Hd"Night watch"[level=1] + Tx"3 investigating"[t=supporting]) + SegmentedControl"Filter by status" + B"Declare incident") + (LC[p0] > V[g0] > (H > PowerSearch"Search the night watch…") + (List > (ListItem)*7)) + (LayoutPanel[w380 p0] > V[g4] > (V[g2] > (H[g2 a=center] > StatusDot + Tx"INC-2417"[t=supporting] + Token"Investigating") + Hd"Checkout API elevated 5xx rate"[level=2]) + (H[g2] > B.primary"Mark mitigated" + B.secondary"Escalate") + Divider + MetadataList + Divider + (V[g2] > Hd"Timeline"[level=3] + List))
+// NOTE on `t=display-2`: the h1 asked for display-2 from the start, but
+// core 0.3.0's Heading emitted no `data-type`, and the 0.3.0 CLI emitted no
+// `.astryx-heading[data-type]` rule, so --text-display-2-size never reached a
+// heading and the 24px level-1 default leaked through. core+CLI 0.6.3 restored
+// the path, so this title now renders at its declared 35px. Verified by
+// pixel-diffing the pre-upgrade build against this one at 1440 and 390: the
+// only regression was this header detaching at 390, fixed by stacking the
+// title group under `isNarrow`.
+//   L > (LH > H[g3 a=center] > (H[g2 a=center] > Hd"Night watch"[level=1 t=display-2] + Tx"3 investigating"[t=supporting]) + SegmentedControl"Filter by status" + B"Declare incident") + (LC[p0] > V[g0] > (H > PowerSearch"Search the night watch…") + (List > (ListItem)*7)) + (LayoutPanel[w380 p0] > V[g4] > (V[g2] > (H[g2 a=center] > StatusDot + Tx"INC-2417"[t=supporting] + Token"Investigating") + Hd"Checkout API elevated 5xx rate"[level=2]) + (H[g2] > B.primary"Mark mitigated" + B.secondary"Escalate") + Divider + MetadataList + Divider + (V[g2] > Hd"Timeline"[level=3] + List))
 
 /**
  * Incident Console — an on-call incident response tool for the night watch.  Frame-first layout (see `bunx astryx docs layout`), distilled fro (Frame/responsive/container: see XLE header above.)
@@ -521,7 +529,22 @@ export default function IncidentConsole() {
       icon={<Icon icon={Plus} size="sm" />}
     />
   );
-  const titleGroup = (
+  // Stacks below 1024px. The H1 asks for `display-2` (35px), which is the
+  // theme's own declared value but only started rendering in core 0.6.3 —
+  // see the note in the XLE header. At 35px the title wraps to two lines on a
+  // phone, and the counter beside it then wraps too and detaches into the
+  // corner. Stacking keeps the counter on the title's own line at any width
+  // the title needs more than one, and costs nothing at desktop.
+  const titleGroup = isNarrow ? (
+    <VStack gap={1}>
+      <Heading level={1} type="display-2">
+        Night watch
+      </Heading>
+      <Text type="supporting" color="secondary" hasTabularNumbers>
+        {openCount} investigating
+      </Text>
+    </VStack>
+  ) : (
     <HStack gap={2} vAlign="center">
       <Heading level={1} type="display-2">Night watch</Heading>
       <Text type="supporting" color="secondary" hasTabularNumbers>
