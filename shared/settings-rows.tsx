@@ -40,7 +40,7 @@ import {Divider} from '@astryxdesign/core/Divider';
 // boundaries). Verified by hash before the move — the row BODIES matched
 // exactly; only these call-site differences remained.
 //
-// TWO RULES these rows are built around, from USAGE.md "Rules":
+// THREE RULES these rows are built around, from USAGE.md "Rules":
 //  - A link is a destination, a button is an action. Every trailing control
 //    here ("Create", "Disconnect", "Edit") changes state in place, so all three
 //    are `Button`s. `secondary`, not `primary`: a row action must not outrank
@@ -50,6 +50,10 @@ import {Divider} from '@astryxdesign/core/Divider';
 //    render one ONLY when the caller marks `hasDivider` at a real group
 //    boundary; without it the row leaves the rhythm to the caller's own
 //    `Stack gap` / row padding rather than adding a rule of its own.
+//  - Spacing comes from the scale. The label/value pair is spaced with
+//    `Stack gap`, never a margin, and `gap={1}` matches the rows each template
+//    builds itself (device history, Deactivate, the info tiles) so no row on
+//    the page reads tighter than its neighbours.
 //
 // `href` is retained as an accepted-but-unused prop on both public rows. It
 // existed only to anchor the Links this file no longer renders, so nothing
@@ -73,7 +77,7 @@ export function InfoRowItem({
   return (
     <>
       <HStack hAlign="between" vAlign="start" style={style}>
-        <VStack gap={0}>
+        <VStack gap={1}>
           <Text type="body" weight="semibold" display="block">
             {label}
           </Text>
@@ -136,7 +140,7 @@ function ExpandableRowViewing({
 }) {
   return (
     <HStack hAlign="between" vAlign="start" style={style}>
-      <VStack gap={0}>
+      <VStack gap={1}>
         <Text type="body" weight="semibold" display="block">
           {label}
         </Text>
