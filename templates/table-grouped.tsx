@@ -1,12 +1,12 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LH[divider] > V[g=4] > (H[j=between a=center] > Hd"Night-shift issues"[level=1] + B.primary"Raise issue"[opens=#raise-issue]) + (H[g=2 a=center] > PS + Po > B.secondary"View options")) + (LC[p=0] > T[hover] > (TR > THC*7) + (TR > TC*7)*4) + (LP > V[g=4] > (H > Tx[t=supporting] + IB"Close panel") + (V[g=1] > Hd[level=2] + Tx[t=body]) + ML + (D + (V[g=2] > Tx"Labels"[t=label] + (H[g=2] > Tk*2)))) ;; Dlg#raise-issue > (DH"Raise issue" + (LC[p=4] > V[g=4] > TI*4) + (LF > H[j=end g=2] > B.secondary"Cancel" + B.primary"Raise issue"))
+//   L > (LH[divider] > V[g=4] > (H[j=between a=center] > Hd"Night-shift issues"[level=1] + B.primary"Raise issue"[opens=#raise-issue]) + (H[g=2 a=center] > PS + Po > B.secondary"View options")) + (LC[p=0] > (Tx"Scroll the table sideways to see every column"[t=supporting] + D) + T[hover] > (TR > THC*7) + (TR > TC*7)*4) + (LP > V[g=4] > (H > Tx[t=supporting] + IB"Close panel") + (V[g=1] > Hd[level=2] + Tx[t=body]) + ML + (D + (V[g=2] > Tx"Labels"[t=label] + (H[g=2] > Tk*2)))) ;; Dlg#raise-issue > (DH"Raise issue" + (LC[p=4] > V[g=4] > TI*4) + (LF > H[j=end g=2] > B.secondary"Cancel" + B.primary"Raise issue"))
 
 /**
  * Table Grouped — the night-shift issue tracker: a grouped, collapsible issue table with a PowerSearch bar and a resizable detail inspector. (Frame/responsive/container: see XLE header above.)
  */
 
-import React, {useState, useMemo} from 'react';
+import React, {useRef, useState, useMemo} from 'react';
 import {useResizable, ResizeHandle} from '@astryxdesign/core/Resizable';
 import type {ResizableProps} from '@astryxdesign/core/Resizable';
 import {
@@ -41,6 +41,7 @@ import {
   Table,
   TableRow,
   TableCell,
+  TableHeaderCell,
   proportional,
   pixel,
   resolveColumnWidths,
@@ -69,6 +70,37 @@ const groupHeaderCell: React.CSSProperties = {
   backgroundColor: 'var(--color-background-muted)',
   padding: 'var(--spacing-3) var(--spacing-4)',
 };
+
+// Chrome above the scroller, never an overlay on it: the Actions menu is the
+// last column inside the overflow, and a sticky element covering row controls
+// is a defect (SKILL.md, responsive rules).
+const scrollCueBar: React.CSSProperties = {
+  padding: 'var(--spacing-2) var(--spacing-4)',
+};
+
+// Whether the table currently overflows its scroller. Measured rather than
+// derived from a breakpoint: the pane narrows both on window resize and when
+// the (resizable) inspector opens, and the scroller is core's own, so a media
+// query would disagree with what the reader actually sees. This is the
+// scroller's own overflow test, so the hint can never contradict the scroll.
+function useTableOverflows(paneRef: React.RefObject<HTMLDivElement | null>) {
+  const [overflows, setOverflows] = useState(false);
+  React.useLayoutEffect(() => {
+    // The <table>'s parent is the scroll container core renders around it.
+    const scroller = paneRef.current?.querySelector('table')?.parentElement;
+    if (!scroller) {
+      return;
+    }
+    const measure = () => {
+      setOverflows(scroller.scrollWidth > scroller.clientWidth + 1);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(scroller);
+    return () => observer.disconnect();
+  }, [paneRef]);
+  return overflows;
+}
 
 // Types
 type TaskStatus = 'in_progress' | 'todo' | 'backlog' | 'done';
@@ -621,36 +653,61 @@ function getGroupLabel(groupBy: GroupByField, key: string): string {
   return key;
 }
 
+// Real widths, because `resolveColumnWidths` derives the table's aggregate
+// min-width from exactly these numbers: every `pixel()` here also sets
+// min-width (the table may not shrink a fixed column) and every
+// `proportional()` contributes its own min. Set too small, the core honors the
+// number anyway and clips the cell — that is how a 44px status column came to
+// hold "In Progress" (91px of text) and a 72px date column came to hold a
+// header plus a value. The floors below are the measured width of the widest
+// real value in the column plus the 24px of balanced-density cell padding, so
+// no value in the data is ever narrower than its own content.
+// The consequence is an honest min-width of 1014px, which is why the table
+// scrolls in its own container below that and why the cue below it exists:
+// at 390 the status and the Issue column both land on screen, and the
+// remaining columns are one swipe away.
 const columns: TableColumn<TaskRow>[] = [
   {
     key: 'status',
     header: '',
-    width: pixel(44),
+    // StatusDot + the status word, which WCAG 1.4.1 requires as a channel
+    // beside the hue.
+    width: pixel(116),
   },
   {
     key: 'title',
     header: 'Issue',
-    width: proportional(1),
+    // 2fr of the flexible pair: the issue id and title are what the reader
+    // scans the list for.
+    width: proportional(2, {minWidth: 280}),
   },
   {
     key: 'project',
     header: 'Project',
-    width: proportional(1),
+    width: proportional(1, {minWidth: 150}),
   },
   {
     key: 'created',
     header: 'Created',
-    width: pixel(72),
+    // 112, not 80: the header label measures 83px at label-semibold, and a
+    // header cell always truncates, so the floor has to clear the label and
+    // not just the "Jul 3" value underneath it.
+    width: pixel(112),
   },
   {
     key: 'updated',
     header: 'Updated',
-    width: pixel(72),
+    width: pixel(112),
   },
   {
     key: 'assignee',
     header: 'Assignee',
-    width: pixel(52),
+    // Avatar AND name. At 52px the column showed the avatar alone, which
+    // left the name reachable only in the inspector — and the inspector is
+    // gone below 1024. 168 clears the widest name in the data
+    // ("Isabella Nguyen", 108px of text) beside the 24px avatar, so it never
+    // breaks across two lines.
+    width: pixel(168),
   },
   {
     key: 'actions',
@@ -863,6 +920,10 @@ export default function TableGrouped() {
   const COL_COUNT = columns.length;
   const resolvedWidths = resolveColumnWidths(columns);
 
+  // The pane the table scrolls inside, and whether it currently needs to.
+  const paneRef = useRef<HTMLDivElement | null>(null);
+  const tableOverflows = useTableOverflows(paneRef);
+
   return (
     <>
       <Layout
@@ -870,15 +931,16 @@ export default function TableGrouped() {
         header={
           <LayoutHeader hasDivider padding={6}>
             <VStack gap={4}>
-              <HStack gap={3} vAlign="center">
+              {/* wrap: below ~460px the Raise issue button drops to its own
+                  line instead of starving the heading, so the display-2 title
+                  keeps its full measure. The earlier maxLines={1} clipped it
+                  to "Night-shift i…" at 390, and its reveal path was a
+                  Tooltip — a hover affordance a phone never fires. Wrapping
+                  breaks on the space between the two words, so no value is
+                  lost and none is sliced mid-word (SC 1.4.10). */}
+              <HStack gap={3} vAlign="center" wrap="wrap">
                 <StackItem size="fill">
-                  {/* maxLines={1}: this is the worst case in the set — 18
-                      characters at 35px is 378px of a 342px header column, so
-                      it wraps to THREE lines and the header measures 180px
-                      (21.3% of a 390x844 viewport). Core wires maxLines to
-                      useTruncation, so the full title stays reachable in a
-                      Tooltip (SC 1.4.10). */}
-                  <Heading level={1} type="display-2" maxLines={1}>Night-shift issues</Heading>
+                  <Heading level={1} type="display-2">Night-shift issues</Heading>
                 </StackItem>
                 <Button
                   label="Raise issue"
@@ -924,12 +986,27 @@ export default function TableGrouped() {
           </LayoutHeader>
         }
         content={
-          <LayoutContent role="main" padding={0}>
+          <LayoutContent role="main" padding={0} ref={paneRef}>
+            {/* The visible cue for the scroller core already owns: the table
+                carries a real min-width, so below it the columns past Issue
+                live off-screen. Appears only while that is true — measured,
+                not assumed — so it is never a stale promise at 1440. */}
+            {tableOverflows && (
+              <>
+                <HStack gap={2} vAlign="center" style={scrollCueBar}>
+                  <Icon icon={ChevronRight} size="sm" color="secondary" />
+                  <Text type="supporting" color="secondary">
+                    Scroll the table sideways to see every column
+                  </Text>
+                </HStack>
+                <Divider />
+              </>
+            )}
             <Table
               columns={columns}
               density="balanced"
               dividers="rows"
-              textOverflow="truncate"
+              textOverflow="wrap"
               hasHover>
               <colgroup>
                 {columns.map(col => (
@@ -939,6 +1016,19 @@ export default function TableGrouped() {
                   />
                 ))}
               </colgroup>
+              {/* A scroller needs its columns named: once the reader has
+                  scrolled sideways at 390, this row is the only thing that
+                  says which value they are looking at. Rendered from
+                  `columns` so the labels and the widths cannot drift, and as
+                  real <th scope="col"> cells so the association reaches
+                  assistive tech. */}
+              <TableRow>
+                {columns.map(col => (
+                  <TableHeaderCell key={col.key} scope="col">
+                    {col.header}
+                  </TableHeaderCell>
+                ))}
+              </TableRow>
               {groupKeys.map(key => {
                 const tasks = grouped.get(key);
                 if (!tasks || tasks.length === 0) {
@@ -988,8 +1078,8 @@ export default function TableGrouped() {
                             {/* StatusDot paints nothing but an 8px dot — its
                                 label is aria-label on a role="img" span — so
                                 four states here read as hue alone. Same
-                                dot-plus-word pairing as the summary row at
-                                :751-757. */}
+                                dot-plus-word pairing as the Status entry in
+                                TaskDetailPanel's MetadataList. */}
                             <HStack gap={1} vAlign="center">
                               <StatusDot
                                 variant={STATUS_DOT_VARIANT[task.status]}
@@ -1012,7 +1102,7 @@ export default function TableGrouped() {
                                 {task.taskId}
                               </Text>
                               <StackItem size="fill">
-                                <Text type="body" maxLines={1}>
+                                <Text type="body">
                                   {task.title}
                                   {task.subtitle && (
                                     <Text type="inherit" color="secondary">
@@ -1026,7 +1116,7 @@ export default function TableGrouped() {
                           </TableCell>
                           <TableCell>
                             {task.project ? (
-                              <Text type="body" maxLines={1}>
+                              <Text type="body">
                                 {task.project}
                               </Text>
                             ) : (
@@ -1038,21 +1128,28 @@ export default function TableGrouped() {
                           <TableCell>
                             <Text
                               type="supporting"
-                              color="secondary"
-                              maxLines={1}>
+                              color="secondary">
                               {task.created}
                             </Text>
                           </TableCell>
                           <TableCell>
                             <Text
                               type="supporting"
-                              color="secondary"
-                              maxLines={1}>
+                              color="secondary">
                               {task.updated}
                             </Text>
                           </TableCell>
                           <TableCell>
-                            <Avatar name={task.assignee} size="sm" />
+                            {/* Name beside the avatar: below 1024 the
+                                inspector is gone, so the avatar alone would
+                                leave the assignee readable by screen reader
+                                but not by eye. */}
+                            <HStack gap={2} vAlign="center">
+                              <Avatar name={task.assignee} size="sm" />
+                              <Text type="supporting" color="secondary">
+                                {task.assignee}
+                              </Text>
+                            </HStack>
                           </TableCell>
                           <TableCell>
                             <DropdownMenu

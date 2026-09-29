@@ -29,7 +29,7 @@ import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {Dialog, DialogHeader} from '@astryxdesign/core/Dialog';
 import {Divider} from '@astryxdesign/core/Divider';
 import {Tooltip} from '@astryxdesign/core/Tooltip';
-import {Table, pixel} from '@astryxdesign/core/Table';
+import {Table, pixel, proportional} from '@astryxdesign/core/Table';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Section} from '@astryxdesign/core/Section';
 import {Center} from '@astryxdesign/core/Center';
@@ -41,6 +41,17 @@ import {outlinePanel} from 'astryx-dracula/shared/chaptered-doc-config';
 const tabListFlush: CSSProperties = {
   marginInlineStart: 'calc(var(--spacing-3) * -1)',
 };
+
+// The best-practices table lives in the prose column, where the eye tracks a
+// single measure. Table's scroll wrapper bleeds edge-to-edge by reading the
+// container padding vars LayoutContent publishes (32px here), which pushes
+// its dividers 32px past the measure on both sides at every width. This table
+// never overflows, so the bleed buys nothing — zero the vars for this subtree
+// so it sits on the measure with the headings above it.
+const practicesOnMeasure: CSSProperties = ({
+  '--container-padding-inline-start': '0px',
+  '--container-padding-inline-end': '0px',
+}) as CSSProperties;
 
 const COMPONENT_OUTLINE_ITEMS: OutlineItem[] = [
   {id: 'usage', label: 'Usage', level: 2},
@@ -635,34 +646,37 @@ function ComponentDetailView({activeNav}: {activeNav: string}) {
               <Heading id="best-practices" level={3}>
                 Best practices
               </Heading>
-              <Table
-                data={docs.bestPractices as Record<string, unknown>[]}
-                dividers="none"
-                hasHover
-                columns={[
-                  {
-                    key: 'type',
-                    header: 'Guidance',
-                    width: pixel(125),
-                    renderCell: (item: Record<string, unknown>) => (
-                      <Badge
-                        label={item.type === 'do' ? 'Do' : "Don't"}
-                        variant={item.type === 'do' ? 'green' : 'red'}
-                      />
-                    ),
-                  },
-                  {
-                    key: 'text',
-                    header: 'Practices',
-                    renderCell: (item: Record<string, unknown>) => (
-                      <Text type="body" textWrap="wrap">
-                        {item.text as string}
-                      </Text>
-                    ),
-                  },
-                ]}
-                density="spacious"
-              />
+              <div style={practicesOnMeasure}>
+                <Table
+                  data={docs.bestPractices as Record<string, unknown>[]}
+                  dividers="none"
+                  hasHover
+                  columns={[
+                    {
+                      key: 'type',
+                      header: 'Guidance',
+                      width: pixel(125),
+                      renderCell: (item: Record<string, unknown>) => (
+                        <Badge
+                          label={item.type === 'do' ? 'Do' : "Don't"}
+                          variant={item.type === 'do' ? 'green' : 'red'}
+                        />
+                      ),
+                    },
+                    {
+                      key: 'text',
+                      header: 'Practices',
+                      width: proportional(1),
+                      renderCell: (item: Record<string, unknown>) => (
+                        <Text type="body" textWrap="wrap">
+                          {item.text as string}
+                        </Text>
+                      ),
+                    },
+                  ]}
+                  density="spacious"
+                />
+              </div>
             </VStack>
 
             <Divider />

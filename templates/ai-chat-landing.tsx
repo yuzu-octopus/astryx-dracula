@@ -1,6 +1,6 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC > V[g=8 a=center] > (V[g=1] > (H[g=2 a=center] > Ic + Tx"Hi, Vlad"[t=body]) + Hd"Where should we start?"[level=1 type=display-2]) + ChC"Ask anything" + (V[g=6] > (TgG"Category" > Tg"Writing"*4) + Hd"Suggested prompts"[level=2] + (G[c={min:280} g=3] > (CC[p=4] > V[g=0.5] > Hd"Draft"[level=3] + Tx"Compose"[t=body])*4))
+//   L > LC > V[g=8 a=center] > (V[g=1] > (H[g=2 a=center] > Ic + Tx"Hi, Vlad"[t=body]) + Hd"Where should we start?"[level=1 type=display-2]) + ChC"Ask anything" + (V[g=6] > (TgG"Category" > H[g=1 wrap] > Tg"Writing"*4) + Hd"Suggested prompts"[level=2] + (G[c={min:280} g=3] > (CC[p=4] > V[g=0.5] > Hd"Draft"[level=3] + Tx"Compose"[t=body])*4))
 
 import {useRef, useState, type CSSProperties} from 'react';
 
@@ -467,14 +467,22 @@ export default function AiChatLanding() {
                 value={category}
                 onChange={setCategory}
                 size="lg">
-                {CATEGORIES.map(cat => (
-                  <ToggleButton
-                    key={cat.key}
-                    value={cat.key}
-                    label={cat.label}
-                    icon={<Icon icon={cat.icon} size="sm" />}
-                  />
-                ))}
+                {/* ToggleButtonGroup is a single nowrap flex row and the four
+                    chips measure 488px together. In a 390px pane the fourth
+                    chip was cut in half by the viewport edge, which reads as a
+                    rendering fault rather than as overflow. The wrapping
+                    HStack gives the row a second line instead; the group keeps
+                    its own selection semantics either way. */}
+                <HStack gap={1} wrap="wrap">
+                  {CATEGORIES.map(cat => (
+                    <ToggleButton
+                      key={cat.key}
+                      value={cat.key}
+                      label={cat.label}
+                      icon={<Icon icon={cat.icon} size="sm" />}
+                    />
+                  ))}
+                </HStack>
               </ToggleButtonGroup>
 
               {suggestions && (
