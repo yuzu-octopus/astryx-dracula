@@ -19,25 +19,42 @@ export function TrafficChart({
   bars?: Bar[];
   showValues?: boolean;
 }) {
-  const slot = 540 / bars.length;
+  // Slots are cut from the PLOT AREA (20..520, where the gridlines run), not
+  // from the full 540-wide viewBox. Dividing the viewBox instead put the last
+  // bar's right edge at x=548 -- 8 units past the edge, where the SVG clipped
+  // it -- so the series started 32 units in and ended flush against the
+  // border. Sizing against the plot area puts a 12-unit gutter at both ends
+  // for any bar count.
+  const PLOT_LEFT = 20;
+  const PLOT_WIDTH = 500;
+  const slot = PLOT_WIDTH / bars.length;
   const barWidth = slot - 24;
+  // Geometry is expressed as one baseline plus a bar scale rather than as
+  // absolute y values, so the whole plot compresses by changing two numbers.
+  // It is tuned to 140 units: at the ~580px this renders inside the bento's
+  // half-width cell, a 180-unit box was 193px tall on its own and pushed the
+  // page past the height the draculatheme.com preview can show.
+  const PLOT_BOTTOM = 112;
+  const BAR_SCALE = 88;
+  const LABEL_Y = 128;
+  const VALUE_LIFT = 8;
   return (
     <svg
-      viewBox="0 0 540 180"
+      viewBox="0 0 540 140"
       width="100%"
       role="img"
       aria-label="Monthly traffic by category">
-      <line x1="20" y1="30" x2="520" y2="30" stroke="var(--color-separator)" strokeDasharray="3 3" opacity={0.5} />
-      <line x1="20" y1="80" x2="520" y2="80" stroke="var(--color-separator)" strokeDasharray="3 3" opacity={0.5} />
-      <line x1="20" y1="130" x2="520" y2="130" stroke="var(--color-separator)" />
+      <line x1="20" y1="46" x2="520" y2="46" stroke="var(--color-separator)" strokeDasharray="3 3" opacity={0.5} />
+      <line x1="20" y1="79" x2="520" y2="79" stroke="var(--color-separator)" strokeDasharray="3 3" opacity={0.5} />
+      <line x1="20" y1={PLOT_BOTTOM} x2="520" y2={PLOT_BOTTOM} stroke="var(--color-separator)" />
       {bars.map((b, i) => {
-        const h = (b.value / 100) * 110;
-        const x = 20 + i * slot + 12;
+        const h = (b.value / 100) * BAR_SCALE;
+        const x = PLOT_LEFT + i * slot + 12;
         return (
           <g key={b.month}>
             <rect
               x={x}
-              y={130 - h}
+              y={PLOT_BOTTOM - h}
               width={barWidth}
               height={h}
               rx={4}
@@ -46,7 +63,7 @@ export function TrafficChart({
             {showValues && (
               <text
                 x={x + barWidth / 2}
-                y={120 - h}
+                y={PLOT_BOTTOM - VALUE_LIFT - h}
                 textAnchor="middle"
                 fontSize={13}
                 fill="var(--color-text-highlight)"
@@ -56,7 +73,7 @@ export function TrafficChart({
             )}
             <text
               x={x + barWidth / 2}
-              y={150}
+              y={LABEL_Y}
               textAnchor="middle"
               fontSize={13}
               fill="var(--color-text-paragraph)"
