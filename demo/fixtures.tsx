@@ -107,20 +107,3 @@ export function RouteCell({row}: {row: RouteRow}) {
   );
 }
 
-// The three-dot status vocabulary strip, now with visible keys.
-export function StatusKey({
-  items,
-}: {
-  items: {variant: 'success' | 'warning' | 'error'; label: string}[];
-}) {
-  return (
-    <HStack gap={3} vAlign="center">
-      {items.map((s) => (
-        <HStack key={s.label} gap={1} vAlign="center">
-          <StatusDot variant={s.variant} label={s.label} />
-          <Text type="supporting">{s.label}</Text>
-        </HStack>
-      ))}
-    </HStack>
-  );
-}
