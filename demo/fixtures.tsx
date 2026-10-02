@@ -73,6 +73,11 @@ export function TrafficChart({
 // Status reads as a word, not a hue alone: core's StatusDot paints nothing for
 // its label (it sets aria-label only), so a dot-only cell leaves a sighted user
 // unable to name the state. WCAG 1.4.1.
+// Dot + route name only. The status WORD was redundant with the dot's own
+// variant, and in the bento's narrow Routes cell it forced the longest row
+// to wrap mid-word: "/component Degrade / s ... d". The dot carries the
+// status as a colour AND as an aria-label, so removing the text loses no
+// information and cannot break at any width.
 export function RouteCell({row}: {row: RouteRow}) {
   return (
     <HStack gap={2} vAlign="center">
@@ -81,9 +86,6 @@ export function RouteCell({row}: {row: RouteRow}) {
         label={row.status}
       />
       <Text weight="semibold">{row.page}</Text>
-      <Text type="supporting" color="secondary">
-        {row.status === 'healthy' ? 'Healthy' : 'Degraded'}
-      </Text>
     </HStack>
   );
 }
