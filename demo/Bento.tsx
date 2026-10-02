@@ -49,7 +49,6 @@ const SPEC = [
 const METERS: { label: string; value: number; color: DataBarSegment['color'] }[] = [
   { label: 'Build minutes quota', value: 62, color: 'var(--color-data-categorical-green)' },
   { label: 'Error budget', value: 91, color: 'var(--color-data-yellow-2)' },
-  { label: 'Uptime', value: 99, color: 'var(--color-data-categorical-green)' },
 ];
 
 // Every number this page prints is read off the data it renders, and latency is
@@ -148,9 +147,9 @@ export function Bento() {
           whole content area, so every card matched the frame around it rather
           than the field it sat in, and a 100vh min-height left a dead band
           under the grid. */}
-      <VStack gap={6}>
+      <VStack gap={4}>
         <section id="bento">
-          <Card padding={3}>
+          <Card padding={2}>
             <HStack justify="between" vAlign="center" wrap="wrap" gap={6}>
               <VStack gap={2}>
                 <HStack gap={2} vAlign="center" wrap="wrap">
@@ -184,8 +183,8 @@ export function Bento() {
         </section>
 
         <section id="cells">
-          <VStack gap={6}>
-            <Grid columns={{ minWidth: 260, max: 4 }} gap={3}>
+          <VStack gap={4}>
+            <Grid columns={{ minWidth: 260, max: 4 }} gap={2}>
               <GridSpan columns={2}>
                 <Cell
                   title="Traffic"
@@ -202,7 +201,18 @@ export function Bento() {
                 <Cell
                   title="Routes"
                   caption="Edge throughput and p99 latency"
-                  end={<Badge label={`${ROUTES.length} endpoints`} variant="neutral" />}
+                  end={
+                    <HStack gap={1.5} vAlign="center">
+                      {/* The derived totals ride in the header's right slot, where
+                          badges already live, so the cell keeps both numbers
+                          without spending a body row on them. */}
+                      <Badge label={`${TOTAL_VIEWS.toLocaleString()} views`} variant="neutral" />
+                      <Badge
+                        label={SLOWEST.status === 'healthy' ? 'All healthy' : 'One degraded'}
+                        variant={SLOWEST.status === 'healthy' ? 'green' : 'yellow'}
+                      />
+                    </HStack>
+                  }
                 >
                   <Table
                     data={ROUTES}
@@ -236,28 +246,6 @@ export function Bento() {
                       },
                     ]}
                   />
-                  {/* One line, not a nested card. This cell sits in a fixed-height
-                      grid row and the summary was the tallest thing in it; the
-                      numbers are unchanged, only the chrome around them is not. */}
-                  <HStack justify="between" vAlign="center" gap={3}>
-                    <HStack gap={2} vAlign="center">
-                      <Text type="supporting">
-                        <Text weight="semibold" hasTabularNumbers>
-                          {TOTAL_VIEWS.toLocaleString()}
-                        </Text>{' '}
-                        views
-                      </Text>
-                      {/* This names the one route that missed, so it takes warning
-                          yellow rather than reading as neutral metadata. 10.55:1. */}
-                      <Text type="supporting" style={{ color: 'var(--color-warning)' }}>
-                        slowest p99 on {SLOWEST.page} at {SLOWEST.latency}
-                      </Text>
-                    </HStack>
-                    <Badge
-                      label={SLOWEST.status === 'healthy' ? 'All healthy' : 'One degraded'}
-                      variant={SLOWEST.status === 'healthy' ? 'green' : 'yellow'}
-                    />
-                  </HStack>
                 </Cell>
               </GridSpan>
 

@@ -31,21 +31,21 @@ export function TrafficChart({
   const barWidth = slot - 24;
   // Geometry is expressed as one baseline plus a bar scale rather than as
   // absolute y values, so the whole plot compresses by changing two numbers.
-  // It is tuned to 140 units: at the ~580px this renders inside the bento's
+  // It is tuned to 110 units: at the ~580px this renders inside the bento's
   // half-width cell, a 180-unit box was 193px tall on its own and pushed the
   // page past the height the draculatheme.com preview can show.
-  const PLOT_BOTTOM = 112;
-  const BAR_SCALE = 88;
-  const LABEL_Y = 128;
+  const PLOT_BOTTOM = 88;
+  const BAR_SCALE = 68;
+  const LABEL_Y = 102;
   const VALUE_LIFT = 8;
   return (
     <svg
-      viewBox="0 0 540 140"
+      viewBox="0 0 540 110"
       width="100%"
       role="img"
       aria-label="Monthly traffic by category">
-      <line x1="20" y1="46" x2="520" y2="46" stroke="var(--color-separator)" strokeDasharray="3 3" opacity={0.5} />
-      <line x1="20" y1="79" x2="520" y2="79" stroke="var(--color-separator)" strokeDasharray="3 3" opacity={0.5} />
+      <line x1="20" y1="36" x2="520" y2="36" stroke="var(--color-separator)" strokeDasharray="3 3" opacity={0.5} />
+      <line x1="20" y1="62" x2="520" y2="62" stroke="var(--color-separator)" strokeDasharray="3 3" opacity={0.5} />
       <line x1="20" y1={PLOT_BOTTOM} x2="520" y2={PLOT_BOTTOM} stroke="var(--color-separator)" />
       {bars.map((b, i) => {
         const h = (b.value / 100) * BAR_SCALE;
