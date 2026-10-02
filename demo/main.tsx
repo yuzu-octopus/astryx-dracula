@@ -11,6 +11,8 @@ import App from './App';
 import { BareTemplate, TemplateDetail, TemplatesIndex } from './Templates';
 import { TEMPLATE_IDS } from './templateRegistry';
 
+import { SiteShell } from './Chrome';
+
 const Bento = lazy(() =>
   import('./Bento').then((m) => ({ default: m.Bento })),
 );
@@ -42,10 +44,20 @@ function Router() {
       </Suspense>
     );
   }
+  // The bento is a showcase page, so it gets the site chrome like every other
+  // one -- the nav is how a visitor finds the rest of the kit. `?shot=` renders
+  // it bare, because the harness wants the grid alone and chrome would only
+  // push it out of frame.
   if (shot === 'bento' || hash === '#/bento') {
     return (
       <Suspense fallback={null}>
-        <Bento />
+        {shot === 'bento' ? (
+          <Bento />
+        ) : (
+          <SiteShell ctaHref="#/templates" isWide>
+            <Bento />
+          </SiteShell>
+        )}
       </Suspense>
     );
   }

@@ -36,10 +36,22 @@ const NAV_LINKS = [
 // TopNav renders this list twice: inline in the bar above the breakpoint, and
 // stacked inside the drawer below it. Collapsing the drawer on click is a no-op
 // above the breakpoint, so both placements can share the same handler.
+// Top-bar links are standalone, not inline: they are destinations sitting
+// beside the wordmark, so they take the `lg` step (--font-size-lg, 17px — the
+// same step as a level-3 heading) rather than inheriting body 14. At 14px in
+// JetBrains Mono Regular the bar read as a row of small purple smudges next to
+// a semibold wordmark. Purple on the surface tier is 4.89:1, so AA holds at the
+// larger size — the size change costs no contrast.
 function SiteNavLinks({ isVertical }: { isVertical: boolean }) {
   const { closeMobileNav } = useAppShellMobile();
   const links = NAV_LINKS.map((link) => (
-    <Link key={link.href} href={link.href} onClick={closeMobileNav}>
+    <Link
+      key={link.href}
+      href={link.href}
+      onClick={closeMobileNav}
+      isStandalone
+      size="lg"
+    >
       {link.label}
     </Link>
   ));
@@ -56,10 +68,15 @@ export function SiteShell({
   children,
   ctaHref,
   onCta,
+  isWide,
 }: {
   children: ReactNode;
   ctaHref?: string;
   onCta?: () => void;
+  /** Opt out of the reading-width measure. The bento is a dense 4-up grid and
+   *  the 1160px cap squeezes its columns until the Routes cell wraps mid-word,
+   *  so that page asks for the full viewport width. */
+  isWide?: boolean;
 }) {
   const narrow = useMediaQuery('(max-width: 768px)');
 
@@ -90,10 +107,17 @@ export function SiteShell({
               <HStack gap={2} vAlign="center">
                 {!narrow && (
                   <>
-                    <Link href="https://github.com/yuzu-octopus/astryx-dracula" isExternalLink>
+                    <Link
+                      href="https://github.com/yuzu-octopus/astryx-dracula"
+                      isExternalLink
+                      isStandalone
+                      size="lg"
+                    >
                       GitHub
                     </Link>
-                    <Link href="./llms.txt">llms.txt</Link>
+                    <Link href="./llms.txt" isStandalone size="lg">
+                      llms.txt
+                    </Link>
                   </>
                 )}
                 <Button label="Use this theme" variant="primary" href={ctaHref} onClick={onCta} />
@@ -106,7 +130,7 @@ export function SiteShell({
           variant="transparent"
           padding={0}
           style={{
-            maxWidth: '1160px',
+            maxWidth: isWide ? 'none' : '1160px',
             marginInline: 'auto',
             width: '100%',
             paddingInline: 'var(--spacing-4)',
