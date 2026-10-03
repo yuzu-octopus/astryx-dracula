@@ -48,3 +48,6 @@ local/
 
 # Scratch worktrees created by visual-regression checks; never committed.
 .visual-*/
+
+# Generated - fonts:sync rebuilds from fonts/
+public/fonts/

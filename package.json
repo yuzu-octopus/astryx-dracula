@@ -92,7 +92,8 @@
     "url": "git+https://github.com/yuzu-octopus/astryx-dracula.git"
   },
   "scripts": {
-    "audit": "bun scripts/check.ts",
+    "audit": "bun run fonts:sync && bun scripts/check.ts",
+    "fonts:sync": "mkdir -p public/fonts && cp fonts/*.woff2 public/fonts/",
     "build": "tsc --noEmit && vite build",
     "dev": "vite",
     "preview": "vite preview",
