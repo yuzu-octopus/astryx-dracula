@@ -4,7 +4,7 @@
 // Note: skeleton placeholders carry no Hd by design (skill skeleton-shell
 // exemption) — routed pages supply the h1.
 
-import {Fragment, useState, useMemo, useEffect} from 'react';
+import {Fragment, useState, useMemo} from 'react';
 import {AppShell} from '@astryxdesign/core/AppShell';
 import {Layout, LayoutHeader, LayoutContent} from '@astryxdesign/core/Layout';
 import {TopNav} from '@astryxdesign/core/TopNav';
@@ -19,11 +19,9 @@ import type {TreeListItemData} from '@astryxdesign/core/TreeList';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Text} from '@astryxdesign/core/Text';
 import {Button} from '@astryxdesign/core/Button';
-import {Card} from '@astryxdesign/core/Card';
+import {Skeleton} from '@astryxdesign/core/Skeleton';
 import {VStack, HStack} from '@astryxdesign/core/Stack';
 import {Search, Folder, FileText} from 'lucide-react';
-
-const noop = () => {};
 
 const folder = (
   id: string,
@@ -44,21 +42,14 @@ const file = (id: string, isSelected = false): TreeListItemData => ({
   isSelected,
 });
 
+// Five nodes: one expanded folder per level plus leaf files. The factories
+// keep the TreeListItemData shape (id/label/icon/expansion) in one place.
 const FILE_TREE: TreeListItemData[] = [
   folder('src', [
-    folder('components', [
-      file('AppShell.tsx', true),
-      file('TopNav.tsx'),
-      file('SideNav.tsx'),
-    ]),
-    folder('hooks', [file('useTheme.ts'), file('useResizable.ts')]),
+    folder('components', [file('AppShell.tsx', true), file('TopNav.tsx')]),
     file('index.tsx'),
-    file('App.tsx'),
   ]),
-  folder('public', [file('favicon.ico'), file('robots.txt')], false),
   file('package.json'),
-  file('tsconfig.json'),
-  file('README.md'),
 ];
 
 // Each menu is split into groups; groups are separated by a divider.
@@ -142,53 +133,31 @@ const MENUS: {label: string; groups: MenuEntry[][]}[] = [
   },
 ];
 
+// Five placeholder rows: three code lines plus two 1px blank-line rules.
 const CODE_LINES = [
   {id: 'line-1', width: '38%'},
   {id: 'line-2', width: '62%'},
-  {id: 'line-3', width: '54%'},
-  {id: 'line-4', width: '0%'},
-  {id: 'line-5', width: '46%'},
-  {id: 'line-6', width: '70%'},
-  {id: 'line-7', width: '58%'},
-  {id: 'line-8', width: '34%'},
-  {id: 'line-9', width: '0%'},
-  {id: 'line-10', width: '50%'},
-  {id: 'line-11', width: '66%'},
-  {id: 'line-12', width: '42%'},
-  {id: 'line-13', width: '60%'},
-  {id: 'line-14', width: '28%'},
+  {id: 'line-3', width: '0%'},
+  {id: 'line-4', width: '46%'},
+  {id: 'line-5', width: '0%'},
 ];
 
-const EDITOR_TABS = ['AppShell.tsx', 'TopNav.tsx', 'theme.ts'];
+const EDITOR_TABS = ['AppShell.tsx', 'TopNav.tsx'];
 
+// Six entries: three file results plus three commands, so the palette shows
+// both halves of its static source.
 const COMMANDS = [
   {id: 'new-file', label: 'New File'},
-  {id: 'open-file', label: 'Open File…'},
   {id: 'save-all', label: 'Save All'},
-  {id: 'find-in-files', label: 'Find in Files'},
   {id: 'toggle-terminal', label: 'Toggle Terminal'},
-  {id: 'go-to-symbol', label: 'Go to Symbol…'},
   {id: 'appshell', label: 'AppShell.tsx'},
   {id: 'topnav', label: 'TopNav.tsx'},
   {id: 'sidenav', label: 'SideNav.tsx'},
-  {id: 'use-theme', label: 'useTheme.ts'},
-  {id: 'theme', label: 'theme.ts'},
 ];
 
 export default function ShellNav() {
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const searchSource = useMemo(() => createStaticSource(COMMANDS), []);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        setIsPaletteOpen(true);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
 
   return (
     <>
@@ -215,7 +184,6 @@ export default function ShellNav() {
                           <DropdownMenuItem
                             key={label}
                             label={label}
-                            onClick={noop}
                             endContent={
                               shortcut ? <Kbd keys={shortcut} /> : undefined
                             }
@@ -229,10 +197,9 @@ export default function ShellNav() {
             }
             endContent={
               // A real palette trigger, not a lookalike field: the previous
-              // TextInput swallowed keystrokes (fixed value, noop onChange)
-              // while a wrapper div opened the palette on click. The dead Run
-              // and Share buttons go with it — demo chrome must not ship
-              // controls that do nothing.
+              // TextInput swallowed keystrokes while a wrapper div opened the
+              // palette on click. The dead Run and Share buttons go with it —
+              // demo chrome must not ship controls that do nothing.
               <Button
                 label="Search files and commands"
                 variant="secondary"
@@ -254,16 +221,10 @@ export default function ShellNav() {
           height="fill"
           header={
             <LayoutHeader hasDivider padding={6}>
-              {/* Wraps rather than clipping: three 132px tabs need ~410px. */}
+              {/* Wraps rather than clipping: two 132px tabs need ~280px. */}
               <HStack gap={2} wrap="wrap">
                 {EDITOR_TABS.map(tab => (
-                  <Card
-                    key={tab}
-                    variant="muted"
-                    padding={0}
-                    width={132}
-                    height={36}
-                  />
+                  <Skeleton key={tab} width={132} height={36} />
                 ))}
               </HStack>
             </LayoutHeader>
@@ -274,27 +235,11 @@ export default function ShellNav() {
               <VStack gap={2}>
                 {CODE_LINES.map(line =>
                   line.width === '0%' ? (
-                    <Card
-                      key={line.id}
-                      variant="muted"
-                      padding={0}
-                      width={1}
-                      height={14}
-                    />
+                    <Skeleton key={line.id} width={1} height={14} />
                   ) : (
                     <HStack key={line.id} gap={3} vAlign="center">
-                      <Card
-                        variant="muted"
-                        padding={0}
-                        width={20}
-                        height={14}
-                      />
-                      <Card
-                        variant="muted"
-                        padding={0}
-                        width={line.width}
-                        height={14}
-                      />
+                      <Skeleton width={20} height={14} />
+                      <Skeleton width={line.width} height={14} />
                     </HStack>
                   ),
                 )}

@@ -48,8 +48,6 @@ import {ChartLabel} from 'astryx-dracula/shared/chart-labels';
 // Filter ← FunnelIcon, Download ← ArrowDownTrayIcon, RotateCw ← ArrowPathIcon.
 
 // ============= DATA =============
-
-type Severity = 'critical' | 'major' | 'minor' | 'resolved';
 type ProductName =
   | 'Ads Manager'
   | 'Business Suite'
@@ -64,7 +62,6 @@ interface IncidentRow extends Record<string, unknown> {
   id: string;
   product: ProductName;
   title: string;
-  severity: Severity;
   status: 'ongoing' | 'identified' | 'monitoring' | 'resolved';
   oncall: string;
   startTime: string;
@@ -81,7 +78,6 @@ const incidents: IncidentRow[] = [
     product: 'Business Suite',
     title:
       'Notification delivery delays affecting mobile push and email channels, queue saturation under investigation',
-    severity: 'major',
     oncall: 'Carlos Mendez',
     status: 'ongoing',
     startTime: '09:15',
@@ -96,7 +92,6 @@ const incidents: IncidentRow[] = [
     product: 'Ads Manager',
     title:
       'Campaign creation timing out for ~12% of advertisers in EMEA region, root caused to elevated DB write latency',
-    severity: 'critical',
     oncall: 'Sarah Chen',
     status: 'resolved',
     startTime: '15:10',
@@ -110,7 +105,6 @@ const incidents: IncidentRow[] = [
     product: 'Graph API',
     title:
       'Elevated 5xx error rates on /me and /me/accounts endpoints affecting third-party integrations globally',
-    severity: 'critical',
     oncall: 'David Kim',
     status: 'resolved',
     startTime: '15:30',
@@ -124,7 +118,6 @@ const incidents: IncidentRow[] = [
     product: 'Instagram API',
     title:
       'Media upload failures for image and video content via /media endpoint affecting ~8% of publishers',
-    severity: 'major',
     oncall: 'Priya Sharma',
     status: 'resolved',
     startTime: '15:05',
@@ -139,7 +132,6 @@ const incidents: IncidentRow[] = [
     product: 'Ads Manager',
     title:
       'Audience insights tab returning empty results due to cache invalidation cascade from earlier outage',
-    severity: 'minor',
     oncall: 'Marcus Rivera',
     status: 'resolved',
     startTime: '16:00',
@@ -153,7 +145,6 @@ const incidents: IncidentRow[] = [
     product: 'WhatsApp Business',
     title:
       'Outbound message delivery delays of 2-5 minutes for high-volume senders due to queue backpressure',
-    severity: 'major',
     oncall: 'Elena Volkov',
     status: 'resolved',
     startTime: '16:20',
@@ -168,7 +159,6 @@ const incidents: IncidentRow[] = [
     product: 'Commerce Manager',
     title:
       'Product catalog sync failures from Shopify and BigCommerce integrations after schema migration deployed',
-    severity: 'major',
     oncall: 'Noah Williams',
     status: 'resolved',
     startTime: '10:15',
@@ -183,7 +173,6 @@ const incidents: IncidentRow[] = [
     product: 'Messenger API',
     title:
       'Webhook delivery failures for subscribed page events, retries succeeded but signaled false alerts',
-    severity: 'minor',
     oncall: 'Mei Lin',
     status: 'resolved',
     startTime: '16:30',
@@ -199,7 +188,6 @@ const incidents: IncidentRow[] = [
     product: 'Pages',
     title:
       'Image upload timeouts for posts larger than 4MB, auto-recovered after CDN region failover',
-    severity: 'minor',
     oncall: 'Fatima Al-Rashid',
     status: 'resolved',
     startTime: '11:00',
@@ -213,7 +201,6 @@ const incidents: IncidentRow[] = [
     product: 'Graph API',
     title:
       'Intermittent 503 errors on a single load balancer in us-east-1, auto-healed by health check rotation',
-    severity: 'minor',
     oncall: 'Lucas Andersson',
     status: 'resolved',
     startTime: '14:30',
@@ -227,7 +214,6 @@ const incidents: IncidentRow[] = [
     product: 'WhatsApp Business',
     title:
       'Template message rejections due to stale category cache for newly approved templates',
-    severity: 'minor',
     oncall: 'Sofia Garcia',
     status: 'resolved',
     startTime: '13:00',
@@ -241,7 +227,6 @@ const incidents: IncidentRow[] = [
     product: 'Commerce Manager',
     title:
       'Inventory count mismatch between checkout and catalog services for ~200 SKUs in test region',
-    severity: 'minor',
     oncall: 'Raj Kapoor',
     status: 'resolved',
     startTime: '12:00',
@@ -255,7 +240,6 @@ const incidents: IncidentRow[] = [
     product: 'Instagram API',
     title:
       'Story insights data delayed by 30-60 minutes for accounts with >100K followers',
-    severity: 'minor',
     oncall: 'Emma Thompson',
     status: 'resolved',
     startTime: '10:00',
@@ -269,7 +253,6 @@ const incidents: IncidentRow[] = [
     product: 'Business Suite',
     title:
       'Slow inbox loading times (>3s p95) for accounts with large message histories, index rebuild in progress',
-    severity: 'minor',
     oncall: 'Andre Santos',
     status: 'resolved',
     startTime: '15:00',

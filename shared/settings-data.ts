@@ -165,3 +165,31 @@ export const sideNavHeading: CSSProperties = {
   marginInline: 'var(--spacing-4)',
 };
 
+// Locale pickers shared by the sidebar and dialog templates. The two copies
+// were byte-identical walls; a single source keeps them in sync.
+export const LANGUAGES: {label: string; value: string}[] = [
+  {label: 'English (Canada)', value: 'en-CA'},
+  {label: 'English (US)', value: 'en-US'},
+  {label: 'French', value: 'fr'},
+  {label: 'Spanish', value: 'es'},
+  {label: 'German', value: 'de'},
+  {label: 'Japanese', value: 'ja'},
+];
+
+export const CURRENCIES: {label: string; value: string}[] = [
+  {label: 'Canadian dollar (CAD)', value: 'CAD'},
+  {label: 'US dollar (USD)', value: 'USD'},
+  {label: 'Euro (EUR)', value: 'EUR'},
+  {label: 'British pound (GBP)', value: 'GBP'},
+  {label: 'Japanese yen (JPY)', value: 'JPY'},
+];
+
+export const TIMEZONES: {label: string; value: string}[] = [
+  {label: '(GMT-05:00) Eastern Time (US & Canada)', value: 'ET'},
+  {label: '(GMT-06:00) Central Time (US & Canada)', value: 'CT'},
+  {label: '(GMT-07:00) Mountain Time (US & Canada)', value: 'MT'},
+  {label: '(GMT-08:00) Pacific Time (US & Canada)', value: 'PT'},
+  {label: '(GMT+00:00) UTC', value: 'UTC'},
+  {label: '(GMT+01:00) London', value: 'GMT+1'},
+];
+

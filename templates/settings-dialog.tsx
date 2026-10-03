@@ -30,7 +30,7 @@ import {Icon} from '@astryxdesign/core/Icon';
 import {Center} from '@astryxdesign/core/Center';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {Lock, ShieldCheck, Monitor} from 'lucide-react';
-import {NAV_ITEMS, LOGIN_ROWS, SOCIAL_ROWS, DEVICE_ROWS, INFO_TILES, iconBox, sideNavHeading} from 'astryx-dracula/shared/settings-data';
+import {NAV_ITEMS, LOGIN_ROWS, SOCIAL_ROWS, DEVICE_ROWS, INFO_TILES, LANGUAGES, CURRENCIES, TIMEZONES, iconBox, sideNavHeading} from 'astryx-dracula/shared/settings-data';
 import {InfoRowItem, ExpandableRow} from 'astryx-dracula/shared/settings-rows';
 import type {DeviceRow, InfoTileData} from 'astryx-dracula/shared/settings-data';
 
@@ -42,11 +42,9 @@ const headerSticky: CSSProperties = {
   backgroundColor: 'var(--color-background-surface)',
   zIndex: 1,
 };
-// No `maxWidth` prop on VStack — width only. Inline padding comes from
-// the parent LayoutContent `padding`.
-const contentMaxWidth: CSSProperties = {
-  maxWidth: 680,
-};
+
+// Width cap on the content column (VStack `maxWidth`; inline padding comes
+// from the parent LayoutContent `padding`).
 const dialogHeight: CSSProperties = {
   height: '85vh',
 };
@@ -55,31 +53,11 @@ const dialogHeight: CSSProperties = {
 // template through the hash router (bare "#" would drop back to the home page).
 const SELF_HASH = '#/templates/settings-dialog';
 
-const LANGUAGES = [
-  {label: 'English (Canada)', value: 'en-CA'},
-  {label: 'English (US)', value: 'en-US'},
-  {label: 'French', value: 'fr'},
-  {label: 'Spanish', value: 'es'},
-  {label: 'German', value: 'de'},
-  {label: 'Japanese', value: 'ja'},
-];
-
-const CURRENCIES = [
-  {label: 'Canadian dollar (CAD)', value: 'CAD'},
-  {label: 'US dollar (USD)', value: 'USD'},
-  {label: 'Euro (EUR)', value: 'EUR'},
-  {label: 'British pound (GBP)', value: 'GBP'},
-  {label: 'Japanese yen (JPY)', value: 'JPY'},
-];
-
-const TIMEZONES = [
-  {label: '(GMT-05:00) Eastern Time (US & Canada)', value: 'ET'},
-  {label: '(GMT-06:00) Central Time (US & Canada)', value: 'CT'},
-  {label: '(GMT-07:00) Mountain Time (US & Canada)', value: 'MT'},
-  {label: '(GMT-08:00) Pacific Time (US & Canada)', value: 'PT'},
-  {label: '(GMT+00:00) UTC', value: 'UTC'},
-  {label: '(GMT+01:00) London', value: 'GMT+1'},
-];
+// InfoTile renders the icon tile plus title/body stacked text. DeviceRowItem
+// renders the session icon, label + current-session badge, timestamp, and
+// trailing action Button. Both live here — not in shared/settings-rows.tsx —
+// because that module already covered InfoRowItem/ExpandableRow at its size
+// limit, and these two are used by this dialog only.
 
 
 function InfoTile({icon, title, body}: InfoTileData) {
@@ -256,7 +234,7 @@ export default function SettingsDialog() {
                     width="100%"
                   />
                 )}
-                <VStack gap={0} style={contentMaxWidth}>
+                <VStack gap={0} maxWidth={680}>
                   {activeNav === 'Personal information' && (
                     <VStack gap={6}>
                       <VStack gap={4}>

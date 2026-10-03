@@ -12,7 +12,6 @@ import {
   VStack,
   HStack,
   StackItem,
-  Card,
   Section,
 } from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
@@ -29,6 +28,8 @@ import {Collapsible} from '@astryxdesign/core/Collapsible';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Dialog, DialogHeader} from '@astryxdesign/core/Dialog';
 import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
+import {SceneFrame} from 'astryx-dracula/shared/scene-frame';
+import {formatMoney} from 'astryx-dracula/shared/format-money';
 import {
   Calendar,
   Flag,
@@ -121,12 +122,8 @@ const sigilClip: CSSProperties = {
 function ProductSigil({index}: {name: string; index: number}) {
   const hue = PRODUCT_HUES[index % PRODUCT_HUES.length];
   return (
-    <Card padding={0} style={sigilClip}>
-      <svg
-        viewBox="0 0 40 40"
-        width={40}
-        height={40}
-        aria-hidden="true">
+    <div style={sigilClip}>
+      <SceneFrame label={`${PRODUCTS[index % PRODUCTS.length].name} sigil`} viewBox="0 0 40 40" hasBackdrop={false}>
         <rect width="40" height="40" fill="var(--dracula-bg-light)" />
         <circle cx={28} cy={11} r={7} fill={hue} />
         <circle
@@ -140,8 +137,8 @@ function ProductSigil({index}: {name: string; index: number}) {
           d="M0 28 Q10 22 20 26 T40 24 V40 H0 Z"
           fill="var(--dracula-current-line)"
         />
-      </svg>
-    </Card>
+      </SceneFrame>
+    </div>
   );
 }
 
@@ -151,7 +148,6 @@ const SHIPPING = 0;
 const TAX_RATE = 0.0825;
 const TAX = Math.round((SUBTOTAL - DISCOUNT) * TAX_RATE * 100) / 100;
 const TOTAL = SUBTOTAL - DISCOUNT + SHIPPING + TAX;
-const fmt = (n: number) => `$${n.toFixed(2)}`;
 
 // ─── Activity data ──────────────────────────────────────────────────────────
 const ACTIVITY = [
@@ -381,14 +377,14 @@ function ItemsCard() {
                     weight="semibold"
                     maxLines={1}
                     hasTabularNumbers>
-                    {fmt(product.price * product.qty)}
+                    {formatMoney(product.price * product.qty)}
                   </Text>
                   <Text
                     type="supporting"
                     color="secondary"
                     maxLines={1}
                     hasTabularNumbers>
-                    {fmt(product.price)} {'×'} {product.qty}
+                    {formatMoney(product.price)} {'×'} {product.qty}
                   </Text>
                 </VStack>
               }
@@ -430,7 +426,7 @@ function InvoiceCard() {
                 </Text>
               </StackItem>
               <Text type="body" hasTabularNumbers>
-                {fmt(SUBTOTAL)}
+                {formatMoney(SUBTOTAL)}
               </Text>
             </HStack>
           </MetadataListItem>
@@ -440,7 +436,7 @@ function InvoiceCard() {
                 <Text type="body">New customer code: NEW15</Text>
               </StackItem>
               <Text type="body" hasTabularNumbers>
-                – {fmt(DISCOUNT)}
+                – {formatMoney(DISCOUNT)}
               </Text>
             </HStack>
           </MetadataListItem>
@@ -452,7 +448,7 @@ function InvoiceCard() {
                 </Text>
               </StackItem>
               <Text type="body" hasTabularNumbers>
-                {fmt(SHIPPING)}
+                {formatMoney(SHIPPING)}
               </Text>
             </HStack>
           </MetadataListItem>
@@ -464,7 +460,7 @@ function InvoiceCard() {
                 </Text>
               </StackItem>
               <Text type="body" hasTabularNumbers>
-                {fmt(TAX)}
+                {formatMoney(TAX)}
               </Text>
             </HStack>
           </MetadataListItem>
@@ -472,7 +468,7 @@ function InvoiceCard() {
             <HStack>
               <StackItem size="fill" />
               <Text type="body" weight="semibold" hasTabularNumbers>
-                {fmt(TOTAL)}
+                {formatMoney(TOTAL)}
               </Text>
             </HStack>
           </MetadataListItem>
@@ -489,7 +485,7 @@ function InvoiceCard() {
                 </Text>
               </StackItem>
               <Text type="body" hasTabularNumbers>
-                {fmt(TOTAL)}
+                {formatMoney(TOTAL)}
               </Text>
             </HStack>
           </MetadataListItem>

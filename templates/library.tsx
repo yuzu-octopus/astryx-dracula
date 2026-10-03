@@ -6,7 +6,7 @@
  * Library — a browsable grid of design-system entries grouped by category.  Frame: page header (title) | content column (search, filter row, s (Frame/responsive/container: see XLE header above.)
  */
 
-import {useState, useMemo} from 'react';
+import {useState} from 'react';
 import {Layout, LayoutHeader, LayoutContent} from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
 import {Card} from '@astryxdesign/core/Card';
@@ -301,80 +301,48 @@ function LibraryCard({item}: {item: LibraryItem}) {
   );
 }
 
-function LibrarySection({
-  category,
-  items,
-}: {
-  category: string;
-  items: LibraryItem[];
-}) {
-  return (
-    <VStack gap={8}>
-      <HStack justify="between" vAlign="center">
-        <Heading level={2}>{category}</Heading>
-        <Text type="body" color="secondary" hasTabularNumbers>
-          {items.length} {items.length === 1 ? 'item' : 'items'}
-        </Text>
-      </HStack>
-      <Grid columns={{minWidth: 280}} gap={4}>
-        {items.map(item => (
-          <LibraryCard key={item.id} item={item} />
-        ))}
-      </Grid>
-    </VStack>
-  );
-}
-
 export default function LibraryGrid() {
   const [activeTab, setActiveTab] = useState('All');
   const [search, setSearch] = useState('');
   const [sortOrder, setSortOrder] = useState('A-Z');
 
-  const filtered = useMemo(() => {
-    let items =
-      activeTab === 'All' ? ITEMS : ITEMS.filter(i => i.category === activeTab);
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      items = items.filter(
+  // ITEMS is module-static (only .filter over it and .sort over copies below),
+  // so plain consts recompute cheaply per render with no memo needed.
+  const query = search.trim().toLowerCase();
+  const visible =
+    activeTab === 'All' ? ITEMS : ITEMS.filter(i => i.category === activeTab);
+  const searched = query
+    ? visible.filter(
         i =>
-          i.name.toLowerCase().includes(q) ||
-          i.description.toLowerCase().includes(q),
-      );
-    }
-    const sorted = [...items];
-    if (sortOrder === 'A-Z') {
-      sorted.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (sortOrder === 'Z-A') {
-      sorted.sort((a, b) => b.name.localeCompare(a.name));
-    } else if (sortOrder === 'Newest') {
-      sorted.sort((a, b) => Number(b.id) - Number(a.id));
-    }
-    return sorted;
-  }, [activeTab, search, sortOrder]);
+          i.name.toLowerCase().includes(query) ||
+          i.description.toLowerCase().includes(query),
+      )
+    : visible;
+  const filtered = [...searched];
+  if (sortOrder === 'A-Z') {
+    filtered.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (sortOrder === 'Z-A') {
+    filtered.sort((a, b) => b.name.localeCompare(a.name));
+  } else if (sortOrder === 'Newest') {
+    filtered.sort((a, b) => Number(b.id) - Number(a.id));
+  }
 
-  const groupedSections = useMemo(() => {
-    if (activeTab !== 'All') {
-      return null;
-    }
+  let groupedSections: Array<{category: string; items: LibraryItem[]}> | null =
+    null;
+  if (activeTab === 'All') {
     const order = CATEGORIES.filter(c => c !== 'All');
-    const map = new Map<string, LibraryItem[]>();
+    const byCategory: Record<string, LibraryItem[]> = {};
     for (const item of filtered) {
-      let group = map.get(item.category);
-      if (!group) {
-        group = [];
-        map.set(item.category, group);
-      }
-      group.push(item);
+      (byCategory[item.category] ??= []).push(item);
     }
-    const result: Array<{category: string; items: LibraryItem[]}> = [];
+    groupedSections = [];
     for (const cat of order) {
-      const items = map.get(cat);
+      const items = byCategory[cat];
       if (items) {
-        result.push({category: cat, items});
+        groupedSections.push({category: cat, items});
       }
     }
-    return result;
-  }, [activeTab, filtered]);
+  }
 
   return (
     <Layout
@@ -470,11 +438,19 @@ export default function LibraryGrid() {
                   groupedSections ?? [{category: activeTab, items: filtered}]
                 ).flatMap(section => [
                   <Divider key={`d-${section.category}`} />,
-                  <LibrarySection
-                    key={section.category}
-                    category={section.category}
-                    items={section.items}
-                  />,
+                  <VStack key={section.category} gap={8}>
+                    <HStack justify="between" vAlign="center">
+                      <Heading level={2}>{section.category}</Heading>
+                      <Text type="body" color="secondary" hasTabularNumbers>
+                        {section.items.length} {section.items.length === 1 ? 'item' : 'items'}
+                      </Text>
+                    </HStack>
+                    <Grid columns={{minWidth: 280}} gap={4}>
+                      {section.items.map(item => (
+                        <LibraryCard key={item.id} item={item} />
+                      ))}
+                    </Grid>
+                  </VStack>,
                 ])}
               </VStack>
             )}

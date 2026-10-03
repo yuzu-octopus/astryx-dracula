@@ -6,48 +6,48 @@
  * Midnight Kicks — sneaker order desk: a daily revenue line over the order log.  Frame: page header (title + icon actions) | content column (c (Frame/responsive/container: see XLE header above.)
  */
 
-import {OrderDesk, type OrderDeskRow} from 'astryx-dracula/shared/order-desk';
-import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
+import {
+  OrderDesk,
+  type OrderDeskProduct,
+  type OrderDeskRow,
+} from 'astryx-dracula/shared/order-desk';
 
 // ============= DATA =============
 
-type ProductCategory =
-  'Running' | 'Lifestyle' | 'Basketball' | 'Training' | 'Skateboarding';
-
-const PRODUCTS: Array<{name: string; category: string; accent: SceneHue; price: number}> = [
+const PRODUCTS: OrderDeskProduct[] = [
   {
     name: 'Air Max 90',
-    category: 'Lifestyle' as ProductCategory,
+    category: 'Lifestyle',
     accent: 'var(--dracula-yellow)',
     price: 130,
   },
   {
     name: 'UltraBoost 22',
-    category: 'Running' as ProductCategory,
+    category: 'Running',
     accent: 'var(--dracula-cyan)',
     price: 190,
   },
   {
     name: 'Old Skool',
-    category: 'Skateboarding' as ProductCategory,
+    category: 'Skateboarding',
     accent: 'var(--dracula-orange)',
     price: 70,
   },
   {
     name: 'Jordan 1 Retro',
-    category: 'Basketball' as ProductCategory,
+    category: 'Basketball',
     accent: 'var(--dracula-red)',
     price: 180,
   },
   {
     name: 'Metcon 8',
-    category: 'Training' as ProductCategory,
+    category: 'Training',
     accent: 'var(--dracula-red)',
     price: 140,
   },
   {
     name: 'Dunk Low',
-    category: 'Skateboarding' as ProductCategory,
+    category: 'Skateboarding',
     accent: 'var(--dracula-green)',
     price: 110,
   },

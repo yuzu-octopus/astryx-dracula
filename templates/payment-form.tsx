@@ -449,39 +449,37 @@ export default function PaymentForm() {
   const tax = Math.round(subtotal * TAX_RATE * 100) / 100;
   const total = subtotal + shipping + tax;
 
-  const errors = submitted
+  // One lockstep 'Required' string for every empty field: seventeen call
+  // sites share this one spelling, so a copy change cannot leave one field
+  // behind with the old text.
+  const required = (hasValue: unknown): string | undefined =>
+    hasValue ? undefined : 'Required';
+
+  const errors: Record<string, string | undefined> = submitted
     ? {
-        firstName: !firstName.trim() ? 'Required' : undefined,
-        lastName: !lastName.trim() ? 'Required' : undefined,
-        address: !address.trim() ? 'Required' : undefined,
-        city: !city.trim() ? 'Required' : undefined,
-        zip: !zip.trim() ? 'Required' : undefined,
-        state: !state ? 'Required' : undefined,
-        email: !email.trim() ? 'Required' : undefined,
-        phone: !phone.trim() ? 'Required' : undefined,
-        expiry: !expiry ? 'Required' : undefined,
-        expYear: !expYear ? 'Required' : undefined,
-        cvc: !cvc.trim() ? 'Required' : undefined,
+        firstName: required(firstName.trim()),
+        lastName: required(lastName.trim()),
+        address: required(address.trim()),
+        city: required(city.trim()),
+        zip: required(zip.trim()),
+        state: required(state),
+        email: required(email.trim()),
+        phone: required(phone.trim()),
+        expiry: required(expiry),
+        expYear: required(expYear),
+        cvc: required(cvc.trim()),
         cardNumber:
-          paymentMethod === 'card' && !cardNumber.trim()
-            ? 'Required'
-            : undefined,
+          paymentMethod === 'card' ? required(cardNumber.trim()) : undefined,
         cardName:
-          paymentMethod === 'card' && !cardName.trim() ? 'Required' : undefined,
+          paymentMethod === 'card' ? required(cardName.trim()) : undefined,
         billingAddress:
-          !billingMatchesShipping && !billingAddress.trim()
-            ? 'Required'
-            : undefined,
+          !billingMatchesShipping ? required(billingAddress.trim()) : undefined,
         billingCity:
-          !billingMatchesShipping && !billingCity.trim()
-            ? 'Required'
-            : undefined,
+          !billingMatchesShipping ? required(billingCity.trim()) : undefined,
         billingZip:
-          !billingMatchesShipping && !billingZip.trim()
-            ? 'Required'
-            : undefined,
+          !billingMatchesShipping ? required(billingZip.trim()) : undefined,
         billingState:
-          !billingMatchesShipping && !billingState ? 'Required' : undefined,
+          !billingMatchesShipping ? required(billingState) : undefined,
       }
     : {};
 

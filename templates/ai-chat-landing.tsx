@@ -13,6 +13,7 @@ import {
   ChatDictationButton,
   useChatDictation,
   type ChatComposerInputHandle,
+  type ChatComposerToken,
   type ChatComposerTrigger,
 } from '@astryxdesign/core/Chat';
 import {
@@ -207,37 +208,54 @@ const COMMAND_ITEMS: SearchableItem<{description: string}>[] = [
   },
 ];
 
-const mentionTrigger: ChatComposerTrigger = {
+// One factory for both composer triggers. Render (TypeaheadItem + auxiliary
+// description) and select (token value/label/variant) differ per trigger;
+// the trigger shape doesn't.
+function makeTrigger<TAux>({
+  character,
+  items,
+  getDescription,
+  toToken,
+}: {
+  character: string;
+  items: SearchableItem<TAux>[];
+  getDescription: (aux: TAux | undefined) => string | undefined;
+  toToken: (item: SearchableItem<TAux>) => string | ChatComposerToken;
+}): ChatComposerTrigger {
+  return {
+    character,
+    searchSource: createStaticSource(items),
+    renderItem: item => (
+      <TypeaheadItem
+        item={item}
+        description={getDescription(item.auxiliaryData as TAux | undefined)}
+      />
+    ),
+    onSelect: item => toToken(item as SearchableItem<TAux>),
+  };
+}
+
+const mentionTrigger = makeTrigger({
   character: '@',
-  searchSource: createStaticSource(MENTION_ITEMS),
-  renderItem: item => (
-    <TypeaheadItem
-      item={item}
-      description={(item.auxiliaryData as {role: string})?.role}
-    />
-  ),
-  onSelect: item => ({
+  items: MENTION_ITEMS,
+  getDescription: aux => aux?.role,
+  toToken: item => ({
     value: `@${item.id}`,
     label: item.label,
     variant: 'cyan',
   }),
-};
+});
 
-const commandTrigger: ChatComposerTrigger = {
+const commandTrigger = makeTrigger({
   character: '/',
-  searchSource: createStaticSource(COMMAND_ITEMS),
-  renderItem: item => (
-    <TypeaheadItem
-      item={item}
-      description={(item.auxiliaryData as {description: string})?.description}
-    />
-  ),
-  onSelect: item => ({
+  items: COMMAND_ITEMS,
+  getDescription: aux => aux?.description,
+  toToken: item => ({
     value: `/${item.label}`,
     label: `/${item.label}`,
     variant: 'yellow',
   }),
-};
+});
 
 const composerTriggers = [mentionTrigger, commandTrigger];
 
@@ -254,13 +272,42 @@ const INITIAL_ATTACHMENTS: Attachment[] = [
   'api_spec.yaml',
   'contrast_audit.csv',
   'dracula_spec.pdf',
-].map((name, index) => ({id: `file-${index + 1}`, name}));
+].map(name => ({id: crypto.randomUUID(), name}));
 
 // The composer's imperative insert methods mutate the DOM without emitting a
 // change, so dispatch an input event to sync its value and clear the placeholder.
 const syncComposerValue = () => {
   document.activeElement?.dispatchEvent(new Event('input', {bubbles: true}));
 };
+
+// One inserter for every composer write. `insertText` replaces the selection
+// (suggestion prompts); `insertToken` inserts a chip at the cursor without
+// touching the selection (mentions, mode tokens).
+function insertIntoComposer(
+  input: ChatComposerInputHandle | null,
+  write: {text: string} | {token: ChatComposerToken},
+  collapseToEnd = false,
+) {
+  if (!input) {
+    return;
+  }
+  input.focus();
+  if (document.activeElement) {
+    if (collapseToEnd) {
+      const sel = window.getSelection();
+      sel?.selectAllChildren(document.activeElement);
+      sel?.collapseToEnd();
+    } else {
+      window.getSelection()?.selectAllChildren(document.activeElement);
+    }
+  }
+  if ('text' in write) {
+    input.insertText(write.text);
+  } else {
+    input.insertToken(write.token);
+  }
+  syncComposerValue();
+}
 
 // Main component
 
@@ -273,53 +320,36 @@ export default function AiChatLanding() {
   const [isModeMenuOpen, setIsModeMenuOpen] = useState(false);
   const composerInputRef = useRef<ChatComposerInputHandle>(null);
   const shouldFocusComposerRef = useRef(false);
-  // Two dropped files can share a name, so attachments carry their own id.
-  const nextAttachmentId = useRef(INITIAL_ATTACHMENTS.length);
+  // Dictation mic stays: the composer still renders ChatDictationButton below.
   const dictation = useChatDictation({inputRef: composerInputRef});
 
   const activeMode = MODE_OPTIONS.find(m => m.key === mode) ?? MODE_OPTIONS[0];
   const suggestions = category ? CATEGORY_SUGGESTIONS[category] : null;
 
   const applySuggestion = (prompt: string) => {
-    const input = composerInputRef.current;
-    if (!input) {
-      return;
-    }
-    input.focus();
-    if (document.activeElement) {
-      window.getSelection()?.selectAllChildren(document.activeElement);
-    }
-    input.insertText(prompt);
-    syncComposerValue();
+    insertIntoComposer(composerInputRef.current, {text: prompt});
   };
-
   const insertMention = (item: (typeof MENTION_ITEMS)[number]) => {
-    const input = composerInputRef.current;
-    if (!input) {
-      return;
-    }
-    input.focus();
-    if (document.activeElement) {
-      const sel = window.getSelection();
-      sel?.selectAllChildren(document.activeElement);
-      sel?.collapseToEnd();
-    }
-    input.insertToken({
-      value: `@${item.id}`,
-      label: item.label,
-      variant: 'cyan',
-    });
-    syncComposerValue();
+    insertIntoComposer(
+      composerInputRef.current,
+      {
+        token: {
+          value: `@${item.id}`,
+          label: item.label,
+          variant: 'cyan',
+        },
+      },
+      true,
+    );
   };
-
   const insertModeToken = (label: string) => {
-    composerInputRef.current?.focus();
-    composerInputRef.current?.insertToken({
-      value: label,
-      label,
-      variant: 'orange',
+    insertIntoComposer(composerInputRef.current, {
+      token: {
+        value: label,
+        label,
+        variant: 'orange',
+      },
     });
-    syncComposerValue();
   };
 
   return (
@@ -356,7 +386,7 @@ export default function AiChatLanding() {
                     setAttachments(prev => [
                       ...prev,
                       ...files.map(file => ({
-                        id: `file-${++nextAttachmentId.current}`,
+                        id: crypto.randomUUID(),
                         name: file.name,
                       })),
                     ])

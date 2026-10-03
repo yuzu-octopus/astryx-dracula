@@ -6,31 +6,16 @@ import {useState, useTransition} from 'react';
 import {demoLogin} from 'astryx-dracula/shared/login-demo';
 import {AppleIcon, GoogleIcon} from 'astryx-dracula/shared/sso-icons';
 import {
-  AUTH_HEADING,
-  AUTH_SUBTITLE,
-  AUTH_PRIMARY_CTA,
-  AUTH_SIGNUP_PROMPT,
-  AUTH_SIGNUP_LINK,
   AUTH_SSO_DIVIDER,
-  AUTH_FORGOT_PASSWORD,
   AUTH_ERROR_MESSAGE,
-  AUTH_EMAIL_PLACEHOLDER,
-  AUTH_PASSWORD_PLACEHOLDER,
-  AUTH_TERMS_PREFIX,
-  AUTH_TERMS_SERVICE,
-  AUTH_TERMS_PRIVACY,
 } from 'astryx-dracula/shared/auth-copy';
 import {VStack} from '@astryxdesign/core/Layout';
 import {Center} from '@astryxdesign/core/Center';
-import {Text, Heading} from '@astryxdesign/core/Text';
-import {TextInput} from '@astryxdesign/core/TextInput';
 import {Button} from '@astryxdesign/core/Button';
-import {Card} from '@astryxdesign/core/Card';
-import {Link} from '@astryxdesign/core/Link';
 import {Divider} from '@astryxdesign/core/Divider';
 
-import {authPageStyle as pageStyle, authContentStyle as contentStyle, inputAutoComplete} from 'astryx-dracula/shared/auth-chrome-config';
-import {LoginBrand} from 'astryx-dracula/shared/auth-chrome';
+import {authPageStyle as pageStyle, authContentStyle as contentStyle} from 'astryx-dracula/shared/auth-chrome-config';
+import {LoginBrand, AuthCard, AuthLoginFields} from 'astryx-dracula/shared/auth-chrome';
 
 export default function LoginCard() {
   const [email, setEmail] = useState('');
@@ -55,121 +40,43 @@ export default function LoginCard() {
       <VStack gap={4} hAlign="center" style={contentStyle}>
         <LoginBrand />
 
-        {/* Card */}
-        <Card padding={4} width="100%">
-          <VStack gap={4} hAlign="stretch">
-            {/* Header */}
-            <VStack gap={1} hAlign="center">
-              <Heading level={1} type="display-2">
-                {AUTH_HEADING}
-              </Heading>
-              <Text type="body" color="secondary">
-                {AUTH_SUBTITLE}
-              </Text>
-            </VStack>
+        <AuthCard selfHash="#/templates/login-card">
+          <AuthLoginFields
+            email={email}
+            password={password}
+            error={error}
+            selfHash="#/templates/login-card"
+            isLoading={isLoading}
+            onEmailChange={(v: string) => {
+              setEmail(v);
+              setError(null);
+            }}
+            onPasswordChange={(v: string) => {
+              setPassword(v);
+              setError(null);
+            }}
+            onSubmit={handleLogin}
+          />
 
-            {/* Form fields */}
-            <VStack gap={2}>
-              <TextInput
-                label="Email"
-                isLabelHidden
-                type="email"
-                {...inputAutoComplete('email')}
-                placeholder={AUTH_EMAIL_PLACEHOLDER}
-                value={email}
-                onChange={(v: string) => {
-                  setEmail(v);
-                  setError(null);
-                }}
-                size="lg"
-                onEnter={handleLogin}
-                status={error ? {type: 'error', message: error} : undefined}
-              />
-              <VStack gap={1}>
-                <TextInput
-                  label="Password"
-                  isLabelHidden
-                  placeholder={AUTH_PASSWORD_PLACEHOLDER}
-                  type="password"
-                  {...inputAutoComplete('current-password')}
-                  value={password}
-                  onChange={(v: string) => {
-                    setPassword(v);
-                    setError(null);
-                  }}
-                  size="lg"
-                  onEnter={handleLogin}
-                  status={error ? {type: 'error', message: error} : undefined}
-                />
-                {error && (
-                  <VStack hAlign="end">
-                    <Link
-                      href="#/templates/login-card"
-                      color="secondary"
-                      isStandalone>
-                      {AUTH_FORGOT_PASSWORD}
-                    </Link>
-                  </VStack>
-                )}
-              </VStack>
-            </VStack>
+          {/* Divider */}
+          <Divider label={AUTH_SSO_DIVIDER} />
 
-            {/* Login button */}
+          {/* Social buttons */}
+          <VStack gap={3} hAlign="stretch">
             <Button
-              label={AUTH_PRIMARY_CTA}
-              variant="primary"
+              label="Login with Apple"
+              variant="secondary"
+              icon={<AppleIcon />}
               size="lg"
-              isLoading={isLoading}
-              onClick={handleLogin}
             />
-
-            {/* Divider */}
-            <Divider label={AUTH_SSO_DIVIDER} />
-
-            {/* Social buttons */}
-            <VStack gap={3} hAlign="stretch">
-              <Button
-                label="Login with Apple"
-                variant="secondary"
-                icon={<AppleIcon />}
-                size="lg"
-              />
-              <Button
-                label="Login with Google"
-                variant="secondary"
-                icon={<GoogleIcon />}
-                size="lg"
-              />
-            </VStack>
-
-            {/* Prose links. A link inside a sentence needs a persistent
-                underline — colour alone is not a cue (WCAG 1.4.1 / F73),
-                and the kit underlines on hover only. */}
-            <VStack hAlign="center">
-              <Text type="supporting" color="secondary">
-                {AUTH_SIGNUP_PROMPT}{' '}
-                <Link href="#/templates/login-card" type="supporting" hasUnderline>
-                  {AUTH_SIGNUP_LINK}
-                </Link>
-              </Text>
-            </VStack>
+            <Button
+              label="Login with Google"
+              variant="secondary"
+              icon={<GoogleIcon />}
+              size="lg"
+            />
           </VStack>
-        </Card>
-
-        {/* Terms */}
-        <VStack hAlign="center" width="100%">
-          <Text type="supporting" color="secondary" justify="center">
-            {AUTH_TERMS_PREFIX}{' '}
-            <Link href="#/templates/login-card" type="supporting" hasUnderline>
-              {AUTH_TERMS_SERVICE}
-            </Link>{' '}
-            and{' '}
-            <Link href="#/templates/login-card" type="supporting" hasUnderline>
-              {AUTH_TERMS_PRIVACY}
-            </Link>
-            .
-          </Text>
-        </VStack>
+        </AuthCard>
       </VStack>
     </Center>
   );

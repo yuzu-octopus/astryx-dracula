@@ -19,9 +19,11 @@
  * and status or metadata rides on Text.
  */
 
+import type {ReactNode} from 'react';
 import {Icon} from '@astryxdesign/core/Icon';
 import ChapteredDoc, {ChapterArtFrame} from 'astryx-dracula/shared/chaptered-doc';
-import {sceneFill, type ChapterGroup} from 'astryx-dracula/shared/chaptered-doc-config';
+import {type ChapterGroup} from 'astryx-dracula/shared/chaptered-doc-config';
+import {SceneFrame} from 'astryx-dracula/shared/scene-frame';
 
 import {
   Hash,
@@ -409,12 +411,7 @@ function Fir({x, y, scale}: {x: number; y: number; scale: number}) {
 
 function NightScene({alt}: {alt: string}) {
   return (
-    <svg
-      viewBox="0 0 400 225"
-      preserveAspectRatio="xMidYMid slice"
-      style={sceneFill}
-      role="img"
-      aria-label={alt}>
+    <SceneFrame label={alt} hasBackdrop={false}>
       <defs>
         {/* The moon's halo and the light it drops on the ridge below. Drawn as
             gradients: stacked flat circles band badly at this contrast. */}
@@ -557,7 +554,7 @@ function NightScene({alt}: {alt: string}) {
       <Bat x={252} y={92} scale={1.1} opacity={0.92} />
       <Bat x={178} y={42} scale={0.72} opacity={0.78} />
       <Bat x={352} y={96} scale={0.5} opacity={0.55} />
-    </svg>
+    </SceneFrame>
   );
 }
 
@@ -591,12 +588,7 @@ const PALETTE_ROWS: string[][] = [
 
 function PaletteScene({alt}: {alt: string}) {
   return (
-    <svg
-      viewBox="0 0 400 225"
-      preserveAspectRatio="xMidYMid slice"
-      style={sceneFill}
-      role="img"
-      aria-label={alt}>
+    <SceneFrame label={alt} hasBackdrop={false}>
       <rect width="400" height="225" fill="var(--dracula-bg-dark)" />
       {/* Swatches run edge to edge with one hairline each. Without the stroke
           the three darkest surfaces vanish into a backdrop of the same tone. */}
@@ -617,7 +609,7 @@ function PaletteScene({alt}: {alt: string}) {
           ))}
         </g>
       ))}
-    </svg>
+    </SceneFrame>
   );
 }
 
@@ -637,12 +629,7 @@ const TYPE_BASELINE = 74;
 
 function TypeScene({alt}: {alt: string}) {
   return (
-    <svg
-      viewBox="0 0 400 225"
-      preserveAspectRatio="xMidYMid slice"
-      style={sceneFill}
-      role="img"
-      aria-label={alt}>
+    <SceneFrame label={alt} hasBackdrop={false}>
       <rect width="400" height="225" fill="var(--dracula-bg-dark)" />
 
       {/* One rule per ladder row: the grid is the scale's own rhythm. */}
@@ -718,7 +705,7 @@ function TypeScene({alt}: {alt: string}) {
           </g>
         ))}
       </g>
-    </svg>
+    </SceneFrame>
   );
 }
 
@@ -801,13 +788,7 @@ const PAGE_LAYOUTS: ReadonlyArray<{
 
 function PagesScene({alt}: {alt: string}) {
   return (
-    <svg
-      viewBox="0 0 400 225"
-      preserveAspectRatio="xMidYMid slice"
-      style={sceneFill}
-      role="img"
-      aria-label={alt}>
-      <rect width="400" height="225" fill="var(--dracula-bg)" />
+    <SceneFrame label={alt} fill="var(--dracula-bg)">
       {PAGE_CELLS.map((cell, index) => {
         const layout = PAGE_LAYOUTS[index];
         // Cyan marks the page being viewed; purple stays reserved for
@@ -863,40 +844,37 @@ function PagesScene({alt}: {alt: string}) {
           </g>
         );
       })}
-    </svg>
+    </SceneFrame>
   );
 }
 
+type ProductTourScene = {node: (alt: string) => ReactNode; alt: string};
+
+const PRODUCT_TOUR_SCENES: Record<string, ProductTourScene> = {
+  introduction: {
+    node: alt => <NightScene alt={alt} />,
+    alt: 'A full moon over a castle on the ridge, with bats crossing a lit sky',
+  },
+  palette: {
+    node: alt => <PaletteScene alt={alt} />,
+    alt: 'Fifteen palette swatches: six surfaces and neutrals, then the accent colours',
+  },
+  'type-shape': {
+    node: alt => <TypeScene alt={alt} />,
+    alt: 'A type specimen: monospace glyphs on a baseline grid beside the type scale ladder',
+  },
+  templates: {
+    node: alt => <PagesScene alt={alt} />,
+    alt: 'Eight page thumbnails in a grid, the first one highlighted',
+  },
+};
+
 function ChapterArt({chapterId}: {chapterId: string}) {
-  if (chapterId === 'introduction') {
-    return (
-      <ChapterArtFrame>
-        <NightScene alt="A full moon over a castle on the ridge, with bats crossing a lit sky" />
-      </ChapterArtFrame>
-    );
+  const scene = PRODUCT_TOUR_SCENES[chapterId];
+  if (scene == null) {
+    return null;
   }
-  if (chapterId === 'palette') {
-    return (
-      <ChapterArtFrame>
-        <PaletteScene alt="Fifteen palette swatches: six surfaces and neutrals, then the accent colours" />
-      </ChapterArtFrame>
-    );
-  }
-  if (chapterId === 'type-shape') {
-    return (
-      <ChapterArtFrame>
-        <TypeScene alt="A type specimen: monospace glyphs on a baseline grid beside the type scale ladder" />
-      </ChapterArtFrame>
-    );
-  }
-  if (chapterId === 'templates') {
-    return (
-      <ChapterArtFrame>
-        <PagesScene alt="Eight page thumbnails in a grid, the first one highlighted" />
-      </ChapterArtFrame>
-    );
-  }
-  return null;
+  return <ChapterArtFrame>{scene.node(scene.alt)}</ChapterArtFrame>;
 }
 
 export default function ProductTour() {

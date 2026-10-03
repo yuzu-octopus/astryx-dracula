@@ -8,15 +8,6 @@ import {Button} from '@astryxdesign/core/Button';
 import {Table, pixel} from '@astryxdesign/core/Table';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
 import type {TableColumn} from '@astryxdesign/core/Table';
-import type {CSSProperties} from 'react';
-
-// Each column below declares the width its own content needs, so the table
-// takes that sum instead of splitting the viewport four ways and leaving a
-// quarter of the page empty after a ten-character name and 290px of empty
-// table to the right of an Edit button. `width: auto` is what lets the pixel
-// widths survive — under the default `width: 100%` the fixed table layout
-// hands the leftover space back to every column and the voids return.
-const tableHugsContent: CSSProperties = {width: 'auto'};
 
 type Relic = {
   id: string;
@@ -106,12 +97,18 @@ export default function SimpleTable() {
       }
       content={
         <LayoutContent>
+          {/* Each column below declares the width its own content needs, so the table
+              takes that sum instead of splitting the viewport four ways and leaving a
+              quarter of the page empty after a ten-character name and 290px of empty
+              table to the right of an Edit button. `width: auto` is what lets the pixel
+              widths survive — under the default `width: 100%` the fixed table layout
+              hands the leftover space back to every column and the voids return. */}
           <Table<Relic>
             data={data}
             columns={columns}
             idKey="id"
             hasHover
-            style={tableHugsContent}
+            style={{width: 'auto'}}
           />
         </LayoutContent>
       }

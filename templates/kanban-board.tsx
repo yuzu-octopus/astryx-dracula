@@ -6,7 +6,6 @@ import {
   useEffect,
   useRef,
   useState,
-  type CSSProperties,
   type PointerEvent as ReactPointerEvent,
   type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode,
@@ -253,58 +252,11 @@ const DRAG_THRESHOLD = 5;
 
 // ============= STYLES =============
 
-// Responsive board grid: columns collapse to fewer tracks, then a single
-// stack. The board keeps its own internal scroll as the only scroller;
-// grid children get room to shrink so nothing forces page-level scroll.
-const boardColumnsStyle: CSSProperties = {
-  overflowX: 'auto',
-  overflowY: 'auto',
-  height: '100%',
-  padding: 'var(--spacing-6)',
-};
-const columnShellStyle: CSSProperties = {
-  minWidth: 0,
-  height: '100%',
-};
-// Cards stay static per the Dracula brand (no hover lift); the floating drag
-// clone floats above the board with the high shadow token instead.
-const cardStyle: CSSProperties = {
-  cursor: 'grab',
-  userSelect: 'none',
-  touchAction: 'none',
-};
 // The dragged card is lifted out of flow and follows the pointer. It ignores
 // pointer events so hit-testing reads the columns underneath it. The clone
 // rides above shell chrome (layered 0-3) but stays under overlay surfaces
 // (menus, dialogs layer at 500+ plus the top layer), so an open menu wins.
 const DRAG_CLONE_LAYER = 100;
-const floatingStyle: CSSProperties = {
-  position: 'fixed',
-  insetBlockStart: 0,
-  insetInlineStart: 0,
-  pointerEvents: 'none',
-  cursor: 'grabbing',
-  zIndex: DRAG_CLONE_LAYER,
-};
-// Placeholder marking the landing slot; matches the dragged card's height.
-const ghostStyle = (height: number): CSSProperties => ({
-  height,
-  borderRadius: 'var(--radius-element)',
-  backgroundColor: 'var(--color-background-muted)',
-});
-const toolbarDividerStyle: CSSProperties = {
-  alignSelf: 'stretch',
-};
-const columnEmptyStateStyle: CSSProperties = {
-  // 12px, not 24. This applies to an EmptyState inside a LayoutContent
-  // padding={3} (12px), so 24 rendered as 36px of block air on the empty
-  // branch against 12px on the populated one -- a 3x difference between two
-  // states of the same column, and the only nested inset in the kit that
-  // exceeded its container. The block padding is the CONTAINER's job; this
-  // one is the placeholder's room to breathe inside it.
-  paddingBlock: 'var(--spacing-3)',
-};
-
 // ============= CARD BODY =============
 
 // Shared card contents, rendered both in the column list and inside the
@@ -332,12 +284,7 @@ function BoardCardBody({
         <MoreMenu
           label="Work item actions"
           size="sm"
-          items={[
-            {label: 'Open', onClick: () => {}},
-            {label: 'Assign to me', onClick: () => {}},
-            {type: 'divider'},
-            ...moveTargets,
-          ]}
+          items={[{label: 'Open'}, {label: 'Assign to me'}, {type: 'divider'}, ...moveTargets]}
         />
       </HStack>
 
@@ -389,7 +336,9 @@ function BoardCard({
     <Card
       ref={cardRef}
       padding={3}
-      style={cardStyle}
+      // Cards stay static per the Dracula brand (no hover lift); the floating
+      // drag clone floats above the board with the high shadow token instead.
+      style={{cursor: 'grab', userSelect: 'none', touchAction: 'none'}}
       tabIndex={0}
       role="button"
       aria-label={`${item.title}. In ${COLUMNS.find(c => c.id === item.column)?.title}. Press left or right arrow to move across columns.`}
@@ -414,7 +363,7 @@ function BoardColumn({
   children: ReactNode;
 }) {
   return (
-    <Card variant="muted" padding={0} style={columnShellStyle}>
+    <Card variant="muted" padding={0} style={{minWidth: 0, height: '100%'}}>
       <Layout
         height="fill"
         header={
@@ -455,7 +404,10 @@ function BoardColumn({
             {children ?? (
               <EmptyState
                 isCompact
-                style={columnEmptyStateStyle}
+                // 12px, not 24: this EmptyState sits inside a LayoutContent
+                // padding={3} (12px), so 24 would render as 36px of block air
+                // on the empty branch against 12px on the populated one.
+                style={{paddingBlock: 'var(--spacing-3)'}}
                 icon={
                   <Icon icon={meta.emptyIcon} size="lg" color="secondary" />
                 }
@@ -488,36 +440,22 @@ export default function KanbanBoard() {
   );
   const teardownRef = useRef<(() => void) | null>(null);
 
-  // Stable ref callbacks so registering an element never churns across renders.
-  const getColumnRef = (id: ColumnId) => {
-    let cb = columnRefCbs.current.get(id);
+  // One helper for both registries: stable per-key ref callbacks so
+  // registering an element never churns across renders.
+  function refCallback<K>(cbs: Map<K, (el: HTMLDivElement | null) => void>, els: Map<K, HTMLElement>, key: K) {
+    let cb = cbs.get(key);
     if (!cb) {
       cb = el => {
         if (el) {
-          columnEls.current.set(id, el);
+          els.set(key, el);
         } else {
-          columnEls.current.delete(id);
+          els.delete(key);
         }
       };
-      columnRefCbs.current.set(id, cb);
+      cbs.set(key, cb);
     }
     return cb;
-  };
-
-  const getCardRef = (id: string) => {
-    let cb = cardRefCbs.current.get(id);
-    if (!cb) {
-      cb = el => {
-        if (el) {
-          cardEls.current.set(id, el);
-        } else {
-          cardEls.current.delete(id);
-        }
-      };
-      cardRefCbs.current.set(id, cb);
-    }
-    return cb;
-  };
+  }
 
   const itemsByColumn = groupByColumn(items);
 
@@ -688,7 +626,7 @@ export default function KanbanBoard() {
       <BoardCard
         key={it.id}
         item={it}
-        cardRef={getCardRef(it.id)}
+        cardRef={refCallback(cardRefCbs.current, cardEls.current, it.id)}
         onPointerDown={onCardPointerDown}
         onMove={moveItem}
       />
@@ -699,7 +637,15 @@ export default function KanbanBoard() {
       nodes.splice(
         index,
         0,
-        <VStack key="drag-ghost" style={ghostStyle(ghostTarget.height)} />,
+        <VStack
+          key="drag-ghost"
+          // Placeholder marking the landing slot; matches the dragged card's height.
+          style={{
+            height: ghostTarget.height,
+            borderRadius: 'var(--radius-element)',
+            backgroundColor: 'var(--color-background-muted)',
+          }}
+        />,
       );
     }
 
@@ -739,7 +685,7 @@ export default function KanbanBoard() {
                   <Divider
                     variant="strong"
                     orientation="vertical"
-                    style={toolbarDividerStyle}
+                    style={{alignSelf: 'stretch'}}
                   />
                   <HStack gap={1} vAlign="center" wrap="wrap">
                     <IconButton
@@ -770,7 +716,7 @@ export default function KanbanBoard() {
             <Grid
               columns={{ minWidth: 280, max: 4 }}
               gap={4}
-              style={boardColumnsStyle}
+              style={{overflowX: 'auto', overflowY: 'auto', height: '100%', padding: 'var(--spacing-6)'}}
               tabIndex={0}
               role="region"
               aria-label="Sprint board columns">
@@ -779,7 +725,7 @@ export default function KanbanBoard() {
                   key={meta.id}
                   meta={meta}
                   count={itemsByColumn[meta.id].length}
-                  contentRef={getColumnRef(meta.id)}>
+                  contentRef={refCallback(columnRefCbs.current, columnEls.current, meta.id)}>
                   {renderColumnCards(meta.id)}
                 </BoardColumn>
               ))}
@@ -792,7 +738,12 @@ export default function KanbanBoard() {
           padding={3}
           elevation="none"
           style={{
-            ...floatingStyle,
+            position: 'fixed',
+            insetBlockStart: 0,
+            insetInlineStart: 0,
+            pointerEvents: 'none',
+            cursor: 'grabbing',
+            zIndex: DRAG_CLONE_LAYER,
             width: drag.width,
             borderColor: 'var(--color-border-emphasized)',
             transform: `translate(${drag.pointerX - drag.offsetX}px, ${drag.pointerY - drag.offsetY}px)`,

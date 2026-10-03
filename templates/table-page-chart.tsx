@@ -6,47 +6,48 @@
  * Matcha Bar — order desk: a daily revenue line over the full order log.  Frame: page header (title + icon actions) | content column (chart, t (Frame/responsive/container: see XLE header above.)
  */
 
-import {OrderDesk, type OrderDeskRow} from 'astryx-dracula/shared/order-desk';
-import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
+import {
+  OrderDesk,
+  type OrderDeskProduct,
+  type OrderDeskRow,
+} from 'astryx-dracula/shared/order-desk';
 
 // ============= DATA =============
 
-type ProductCategory = 'Matcha' | 'Coffee' | 'Tea' | 'Smoothie' | 'Specialty';
-
-const PRODUCTS: Array<{name: string; category: string; accent: SceneHue; price: number}> = [
+const PRODUCTS: OrderDeskProduct[] = [
   {
     name: 'Ceremonial Matcha Latte',
-    category: 'Matcha' as ProductCategory,
+    category: 'Matcha',
     accent: 'var(--dracula-green)',
     price: 6,
   },
   {
     name: 'Oat Milk Cappuccino',
-    category: 'Coffee' as ProductCategory,
+    category: 'Coffee',
     accent: 'var(--dracula-orange)',
     price: 5,
   },
   {
     name: 'Jasmine Green Tea',
-    category: 'Tea' as ProductCategory,
+    category: 'Tea',
     accent: 'var(--dracula-cyan)',
     price: 4,
   },
   {
     name: 'Mango Matcha Smoothie',
-    category: 'Smoothie' as ProductCategory,
+    category: 'Smoothie',
     accent: 'var(--dracula-pink)',
     price: 8,
   },
   {
     name: 'Hojicha Latte',
-    category: 'Specialty' as ProductCategory,
+    category: 'Specialty',
     accent: 'var(--dracula-pink)',
     price: 7,
   },
   {
     name: 'Iced Yuzu Matcha',
-    category: 'Matcha' as ProductCategory,
+    category: 'Matcha',
     accent: 'var(--dracula-yellow)',
     price: 7,
   },

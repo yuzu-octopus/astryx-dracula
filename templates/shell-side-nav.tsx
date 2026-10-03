@@ -16,9 +16,7 @@ import {
 } from '@astryxdesign/core/SideNav';
 import {NavIcon} from '@astryxdesign/core/NavIcon';
 import {Icon} from '@astryxdesign/core/Icon';
-import type {IconType} from '@astryxdesign/core/Icon';
 import {StatusDot} from '@astryxdesign/core/StatusDot';
-import type {StatusDotVariant} from '@astryxdesign/core/StatusDot';
 import {Card} from '@astryxdesign/core/Card';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {VStack, HStack} from '@astryxdesign/core/Stack';
@@ -30,23 +28,9 @@ import {
   Settings,
   CircleUserRound,
   User,
-  Building2,
-  CodeXml,
 } from 'lucide-react';
 
-type Conversation = {
-  label: string;
-  status: StatusDotVariant;
-  statusLabel: string;
-};
-
-type Workspace = {
-  name: string;
-  icon: IconType;
-  chats: Conversation[];
-};
-
-const WORKSPACES: Workspace[] = [
+const WORKSPACES = [
   {
     name: 'Personal',
     icon: User,
@@ -66,52 +50,11 @@ const WORKSPACES: Workspace[] = [
         status: 'warning',
         statusLabel: 'Needs review',
       },
-      {label: 'Crypt workout plan', status: 'neutral', statusLabel: 'Idle'},
     ],
   },
-  {
-    name: 'Night Watch',
-    icon: Building2,
-    chats: [
-      {
-        label: 'Crypt expansion draft',
-        status: 'info',
-        statusLabel: 'In progress',
-      },
-      {
-        label: 'Neonate welcoming rite',
-        status: 'success',
-        statusLabel: 'Active',
-      },
-      {
-        label: 'Tribute ledger review',
-        status: 'warning',
-        statusLabel: 'Needs review',
-      },
-      {label: 'Night-watch summary', status: 'neutral', statusLabel: 'Idle'},
-    ],
-  },
-  {
-    name: 'Open Source',
-    icon: CodeXml,
-    chats: [
-      {
-        label: 'Coven theme migration notes',
-        status: 'info',
-        statusLabel: 'In progress',
-      },
-      {
-        label: 'Crypt loading states',
-        status: 'success',
-        statusLabel: 'Active',
-      },
-      {label: 'Accessibility audit', status: 'error', statusLabel: 'Blocked'},
-      {label: 'Release notes v4.0', status: 'neutral', statusLabel: 'Idle'},
-    ],
-  },
-];
+] as const;
 
-const SELECTED_CHAT = 'Coven theme migration notes';
+const SELECTED_CHAT = 'Full-moon rite planning';
 // Same-route hash: demo links stay focusable anchors without escaping the
 // template through the hash router (bare "#" would drop back to the home page).
 const SELF_HASH = '#/templates/shell-side-nav';
@@ -125,32 +68,6 @@ const MESSAGES = [
   {id: 'reply', role: 'user', width: '38%', height: 40},
 ];
 
-function ConversationItem({
-  label,
-  status,
-  statusLabel,
-  isSelected,
-  onSelect,
-}: {
-  label: string;
-  status: StatusDotVariant;
-  statusLabel: string;
-  isSelected?: boolean;
-  onSelect: () => void;
-}) {
-  // The hover-only MoreMenu was four dead actions unreachable by keyboard and
-  // touch, so it goes: the status dot is always visible (its label doubles as
-  // the tooltip), and selecting a conversation actually switches selection.
-  return (
-    <SideNavItem
-      label={label}
-      href={SELF_HASH}
-      isSelected={isSelected}
-      onClick={onSelect}
-      endContent={<StatusDot variant={status} label={statusLabel} />}
-    />
-  );
-}
 
 export default function ShellSideNav() {
   const [selectedChat, setSelectedChat] = useState(SELECTED_CHAT);
@@ -194,13 +111,22 @@ export default function ShellSideNav() {
                 collapsible={{defaultIsCollapsed: false}}>
                 <VStack gap={0.5}>
                   {workspace.chats.map(chat => (
-                    <ConversationItem
+                    // The hover-only MoreMenu was four dead actions unreachable
+                    // by keyboard and touch, so it goes: the status dot stays
+                    // always visible (its label doubles as the tooltip), and
+                    // selecting a conversation switches selection.
+                    <SideNavItem
                       key={chat.label}
                       label={chat.label}
-                      status={chat.status}
-                      statusLabel={chat.statusLabel}
+                      href={SELF_HASH}
                       isSelected={chat.label === selectedChat}
-                      onSelect={() => setSelectedChat(chat.label)}
+                      onClick={() => setSelectedChat(chat.label)}
+                      endContent={
+                        <StatusDot
+                          variant={chat.status}
+                          label={chat.statusLabel}
+                        />
+                      }
                     />
                   ))}
                 </VStack>

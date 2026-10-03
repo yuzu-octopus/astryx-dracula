@@ -1,12 +1,12 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   TN"Nocturne" + (S[p6] > V[g10] > (Ctr > V[g4 a=center] > Hd"Little haunts"[level=1 type=display-2] + Tx"We believe"[t=body]) + (G[c={min:200,max:3} g4] > (C[p0] > AR + V[g2 a=center] > Bd + Hd"Product"[level=2] + Tx"Description"[t=body] + (H[g2] > NI + B"Add to cart"))*3)) + (V[g8] > (G[c={min:200} g4] > (GS[c=1] > C > Hd"Checkout"[level=2]) + (GS[c=2] > C > Hd"Night Owl AI"[level=2])) + (G[c={min:200} g4] > (GS[c=3] > C > T) + (GS[c=1] > C > Hd"Revenue"[level=2])))
+//   TN"Nocturne" + (S[p6] > V[g10] > (Ctr > V[g4 a=center] > Hd"Little haunts"[level=1 type=display-2] + Tx"We believe"[t=body]) + (G[c={min:200,max:3} g4] > (C[p0] > AR + V[g2 a=center] > Bd + Hd"Product"[level=2] + Tx"Description"[t=body] + (H[g2] > NI + B"Add to cart"))*3)) + (V[g8] > (C[p0] > Hd"Night Owl AI"[level=2]) + (G[c={min:200} g4] > (GS[c=3] > C > T) + (GS[c=1] > C > Hd"Revenue"[level=2])))
 
 /**
  * Theme Showcase — the storefront page each theme is previewed against, and the only template that is deliberately shell-less: it paints its o (Frame/responsive/container: see XLE header above.)
  */
 
-import {type CSSProperties, type ReactNode} from 'react';
+import type {ReactNode} from 'react';
 import {
   Plus,
   Search,
@@ -18,12 +18,8 @@ import {
   ShoppingBag,
   Banknote,
   Mic,
-  CreditCard,
-  Lock,
   X,
   Download,
-  Smartphone,
-  Wallet,
   User,
 } from 'lucide-react';
 import {Text, Heading} from '@astryxdesign/core/Text';
@@ -45,8 +41,6 @@ import {ProductSwatch} from 'astryx-dracula/shared/revenue-chart';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {Selector} from '@astryxdesign/core/Selector';
-import {RadioList, RadioListItem} from '@astryxdesign/core/RadioList';
-import {SelectableCard} from '@astryxdesign/core/SelectableCard';
 import {MoreMenu} from '@astryxdesign/core/MoreMenu';
 import {Center} from '@astryxdesign/core/Center';
 import {Section} from '@astryxdesign/core/Section';
@@ -62,182 +56,7 @@ import {
   ChatSystemMessage,
 } from '@astryxdesign/core/Chat';
 import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
-
-// Styles passed to Astryx components via their `style` prop. Astryx components
-// forward the DOM `style` prop, so these work with no CSS compiler — in
-// compiled builds and in the live playground preview alike.
-const styles: Record<string, CSSProperties> = {
-  card: {
-    backgroundColor: 'var(--color-background-body)',
-    color: 'var(--color-text-primary)',
-    minWidth: 0,
-    borderColor: 'transparent',
-  },
-  checkoutStack: {
-    minWidth: 0,
-    width: '100%',
-  },
-  paymentCardContent: {
-    minWidth: 0,
-    width: '100%',
-    textAlign: 'center',
-    wordBreak: 'break-word',
-  },
-  inventoryCard: {
-    backgroundColor: 'var(--color-background-surface)',
-    color: 'var(--color-text-primary)',
-    overflow: 'hidden',
-  },
-  inventoryHeader: {
-    paddingBlock: 'var(--spacing-6)',
-    paddingInline: 'var(--spacing-6)',
-  },
-  inventoryFilterRow: {
-    paddingBlock: 'var(--spacing-4)',
-    paddingInline: 'var(--spacing-6)',
-    width: '100%',
-    overflowX: 'auto' as const,
-  },
-  // Inset the table by --spacing-6 (the card is padding={0}) so its edge lines
-  // up with the header/filter row in every theme's spacing scale.
-  inventoryTableWrap: {
-    paddingInline: 'var(--spacing-6)',
-    paddingBlockEnd: 'var(--spacing-2)',
-  },
-  searchInput: {
-    flex: 1,
-    minWidth: 0,
-    maxWidth: 240,
-  },
-  filterRowFill: {
-    flex: 1,
-    minWidth: 0,
-  },
-  activityCard: {
-    backgroundColor: 'var(--color-background-surface)',
-    color: 'var(--color-text-primary)',
-    minWidth: 0,
-    height: '100%',
-  },
-  chatCard: {
-    backgroundColor: 'var(--color-background-surface)',
-    color: 'var(--color-text-primary)',
-    minWidth: 0,
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column' as const,
-  },
-  chatHeader: {
-    paddingBlock: 'var(--spacing-4)',
-    paddingInline: 'var(--spacing-4)',
-  },
-  activityCardStack: {
-    height: '100%',
-  },
-  inventoryItemText: {
-    minWidth: 0,
-  },
-  activityListFade: {
-    flex: 1,
-    minHeight: 0,
-    overflow: 'hidden',
-    maskImage:
-      'linear-gradient(to bottom, black calc(100% - 48px), transparent)',
-    WebkitMaskImage:
-      'linear-gradient(to bottom, black calc(100% - 48px), transparent)',
-    marginInline: 'calc(var(--spacing-2) * -1)',
-  },
-  // The hero column: centered, narrower than the grid below it.
-  contentFluid: {
-    maxWidth: 880,
-    marginInline: 'auto',
-    minWidth: 0,
-  },
-  heroText: {
-    textAlign: 'center' as const,
-    maxWidth: 560,
-  },
-  centerText: {
-    textAlign: 'center',
-  },
-  cardStack: {
-    height: '100%',
-  },
-  cardDescription: {
-    flex: 1,
-    textAlign: 'center' as const,
-  },
-  // Store surfaces: the shell is intentionally absent, so the page paints its
-  // own body and card-showcase bands.
-  storeRoot: {
-    minHeight: '100%',
-    backgroundColor: 'var(--color-background-body)',
-  },
-  showcaseBand: {
-    padding: 'var(--spacing-6)',
-    backgroundColor: 'var(--color-background-surface)',
-  },
-  quantityInput: {
-    // minWidth (not a hard width) so the field grows to fit the digit + the
-    // theme's input padding. A fixed 40px was too tight on themes with larger
-    // padding / bigger type scale (e.g. Matcha, Y2K), clipping the value.
-    minWidth: 64,
-    flexShrink: 0,
-  },
-  cartButton: {
-    flex: 1,
-  },
-};
-
-// Styles applied directly to plain DOM elements via the `style` prop.
-// Plain inline styles so they render with no CSS compiler. All are static
-// (no media/pseudo variants), so inline styles reproduce them exactly.
-const inlineStyles: Record<string, CSSProperties> = {
-  inventoryBannerWrap: {
-    paddingInline: 'var(--spacing-6)',
-    paddingBottom: 'var(--spacing-4)',
-  },
-  chatBody: {
-    flex: 1,
-    minHeight: 0,
-    // The message region is the scroll owner: the card is stretched to the
-    // grid row height, so longer conversations must scroll here rather than
-    // clip against the card.
-    overflowY: 'auto' as const,
-  },
-  chatSuggestions: {
-    paddingInline: 'var(--spacing-4)',
-    paddingBottom: 'var(--spacing-2)',
-  },
-  chatComposer: {
-    paddingInline: 'var(--spacing-4)',
-    paddingBottom: 'var(--spacing-4)',
-  },
-  // Center supplies the 32px box and the centering; only the paint stays here.
-  // Surface, not muted: --color-text-secondary #9AA1BC is 3.57:1 on
-  // --color-background-muted #44475A, under the 4.5:1 text floor. The chip is
-  // aria-hidden decorative art so it clears the 3:1 non-text bar as-is, but the
-  // surface fill carries the same 4.60:1 pairing at no cost and cannot drop
-  // under the floor if anything smaller is ever put in the box.
-  activityIcon: {
-    borderRadius: 'var(--radius-element)', // square chip: no circles except dots/avatars
-    backgroundColor: 'var(--color-background-surface)',
-    color: 'var(--color-text-secondary)',
-    flexShrink: 0,
-  },
-  cardBody: {
-    padding: 'var(--spacing-4)',
-    flex: 1,
-  },
-};
-
-// Fills the AspectRatio box with a Dracula product scene. No Image primitive
-// in Astryx (#2582), so product tiles are inline SVG on brand tokens.
-const artImage: CSSProperties = {
-  width: '100%',
-  height: '100%',
-  display: 'block',
-};
+import {SceneFrame} from 'astryx-dracula/shared/scene-frame';
 
 // One Dracula accent per hero product slot. Purple stays off decorative art:
 // it reads as interactive, and nothing here is tappable.
@@ -252,8 +71,6 @@ const PRODUCT_HUES = [
 // every time.
 const SHOWCASE_COLUMNS = {minWidth: 200, repeat: 'fit'} as const;
 const PRODUCT_COLUMNS = {minWidth: 200, max: 3} as const;
-const PAYMENT_COLUMNS = {minWidth: 70, max: 3} as const;
-const EXPIRY_COLUMNS = {minWidth: 90, max: 2} as const;
 
 /** Categorical badge variants usable for showcase product/inventory tags. */
 export type ShowcaseBadgeVariant =
@@ -299,12 +116,11 @@ const DEFAULT_PRODUCTS: ProductSpec[] = [
 // accent glyph. All fills are brand vars, corners rx=4.
 function ProductArt({hue, label}: {hue: string; label: string}) {
   return (
-    <svg
+    <SceneFrame
+      label={`${label} artwork`}
       viewBox="0 0 400 300"
-      preserveAspectRatio="xMidYMid slice"
-      style={artImage}
-      role="img"
-      aria-label={`${label} artwork`}>
+      fill="var(--dracula-bg-light)"
+      hasBackdrop={false}>
       <rect width="400" height="300" fill="var(--dracula-bg-light)" />
       <circle cx="200" cy="110" r="52" fill={hue} opacity={0.9} />
       <circle
@@ -333,35 +149,28 @@ function ProductArt({hue, label}: {hue: string; label: string}) {
         <circle cx="13" cy="-13" r="2.5" fill={hue} stroke="none" />
         <path d="M-22 20 L-5 2 L7 12 L14 5 L23 15" />
       </g>
-    </svg>
+    </SceneFrame>
   );
 }
 
-export interface ThemeShowcaseProps {
-  /** The three hero product cards. Defaults to the nocturne store products. */
-  products?: ProductSpec[];
-  /** Inventory table rows. Defaults to the nocturne store inventory. */
-  inventory?: InventoryRow[];
-}
-
 // Default export is the route page (sandbox renders this as a Next.js page, so
-// it must take no props / satisfy PageProps). It renders the store with the
-// nocturne defaults. Consumers that need per-theme content import the named
-// `ThemeShowcaseStore` below and pass products/inventory.
+// it must take no props / satisfy PageProps). The store is hardcoded to the
+// nocturne products and inventory: nothing outside this file passes products
+// or inventory in, so the props/store split bought indirection for zero
+// callers.
 export default function ThemeShowcase() {
-  return <ThemeShowcaseStore />;
-}
-
-export function ThemeShowcaseStore({
-  products = DEFAULT_PRODUCTS,
-  inventory = DEFAULT_INVENTORY,
-}: ThemeShowcaseProps = {}) {
   const {isMobile} = useAppShellMobile();
   return (
-    <VStack gap={0} style={styles.storeRoot}>
-      <StorePreview products={products} isMobile={isMobile} />
-      <VStack gap={0} style={styles.showcaseBand}>
-        <CardShowcase inventory={inventory} isMobile={isMobile} />
+    <VStack
+      gap={0}
+      minHeight="100%"
+      style={{backgroundColor: 'var(--color-background-body)'}}>
+      <StorePreview products={DEFAULT_PRODUCTS} isMobile={isMobile} />
+      <VStack
+        gap={0}
+        padding={6}
+        style={{backgroundColor: 'var(--color-background-surface)'}}>
+        <CardShowcase inventory={DEFAULT_INVENTORY} isMobile={isMobile} />
       </VStack>
     </VStack>
   );
@@ -378,14 +187,7 @@ function CardShowcase({
 
   return (
     <VStack gap={8}>
-      <Grid columns={columns} gap={4}>
-        <GridSpan columns={1}>
-          <CheckoutCard isMobile={isMobile} />
-        </GridSpan>
-        <GridSpan columns={isMobile ? 1 : 2}>
-          <ChatCard />
-        </GridSpan>
-      </Grid>
+      <ChatCard />
       <Grid columns={columns} gap={4}>
         <GridSpan columns={isMobile ? 1 : 3}>
           <InventoryCard inventory={inventory} />
@@ -470,15 +272,19 @@ function StorePreview({
         />
 
         <Section padding={6} variant="transparent">
-          <VStack gap={10} style={styles.contentFluid}>
+          <VStack
+            gap={10}
+            maxWidth={880}
+            width="100%"
+            style={{marginInline: 'auto', minWidth: 0}}>
             <Center>
-              <VStack gap={4} hAlign="center" style={styles.heroText}>
-                <Heading level={1} type="display-2">
+              <VStack gap={4} hAlign="center" maxWidth={560}>
+                <Heading level={1} type="display-2" justify="center">
                   Little haunts,
                   <br />
                   everywhere you roam
                 </Heading>
-                <Text type="body" color="secondary">
+                <Text type="body" color="secondary" justify="center">
                   We believe the smallest shadows are the ones that matter most.
                   Turn an ordinary evening into something worth remembering.
                 </Text>
@@ -488,7 +294,7 @@ function StorePreview({
             <Grid columns={isMobile ? 1 : PRODUCT_COLUMNS} gap={4}>
               {products.map((p, i) => (
                 <Card key={p.name} padding={0} height="100%">
-                  <VStack gap={0} style={styles.cardStack}>
+                  <VStack gap={0} height="100%">
                     <AspectRatio ratio={1}>
                       <ProductArt
                         hue={PRODUCT_HUES[i % PRODUCT_HUES.length]}
@@ -498,17 +304,19 @@ function StorePreview({
                     <VStack
                       gap={2}
                       hAlign="center"
-                      style={inlineStyles.cardBody}>
+                      padding={4}
+                      style={{flex: 1}}>
                       <HStack>
                         <Badge label={p.badge} variant={p.badgeVariant} />
                       </HStack>
-                      <Heading level={2} style={styles.centerText}>
+                      <Heading level={2} justify="center">
                         {p.name}
                       </Heading>
                       <Text
                         type="body"
                         color="secondary"
-                        style={styles.cardDescription}>
+                        justify="center"
+                        style={{flex: 1}}>
                         {p.description}
                       </Text>
                       <HStack gap={2} vAlign="center" hAlign="center">
@@ -520,14 +328,19 @@ function StorePreview({
                           min={1}
                           max={99}
                           size="sm"
-                          style={styles.quantityInput}
+                          // minWidth (not a hard width) so the field grows to
+                          // fit the digit + the theme's input padding. A fixed
+                          // 40px was too tight on themes with larger padding /
+                          // bigger type scale (e.g. Matcha, Y2K), clipping the
+                          // value.
+                          style={{minWidth: 64, flexShrink: 0}}
                         />
                         <Button
                           label="Add to cart"
                           variant="secondary"
                           size="sm"
                           href="#/templates/theme-showcase"
-                          style={styles.cartButton}
+                          style={{flex: 1}}
                         />
                       </HStack>
                     </VStack>
@@ -542,171 +355,6 @@ function StorePreview({
   );
 }
 
-function CheckoutCard({isMobile}: {isMobile: boolean}) {
-  return (
-    <Card padding={4} style={styles.card}>
-      <VStack gap={4} style={styles.checkoutStack}>
-        <Heading level={2}>Checkout</Heading>
-
-        <VStack gap={3} style={styles.checkoutStack}>
-          <TextInput
-            label="Email"
-            placeholder="you@nocturne.shop"
-            value=""
-            onChange={() => {}}
-            size="lg"
-          />
-
-          <RadioList
-            label="Shipping method"
-            description="Delivery time may vary based on location and availability."
-            value="economy"
-            onChange={() => {}}>
-            <RadioListItem
-              value="economy"
-              label="Economy Shipping"
-              description="Delivered in 5–7 business days"
-              endContent={
-                <Text type="body" weight="semibold" hasTabularNumbers>
-                  $12.00
-                </Text>
-              }
-            />
-            <RadioListItem
-              value="standard"
-              label="Standard Shipping"
-              description="Delivered in 3–5 business days"
-              endContent={
-                <Text type="body" weight="semibold" hasTabularNumbers>
-                  $16.00
-                </Text>
-              }
-            />
-            <RadioListItem
-              value="express"
-              label="Express Shipping"
-              description="Delivered in 1–2 business days"
-              endContent={
-                <Text type="body" weight="semibold" hasTabularNumbers>
-                  $24.00
-                </Text>
-              }
-            />
-          </RadioList>
-
-          <VStack gap={2} style={styles.checkoutStack}>
-            <Text type="label" weight="semibold">
-              Payment method
-            </Text>
-            <Grid columns={isMobile ? 1 : PAYMENT_COLUMNS} gap={2}>
-              <SelectableCard
-                label="Pay with card"
-                isSelected={true}
-                onChange={() => {}}
-                padding={3}>
-                <VStack
-                  gap={1}
-                  hAlign="center"
-                  style={styles.paymentCardContent}>
-                  <CreditCard size={20} />
-                  <Text type="supporting" weight="semibold">
-                    Card
-                  </Text>
-                </VStack>
-              </SelectableCard>
-              <SelectableCard
-                label="Pay with Apple Pay"
-                isSelected={false}
-                onChange={() => {}}
-                padding={3}>
-                <VStack
-                  gap={1}
-                  hAlign="center"
-                  style={styles.paymentCardContent}>
-                  <Smartphone size={20} />
-                  <Text type="supporting" weight="semibold">
-                    Apple Pay
-                  </Text>
-                </VStack>
-              </SelectableCard>
-              <SelectableCard
-                label="Pay with Google Pay"
-                isSelected={false}
-                onChange={() => {}}
-                padding={3}>
-                <VStack
-                  gap={1}
-                  hAlign="center"
-                  style={styles.paymentCardContent}>
-                  <Wallet size={20} />
-                  <Text type="supporting" weight="semibold">
-                    Google Pay
-                  </Text>
-                </VStack>
-              </SelectableCard>
-            </Grid>
-          </VStack>
-
-          <TextInput
-            label="Card number"
-            placeholder="1234 1234 1234 1234"
-            value=""
-            onChange={() => {}}
-            startIcon={<CreditCard size={16} />}
-            size="lg"
-          />
-
-          <Grid columns={isMobile ? 1 : EXPIRY_COLUMNS} gap={2}>
-            <TextInput
-              label="Expiry"
-              placeholder="MM / YY"
-              value=""
-              onChange={() => {}}
-              size="lg"
-            />
-            <TextInput
-              label="CVC"
-              placeholder="123"
-              value=""
-              onChange={() => {}}
-              size="lg"
-            />
-          </Grid>
-
-          <Selector
-            label="Country"
-            value="us"
-            onChange={() => {}}
-            size="lg"
-            options={[
-              {value: 'us', label: 'United States'},
-              {value: 'ca', label: 'Canada'},
-              {value: 'uk', label: 'United Kingdom'},
-              {value: 'de', label: 'Germany'},
-              {value: 'jp', label: 'Japan'},
-              {value: 'au', label: 'Australia'},
-            ]}
-          />
-        </VStack>
-
-        <CheckboxInput
-          label="Securely save my information for 1-click checkout"
-          description="Pay faster on Nocturne and everywhere Link is accepted."
-          value={true}
-          onChange={() => {}}
-        />
-
-        <Button
-          variant="primary"
-          size="lg"
-          label="Pay now"
-          icon={<Lock size={16} />}
-        />
-      </VStack>
-    </Card>
-  );
-}
-
 const SUGGESTED_QUESTIONS = [
   'Reschedule delivery',
   'Update shipping address',
@@ -715,12 +363,22 @@ const SUGGESTED_QUESTIONS = [
 
 function ChatCard() {
   return (
-    <Card padding={0} style={styles.chatCard}>
+    <Card
+      padding={0}
+      style={{
+        backgroundColor: 'var(--color-background-surface)',
+        color: 'var(--color-text-primary)',
+        minWidth: 0,
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column',
+      }}>
       <HStack
         hAlign="between"
         vAlign="center"
         gap={3}
-        style={styles.chatHeader}>
+        paddingBlock={4}
+        paddingInline={4}>
         <Heading level={2}>Night Owl AI</Heading>
 
         <HStack gap={1} vAlign="center">
@@ -747,11 +405,18 @@ function ChatCard() {
 
       <VStack
         gap={0}
-        style={inlineStyles.chatBody}
         isScrollable={false}
         tabIndex={0}
         role="region"
-        aria-label="Night Owl chat messages">
+        aria-label="Night Owl chat messages"
+        style={{
+          flex: 1,
+          minHeight: 0,
+          // The message region is the scroll owner: the card is stretched to the
+          // grid row height, so longer conversations must scroll here rather than
+          // clip against the card.
+          overflowY: 'auto',
+        }}>
         <ChatMessageList>
           <ChatSystemMessage>Today</ChatSystemMessage>
 
@@ -829,7 +494,7 @@ function ChatCard() {
         </ChatMessageList>
       </VStack>
 
-      <VStack gap={0} style={inlineStyles.chatSuggestions}>
+      <VStack gap={0} paddingInline={4} paddingBlockEnd={2}>
         <HStack gap={1} hAlign="center" wrap="wrap">
           {SUGGESTED_QUESTIONS.map(question => (
             <Button
@@ -842,7 +507,7 @@ function ChatCard() {
         </HStack>
       </VStack>
 
-      <VStack gap={0} style={inlineStyles.chatComposer}>
+      <VStack gap={0} paddingInline={4} paddingBlockEnd={4}>
         <ChatComposer
           value=""
           onChange={() => {}}
@@ -933,8 +598,15 @@ function formatAmount(amount: number): string {
 
 function LatestActivityCard({isMobile}: {isMobile: boolean}) {
   return (
-    <Card padding={4} style={styles.activityCard}>
-      <VStack gap={4} style={styles.activityCardStack}>
+    <Card
+      padding={4}
+      height="100%"
+      style={{
+        backgroundColor: 'var(--color-background-surface)',
+        color: 'var(--color-text-primary)',
+        minWidth: 0,
+      }}>
+      <VStack gap={4} height="100%">
         <Heading level={2}>Revenue</Heading>
 
         <Grid columns={isMobile ? 1 : 2} gap={3}>
@@ -963,7 +635,18 @@ function LatestActivityCard({isMobile}: {isMobile: boolean}) {
           <Link href="#/templates/theme-showcase">See all</Link>
         </HStack>
 
-        <VStack gap={1} style={styles.activityListFade}>
+        <VStack
+          gap={1}
+          style={{
+            flex: 1,
+            minHeight: 0,
+            overflow: 'hidden',
+            maskImage:
+              'linear-gradient(to bottom, black calc(100% - 48px), transparent)',
+            WebkitMaskImage:
+              'linear-gradient(to bottom, black calc(100% - 48px), transparent)',
+            marginInline: 'calc(var(--spacing-2) * -1)',
+          }}>
           {/* The sign travels in the string (formatAmount prefixes U+2212), so
               direction is never colour-alone and 1.4.1 holds without a tint.
               A negative text role is not available here, and the reason is
@@ -985,8 +668,19 @@ function LatestActivityCard({isMobile}: {isMobile: boolean}) {
                 <Center
                   width={32}
                   height={32}
-                  style={inlineStyles.activityIcon}
-                  aria-hidden="true">
+                  aria-hidden="true"
+                  style={{
+                    // Center supplies the 32px box and the centering; only the
+                    // paint stays here. Surface, not muted: secondary
+                    // #9AA1BC is 3.57:1 on muted #44475A, under the 4.5:1 text
+                    // floor. The chip is aria-hidden decorative art so it
+                    // clears the 3:1 non-text bar as-is, but the surface fill
+                    // carries the same 4.60:1 pairing at no cost.
+                    borderRadius: 'var(--radius-element)',
+                    backgroundColor: 'var(--color-background-surface)',
+                    color: 'var(--color-text-secondary)',
+                    flexShrink: 0,
+                  }}>
                   {item.icon}
                 </Center>
               }
@@ -1103,7 +797,7 @@ function ItemCell({row}: {row: InventoryRow}) {
   return (
     <HStack gap={3} vAlign="center">
       <ProductSwatch accent={row.hue} label={row.name} />
-      <VStack gap={0} style={styles.inventoryItemText}>
+      <VStack gap={0} style={{minWidth: 0}}>
         <Text type="body" weight="semibold">
           {row.name}
         </Text>
@@ -1218,8 +912,18 @@ function InventoryCard({inventory}: {inventory: InventoryRow[]}) {
     row => row.available < LOW_STOCK_THRESHOLD,
   ).length;
   return (
-    <Card padding={0} style={styles.inventoryCard}>
-      <HStack hAlign="between" vAlign="center" style={styles.inventoryHeader}>
+    <Card
+      padding={0}
+      style={{
+        backgroundColor: 'var(--color-background-surface)',
+        color: 'var(--color-text-primary)',
+        overflow: 'hidden',
+      }}>
+      <HStack
+        hAlign="between"
+        vAlign="center"
+        paddingBlock={6}
+        paddingInline={6}>
         <Heading level={2}>Inventory</Heading>
         <Button
           label="Add item"
@@ -1234,8 +938,11 @@ function InventoryCard({inventory}: {inventory: InventoryRow[]}) {
         gap={3}
         vAlign="center"
         hAlign="between"
-        style={styles.inventoryFilterRow}>
-        <HStack gap={2} vAlign="center" style={styles.filterRowFill}>
+        width="100%"
+        paddingBlock={4}
+        paddingInline={6}
+        style={{overflowX: 'auto'}}>
+        <HStack gap={2} vAlign="center" style={{flex: 1, minWidth: 0}}>
           <TextInput
             label="Search inventory"
             isLabelHidden
@@ -1243,7 +950,7 @@ function InventoryCard({inventory}: {inventory: InventoryRow[]}) {
             value=""
             onChange={() => {}}
             startIcon={<Search size={16} />}
-            style={styles.searchInput}
+            style={{flex: 1, minWidth: 0, maxWidth: 240}}
           />
           <OverflowList
             gap={2}
@@ -1322,7 +1029,7 @@ function InventoryCard({inventory}: {inventory: InventoryRow[]}) {
       </HStack>
 
       {lowStockCount > 0 && (
-        <VStack gap={0} style={inlineStyles.inventoryBannerWrap}>
+        <VStack gap={0} paddingInline={6} paddingBlockEnd={4}>
           <Banner
             status="warning"
             title={lowStockCount + ' items are running low'}
@@ -1330,7 +1037,9 @@ function InventoryCard({inventory}: {inventory: InventoryRow[]}) {
         </VStack>
       )}
 
-      <VStack gap={0} style={styles.inventoryTableWrap}>
+      {/* Inset the table by --spacing-6 (the card is padding={0}) so its edge
+          lines up with the header/filter row in every theme's spacing scale. */}
+      <VStack gap={0} paddingInline={6} paddingBlockEnd={2}>
         <Table<InventoryRow>
           data={inventory}
           columns={

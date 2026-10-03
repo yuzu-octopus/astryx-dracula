@@ -1,8 +1,8 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-// AR*10 is the live count: GALLERY_SCENES has 10 entries and a bare .map renders
-// all 10, with no slice. The header said 9 while 10 rendered.
-//   L > LC[p=6] > G[c={min:280} g8 a=center] > (V[g6] > (V[g3] > Tx"AFTER DARK"[t=supporting] + Hd"Make every night"[level=1] + Tx"The smallest rituals"[t=body]) + B.primary"Explore the night" + (V[g4] > D + (H[g6] > (V > Tx"12k+"[t=display-3] + Tx"Night shots"[t=supporting])*3))) + (G[c3 g3] > AR*10)
+// AR*9 is the live count: SCENE_TILE_ALTS has 9 entries and a bare .map renders
+// all 9, with no slice.
+//   L > LC[p=6] > G[c={min:280} g8 a=center] > (V[g6] > (V[g3] > Tx"AFTER DARK"[t=supporting] + Hd"Make every night"[level=1] + Tx"The smallest rituals"[t=body]) + B.primary"Explore the night" + (V[g4] > D + (H[g6] > (V > Tx"12k+"[t=display-3] + Tx"Night shots"[t=supporting])*3))) + (G[c3 g3] > AR*9)
 
 import type {CSSProperties} from 'react';
 import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
@@ -18,18 +18,18 @@ import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
 
 // ─── Gallery Data ─────────────────────────────────────────────────────────────
 
-// One Dracula accent per tile from the fixed categorical vocabulary; alts are
-// shared with classic-gallery via SCENE_TILE_ALTS.
-const GALLERY_SCENES: Array<{alt: string; hue: SceneHue}> = [
-  {alt: SCENE_TILE_ALTS[0], hue: 'var(--dracula-cyan)'},
-  {alt: SCENE_TILE_ALTS[1], hue: 'var(--dracula-pink)'},
-  {alt: SCENE_TILE_ALTS[2], hue: 'var(--dracula-yellow)'},
-  {alt: SCENE_TILE_ALTS[3], hue: 'var(--dracula-green)'},
-  {alt: SCENE_TILE_ALTS[4], hue: 'var(--dracula-pink)'},
-  {alt: SCENE_TILE_ALTS[5], hue: 'var(--dracula-orange)'},
-  {alt: SCENE_TILE_ALTS[6], hue: 'var(--dracula-cyan)'},
-  {alt: SCENE_TILE_ALTS[7], hue: 'var(--dracula-yellow)'},
-  {alt: SCENE_TILE_ALTS[8], hue: 'var(--dracula-green)'},
+// One Dracula accent per tile from the fixed categorical vocabulary; alts come
+// straight from SCENE_TILE_ALTS, shared with classic-gallery.
+const GALLERY_HUES: SceneHue[] = [
+  'var(--dracula-cyan)',
+  'var(--dracula-pink)',
+  'var(--dracula-yellow)',
+  'var(--dracula-green)',
+  'var(--dracula-pink)',
+  'var(--dracula-orange)',
+  'var(--dracula-cyan)',
+  'var(--dracula-yellow)',
+  'var(--dracula-green)',
 ];
 
 // ─── Stat Block ─────────────────────────────────────────────────────────────
@@ -52,11 +52,11 @@ function StatBlock({value, label}: {value: string; label: string}) {
 function ImageGrid() {
   return (
     <Grid columns={3} gap={3}>
-      {GALLERY_SCENES.map((scene, index) => (
-        <AspectRatio key={scene.alt} ratio={1} style={galleryImageClip}>
+      {SCENE_TILE_ALTS.map((alt, index) => (
+        <AspectRatio key={alt} ratio={1} style={galleryImageClip}>
           <SceneTile
-            label={scene.alt}
-            hue={scene.hue}
+            label={alt}
+            hue={GALLERY_HUES[index]}
             size="sm"
             index={index}
           />

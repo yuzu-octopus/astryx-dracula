@@ -11,12 +11,10 @@ import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
 import {Text, Heading} from '@astryxdesign/core/Text';
 import {Card} from '@astryxdesign/core/Card';
 import {Button} from '@astryxdesign/core/Button';
-import {ProgressBar} from '@astryxdesign/core/ProgressBar';
 import {Grid} from '@astryxdesign/core/Grid';
-import {Table, proportional, pixel} from '@astryxdesign/core/Table';
+import {proportional, pixel} from '@astryxdesign/core/Table';
 import type {TableColumn} from '@astryxdesign/core/Table';
 import {Divider} from '@astryxdesign/core/Divider';
-import {Link} from '@astryxdesign/core/Link';
 import {Icon} from '@astryxdesign/core/Icon';
 
 // Same-route hash: demo links stay focusable anchors without escaping the
@@ -28,8 +26,8 @@ const SELF_HASH = '#/templates/dashboard';
 import {RefreshCw, Square} from 'lucide-react';
 import {ChartLegend} from 'astryx-dracula/shared/chart-legend';
 import {CHART_HUES} from 'astryx-dracula/shared/chart-hues';
-import {MetricDelta} from 'astryx-dracula/shared/metric-delta';
-import {Sparkline, type SparkPoint} from 'astryx-dracula/shared/sparkline';
+import type {SparkPoint} from 'astryx-dracula/shared/sparkline';
+import {MetricCard, TableCard, BarCell, CountCell} from 'astryx-dracula/shared/metric-card';
 import {CHART_PANEL_STYLE} from 'astryx-dracula/shared/chart-panel-style';
 
 // ============= DATA =============
@@ -352,38 +350,22 @@ const topPagesColumns: TableColumn<PageRow>[] = [
     header: 'Views',
     width: proportional(1),
     renderCell: (item: PageRow) => (
-      <VStack gap={1}>
-        <ProgressBar
-          value={item.views}
-          max={topPagesMaxViews}
-          label={`${item.page} views`}
-          isLabelHidden
-        />
-        <Text type="body" hasTabularNumbers maxLines={1}>
-          {formatCount(item.views)}
-        </Text>
-      </VStack>
+      <BarCell label={`${item.page} views`} value={item.views} max={topPagesMaxViews}>
+        {formatCount(item.views)}
+      </BarCell>
     ),
   },
   {
     key: 'newUsers',
     header: 'New Users',
     width: pixel(104),
-    renderCell: (item: PageRow) => (
-      <Text hasTabularNumbers maxLines={1}>
-        {item.newUsers}
-      </Text>
-    ),
+    renderCell: (item: PageRow) => <CountCell>{item.newUsers}</CountCell>,
   },
   {
     key: 'avgTime',
     header: 'Avg. Time',
     width: pixel(104),
-    renderCell: (item: PageRow) => (
-      <Text hasTabularNumbers maxLines={1}>
-        {item.avgTime}
-      </Text>
-    ),
+    renderCell: (item: PageRow) => <CountCell>{item.avgTime}</CountCell>,
   },
 ];
 
@@ -418,49 +400,26 @@ const topEventsColumns: TableColumn<EventRow>[] = [
     header: 'Count',
     width: proportional(1),
     renderCell: (item: EventRow) => (
-      <VStack gap={1}>
-        <ProgressBar
-          value={item.count}
-          max={topEventsMaxCount}
-          label={`${item.count}`}
-          isLabelHidden
-        />
-        <Text type="body" hasTabularNumbers maxLines={1}>
-          {formatCount(item.count)}
-        </Text>
-      </VStack>
+      <BarCell label={`${item.count}`} value={item.count} max={topEventsMaxCount}>
+        {formatCount(item.count)}
+      </BarCell>
     ),
   },
   {
     key: 'users',
     header: 'Users',
     width: pixel(72),
-    renderCell: (item: EventRow) => (
-      <Text hasTabularNumbers maxLines={1}>
-        {formatCount(item.users)}
-      </Text>
-    ),
+    renderCell: (item: EventRow) => <CountCell>{formatCount(item.users)}</CountCell>,
   },
   {
     key: 'newUsers',
     header: 'New Users',
     width: pixel(104),
-    renderCell: (item: EventRow) => (
-      <Text hasTabularNumbers maxLines={1}>
-        {formatCount(item.newUsers)}
-      </Text>
-    ),
+    renderCell: (item: EventRow) => <CountCell>{formatCount(item.newUsers)}</CountCell>,
   },
 ];
 
 // ============= CHART COMPONENTS =============
-
-// Chart series colors: desktop glows orange, mobile glows cyan. Sourced from
-// the shared categorical hues so data encoding can never reach for purple.
-const chartColors = {
-  desktop: CHART_HUES.orange,
-  mobile: CHART_HUES.cyan,
-};
 
 // Legend rows go through shared/chart-legend.tsx, which makes `label` a
 // REQUIRED field so a hue can never ship without the word that names it.
@@ -496,7 +455,7 @@ function ActiveUsersChart() {
                   width={14}
                   height={hAll - hDesktop}
                   rx={4}
-                  fill={chartColors.mobile}
+                  fill={CHART_HUES.cyan}
                 />
                 <rect
                   x={x}
@@ -504,7 +463,7 @@ function ActiveUsersChart() {
                   width={14}
                   height={hDesktop}
                   rx={4}
-                  fill={chartColors.desktop}
+                  fill={CHART_HUES.orange}
                 />
                 {(i % 6 === 0 || i === bars.length - 1) && (
                   <text
@@ -535,8 +494,8 @@ function ActiveUsersChart() {
       </Card>
       <ChartLegend
         entries={[
-          {label: 'Desktop', color: chartColors.desktop},
-          {label: 'Mobile', color: chartColors.mobile},
+          {label: 'Desktop', color: CHART_HUES.orange},
+          {label: 'Mobile', color: CHART_HUES.cyan},
         ]}
         gap={4}
         caption={
@@ -550,44 +509,6 @@ function ActiveUsersChart() {
 }
 
 // ============= CARD COMPONENTS =============
-
-function MetricCard({
-  label,
-  value,
-  change,
-  positive,
-  sparkline,
-}: {
-  label: string;
-  value: string;
-  change: string;
-  positive: boolean;
-  sparkline: SparkPoint[];
-}) {
-  return (
-    <Card>
-      <VStack gap={2}>
-        <Text type="supporting" color="secondary">
-          {label}
-        </Text>
-        <HStack gap={2} vAlign="center">
-          <Text type="display-3" weight="semibold" hasTabularNumbers>
-            {value}
-          </Text>
-          <MetricDelta value={change} positive={positive} />
-        </HStack>
-        <Text type="supporting" color="secondary">
-          Last 30 days vs. Previous
-        </Text>
-        <Sparkline
-          data={sparkline}
-          label={`${label} thirty-day trend`}
-          positive={positive}
-        />
-      </VStack>
-    </Card>
-  );
-}
 
 function StackedBarCard({
   title,
@@ -651,44 +572,6 @@ function StackedBarCard({
     </Card>
   );
 }
-
-// ============= TABLE COMPONENTS =============
-
-function TableCard<T extends {id: string}>({
-  title,
-  linkLabel,
-  linkHref,
-  data,
-  columns,
-}: {
-  title: string;
-  linkLabel: string;
-  linkHref: string;
-  data: T[];
-  columns: TableColumn<T>[];
-}) {
-  return (
-    <Card>
-      <VStack gap={6}>
-        <HStack hAlign="between" vAlign="center">
-          <Heading level={3}>{title}</Heading>
-          <Link href={linkHref}>{linkLabel}</Link>
-        </HStack>
-        <Table<T>
-          data={data}
-          columns={columns}
-          idKey="id"
-          density="compact"
-          dividers="rows"
-          textOverflow="truncate"
-          hasHover
-        />
-      </VStack>
-    </Card>
-  );
-}
-
-// ============= SIDENAV =============
 
 // ============= MAIN COMPONENT =============
 

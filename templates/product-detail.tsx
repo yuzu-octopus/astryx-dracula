@@ -22,6 +22,8 @@ import {SelectableCard} from '@astryxdesign/core/SelectableCard';
 import type {CSSProperties} from 'react';
 import {galleryImageClip} from 'astryx-dracula/shared/gallery-image';
 import {SceneTile} from 'astryx-dracula/shared/scene-tile';
+import {StarRating} from 'astryx-dracula/shared/stars';
+import {formatMoney} from 'astryx-dracula/shared/format-money';
 
 // Custom CSS here is limited to what Astryx components can't express today:
 // - image radius-clip (no Image primitive — #2582, see shared/gallery-image)
@@ -33,41 +35,8 @@ const stickyInfo: CSSProperties = {
   top: 'var(--spacing-8)',
   alignSelf: 'start',
 };
-
-// One Dracula placeholder scene per view, drawn from the fixed badge
-// vocabulary (shared/scene-tile large fork). Resolves to theme tokens so the
-// gallery stays on-brand in the dark-only theme.
-function ProductScene({hue, label}: {hue: SceneHue; label: string}) {
-  return <SceneTile label={label} hue={hue} size="lg" />;
-}
-
-import {Minus, Plus, Star} from 'lucide-react';
+import {Minus, Plus} from 'lucide-react';
 import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
-
-// ─── Star Rating ─────────────────────────────────────────────────────────────
-function StarRating({rating, count}: {rating: number; count: number}) {
-  const filled = Math.round(rating);
-  const empty = 5 - filled;
-
-  return (
-    <HStack gap={1} vAlign="center">
-      {Array.from({length: filled}, (_, i) => (
-        <Icon key={`full-${i}`} icon={Star} size="sm" color="yellow" />
-      ))}
-      {/* secondary, not disabled: --color-icon-disabled #6272A4 is 2.51:1 on
-          the card #343746, under the 3:1 non-text floor, and reads as "this
-          control is unavailable" — but a star is a data mark, not a control.
-          --color-icon-secondary #9AA1BC is 4.60:1, one step under the filled
-          yellow (7.4:1), so the two halves still read as one rating. */}
-      {Array.from({length: empty}, (_, i) => (
-        <Icon key={`empty-${i}`} icon={Star} size="sm" color="secondary" />
-      ))}
-      <Text type="body" color="secondary" hasTabularNumbers>
-        {rating} ({count})
-      </Text>
-    </HStack>
-  );
-}
 
 // ─── Image hues ─────────────────────────────────────────────────────────────
 // IMAGES[selected] is the hero; all six double as thumbnails so the 3-column
@@ -115,8 +84,6 @@ const FINISHES = [
   {value: 'speckled', label: 'Speckled'},
 ];
 
-const fmt = (n: number) => `$${n.toFixed(2)}`;
-
 // ─── Image Gallery ──────────────────────────────────────────────────────────
 function ImageGallery({
   selected,
@@ -131,7 +98,7 @@ function ImageGallery({
   return (
     <VStack gap={3}>
       <AspectRatio ratio={4 / 5} style={galleryImageClip}>
-        <ProductScene hue={heroHue} label={PRODUCT.name} />
+        <SceneTile label={PRODUCT.name} hue={heroHue} size="lg" />
       </AspectRatio>
       <Grid columns={3} gap={2}>
         {thumbnails.map((hue, i) => (
@@ -144,7 +111,7 @@ function ImageGallery({
               padding={0}
               width="100%"
               height="100%">
-              <ProductScene hue={hue} label={`Product image ${i + 1}`} />
+              <SceneTile label={`Product image ${i + 1}`} hue={hue} size="lg" />
             </SelectableCard>
           </AspectRatio>
         ))}
@@ -175,10 +142,10 @@ function ProductInfo() {
         <StarRating rating={4.3} count={128} />
         <HStack gap={2} vAlign="center">
           <Text type="large" hasTabularNumbers>
-            {fmt(PRODUCT.price)}
+            {formatMoney(PRODUCT.price)}
           </Text>
           <Text type="body" color="secondary" hasStrikethrough hasTabularNumbers>
-            {fmt(PRODUCT.originalPrice)}
+            {formatMoney(PRODUCT.originalPrice)}
           </Text>
           <Token label="Sale" color="yellow" />
         </HStack>
