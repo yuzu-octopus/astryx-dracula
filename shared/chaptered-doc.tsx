@@ -9,7 +9,6 @@ import {
   buildOutlineByChapter,
   outlinePanel,
   sceneClip,
-  sceneFill,
   scrollToSection,
   sectionId,
   type ChapterGroup,
@@ -49,7 +48,7 @@ import {useMediaQuery} from '@astryxdesign/core/hooks';
 
 import {ChevronLeft, ChevronRight} from 'lucide-react';
 
-export function ChapterRail({
+function ChapterRail({
   groups,
   activeId,
   onSelect,
@@ -100,7 +99,7 @@ export function ChapterRail({
 
 // ─── Chapter body ────────────────────────────────────────────────────────────
 
-export function SectionBlock({
+function SectionBlock({
   chapterId,
   section,
 }: {
@@ -134,7 +133,7 @@ export function SectionBlock({
   );
 }
 
-export function ChapterNav({
+function ChapterNav({
   chapters,
   chapter,
   onSelect,

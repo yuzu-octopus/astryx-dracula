@@ -72,10 +72,7 @@ import {Divider} from '@astryxdesign/core/Divider';
 //    the page reads tighter than its neighbours.
 //
 // `href` is a real field on `InfoRow`: where a `'destination'` action goes,
-// read only when `actionKind` says the row navigates. The inert `href` prop on
-// `ExpandableRow` stays for call-site compatibility — it anchored Links this
-// file no longer renders, nothing reads it now, and removing it would break
-// any caller that still passes it.
+// read only when `actionKind` says the row navigates.
 
 export function InfoRowItem({
   label,
@@ -200,8 +197,6 @@ export function ExpandableRow({
   onEdit: () => void;
   onCancel: () => void;
   onSave: () => void;
-  /** Accepted for call-site compatibility; unused — see the note above. */
-  href?: string;
   style?: CSSProperties;
   /** Draw a Divider after the row. True only at a group boundary. */
   hasDivider?: boolean;

@@ -26,14 +26,6 @@ export const SCENE_HUES = {
 
 export type SceneHue = (typeof SCENE_HUES)[keyof typeof SCENE_HUES];
 
-/**
- * The union above constrains the KEY, not the value it resolves to. An entry
- * rewritten to `var(--dracula-purple)` still typechecks. `scripts/check.ts`
- * gates the values of this object; add the gate there if it is ever removed.
- * A prose rule does not stop a caller — see the remit note above.
- */
-export const SCENE_HUE_VALUES: readonly SceneHue[] = Object.values(SCENE_HUES);
-
 // Shared alt list for the nine-tile side/classic wall (folded into one
 // module so the two surfaces cannot drift apart again).
 export const SCENE_TILE_ALTS = [

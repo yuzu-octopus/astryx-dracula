@@ -24,7 +24,7 @@
 import type {ReactNode} from 'react';
 import {HStack, StackItem, VStack} from '@astryxdesign/core/Stack';
 import {Text} from '@astryxdesign/core/Text';
-import {CHART_HUES, type ChartHue} from 'astryx-dracula/shared/chart-hues';
+import type {ChartHue} from 'astryx-dracula/shared/chart-hues';
 
 export interface ChartLegendEntry {
   /** REQUIRED. The hue never travels alone — this is the 1.4.1 contract. */
@@ -45,7 +45,6 @@ export interface ChartLegendEntry {
 // would render `background: undefined` at every call site, compile clean, and
 // break at runtime. The old comment here claimed call sites may pass a KEY;
 // none does. The behaviour is correct; only the comment was wrong.
-const HUE_LOOKUP: Record<string, string> = CHART_HUES;
 
 export interface ChartLegendProps {
   entries: readonly ChartLegendEntry[];
@@ -81,7 +80,7 @@ export function ChartLegend({
                 width: `${swatchSize}px`,
                 height: `${swatchSize}px`,
                 flexShrink: 0,
-                background: HUE_LOOKUP[entry.color] ?? entry.color,
+                background: entry.color,
                 borderRadius: 'var(--radius-inner)',
               }}
             />

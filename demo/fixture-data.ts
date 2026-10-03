@@ -36,8 +36,3 @@ export const ROUTES: RouteRow[] = [
   { page: '/themes', views: '3,908', latency: '21ms', status: 'healthy', change: 5.6 },
 ];
 
-// ─── Shared renders ──────────────────────────────────────────────────────────
-// Bento and Dashboard each hand-rolled a bar chart over BARS and a route cell
-// over ROUTES, in two incompatible shapes. One of each lives here so a fixture
-// change cannot land in one page and miss the other.
-

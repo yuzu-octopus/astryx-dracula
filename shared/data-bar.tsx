@@ -66,9 +66,6 @@ export interface DataBarProps {
   formatValue?: (total: number) => string;
   /** Gap between segments as a spacing-scale step. @default 0 */
   gap?: 0 | 0.5 | 1 | 1.5 | 2 | 3;
-  /** Neutral fill shown when every segment is zero. Deliberately
-   *  --color-progress-value, NOT a text token — see the header. */
-  trackColor?: string;
 }
 
 const segmentStyle: CSSProperties = {
@@ -82,7 +79,6 @@ export function DataBar({
   hasValueLabel = false,
   formatValue = total => total.toLocaleString(),
   gap = 0,
-  trackColor = 'var(--color-progress-value)',
 }: DataBarProps) {
   // Negative values are not a magnitude and are clamped out before the ratio is
   // taken: summing a negative into `total` inflates every other segment's
@@ -136,7 +132,11 @@ export function DataBar({
       style={
         total > 0
           ? undefined
-          : {background: trackColor, borderRadius: 'var(--radius-inner)'}
+          : {
+              // Deliberately --color-progress-value, NOT a text token — see the header.
+              background: 'var(--color-progress-value)',
+              borderRadius: 'var(--radius-inner)',
+            }
       }>
       {drawn.map(segment => (
         <StackItem

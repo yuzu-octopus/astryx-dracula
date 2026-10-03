@@ -3,7 +3,6 @@ import {
   Badge,
   Card,
   CodeBlock,
-  Divider,
   Grid,
   GridSpan,
   HStack,
