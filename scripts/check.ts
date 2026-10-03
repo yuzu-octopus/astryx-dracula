@@ -733,6 +733,12 @@ for (const f of lintFiles.sort()) {
 //     ours, so the breakage lands on someone else.
 // One gate, both directions, because the second failure is the expensive one:
 // it costs a downstream user a build error and costs us a bug report.
+//
+// A "./shared/*" wildcard was tried here and REVERTED, not for taste: tsc and
+// vite resolve the kit's OWN self-imports (`astryx-dracula/shared/x`) through
+// this package.json, and neither resolves `*` patterns without an explicit
+// entry per subpath. The wildcard compiled nowhere — 92 TS2307s on a green
+// tree. If npm ever documents self-reference wildcard support, retry then.
 {
   const pkg = JSON.parse(await Bun.file('package.json').text());
   const declared = new Map<string, string>();
@@ -743,7 +749,7 @@ for (const f of lintFiles.sort()) {
   // ('./shared/scene-hues'), so comparing them to filenames would report
   // every module as unexported.
   const onDisk = new Set<string>();
-  for (const entry of [...new Bun.Glob('shared/*.{ts,tsx}').scanSync('.')]) {
+  for (const entry of [...new Bun.Glob('shared/*.ts').scanSync('.'), ...new Bun.Glob('shared/*.tsx').scanSync('.')]) {
     onDisk.add(`./shared/${entry.slice('shared/'.length).replace(/\.tsx?$/, '')}`);
   }
   for (const [key, target] of declared) {
