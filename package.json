@@ -41,6 +41,9 @@
     "./shared/settings-data": "./shared/settings-data.ts",
     "./shared/settings-rows": "./shared/settings-rows.tsx",
     "./shared/sparkline": "./shared/sparkline.tsx",
+    "./shared/format-money": "./shared/format-money.ts",
+    "./shared/metric-card": "./shared/metric-card.tsx",
+    "./shared/stars": "./shared/stars.tsx",
     "./shared/sso-icons": "./shared/sso-icons.tsx",
     ".": {
       "types": "./astryx-dracula.d.ts",

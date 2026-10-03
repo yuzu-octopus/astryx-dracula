@@ -6,7 +6,7 @@
  * Messaging Shell — Slack-style column frame for team messaging tools.  Frame (desktop, left to right): (Frame/responsive/container: see XLE header above.)
  */
 
-import {useState, type CSSProperties} from 'react';
+import {useState, type CSSProperties, type ReactNode} from 'react';
 
 import {
   Layout,
@@ -59,89 +59,74 @@ import {
 } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
-// Styles — plain CSS properties with semantic tokens only.
+// Styles — semantic tokens only. Layout/Stack own their padding via props,
+// so only surfaces Astryx has no prop for live here: dvh anchoring, scroll
+// clipping with a ring budget, and the topic truncation floor.
 // ---------------------------------------------------------------------------
 
-const styles: Record<string, CSSProperties> = {
-  root: {
-    height: '100dvh',
-    width: '100%',
-  },
-  rail: {
-    height: '100%',
-    alignItems: 'center',
-    paddingTop: 'var(--spacing-3)',
-    paddingBottom: 'var(--spacing-3)',
-  },
-  sidebar: {
-    height: '100%',
-    minHeight: 0,
-  },
-  sidebarHeader: {
-    alignItems: 'center',
-    paddingInline: 'var(--spacing-3)',
-    paddingBlock: 'var(--spacing-3)',
-  },
-  sidebarSearch: {
-    paddingInline: 'var(--spacing-3)',
-    paddingBottom: 'var(--spacing-2)',
-  },
-  // Block-start only: the inline (8px) and bottom (12px) edges already clear
-  // Two different jobs on one object, so the two different values are not
-  // redundant. INLINE is a content gutter: it must equal sidebarHeader and
-  // sidebarSearch above it (both var(--spacing-3) = 12px) because the channel
-  // list sits directly under the search field in the same 260px start panel --
-  // at 8px the body sat 4px inside the field above it. BLOCK-START is a ring
-  // budget, not a gutter: 4px = ring offset 2 + thickness 2, so the focus ring
-  // lands inside this clip instead of on its edge. The bottom edge stays 12px
-  // because the list scrolls into it, not into a ring.
-  sidebarScroll: {
-    minHeight: 0,
-    overflowY: 'auto',
-    paddingInline: 'var(--spacing-3)',
-    paddingBlockStart: 'var(--spacing-1)',
-    paddingBottom: 'var(--spacing-3)',
-  },
-  streamColumn: {
-    height: '100%',
-    minHeight: 0,
-  },
-  streamHeader: {
-    alignItems: 'center',
-    paddingInline: 'var(--spacing-4)',
-    paddingBlock: 'var(--spacing-3)',
-  },
-  streamTopic: {
-    minWidth: 0,
-  },
-  chatArea: {
-    minHeight: 0,
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  chatFill: {
-    flex: 1,
-    minHeight: 0,
-  },
-  threadColumn: {
-    height: '100%',
-    minHeight: 0,
-  },
-  threadHeader: {
-    alignItems: 'center',
-    paddingInline: 'var(--spacing-3)',
-    paddingBlock: 'var(--spacing-3)',
-  },
-  threadScroll: {
-    minHeight: 0,
-    overflowY: 'auto',
-    paddingInline: 'var(--spacing-3)',
-    paddingBlock: 'var(--spacing-3)',
-  },
-  threadComposer: {
-    padding: 'var(--spacing-3)',
-  },
+// Fill the window: Layout height="fill" is height:100%, which only resolves
+// against a definite height — the host's <html>/<body> don't set one.
+const rootStyle: CSSProperties = {height: '100dvh', width: '100%'};
+// Workspace rail: full height, centered, ring-safe vertical padding.
+const railStyle: CSSProperties = {
+  height: '100%',
+  alignItems: 'center',
+  paddingTop: 'var(--spacing-3)',
+  paddingBottom: 'var(--spacing-3)',
 };
+// Sidebar frame: full height, scrolls internally.
+const sidebarStyle: CSSProperties = {height: '100%', minHeight: 0};
+const sidebarHeaderStyle: CSSProperties = {
+  alignItems: 'center',
+  paddingInline: 'var(--spacing-3)',
+  paddingBlock: 'var(--spacing-3)',
+};
+const sidebarSearchStyle: CSSProperties = {
+  paddingInline: 'var(--spacing-3)',
+  paddingBottom: 'var(--spacing-2)',
+};
+// Block-start only: the inline (8px) and bottom (12px) edges already clear.
+// INLINE is a content gutter matching sidebarHeader/sidebarSearch (12px);
+// BLOCK-START is a 4px ring budget (offset 2 + thickness 2). Not redundant.
+const sidebarScrollStyle: CSSProperties = {
+  minHeight: 0,
+  overflowY: 'auto',
+  paddingInline: 'var(--spacing-3)',
+  paddingBlockStart: 'var(--spacing-1)',
+  paddingBottom: 'var(--spacing-3)',
+};
+// DM section gap: List is the row container, so the gap rides on the second
+// List's own margin instead of a wrapper element.
+const sectionGapStyle: CSSProperties = {marginTop: 'var(--spacing-4)'};
+// Stream column: full height, scrolls internally.
+const streamColumnStyle: CSSProperties = {height: '100%', minHeight: 0};
+const streamHeaderStyle: CSSProperties = {
+  alignItems: 'center',
+  paddingInline: 'var(--spacing-4)',
+  paddingBlock: 'var(--spacing-3)',
+};
+// Truncation floor: the topic StackItem must shrink before the header does.
+const streamTopicStyle: CSSProperties = {minWidth: 0};
+const chatAreaStyle: CSSProperties = {
+  minHeight: 0,
+  display: 'flex',
+  flexDirection: 'column',
+};
+const chatFillStyle: CSSProperties = {flex: 1, minHeight: 0};
+// Thread column: full height, scrolls internally.
+const threadColumnStyle: CSSProperties = {height: '100%', minHeight: 0};
+const threadHeaderStyle: CSSProperties = {
+  alignItems: 'center',
+  paddingInline: 'var(--spacing-3)',
+  paddingBlock: 'var(--spacing-3)',
+};
+const threadScrollStyle: CSSProperties = {
+  minHeight: 0,
+  overflowY: 'auto',
+  paddingInline: 'var(--spacing-3)',
+  paddingBlock: 'var(--spacing-3)',
+};
+const threadComposerStyle: CSSProperties = {padding: 'var(--spacing-3)'};
 
 // ---------------------------------------------------------------------------
 // Deterministic fixtures — fixed ISO timestamps, stable ordering.
@@ -202,17 +187,16 @@ const DIRECT_MESSAGES: DirectMessage[] = [
   {id: 'dm-sasha', userId: 'sasha', presence: 'offline', unread: 0},
 ];
 
-// AvatarStatusDot supports success | neutral | error (no warning): busy stays error (do-not-disturb), never warning.
-const PRESENCE_VARIANT: Record<Presence, 'success' | 'error' | 'neutral'> = {
-  online: 'success',
-  busy: 'error',
-  offline: 'neutral',
-};
-
-const PRESENCE_LABEL: Record<Presence, string> = {
-  online: 'Online',
-  busy: 'Busy',
-  offline: 'Offline',
+// AvatarStatusDot supports success | neutral | error (no warning): busy stays
+// error (do-not-disturb), never warning. One config — variant and label travel
+// together, so the dot and its accessible name can't disagree.
+const PRESENCE: Record<
+  Presence,
+  {variant: 'success' | 'error' | 'neutral'; label: string}
+> = {
+  online: {variant: 'success', label: 'Online'},
+  busy: {variant: 'error', label: 'Busy'},
+  offline: {variant: 'neutral', label: 'Offline'},
 };
 
 /** One bubble's copy. Ids key the bubble; its position only sets the grouping. */
@@ -318,14 +302,15 @@ interface ThreadReply {
   text: string;
 }
 
-const THREAD_ROOT: ThreadReply = {
-  id: 't0',
-  userId: 'you',
-  time: '2026-06-30T09:17:30',
-  text: 'One question on the List density defaults: should channel sidebars use compact or balanced? The spec shows both.',
-};
-
-const THREAD_REPLIES: ThreadReply[] = [
+// One map: the root plus its replies. [0] is the opener, the rest are replies —
+// one lookup for the divider count and one slice for the reply list.
+const THREAD: ThreadReply[] = [
+  {
+    id: 't0',
+    userId: 'you',
+    time: '2026-06-30T09:17:30',
+    text: 'One question on the List density defaults: should channel sidebars use compact or balanced? The spec shows both.',
+  },
   {
     id: 't1',
     userId: 'mira',
@@ -347,6 +332,55 @@ const RAIL_ITEMS = [
   {id: 'saved', label: 'Saved items', icon: Bookmark},
 ];
 
+// One thread message. The root carries the divider above the replies, so the
+function ThreadMessage({reply}: {reply: ThreadReply}) {
+  return (
+    <ChatMessage
+      sender="assistant"
+      avatar={<Avatar name={USERS[reply.userId].name} size="md" />}>
+      <ChatMessageBubble
+        name={USERS[reply.userId].name}
+        metadata={
+          <ChatMessageMetadata
+            timestamp={<Timestamp value={reply.time} format="time" />}
+          />
+        }>
+        {reply.text}
+      </ChatMessageBubble>
+    </ChatMessage>
+  );
+}
+
+// One nav row factory for the sidebar lists. Search filtering stays at the
+// call sites (visibleChannels/visibleDms); unread badges stay per-row. Only
+// the ListItem shape is shared.
+function NavRow({
+  label,
+  isSelected,
+  onSelect,
+  startContent,
+  unread,
+}: {
+  label: string;
+  isSelected: boolean;
+  onSelect: () => void;
+  startContent: ReactNode;
+  unread: number;
+}) {
+  return (
+    <ListItem
+      label={label}
+      isSelected={isSelected}
+      onClick={onSelect}
+      startContent={startContent}
+      endContent={
+        unread > 0 ? (
+          <Badge label={String(unread)} variant="neutral" />
+        ) : undefined
+      }
+    />
+  );
+}
 // ---------------------------------------------------------------------------
 // Stream message group — avatar + name on the first bubble, timestamp on the
 // last, `group` positions tighten corner radii between consecutive bubbles.
@@ -417,7 +451,7 @@ export default function MessagingShell() {
   const showThreadPanel = isThreadOpen && !isThreadHidden;
 
   const workspaceRail = (
-    <VStack gap={2} style={styles.rail}>
+    <VStack gap={2} style={railStyle}>
       <Avatar name="Night watch" size="md" />
       {RAIL_ITEMS.map(item => (
         <IconButton
@@ -437,17 +471,12 @@ export default function MessagingShell() {
         variant="ghost"
         onClick={() => {}}
       />
-      <Avatar
-        name={USERS.you.name}
-        size="md"
-        status={<AvatarStatusDot variant="success" label="Online" />}
-      />
     </VStack>
   );
 
   const channelSidebar = (
-    <Stack direction="vertical" style={styles.sidebar}>
-      <HStack gap={2} style={styles.sidebarHeader}>
+    <Stack direction="vertical" style={sidebarStyle}>
+      <HStack gap={2} style={sidebarHeaderStyle}>
         <StackItem size="fill">
           <Heading level={1}>Messages</Heading>
         </StackItem>
@@ -460,7 +489,7 @@ export default function MessagingShell() {
           onClick={() => {}}
         />
       </HStack>
-      <VStack gap={0} style={styles.sidebarSearch}>
+      <VStack gap={0} style={sidebarSearchStyle}>
         <TextInput
           label="Jump to"
           isLabelHidden
@@ -473,7 +502,7 @@ export default function MessagingShell() {
       </VStack>
       <StackItem
         size="fill"
-        style={styles.sidebarScroll}
+        style={sidebarScrollStyle}
         role="region"
         aria-label="Channels and direct messages"
         tabIndex={0}>
@@ -486,22 +515,18 @@ export default function MessagingShell() {
             </Text>
           }>
           {visibleChannels.map(channel => (
-            <ListItem
+            <NavRow
               key={channel.id}
               label={channel.name}
               isSelected={
                 selectedDmId === null && channel.id === selectedChannelId
               }
-              onClick={() => {
+              onSelect={() => {
                 setSelectedChannelId(channel.id);
                 setSelectedDmId(null);
               }}
               startContent={<Icon icon={Hash} size="sm" color="secondary" />}
-              endContent={
-                channel.unread > 0 ? (
-                  <Badge label={String(channel.unread)} variant="neutral" />
-                ) : undefined
-              }
+              unread={channel.unread}
             />
           ))}
         </List>
@@ -510,35 +535,31 @@ export default function MessagingShell() {
         <List
           density="compact"
           hasDividers={false}
-          style={styles.sectionGap}
+          style={sectionGapStyle}
           header={
             <Text type="label" size="sm" color="secondary">
               Direct messages
             </Text>
           }>
           {visibleDms.map(dm => (
-            <ListItem
+            <NavRow
               key={dm.id}
               label={USERS[dm.userId].name}
               isSelected={selectedDmId === dm.id}
-              onClick={() => setSelectedDmId(dm.id)}
+              onSelect={() => setSelectedDmId(dm.id)}
               startContent={
                 <Avatar
                   name={USERS[dm.userId].name}
                   size="sm"
                   status={
                     <AvatarStatusDot
-                      variant={PRESENCE_VARIANT[dm.presence]}
-                      label={PRESENCE_LABEL[dm.presence]}
+                      variant={PRESENCE[dm.presence].variant}
+                      label={PRESENCE[dm.presence].label}
                     />
                   }
                 />
               }
-              endContent={
-                dm.unread > 0 ? (
-                  <Badge label={String(dm.unread)} variant="neutral" />
-                ) : undefined
-              }
+              unread={dm.unread}
             />
           ))}
         </List>
@@ -547,11 +568,11 @@ export default function MessagingShell() {
   );
 
   const messageStream = (
-    <Stack direction="vertical" style={styles.streamColumn}>
-      <HStack gap={3} style={styles.streamHeader}>
+    <Stack direction="vertical" style={streamColumnStyle}>
+      <HStack gap={3} style={streamHeaderStyle}>
         <Icon icon={Hash} size="sm" color="secondary" />
         <Heading level={2}>{selectedChannel.name}</Heading>
-        <StackItem size="fill" style={styles.streamTopic}>
+        <StackItem size="fill" style={streamTopicStyle}>
           <Text type="body" color="secondary" maxLines={1}>
             {selectedChannel.topic}
           </Text>
@@ -567,9 +588,9 @@ export default function MessagingShell() {
         />
       </HStack>
       <Divider />
-      <StackItem size="fill" style={styles.chatArea}>
+      <StackItem size="fill" style={chatAreaStyle}>
         <ChatLayout
-          style={styles.chatFill}
+          style={chatFillStyle}
           composer={
             <ChatComposer
               placeholder={`Message #${selectedChannel.name}`}
@@ -602,8 +623,8 @@ export default function MessagingShell() {
   );
 
   const threadPanel = (
-    <Stack direction="vertical" style={styles.threadColumn}>
-      <HStack gap={2} style={styles.threadHeader}>
+    <Stack direction="vertical" style={threadColumnStyle}>
+      <HStack gap={2} style={threadHeaderStyle}>
         <StackItem size="fill">
           <HStack gap={2} style={{alignItems: 'baseline'}}>
             <Text weight="semibold">Thread</Text>
@@ -624,48 +645,21 @@ export default function MessagingShell() {
       <Divider />
       <StackItem
         size="fill"
-        style={styles.threadScroll}
+        style={threadScrollStyle}
         role="region"
         aria-label="Thread messages"
         tabIndex={0}>
         <ChatMessageList density="compact">
-          <ChatMessage
-            sender="assistant"
-            avatar={<Avatar name={USERS[THREAD_ROOT.userId].name} size="md" />}>
-            <ChatMessageBubble
-              name={USERS[THREAD_ROOT.userId].name}
-              metadata={
-                <ChatMessageMetadata
-                  timestamp={
-                    <Timestamp value={THREAD_ROOT.time} format="time" />
-                  }
-                />
-              }>
-              {THREAD_ROOT.text}
-            </ChatMessageBubble>
-          </ChatMessage>
+          <ThreadMessage reply={THREAD[0]} />
           <ChatSystemMessage variant="divider">
-            {THREAD_REPLIES.length} replies
+            {THREAD.length - 1} replies
           </ChatSystemMessage>
-          {THREAD_REPLIES.map(reply => (
-            <ChatMessage
-              key={reply.id}
-              sender="assistant"
-              avatar={<Avatar name={USERS[reply.userId].name} size="md" />}>
-              <ChatMessageBubble
-                name={USERS[reply.userId].name}
-                metadata={
-                  <ChatMessageMetadata
-                    timestamp={<Timestamp value={reply.time} format="time" />}
-                  />
-                }>
-                {reply.text}
-              </ChatMessageBubble>
-            </ChatMessage>
+          {THREAD.slice(1).map(reply => (
+            <ThreadMessage key={reply.id} reply={reply} />
           ))}
         </ChatMessageList>
       </StackItem>
-      <VStack gap={0} style={styles.threadComposer}>
+      <VStack gap={0} style={threadComposerStyle}>
         <ChatComposer
           density="compact"
           placeholder="Reply in thread…"
@@ -678,7 +672,7 @@ export default function MessagingShell() {
   return (
     <Layout
       height="fill"
-      style={styles.root}
+      style={rootStyle}
       start={
         <>
           <LayoutPanel width={68} padding={0}>

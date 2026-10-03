@@ -75,6 +75,15 @@ const styles: Record<string, CSSProperties> = {
   },
 };
 
+// Full-bleed CodeBlock inside a panel: the panel owns the chrome, so the
+// block drops its own border and radius rather than drawing a box in a box.
+const codeBlockFlush: CSSProperties = {
+  width: '100%',
+  height: '100%',
+  borderWidth: 0,
+  borderRadius: 0,
+};
+
 const EDITOR_CODE = `import {useState, useCallback} from 'react';
 import {Button} from '@astryxdesign/core/Button';
 import {Text} from '@astryxdesign/core/Text';
@@ -323,12 +332,7 @@ export default function IdeWorkspace() {
                             highlightLines={[21]}
                             hasCopyButton={false}
                             size="sm"
-                            style={{
-                              width: '100%',
-                              height: '100%',
-                              borderWidth: 0,
-                              borderRadius: 0,
-                            }}
+                            style={codeBlockFlush}
                           />
                         </StackItem>
                         <ResizeHandle
@@ -366,12 +370,7 @@ export default function IdeWorkspace() {
                                   hasLanguageLabel={false}
                                   hasCopyButton={false}
                                   size="sm"
-                                  style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    borderWidth: 0,
-                                    borderRadius: 0,
-                                  }}
+                                  style={codeBlockFlush}
                                 />
                               )}
                               {activeTermTab === 'output' && (
@@ -382,12 +381,7 @@ export default function IdeWorkspace() {
                                   hasLanguageLabel={false}
                                   hasCopyButton={false}
                                   size="sm"
-                                  style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    borderWidth: 0,
-                                    borderRadius: 0,
-                                  }}
+                                  style={codeBlockFlush}
                                 />
                               )}
                               {activeTermTab === 'problems' && (

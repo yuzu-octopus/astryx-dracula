@@ -4,30 +4,12 @@
 
 import {useState, useTransition} from 'react';
 import {demoLogin} from 'astryx-dracula/shared/login-demo';
-import {
-  AUTH_HEADING,
-  AUTH_SUBTITLE,
-  AUTH_PRIMARY_CTA,
-  AUTH_SIGNUP_PROMPT,
-  AUTH_SIGNUP_LINK,
-  AUTH_FORGOT_PASSWORD,
-  AUTH_ERROR_MESSAGE,
-  AUTH_EMAIL_PLACEHOLDER,
-  AUTH_PASSWORD_PLACEHOLDER,
-  AUTH_TERMS_PREFIX,
-  AUTH_TERMS_SERVICE,
-  AUTH_TERMS_PRIVACY,
-} from 'astryx-dracula/shared/auth-copy';
+import {AUTH_ERROR_MESSAGE} from 'astryx-dracula/shared/auth-copy';
 import {VStack} from '@astryxdesign/core/Layout';
 import {Center} from '@astryxdesign/core/Center';
-import {Text, Heading} from '@astryxdesign/core/Text';
-import {TextInput} from '@astryxdesign/core/TextInput';
-import {Button} from '@astryxdesign/core/Button';
-import {Card} from '@astryxdesign/core/Card';
-import {Link} from '@astryxdesign/core/Link';
 
-import {authPageStyle as pageStyle, authContentStyle as contentStyle, inputAutoComplete} from 'astryx-dracula/shared/auth-chrome-config';
-import {LoginBrand} from 'astryx-dracula/shared/auth-chrome';
+import {authPageStyle as pageStyle, authContentStyle as contentStyle} from 'astryx-dracula/shared/auth-chrome-config';
+import {LoginBrand, AuthCard, AuthLoginFields} from 'astryx-dracula/shared/auth-chrome';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -51,106 +33,24 @@ export default function LoginPage() {
       <VStack gap={4} hAlign="center" style={contentStyle}>
         <LoginBrand />
 
-        {/* Card */}
-        <Card padding={4} width="100%">
-          <VStack gap={4} hAlign="stretch">
-            <VStack gap={1} hAlign="center">
-              <Heading level={1} type="display-2" justify="center">
-                {AUTH_HEADING}
-              </Heading>
-              <Text type="body" color="secondary">
-                {AUTH_SUBTITLE}
-              </Text>
-            </VStack>
-
-            {/* The field group, as its three siblings carry it
-                (login-card.tsx:76, login-split.tsx:160, login-sso.tsx:192).
-                Without it these two inputs sat 16px apart -- the outer
-                VStack's gap={4} -- where all three twins render 8px, so the
-                gap between the two fields was twice the gap between the
-                fields and the sign-up link below. */}
-            <VStack gap={2}>
-              <TextInput
-                label="Email"
-                isLabelHidden
-                value={email}
-                onChange={v => {
-                  setEmail(v);
-                  setError(null);
-                }}
-                placeholder={AUTH_EMAIL_PLACEHOLDER}
-                type="email"
-                {...inputAutoComplete('email')}
-                size="lg"
-                onEnter={handleSignIn}
-                status={error ? {type: 'error', message: error} : undefined}
-              />
-
-              <VStack gap={1}>
-                <TextInput
-                  label="Password"
-                  isLabelHidden
-                  value={password}
-                  onChange={v => {
-                    setPassword(v);
-                    setError(null);
-                  }}
-                  placeholder={AUTH_PASSWORD_PLACEHOLDER}
-                  type="password"
-                  {...inputAutoComplete('current-password')}
-                  size="lg"
-                  onEnter={handleSignIn}
-                  status={error ? {type: 'error', message: error} : undefined}
-                />
-                {error && (
-                  <VStack hAlign="end">
-                    <Link
-                      href="#/templates/login"
-                      color="secondary"
-                      isStandalone>
-                      {AUTH_FORGOT_PASSWORD}
-                    </Link>
-                  </VStack>
-                )}
-              </VStack>
-            </VStack>
-
-            <Button
-              label={AUTH_PRIMARY_CTA}
-              variant="primary"
-              size="lg"
-              isLoading={isLoading}
-              onClick={handleSignIn}
-            />
-
-            {/* Prose links. A link inside a sentence needs a persistent
-                underline — colour alone is not a cue (WCAG 1.4.1 / F73),
-                and the kit underlines on hover only. */}
-            <VStack hAlign="center">
-              <Text type="supporting" color="secondary">
-                {AUTH_SIGNUP_PROMPT}{' '}
-                <Link href="#/templates/login" type="supporting" hasUnderline>
-                  {AUTH_SIGNUP_LINK}
-                </Link>
-              </Text>
-            </VStack>
-          </VStack>
-        </Card>
-
-        {/* Terms */}
-        <VStack hAlign="center" width="100%">
-          <Text type="supporting" color="secondary" justify="center">
-            {AUTH_TERMS_PREFIX}{' '}
-            <Link href="#/templates/login" type="supporting" hasUnderline>
-              {AUTH_TERMS_SERVICE}
-            </Link>{' '}
-            and{' '}
-            <Link href="#/templates/login" type="supporting" hasUnderline>
-              {AUTH_TERMS_PRIVACY}
-            </Link>
-            .
-          </Text>
-        </VStack>
+        <AuthCard selfHash="#/templates/login">
+          <AuthLoginFields
+            email={email}
+            password={password}
+            error={error}
+            selfHash="#/templates/login"
+            isLoading={isLoading}
+            onEmailChange={v => {
+              setEmail(v);
+              setError(null);
+            }}
+            onPasswordChange={v => {
+              setPassword(v);
+              setError(null);
+            }}
+            onSubmit={handleSignIn}
+          />
+        </AuthCard>
       </VStack>
     </Center>
   );

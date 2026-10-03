@@ -2,22 +2,22 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   Ctr > V[g=4] > (Ctr.horizontal > C[p=0] > G[c={min:240} g=8 a=stretch] > (S[p=0] > V[g=4] > (H[g=2 a=center] > Ic + Tx"Castle Dracula"[t=body]) + (V[g=4] > (V[g=1] > Hd"Welcome back to the night"[level=1] + Tx"Sign in to your crypt"[t=body]) + (V[g=2] > TI"Email"[t=email] + (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?")) + B.primary"Enter the night" + D"Or continue with" + (G[c={min:200} g=3] > B.secondary"Login with Apple" + B.secondary"Login with Google")) + (V[a=center] > Tx"New to the castle?"[t=supporting] + Lk"Sign up")) + (C[p=0] > AR)) + (V[a=center] > Tx"By clicking continue, you agree to our Terms of service and Privacy policy"[t=supporting])
 
-import {useState, useTransition, type CSSProperties} from 'react';
-import {inputAutoComplete} from 'astryx-dracula/shared/auth-chrome-config';
+import {useState, useTransition} from 'react';
+import {authPageStyle, inputAutoComplete} from 'astryx-dracula/shared/auth-chrome-config';
 import {demoLogin} from 'astryx-dracula/shared/login-demo';
 import {AppleIcon, GoogleIcon} from 'astryx-dracula/shared/sso-icons';
 import {
   AUTH_HEADING,
   AUTH_SUBTITLE,
   AUTH_PRIMARY_CTA,
-  AUTH_SIGNUP_PROMPT,
-  AUTH_SIGNUP_LINK,
   AUTH_SSO_DIVIDER,
   AUTH_FORGOT_PASSWORD,
   AUTH_ERROR_MESSAGE,
   AUTH_EMAIL_PLACEHOLDER,
   AUTH_PASSWORD_PLACEHOLDER,
   AUTH_BRAND_NAME,
+  AUTH_SIGNUP_PROMPT,
+  AUTH_SIGNUP_LINK,
   AUTH_TERMS_PREFIX,
   AUTH_TERMS_SERVICE,
   AUTH_TERMS_PRIVACY,
@@ -30,40 +30,23 @@ import {Card} from '@astryxdesign/core/Card';
 import {Section} from '@astryxdesign/core/Section';
 import {Text, Heading} from '@astryxdesign/core/Text';
 import {Icon} from '@astryxdesign/core/Icon';
-import {EmptyState} from '@astryxdesign/core/EmptyState';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {Button} from '@astryxdesign/core/Button';
 import {Link} from '@astryxdesign/core/Link';
 import {Divider} from '@astryxdesign/core/Divider';
 
 // ============= ICONS (verified lucide-react exports) =============
-// Moon is the castle brand mark (see login, login-card); CircleCheck ←
-// CheckCircleIcon. The SquaresPlusIcon brand mark has no place here.
-import {Moon, CircleCheck} from 'lucide-react';
+// Moon is the castle brand mark (see login, login-card).
+import {Moon} from 'lucide-react';
 
 // Cover art lives in shared/scene-castle (`rooftops` variant:
 // crescent-overlay moon over a rooftop skyline). The transparent Card clips
 // it to rounded corners (overflow:clip + radius), so the art needs no radius.
-// Grid emits minmax(MIN, 1fr) where MIN is a hard floor, so MIN plus the
-// grid inset and page padding must fit the narrowest phone or the column is
-// clipped. 320 − 2×24 (page) − 2×16 (stacked inset) = 240.
-const COLUMN_MIN_WIDTH = 240;
-// repeat:'fit' (auto-fit) collapses the two columns to one — expanding to fill —
-// below 2×MIN + 32(gap) = 512px. The container query reorders the image and
-// tightens the inset at that same point, keyed to the card width (not the
-// window) so it never desyncs.
-// minHeight:100% fills the host so the centered card never leaves an unpainted
-// band; padding keeps it off the surface edges.
-const pageStyle: CSSProperties = {
-  minHeight: '100%',
-  backgroundColor: 'var(--color-background-body)',
-  padding: 'var(--spacing-6)',
-};
-const cardWrap: CSSProperties = {
+const cardWrap = {
   width: '100%',
   maxWidth: 1000,
   marginInline: 'auto',
-};
+} as const;
 
 // The container query lives in a plain <style> tag so it needs NO CSS compiler.
 // - Pad the grid, not the Card: the form's Section escapes Card's
@@ -72,6 +55,9 @@ const cardWrap: CSSProperties = {
 // - repeat:'fit' (auto-fit) collapses the two columns to one below 511px; the
 //   query reorders the image (order:-1) and tightens the inset at that point,
 //   keyed to the card width (not the window) so it never desyncs.
+// Grid emits minmax(240, 1fr) where 240 is a hard floor, so MIN plus the grid
+// inset and page padding must fit the narrowest phone: 320 − 2×24 (page) −
+// 2×16 (stacked inset) = 240.
 const LOGIN_SPLIT_CSS = `
 .login-split-grid {
   container-type: inline-size;
@@ -97,7 +83,6 @@ export default function LoginSplit() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, startTransition] = useTransition();
-  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleLogin = () => {
     if (!email || !password) {
@@ -107,18 +92,17 @@ export default function LoginSplit() {
     setError(null);
     startTransition(async () => {
       await demoLogin();
-      setIsSuccess(true);
     });
   };
 
   return (
-    <Center axis="both" style={pageStyle}>
+    <Center axis="both" style={authPageStyle}>
       <style>{LOGIN_SPLIT_CSS}</style>
       <VStack gap={4} width="100%">
         <Center axis="horizontal" style={cardWrap}>
           <Card padding={0} width="100%">
             <Grid
-              columns={{minWidth: COLUMN_MIN_WIDTH, repeat: 'fit'}}
+              columns={{minWidth: 240, repeat: 'fit'}}
               gap={8}
               align="stretch"
               className="login-split-grid">
@@ -134,105 +118,91 @@ export default function LoginSplit() {
 
                   <StackItem size="fill">
                     <Center axis="vertical" height="100%">
-                      {isSuccess ? (
-                        <EmptyState
-                          title="You're in for the night"
-                          description="Drifting to your crypt…"
-                          icon={
-                            <Icon
-                              icon={CircleCheck}
-                              size="lg"
-                              color="secondary"
-                            />
-                          }
-                        />
-                      ) : (
-                        <VStack gap={4} hAlign="stretch" width="100%">
-                          <VStack gap={1}>
-                            <Heading level={1} type="display-2">
-                              {AUTH_HEADING}
-                            </Heading>
-                            <Text type="body" color="secondary">
-                              {AUTH_SUBTITLE}
-                            </Text>
-                          </VStack>
+                      <VStack gap={4} hAlign="stretch" width="100%">
+                        <VStack gap={1}>
+                          <Heading level={1} type="display-2">
+                            {AUTH_HEADING}
+                          </Heading>
+                          <Text type="body" color="secondary">
+                            {AUTH_SUBTITLE}
+                          </Text>
+                        </VStack>
 
-                          <VStack gap={2}>
+                        <VStack gap={2}>
+                          <TextInput
+                            label="Email"
+                            isLabelHidden
+                            type="email"
+                            {...inputAutoComplete('email')}
+                            placeholder={AUTH_EMAIL_PLACEHOLDER}
+                            value={email}
+                            onChange={(v: string) => {
+                              setEmail(v);
+                              setError(null);
+                            }}
+                            size="lg"
+                            onEnter={handleLogin}
+                            status={error ? {type: 'error', message: error} : undefined}
+                          />
+                          <VStack gap={1}>
                             <TextInput
-                              label="Email"
+                              label="Password"
                               isLabelHidden
-                              type="email"
-                              {...inputAutoComplete('email')}
-                              placeholder={AUTH_EMAIL_PLACEHOLDER}
-                              value={email}
+                              placeholder={AUTH_PASSWORD_PLACEHOLDER}
+                              type="password"
+                              {...inputAutoComplete('current-password')}
+                              value={password}
                               onChange={(v: string) => {
-                                setEmail(v);
+                                setPassword(v);
                                 setError(null);
                               }}
                               size="lg"
                               onEnter={handleLogin}
                               status={error ? {type: 'error', message: error} : undefined}
                             />
-                            <VStack gap={1}>
-                              <TextInput
-                                label="Password"
-                                isLabelHidden
-                                placeholder={AUTH_PASSWORD_PLACEHOLDER}
-                                type="password"
-                                {...inputAutoComplete('current-password')}
-                                value={password}
-                                onChange={(v: string) => {
-                                  setPassword(v);
-                                  setError(null);
-                                }}
-                                size="lg"
-                                onEnter={handleLogin}
-                                status={error ? {type: 'error', message: error} : undefined}
-                              />
-                              {error && (
-                                <VStack hAlign="end">
-                                  <Link
-                                    href="#/templates/login-split"
-                                    isStandalone>
-                                    {AUTH_FORGOT_PASSWORD}
-                                  </Link>
-                                </VStack>
-                              )}
-                            </VStack>
+                            {error && (
+                              <VStack hAlign="end">
+                                <Link
+                                  href="#/templates/login-split"
+                                  isStandalone>
+                                  {AUTH_FORGOT_PASSWORD}
+                                </Link>
+                              </VStack>
+                            )}
                           </VStack>
-
-                          <Button
-                            label={AUTH_PRIMARY_CTA}
-                            variant="primary"
-                            size="lg"
-                            isLoading={isLoading}
-                            onClick={handleLogin}
-                          />
-
-                          <Divider label={AUTH_SSO_DIVIDER} />
-
-                          {/* minWidth (not a fixed 2-up) so the pair stacks inside
-                              the narrow single-column container instead of
-                              giving each button ~114px for an icon + label. */}
-                          <Grid
-                            columns={{minWidth: 200, repeat: 'fit'}}
-                            gap={3}
-                            justify="stretch">
-                            <Button
-                              label="Login with Apple"
-                              variant="secondary"
-                              icon={<AppleIcon />}
-                              size="lg"
-                            />
-                            <Button
-                              label="Login with Google"
-                              variant="secondary"
-                              icon={<GoogleIcon />}
-                              size="lg"
-                            />
-                          </Grid>
                         </VStack>
-                      )}
+
+                        <Button
+                          label={AUTH_PRIMARY_CTA}
+                          variant="primary"
+                          size="lg"
+                          isLoading={isLoading}
+                          onClick={handleLogin}
+                        />
+
+                        <Divider label={AUTH_SSO_DIVIDER} />
+
+                        {/* minWidth (not a fixed 2-up) so the pair stacks inside
+                            the narrow single-column container instead of
+                            giving each button ~114px for an icon + label. */}
+                        <Grid
+                          columns={{minWidth: 200, repeat: 'fit'}}
+                          gap={3}
+                          justify="stretch">
+                          <Button
+                            label="Login with Apple"
+                            variant="secondary"
+                            icon={<AppleIcon />}
+                            size="lg"
+                          />
+                          <Button
+                            label="Login with Google"
+                            variant="secondary"
+                            icon={<GoogleIcon />}
+                            size="lg"
+                          />
+                        </Grid>
+                      </VStack>
                     </Center>
                   </StackItem>
 
@@ -241,16 +211,14 @@ export default function LoginSplit() {
                       only gives on hover. The VStack centres the line, as the
                       other three login templates do — it was sitting flush
                       left under a left-aligned form. */}
-                  {!isSuccess && (
-                    <VStack hAlign="center">
-                      <Text type="supporting" color="secondary">
-                        {AUTH_SIGNUP_PROMPT}{' '}
-                        <Link href="#/templates/login-split" type="supporting" hasUnderline>
-                          {AUTH_SIGNUP_LINK}
-                        </Link>
-                      </Text>
-                    </VStack>
-                  )}
+                  <VStack hAlign="center">
+                    <Text type="supporting" color="secondary">
+                      {AUTH_SIGNUP_PROMPT}{' '}
+                      <Link href="#/templates/login-split" type="supporting" hasUnderline>
+                        {AUTH_SIGNUP_LINK}
+                      </Link>
+                    </Text>
+                  </VStack>
                 </VStack>
               </Section>
 

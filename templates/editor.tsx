@@ -9,6 +9,7 @@ import {
   type CSSProperties,
   type KeyboardEvent,
   type MouseEvent,
+  type ReactNode,
   type SVGProps,
 } from 'react';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
@@ -158,10 +159,6 @@ const VIEWPORT_MAX: Record<ViewportSize, number> = {
   phone: 375,
 };
 
-let nextId = 5;
-function uid() {
-  return String(nextId++);
-}
 
 const DEFAULT_BLOCKS: Block[] = [
   {
@@ -328,6 +325,36 @@ const iconCircle: CSSProperties = {
 // Properties Form
 // ---------------------------------------------------------------------------
 
+// Heading/description pair shared by the hero/text/features/cta branches.
+// Hero labels it "Subheading" and adds its own button/alignment controls;
+// the merge keeps the shared pair, not the per-branch extras.
+function HeadingDescriptionGroup({
+  props,
+  onUpdate,
+  descriptionKey,
+  descriptionLabel,
+}: {
+  props: Record<string, unknown>;
+  onUpdate: (key: string, value: unknown) => void;
+  descriptionKey: string;
+  descriptionLabel: string;
+}) {
+  return (
+    <>
+      <TextInput
+        label="Heading"
+        value={(props.heading as string) ?? ''}
+        onChange={(v: string) => onUpdate('heading', v)}
+      />
+      <TextArea
+        label={descriptionLabel}
+        value={(props[descriptionKey] as string) ?? ''}
+        onChange={(v: string) => onUpdate(descriptionKey, v)}
+      />
+    </>
+  );
+}
+
 function PropertiesForm({
   block,
   onUpdate,
@@ -341,15 +368,11 @@ function PropertiesForm({
     case 'hero':
       return (
         <VStack gap={4}>
-          <TextInput
-            label="Heading"
-            value={(props.heading as string) ?? ''}
-            onChange={(v: string) => onUpdate('heading', v)}
-          />
-          <TextArea
-            label="Subheading"
-            value={(props.subheading as string) ?? ''}
-            onChange={(v: string) => onUpdate('subheading', v)}
+          <HeadingDescriptionGroup
+            props={props}
+            onUpdate={onUpdate}
+            descriptionKey="subheading"
+            descriptionLabel="Subheading"
           />
           <TextInput
             label="Button Label"
@@ -372,15 +395,11 @@ function PropertiesForm({
     case 'text':
       return (
         <VStack gap={4}>
-          <TextInput
-            label="Heading"
-            value={(props.heading as string) ?? ''}
-            onChange={(v: string) => onUpdate('heading', v)}
-          />
-          <TextArea
-            label="Description"
-            value={(props.description as string) ?? ''}
-            onChange={(v: string) => onUpdate('description', v)}
+          <HeadingDescriptionGroup
+            props={props}
+            onUpdate={onUpdate}
+            descriptionKey="description"
+            descriptionLabel="Description"
           />
           <TextInput
             label="Button Label"
@@ -389,20 +408,15 @@ function PropertiesForm({
           />
         </VStack>
       );
-
     case 'features':
     case 'cta':
       return (
         <VStack gap={4}>
-          <TextInput
-            label="Heading"
-            value={(props.heading as string) ?? ''}
-            onChange={(v: string) => onUpdate('heading', v)}
-          />
-          <TextArea
-            label="Description"
-            value={(props.description as string) ?? ''}
-            onChange={(v: string) => onUpdate('description', v)}
+          <HeadingDescriptionGroup
+            props={props}
+            onUpdate={onUpdate}
+            descriptionKey="description"
+            descriptionLabel="Description"
           />
         </VStack>
       );
@@ -458,187 +472,156 @@ function BlockPreview({
 }) {
   const {type, props} = block;
 
+  // One SelectableCard wrapper for every block; only the inner content
+  // switches. Keeps padding/label/selection in one place.
+  let content: ReactNode;
   switch (type) {
     case 'hero':
-      return (
-        <SelectableCard
-          padding={4}
-          label={block.label}
-          isSelected={isSelected}
-          onChange={onSelect}>
-          <VStack gap={4}>
-            <Heading level={3}>
-              {(props.heading as string) || 'Hero Heading'}
-            </Heading>
-            <Text type="body" color="secondary">
-              {(props.subheading as string) || 'A whisper from the crypt…'}
-            </Text>
-            {(props.buttonLabel as string) && (
-              <Button label={props.buttonLabel as string} />
-            )}
-          </VStack>
-          </SelectableCard>
+      content = (
+        <VStack gap={4}>
+          <Heading level={3}>
+            {(props.heading as string) || 'Hero Heading'}
+          </Heading>
+          <Text type="body" color="secondary">
+            {(props.subheading as string) || 'A whisper from the crypt…'}
+          </Text>
+          {(props.buttonLabel as string) && (
+            <Button label={props.buttonLabel as string} />
+          )}
+        </VStack>
       );
+      break;
 
     case 'text':
-      if (props.heading) {
-        return (
-          <SelectableCard
-          padding={4}
-          label={block.label}
-          isSelected={isSelected}
-          onChange={onSelect}>
-            <EmptyState
-              title={props.heading as string}
-              description={props.description as string}
-              icon={<Icon icon={FileText} color="secondary" />}
-              actions={
-                (props.buttonLabel as string) ? (
-                  <Button
-                    label={props.buttonLabel as string}
-                    variant="secondary"
-                  />
-                ) : undefined
-              }
-            />
-          </SelectableCard>
-        );
-      }
-      return (
-        <SelectableCard
-          padding={4}
-          label={block.label}
-          isSelected={isSelected}
-          onChange={onSelect}>
-          <Text type="body">
-            {(props.content as string) || 'Ink your midnight thoughts here…'}
-          </Text>
-          </SelectableCard>
+      content = props.heading ? (
+        <EmptyState
+          title={props.heading as string}
+          description={props.description as string}
+          icon={<Icon icon={FileText} color="secondary" />}
+          actions={
+            (props.buttonLabel as string) ? (
+              <Button
+                label={props.buttonLabel as string}
+                variant="secondary"
+              />
+            ) : undefined
+          }
+        />
+      ) : (
+        <Text type="body">
+          {(props.content as string) || 'Ink your midnight thoughts here…'}
+        </Text>
       );
-
+      break;
     case 'image':
-      return (
-        <SelectableCard
-          padding={4}
-          label={block.label}
-          isSelected={isSelected}
-          onChange={onSelect}>
-          <EmptyState
-            title="Image Block"
-            description="Drop an image or enter a URL"
-            icon={<Icon icon={Image} color="secondary" />}
-            isCompact
-          />
-          </SelectableCard>
+      content = (
+        <EmptyState
+          title="Image Block"
+          description="Drop an image or enter a URL"
+          icon={<Icon icon={Image} color="secondary" />}
+          isCompact
+        />
       );
+      break;
 
     case 'button':
-      return (
-        <SelectableCard
-          padding={4}
-          label={block.label}
-          isSelected={isSelected}
-          onChange={onSelect}>
-          <Center>
-            <Button
-              label={(props.label as string) || 'Button'}
-              variant={
-                (props.variant as 'primary' | 'secondary' | 'ghost') ||
-                'primary'
-              }
-              size={(props.size as 'sm' | 'md' | 'lg') || 'md'}
-            />
-          </Center>
-          </SelectableCard>
+      content = (
+        <Center>
+          <Button
+            label={(props.label as string) || 'Button'}
+            variant={
+              (props.variant as 'primary' | 'secondary' | 'ghost') ||
+              'primary'
+            }
+            size={(props.size as 'sm' | 'md' | 'lg') || 'md'}
+          />
+        </Center>
       );
+      break;
+
 
     case 'features': {
       const items = (props.items as Transaction[]) || [];
-      return (
-        <SelectableCard
-          padding={4}
-          label={block.label}
-          isSelected={isSelected}
-          onChange={onSelect}>
-          <VStack gap={4}>
-            <HStack gap={3} vAlign="start" hAlign="between">
-              <VStack gap={1}>
-                <Heading level={3}>
-                  {(props.heading as string) || 'Features'}
-                </Heading>
-                {(props.description as string) && (
-                  <Text type="body" color="secondary">
-                    {props.description as string}
-                  </Text>
-                )}
-              </VStack>
-              <Button label="View All" variant="secondary" />
-            </HStack>
-            <Table
-              data={items}
-              columns={TRANSACTION_COLUMNS}
-              idKey="id"
-              hasHover
-              textOverflow="truncate"
-            />
-          </VStack>
-          </SelectableCard>
+      content = (
+        <VStack gap={4}>
+          <HStack gap={3} vAlign="start" hAlign="between">
+            <VStack gap={1}>
+              <Heading level={3}>
+                {(props.heading as string) || 'Features'}
+              </Heading>
+              {(props.description as string) && (
+                <Text type="body" color="secondary">
+                  {props.description as string}
+                </Text>
+              )}
+            </VStack>
+            <Button label="View All" variant="secondary" />
+          </HStack>
+          <Table
+            data={items}
+            columns={TRANSACTION_COLUMNS}
+            idKey="id"
+            hasHover
+            textOverflow="truncate"
+          />
+        </VStack>
       );
+      break;
     }
 
     case 'cards': {
       const cardItems =
         (props.cards as Array<{title: string; description: string}>) || [];
-      return (
-        <SelectableCard
-          padding={4}
-          label={block.label}
-          isSelected={isSelected}
-          onChange={onSelect}>
-          <VStack gap={4}>
-            <Heading level={3}>Cards</Heading>
-            <Divider />
-            <List density="balanced" hasDividers={false}>
-              {cardItems.map((card) => (
-                <ListItem
-                  key={card.title}
-                  label={card.title}
-                  description={card.description}
-                />
-              ))}
-            </List>
-          </VStack>
-          </SelectableCard>
+      content = (
+        <VStack gap={4}>
+          <Heading level={3}>Cards</Heading>
+          <Divider />
+          <List density="balanced" hasDividers={false}>
+            {cardItems.map(card => (
+              <ListItem
+                key={card.title}
+                label={card.title}
+                description={card.description}
+              />
+            ))}
+          </List>
+        </VStack>
       );
+      break;
     }
 
     case 'cta':
-      return (
-        <SelectableCard
-          padding={4}
-          label={block.label}
-          isSelected={isSelected}
-          onChange={onSelect}>
-          <HStack gap={4} vAlign="start">
-            <Center width={40} height={40} style={iconCircle}>
-              <Icon icon={Lock} color="secondary" />
-            </Center>
-            <VStack gap={1}>
-              <Heading level={3}>
-                {(props.heading as string) || 'Notice'}
-              </Heading>
-              <Text type="body" color="secondary">
-                {(props.description as string) ||
-                  'Words from the crypt gather here…'}
-              </Text>
-            </VStack>
-          </HStack>
-          </SelectableCard>
+      content = (
+        <HStack gap={4} vAlign="start">
+          <Center width={40} height={40} style={iconCircle}>
+            <Icon icon={Lock} color="secondary" />
+          </Center>
+          <VStack gap={1}>
+            <Heading level={3}>
+              {(props.heading as string) || 'Notice'}
+            </Heading>
+            <Text type="body" color="secondary">
+              {(props.description as string) ||
+                'Words from the crypt gather here…'}
+            </Text>
+          </VStack>
+        </HStack>
       );
+      break;
 
     default:
       return null;
   }
+
+  return (
+    <SelectableCard
+      padding={4}
+      label={block.label}
+      isSelected={isSelected}
+      onChange={onSelect}>
+      {content}
+    </SelectableCard>
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -701,7 +684,7 @@ export default function PageEditor() {
   );
 
   const addBlock = useCallback((type: BlockType) => {
-    const id = uid();
+    const id = crypto.randomUUID();
     const newBlock: Block = {
       id,
       type,

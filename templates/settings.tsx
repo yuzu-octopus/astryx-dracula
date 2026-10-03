@@ -19,6 +19,7 @@
  */
 
 import {useState} from 'react';
+import {inputAutoComplete} from 'astryx-dracula/shared/auth-chrome-config';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {
   VStack,
@@ -50,12 +51,6 @@ const NAV_ITEMS = [
   'API',
 ];
 
-// WCAG 1.3.5 wants autocomplete on identity fields. TextInput forwards unknown
-// props to the <input>, but its prop type omits input-only attributes, so the
-// attribute is spread in through a widened record.
-const inputAutoComplete = (value: string) =>
-  ({autoComplete: value}) as Record<string, string>;
-
 const SETTINGS_ITEMS: SearchableItem[] = [
   {id: '1', label: 'Username'},
   {id: '2', label: 'First name'},
@@ -75,19 +70,202 @@ const settingsSearchSource: SearchSource<SearchableItem> = {
   bootstrap: () => SETTINGS_ITEMS,
 };
 
+// One entry per section grid below: the heading + lede in the left column and
+// the fields in the right column. Text and check fields share one row shape;
+// the renderer switches on `kind`.
+type SettingsTextKey =
+  | 'username'
+  | 'firstName'
+  | 'lastName'
+  | 'email'
+  | 'currentPw'
+  | 'newPw'
+  | 'confirmPw';
+type SettingsCheckKey = 'dataExport' | 'adminMembers' | 'twoFactor';
+type SettingsField =
+  | {
+      key: string;
+      kind: 'text';
+      label: string;
+      inputType?: 'email' | 'password';
+      autoComplete?: string;
+      valueKey: SettingsTextKey;
+    }
+  | {
+      key: string;
+      kind: 'check';
+      label: string;
+      description: string;
+      valueKey: SettingsCheckKey;
+    };
+type SettingsSectionData = {
+  key: string;
+  heading: string;
+  body: string;
+  fields: SettingsField[];
+};
+
+const SECTIONS: SettingsSectionData[] = [
+  {
+    key: 'basic',
+    heading: 'Basic information',
+    body: 'View and update your crypt details and coven account information.',
+    fields: [
+      {key: 'username', kind: 'text', label: 'Username', valueKey: 'username'},
+      {
+        key: 'first-name',
+        kind: 'text',
+        label: 'First name',
+        valueKey: 'firstName',
+      },
+      {key: 'last-name', kind: 'text', label: 'Last name', valueKey: 'lastName'},
+      {
+        key: 'email',
+        kind: 'text',
+        label: 'Email address',
+        inputType: 'email',
+        autoComplete: 'email',
+        valueKey: 'email',
+      },
+    ],
+  },
+  {
+    key: 'password',
+    heading: 'Change password',
+    body: 'Update your password to keep your coffin sealed.',
+    fields: [
+      {
+        key: 'current-pw',
+        kind: 'text',
+        label: 'Verify current password',
+        inputType: 'password',
+        autoComplete: 'current-password',
+        valueKey: 'currentPw',
+      },
+      {
+        key: 'new-pw',
+        kind: 'text',
+        label: 'New password',
+        inputType: 'password',
+        autoComplete: 'new-password',
+        valueKey: 'newPw',
+      },
+      {
+        key: 'confirm-pw',
+        kind: 'text',
+        label: 'Confirm password',
+        inputType: 'password',
+        autoComplete: 'new-password',
+        valueKey: 'confirmPw',
+      },
+    ],
+  },
+  {
+    key: 'advanced',
+    heading: 'Advanced settings',
+    body: 'Configure detailed coven preferences and warding options.',
+    fields: [
+      {
+        key: 'data-export',
+        kind: 'check',
+        label: 'Data Export Access',
+        description: 'Allow export of personal data and backups.',
+        valueKey: 'dataExport',
+      },
+      {
+        key: 'admin-members',
+        kind: 'check',
+        label: 'Allow Admin to Add Members',
+        description: 'Admins can invite and manage members.',
+        valueKey: 'adminMembers',
+      },
+      {
+        key: 'two-factor',
+        kind: 'check',
+        label: 'Enable Two-Factor Authentication',
+        description: 'Require 2FA for added account security.',
+        valueKey: 'twoFactor',
+      },
+    ],
+  },
+];
+
+function SettingsSection({
+  section,
+  textValues,
+  onTextChange,
+  checkValues,
+  onCheckChange,
+  isLast,
+}: {
+  section: SettingsSectionData;
+  textValues: Record<SettingsTextKey, string>;
+  onTextChange: (key: SettingsTextKey, value: string) => void;
+  checkValues: Record<SettingsCheckKey, boolean>;
+  onCheckChange: (key: SettingsCheckKey, value: boolean) => void;
+  isLast: boolean;
+}) {
+  return (
+    <>
+      <Grid columns={{minWidth: 280}} gap={8}>
+        <VStack gap={1}>
+          <Heading level={2}>{section.heading}</Heading>
+          <Text type="body" color="secondary">
+            {section.body}
+          </Text>
+        </VStack>
+        <VStack gap={4}>
+          {section.fields.map(field =>
+            field.kind === 'check' ? (
+              <CheckboxInput
+                key={field.key}
+                label={field.label}
+                description={field.description}
+                value={checkValues[field.valueKey]}
+                onChange={value => onCheckChange(field.valueKey, value)}
+              />
+            ) : (
+              <TextInput
+                key={field.key}
+                label={field.label}
+                type={field.inputType}
+                {...(field.autoComplete
+                  ? inputAutoComplete(field.autoComplete)
+                  : {})}
+                value={textValues[field.valueKey]}
+                onChange={value => onTextChange(field.valueKey, value)}
+              />
+            ),
+          )}
+          <HStack>
+            <Button label="Save" variant="primary" />
+          </HStack>
+        </VStack>
+      </Grid>
+      {!isLast && <Divider />}
+    </>
+  );
+}
+
 export default function SettingsTemplate() {
   const isNarrow = useMediaQuery('(max-width: 768px)');
   const [activeNav, setActiveNav] = useState('Profile');
-  const [username, setUsername] = useState('vlad_tepes');
-  const [firstName, setFirstName] = useState('Vlad');
-  const [lastName, setLastName] = useState('Tepes');
-  const [email, setEmail] = useState('vlad_tepes@castle-dracula.ro');
-  const [currentPw, setCurrentPw] = useState('password123');
-  const [newPw, setNewPw] = useState('password123');
-  const [confirmPw, setConfirmPw] = useState('password123');
-  const [dataExport, setDataExport] = useState(false);
-  const [adminMembers, setAdminMembers] = useState(false);
-  const [twoFactor, setTwoFactor] = useState(false);
+  const [textValues, setTextValues] = useState<Record<SettingsTextKey, string>>({
+    username: 'vlad_tepes',
+    firstName: 'Vlad',
+    lastName: 'Tepes',
+    email: 'vlad_tepes@castle-dracula.ro',
+    currentPw: 'password123',
+    newPw: 'password123',
+    confirmPw: 'password123',
+  });
+  const [checkValues, setCheckValues] = useState<
+    Record<SettingsCheckKey, boolean>
+  >({
+    dataExport: false,
+    adminMembers: false,
+    twoFactor: false,
+  });
   const [searchValue, setSearchValue] = useState<SearchableItem | null>(null);
 
   return (
@@ -150,112 +328,21 @@ export default function SettingsTemplate() {
                 </TabList>
               </VStack>
             )}
-            <Grid columns={{minWidth: 280}} gap={8}>
-              <VStack gap={1}>
-                <Heading level={2}>Basic information</Heading>
-                <Text type="body" color="secondary">
-                  View and update your crypt details and coven account information.
-                </Text>
-              </VStack>
-              <VStack gap={4}>
-                <TextInput
-                  label="Username"
-                  value={username}
-                  onChange={setUsername}
+            {SECTIONS.map((section, index) => (
+                <SettingsSection
+                  key={section.key}
+                  section={section}
+                  textValues={textValues}
+                  onTextChange={(fieldKey, value) =>
+                    setTextValues(prev => ({...prev, [fieldKey]: value}))
+                  }
+                  checkValues={checkValues}
+                  onCheckChange={(fieldKey, value) =>
+                    setCheckValues(prev => ({...prev, [fieldKey]: value}))
+                  }
+                  isLast={index === SECTIONS.length - 1}
                 />
-                <TextInput
-                  label="First name"
-                  value={firstName}
-                  onChange={setFirstName}
-                />
-                <TextInput
-                  label="Last name"
-                  value={lastName}
-                  onChange={setLastName}
-                />
-                <TextInput
-                  label="Email address"
-                  type="email"
-                  {...inputAutoComplete('email')}
-                  value={email}
-                  onChange={setEmail}
-                />
-                <HStack>
-                  <Button label="Save" variant="primary" />
-                </HStack>
-              </VStack>
-            </Grid>
-
-            <Divider />
-
-            <Grid columns={{minWidth: 280}} gap={8}>
-              <VStack gap={1}>
-                <Heading level={2}>Change password</Heading>
-                <Text type="body" color="secondary">
-                  Update your password to keep your coffin sealed.
-                </Text>
-              </VStack>
-              <VStack gap={4}>
-                <TextInput
-                  label="Verify current password"
-                  type="password"
-                  {...inputAutoComplete('current-password')}
-                  value={currentPw}
-                  onChange={setCurrentPw}
-                />
-                <TextInput
-                  label="New password"
-                  type="password"
-                  {...inputAutoComplete('new-password')}
-                  value={newPw}
-                  onChange={setNewPw}
-                />
-                <TextInput
-                  label="Confirm password"
-                  type="password"
-                  {...inputAutoComplete('new-password')}
-                  value={confirmPw}
-                  onChange={setConfirmPw}
-                />
-                <HStack>
-                  <Button label="Save" variant="primary" />
-                </HStack>
-              </VStack>
-            </Grid>
-
-            <Divider />
-
-            <Grid columns={{minWidth: 280}} gap={8}>
-              <VStack gap={1}>
-                <Heading level={2}>Advanced settings</Heading>
-                <Text type="body" color="secondary">
-                  Configure detailed coven preferences and warding options.
-                </Text>
-              </VStack>
-              <VStack gap={4}>
-                <CheckboxInput
-                  label="Data Export Access"
-                  description="Allow export of personal data and backups."
-                  value={dataExport}
-                  onChange={setDataExport}
-                />
-                <CheckboxInput
-                  label="Allow Admin to Add Members"
-                  description="Admins can invite and manage members."
-                  value={adminMembers}
-                  onChange={setAdminMembers}
-                />
-                <CheckboxInput
-                  label="Enable Two-Factor Authentication"
-                  description="Require 2FA for added account security."
-                  value={twoFactor}
-                  onChange={setTwoFactor}
-                />
-                <HStack>
-                  <Button label="Save" variant="primary" />
-                </HStack>
-              </VStack>
-            </Grid>
+            ))}
           </VStack>
         </LayoutContent>
       }

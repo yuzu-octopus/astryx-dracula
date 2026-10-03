@@ -4,7 +4,6 @@
 // Note: skeleton placeholders carry no Hd by design (skill skeleton-shell
 // exemption) — routed pages supply the h1.
 
-import type {CSSProperties} from 'react';
 import {AppShell} from '@astryxdesign/core/AppShell';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
 import {
@@ -35,16 +34,6 @@ import {
   SwatchBook,
   Tag,
   House,
-  Smile,
-  BadgePercent,
-  Gift,
-  Cloud,
-  Zap,
-  Sun,
-  Star,
-  Flame,
-  Globe,
-  Moon,
 } from 'lucide-react';
 
 // Cap + center the page body so wide screens show whitespace gutters.
@@ -52,23 +41,20 @@ const CONTENT_MAX_WIDTH = 1100;
 // Same-route hash: demo links stay focusable anchors without escaping the
 // template through the hash router (bare "#" would drop back to the home page).
 const SELF_HASH = '#/templates/shell-top-nav';
-// Lock both mega-menu panels to an identical size. Without this, Shop and
-// Brands size to their own content (different widths); since both anchor to
-// the centered nav, switching between them resizes the panel — which reads
-// as flashing/jumping. Fixed item + featured widths make the panels
-// pixel-identical so the transition is seamless. The pair needs roughly
-// 800px of clear space, so narrower viewports fall back to natural-width
-// single columns (see MegaItems) instead of painting past the edge.
-const megaItems: CSSProperties = {gridColumn: '1 / -1', width: 520};
-const megaFeatured: CSSProperties = {width: 240};
+// Lock both mega-menu panels to an identical size. Without fixed widths Shop
+// and Brands size to their own content (different widths); since both anchor
+// to the centered nav, switching between them resizes the panel — which reads
+// as flashing/jumping. The pair needs roughly 800px of clear space, so
+// narrower viewports fall back to natural-width single columns (see
+// MegaItems) instead of painting past the edge.
 
 // Three identical shelves; the ids keep React keys stable if they reorder.
 const SHELVES = ['new-in', 'featured', 'sale'];
 
 type MegaItem = {name: string; tagline: string; icon: IconType};
 
-// Shop and Brands each render 8 items — the mega menu's built-in 2-column grid
-// lays them out as 2 columns × 4 rows, alongside a featured card.
+// Shop and Brands each render 4 items — the mega menu's built-in 2-column
+// grid lays them out as 2 columns × 2 rows, alongside a featured card.
 const SHOP_ITEMS: MegaItem[] = [
   {name: 'New Moon Arrivals', tagline: 'Fresh from the kiln', icon: Sparkles},
   {
@@ -78,42 +64,23 @@ const SHOP_ITEMS: MegaItem[] = [
   },
   {name: 'Doublets & Tailoring', tagline: 'Shirts, cloaks & more', icon: Tag},
   {name: 'Keep & Crypt', tagline: 'Bedding, candlelight & décor', icon: House},
-  {
-    name: 'Potions',
-    tagline: 'Salves, scents & powders',
-    icon: Smile,
-  },
-  {
-    name: 'Relics',
-    tagline: 'Satchels, hats & moonshades',
-    icon: ShoppingBag,
-  },
-  {name: 'Sale', tagline: 'Up to 50% off', icon: BadgePercent},
-  {name: 'Gift Tokens', tagline: 'The perfect tribute', icon: Gift},
 ];
 
 const BRAND_ITEMS: MegaItem[] = [
   {name: 'Aether', tagline: 'Moonlit essentials', icon: Sparkles},
-  {name: 'Northcrypt', tagline: 'Cold-weather & travel', icon: Cloud},
-  {name: 'Loomwell', tagline: 'Everyday knitwear, coven-stitched', icon: Zap},
-  {name: 'Verdant', tagline: 'Earth-kept basics', icon: Sun},
-  {name: 'Studio Mara', tagline: 'Modern tailoring for the night', icon: Star},
-  {name: 'Atelier Kos', tagline: 'Small-batch ateliers', icon: Flame},
-  {name: 'Rue & Co', tagline: 'Old-town streetwear', icon: Globe},
-  {name: 'Halden', tagline: 'Spare, lasting staples', icon: Moon},
+  {name: 'Loomwell', tagline: 'Everyday knitwear, coven-stitched', icon: Tag},
+  {name: 'Verdant', tagline: 'Earth-kept basics', icon: House},
+  {name: 'Studio Mara', tagline: 'Modern tailoring for the night', icon: SwatchBook},
 ];
 
-const CATEGORY_TILES = [
-  'New Moon Arrivals',
-  'Gowns & Cloaks',
-  'Doublets & Tailoring',
-  'Keep & Crypt',
-  'Potions',
-  'Relics',
-];
+// Shelf tiles mirror the Shop menu so the page previews what the menu links.
+const CATEGORY_TILES = SHOP_ITEMS.map(item => item.name);
 
-// Wraps the 8 items in a fixed-width 2-column grid so every mega menu's item
-// area is exactly the same width regardless of its content.
+// Both panels share one item renderer so the drawer's single column and the
+// desktop popover's fixed-width grid stay in lockstep. Fixed widths keep the
+// two panels pixel-identical (no resize flash when switching menus); the
+// drawer and narrow viewports fall back to a natural-width column so the
+// locked 520px panel never paints past the edge.
 function MegaItems({items}: {items: MegaItem[]}) {
   // In the mobile drawer the fixed 520px panel would overflow the ~350px
   // drawer, and the 2-column grid overlaps item text there — so the drawer
@@ -138,7 +105,7 @@ function MegaItems({items}: {items: MegaItem[]}) {
     );
   }
   return (
-    <Stack style={megaItems}>
+    <Stack style={{gridColumn: '1 / -1', width: 520}}>
       <Grid columns={2} gap={2}>
         {items.map(item => (
           <TopNavMegaMenuItem
@@ -164,7 +131,7 @@ function MegaFeatured(props: {
   const isDrawer = useTopNavRenderMode() === 'drawer';
   const isCompact = useMediaQuery('(max-width: 1024px)');
   return (
-    <Stack style={isDrawer || isCompact ? undefined : megaFeatured}>
+    <Stack style={isDrawer || isCompact ? undefined : {width: 240}}>
       <TopNavMegaMenuFeaturedCard {...props} />
     </Stack>
   );

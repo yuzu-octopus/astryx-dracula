@@ -2,7 +2,7 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   L > LC[p=0] > H > (SI[fill] > ChL > ChML > (ChM > ChB)*4 + ChC"Ask a follow up...") + (C.transparent > Tbar + S.section > MD) ;; Dlg#artifact[variant=fullscreen] > L > (DH"JWT Token Refresh" + (LC[p=0] > S.section > MD))
 
-import {useRef, useState, type CSSProperties} from 'react';
+import {useState, type CSSProperties} from 'react';
 
 import {
   HStack,
@@ -40,6 +40,7 @@ import {DropdownMenu} from '@astryxdesign/core/DropdownMenu';
 import {MoreMenu} from '@astryxdesign/core/MoreMenu';
 import {Toolbar} from '@astryxdesign/core/Toolbar';
 import {useResizable, ResizeHandle} from '@astryxdesign/core/Resizable';
+import {useMediaQuery} from '@astryxdesign/core/hooks';
 
 import {
   FileText,
@@ -52,19 +53,17 @@ import {
 } from 'lucide-react';
 
 // Below this container width the split-pane collapses to a single chat column
-// and the artifact opens as a full-screen dialog instead. Shared by the CSS
-// container query and the JS check in openArtifact so they can't drift. 1023
-// keeps tablet widths from squeezing the chat into a ~100px rail beside the
-// 640px default artifact panel.
+// and the artifact opens as a full-screen dialog instead. Single source:
+// MOBILE_MAX_WIDTH feeds useMediaQuery below, which both gates the panel and
+// routes openArtifact — no container query, no manual width read to drift.
+// 1023 keeps tablet widths from squeezing the chat into a ~100px rail beside
+// the 640px default artifact panel.
 const MOBILE_MAX_WIDTH = 1023;
-
 const root: CSSProperties = {
   // The viewer owns its chrome: the root fills the viewport and the message
   // list plus artifact body scroll inside it (editor pattern).
   height: '100dvh',
   width: '100%',
-  containerType: 'inline-size',
-  containerName: 'artifact',
 };
 const chatColumn: CSSProperties = {
   flex: 1,
@@ -91,37 +90,15 @@ const articleBody: CSSProperties = {
   marginInline: 'auto',
 };
 
-// Runtime width for the artifact panel, passed in via the --artifact-panel-width
-// custom property so the MOBILE container query can still override it to 100%
-// (an inline `width` would beat the class rule). The container query lives in a
-// plain <style> tag below so it needs NO CSS compiler.
+// Width for the artifact panel. Plain style object — the panel unmounts below
+// the breakpoint (see useMediaQuery in the component), so no container query
+// or <style> tag is needed to hide it.
 const artifactPanelWidthVar = (size: number | string): CSSProperties =>
   ({
-    '--artifact-panel-width': typeof size === 'number' ? `${size}px` : size,
+    width: typeof size === 'number' ? `${size}px` : size,
+    flexShrink: 0,
+    overflow: 'hidden',
   }) as CSSProperties;
-
-const AI_CHAT_CSS = `
-.ai-chat-resize-handle {
-  display: flex;
-}
-.ai-chat-artifact-panel {
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  width: var(--artifact-panel-width);
-  flex-shrink: 0;
-}
-@container artifact (max-width: ${MOBILE_MAX_WIDTH}px) {
-  .ai-chat-resize-handle {
-    display: none;
-  }
-  .ai-chat-artifact-panel {
-    display: none;
-    width: 100%;
-    flex-shrink: 1;
-  }
-}
-`;
 
 // Artifact content
 
@@ -175,6 +152,13 @@ The refresh path is covered end to end:
 
 // Artifact subviews
 
+// Copy/Share live in both surfaces: desktop toolbar buttons and the mobile
+// overflow menu. One items array so the two can't drift.
+const ARTIFACT_ACTION_ITEMS = [
+  {label: 'Copy', icon: Copy},
+  {label: 'Share', icon: Share2},
+] as const;
+
 // Header actions: version menu, copy, share. Pass `onClose` for the desktop
 // close button. A fragment so each control is a direct child of the toolbar.
 function ArtifactActions({onClose}: {onClose?: () => void}) {
@@ -188,20 +172,16 @@ function ArtifactActions({onClose}: {onClose?: () => void}) {
         }}
         items={[{label: 'v2 (current)'}, {label: 'v1'}]}
       />
-      <Button
-        label="Copy"
-        variant="ghost"
-        size="sm"
-        icon={<Icon icon={Copy} size="sm" />}
-        isIconOnly
-      />
-      <Button
-        label="Share"
-        variant="ghost"
-        size="sm"
-        icon={<Icon icon={Share2} size="sm" />}
-        isIconOnly
-      />
+      {ARTIFACT_ACTION_ITEMS.map(item => (
+        <Button
+          key={item.label}
+          label={item.label}
+          variant="ghost"
+          size="sm"
+          icon={<Icon icon={item.icon} size="sm" />}
+          isIconOnly
+        />
+      ))}
       {onClose != null && (
         <Button
           label="Close document"
@@ -226,23 +206,23 @@ function MobileArtifactActions() {
         {
           type: 'section',
           title: 'Version',
-          items: [
-            {label: 'v2 (current)', onClick: () => {}},
-            {label: 'v1', onClick: () => {}},
-          ],
+          items: [{label: 'v2 (current)'}, {label: 'v1'}],
         },
         {type: 'divider'},
-        {label: 'Copy', icon: Copy},
-        {label: 'Share', icon: Share2},
+        ...ARTIFACT_ACTION_ITEMS,
       ]}
     />
   );
 }
 
-// Scrollable artifact body — the formatted document. The mobile dialog renders
-// the title in its DialogHeader, so it drops the in-body heading rather than
-// announcing the same h1 twice.
-function ArtifactBody({hasOwnTitle = true}: {hasOwnTitle?: boolean}) {
+// Scrollable artifact content — the formatted document, no heading. The
+// desktop panel renders ArtifactBody above it; the mobile dialog renders its
+// title in DialogHeader instead, so both share this rather than a flag prop.
+function ArtifactContent() {
+  return <Markdown>{ARTIFACT_CONTENT}</Markdown>;
+}
+// Desktop body: in-body heading plus the shared content.
+function ArtifactBody() {
   return (
     <Section
       variant="transparent"
@@ -251,13 +231,10 @@ function ArtifactBody({hasOwnTitle = true}: {hasOwnTitle?: boolean}) {
       aria-label={ARTIFACT_TITLE}
       tabIndex={0}>
       <VStack gap={2} style={articleBody}>
-        {/* Page owns the h1 (VisuallyHidden "Night thread"); the panel title is h2. */}
-        {hasOwnTitle && (
-          <Heading level={2} type="display-2">
-            {ARTIFACT_TITLE}
-          </Heading>
-        )}
-        <Markdown>{ARTIFACT_CONTENT}</Markdown>
+        <Heading level={2} type="display-2">
+          {ARTIFACT_TITLE}
+        </Heading>
+        <ArtifactContent />
       </VStack>
     </Section>
   );
@@ -298,7 +275,6 @@ export default function AiChat() {
   // Mobile shows the artifact as a full-screen dialog; desktop as a side panel.
   const [isArtifactDialogOpen, setIsArtifactDialogOpen] = useState(false);
   const [isArtifactOpen, setIsArtifactOpen] = useState(true);
-  const rootRef = useRef<HTMLElement>(null);
   const artifactResize = useResizable({
     defaultSize: 640,
     minSize: 480,
@@ -306,10 +282,12 @@ export default function AiChat() {
     autoSaveId: 'ai-chat-artifact-panel',
   });
 
-  // Match the container-query breakpoint by measuring the root, not the viewport.
+  // Single source for the breakpoint: the media query both gates the panel
+  // below and routes openArtifact, so the split-pane and the dialog target
+  // can't disagree about which surface is live.
+  const isMobileWidth = useMediaQuery(`(max-width: ${MOBILE_MAX_WIDTH}px)`);
   const openArtifact = () => {
-    const width = rootRef.current?.offsetWidth ?? Infinity;
-    if (width <= MOBILE_MAX_WIDTH) {
+    if (isMobileWidth) {
       setIsArtifactDialogOpen(true);
     } else {
       setIsArtifactOpen(true);
@@ -317,8 +295,7 @@ export default function AiChat() {
   };
 
   return (
-    <VStack ref={rootRef} style={root}>
-      <style>{AI_CHAT_CSS}</style>
+    <VStack style={root}>
       <Layout
         height="fill"
         content={
@@ -700,8 +677,11 @@ The fix is to catch \`TokenExpiredError\` specifically and attempt a refresh bef
                 </ChatLayout>
               </VStack>
 
-              {/* Desktop split-pane: resize handle + artifact panel */}
-              {isArtifactOpen && (
+              {/* Desktop split-pane: resize handle + artifact panel. Gated on
+                  the same media query that routes openArtifact, so shrinking
+                  the window while open moves to the dialog instead of
+                  squeezing the chat into a rail. */}
+              {isArtifactOpen && !isMobileWidth && (
                 <>
                   <ResizeHandle
                     direction="horizontal"
@@ -710,14 +690,12 @@ The fix is to catch \`TokenExpiredError\` specifically and attempt a refresh bef
                     pillPlacement="start"
                     hasDivider
                     label="Resize artifact panel"
-                    className="ai-chat-resize-handle"
                   />
 
                   {/* Toolbar as the card header, body below */}
                   <Card
                     variant="transparent"
                     height="100%"
-                    className="ai-chat-artifact-panel"
                     style={artifactPanelWidthVar(artifactResize.size)}>
                     <Toolbar
                       label="Artifact actions"
@@ -773,7 +751,16 @@ The fix is to catch \`TokenExpiredError\` specifically and attempt a refresh bef
           }
           content={
             <LayoutContent padding={0}>
-              <ArtifactBody hasOwnTitle={false} />
+              <Section
+                variant="transparent"
+                style={artifactScroll}
+                role="region"
+                aria-label={ARTIFACT_TITLE}
+                tabIndex={0}>
+                <VStack gap={2} style={articleBody}>
+                  <ArtifactContent />
+                </VStack>
+              </Section>
             </LayoutContent>
           }
         />

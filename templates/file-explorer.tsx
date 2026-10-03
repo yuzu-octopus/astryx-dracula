@@ -2,7 +2,7 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   L > (Tbar[size=sm] > (H > IB"Go back" + IB"Go forward" + Tx"Folder"[t=label]) + (SG"View mode" > SGI*4) + (H > IB"Group" + IB"Share" + IB"Tags" + IB"More" + IB"Search")) + (LC[p=0 !scroll] > (Hd"File Explorer"[level=1] + H[h=fill] > (S.transparent[p=2 w=240 dv=[end]] > UL[density=compact !hasDividers] > (LI > Ic + Tx"Item"[t=body])*3)*3 + (S.transparent[p=6] > V[g=4 a=center] > Av[size=96] + (V[g=1 a=center] > Tx"Name"[t=body] + Tx"Kind"[t=supporting]) + (ML"Information" > MLI*3))))
 
-import {useState, useMemo, type CSSProperties} from 'react';
+import {useState, useMemo} from 'react';
 import {Layout, LayoutContent} from '@astryxdesign/core/Layout';
 import {Toolbar} from '@astryxdesign/core/Toolbar';
 import {List, ListItem} from '@astryxdesign/core/List';
@@ -262,19 +262,6 @@ const FILESYSTEM: FileSystemItem[] = [
   },
 ];
 
-const page: CSSProperties = {height: '100dvh'};
-const columnRow: CSSProperties = {overflowX: 'auto', overflowY: 'hidden'};
-const scrollable: CSSProperties = {overflowY: 'auto'};
-const fixedColumn: CSSProperties = {flexShrink: 0};
-// The column's 320px resting width rides on Section's `width` prop; grow
-// lets it absorb whatever the fixed columns leave. Inline styles are for
-// what props cannot express.
-const detailColumn: CSSProperties = {
-  flexGrow: 1,
-  flexShrink: 0,
-};
-const controlsScroll: CSSProperties = {overflowX: 'auto'};
-
 // Static toolbar content, hoisted out of the render path: neither element
 // reads component state, so rebuilding them per render buys nothing.
 const viewSwitcher = (
@@ -373,7 +360,6 @@ export default function FileExplorer() {
   ]);
 
   const isNarrow = useMediaQuery('(max-width: 768px)');
-  const isPhone = isNarrow;
 
   const columns = useMemo(() => {
     // `id` names the folder a column lists, so the React key stays put when
@@ -480,19 +466,19 @@ export default function FileExplorer() {
 
   return (
     <Layout
-      style={page}
+      style={{height: '100dvh'}}
       height="fill"
       header={
         <>
           <Toolbar
             label="File Explorer"
             size="sm"
-            dividers={isPhone ? undefined : ['bottom']}
+            dividers={isNarrow ? undefined : ['bottom']}
             startContent={titleContent}
-            centerContent={isPhone ? undefined : viewSwitcher}
-            endContent={isPhone ? undefined : fileActions}
+            centerContent={isNarrow ? undefined : viewSwitcher}
+            endContent={isNarrow ? undefined : fileActions}
           />
-          {isPhone && (
+          {isNarrow && (
             <Section
               variant="transparent"
               padding={2}
@@ -500,7 +486,7 @@ export default function FileExplorer() {
               <HStack
                 gap={2}
                 vAlign="center"
-                style={controlsScroll}
+                style={{overflowX: 'auto'}}
                 role="region"
                 aria-label="View and file actions"
                 tabIndex={0}>
@@ -516,7 +502,7 @@ export default function FileExplorer() {
           <VisuallyHidden as="h1">
             File Explorer
           </VisuallyHidden>
-          <HStack height="100%" style={columnRow}>
+          <HStack height="100%" style={{overflowX: 'auto', overflowY: 'hidden'}}>
             {!isPreviewPane &&
               visibleColumns.map((col, colIndex) => {
                 const trueIndex = columnOffset + colIndex;
@@ -529,7 +515,7 @@ export default function FileExplorer() {
                     padding={2}
                     variant="transparent"
                     dividers={showDivider ? ['end'] : undefined}
-                    style={{...scrollable, ...fixedColumn}}
+                    style={{overflowY: 'auto', flexShrink: 0}}
                     role="region"
                     aria-label={`Folder column ${trueIndex + 1}`}
                     tabIndex={0}>
@@ -600,7 +586,7 @@ export default function FileExplorer() {
                 // uses for exactly this (scaffolds.md new-site recipe).
                 padding={4}
                 variant="transparent"
-                style={{...scrollable, ...detailColumn}}
+                style={{overflowY: 'auto', flexGrow: 1, flexShrink: 0}}
                 role="region"
                 aria-label={`Details for ${selectedFile.name}`}
                 tabIndex={0}>

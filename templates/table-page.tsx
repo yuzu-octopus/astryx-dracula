@@ -315,37 +315,10 @@ const allFamiliars: FamiliarRow[] = [
   },
 ];
 
-const kindValues = [
-  {value: 'Vampire Bat', label: 'Vampire Bat'},
-  {value: 'Black Cat', label: 'Black Cat'},
-  {value: 'Hellhound', label: 'Hellhound'},
-  {value: 'Raven', label: 'Raven'},
-  {value: 'Bloodhound', label: 'Bloodhound'},
-  {value: 'Imp', label: 'Imp'},
-  {value: 'Wisp', label: 'Wisp'},
-  {value: 'Iron Boar', label: 'Iron Boar'},
-  {value: 'Mist Ferret', label: 'Mist Ferret'},
-  {value: 'Obsidian Panther', label: 'Obsidian Panther'},
-  {value: 'Thorn Hedgehog', label: 'Thorn Hedgehog'},
-  {value: 'Gargoyle', label: 'Gargoyle'},
-  {value: 'Swamp Rat', label: 'Swamp Rat'},
-  {value: 'Moon Moth', label: 'Moon Moth'},
-  {value: 'Direwolf', label: 'Direwolf'},
-  {value: 'Coffin Beetle', label: 'Coffin Beetle'},
-  {value: 'Nightmare Mare', label: 'Nightmare Mare'},
-  {value: 'Frost Lynx', label: 'Frost Lynx'},
-  {value: 'Ember Salamander', label: 'Ember Salamander'},
-  {value: 'Grave Toad', label: 'Grave Toad'},
-  {value: 'Shadow Fox', label: 'Shadow Fox'},
-  {value: 'Night Owl', label: 'Night Owl'},
-  {value: 'Sable Marten', label: 'Sable Marten'},
-  {value: 'Cave Eel', label: 'Cave Eel'},
-  {value: 'Albino Crocodile', label: 'Albino Crocodile'},
-  {value: 'Crypt Spider', label: 'Crypt Spider'},
-  {value: 'Carrion Crow', label: 'Carrion Crow'},
-  {value: 'Bone Vulture', label: 'Bone Vulture'},
-  {value: 'Albino Python', label: 'Albino Python'},
-];
+const kindValues = Array.from(new Set(allFamiliars.map(f => f.kind)), kind => ({
+  value: kind,
+  label: kind,
+}));
 
 const fieldDefs = [
   {key: 'name', type: 'string', label: 'Name'},

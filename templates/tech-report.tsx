@@ -5,7 +5,7 @@
 /**
  * Technical report — a chaptered walkthrough of the DeepSeek-V4.1-Flash technical report, from the KV cache bottleneck through architecture, i (Frame/responsive/container: see XLE header above.)
  */
-
+import type {ReactNode} from 'react';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Link} from '@astryxdesign/core/Link';
 import {Text} from '@astryxdesign/core/Text';
@@ -696,14 +696,15 @@ const FOOTPRINT_BARS = [
   },
 ];
 
-const FOOTPRINT_BASELINE = 176;
+// One axis height for every bar scene: footprint, FP4 and eval all read 176.
+const CHART_BASELINE = 176;
 
 function FootprintScene({alt}: {alt: string}) {
   return (
     <SceneFrame label={alt}>
       {/* Axis line, not text: comment clears the 3:1 graphical floor here. */}
       <path
-        d={`M40 ${FOOTPRINT_BASELINE} H360`}
+        d={`M40 ${CHART_BASELINE} H360`}
         stroke="var(--dracula-comment)"
         strokeOpacity={0.4}
       />
@@ -711,7 +712,7 @@ function FootprintScene({alt}: {alt: string}) {
         <g key={bar.name}>
           <rect
             x={bar.x}
-            y={FOOTPRINT_BASELINE - bar.height}
+            y={CHART_BASELINE - bar.height}
             width="44"
             height={bar.height}
             rx="2"
@@ -724,7 +725,7 @@ function FootprintScene({alt}: {alt: string}) {
               the 4.5:1 text floor. */}
           <text
             x={bar.x + 22}
-            y={FOOTPRINT_BASELINE - bar.height - 9}
+            y={CHART_BASELINE - bar.height - 9}
             fontFamily="var(--font-family-mono)"
             fontSize="11"
             textAnchor="middle"
@@ -743,7 +744,7 @@ function FootprintScene({alt}: {alt: string}) {
         fill="var(--color-text-paragraph)"
         textAnchor="middle">
         {FOOTPRINT_BARS.map(bar => (
-          <text key={bar.name} x={bar.x + 22} y={FOOTPRINT_BASELINE + 16}>
+          <text key={bar.name} x={bar.x + 22} y={CHART_BASELINE + 16}>
             {bar.name}
           </text>
         ))}
@@ -1255,13 +1256,13 @@ const FP4_BARS = [
   },
 ];
 
-const FP4_BASELINE = 176;
+// (shares CHART_BASELINE above: the 2:1 scale sits on the same axis height)
 
 function Fp4Scene({alt}: {alt: string}) {
   return (
     <SceneFrame label={alt}>
       <path
-        d={`M40 ${FP4_BASELINE} H360`}
+        d={`M40 ${CHART_BASELINE} H360`}
         stroke="var(--dracula-comment)"
         strokeOpacity={0.4}
       />
@@ -1269,7 +1270,7 @@ function Fp4Scene({alt}: {alt: string}) {
         <g key={bar.name}>
           <rect
             x={bar.x}
-            y={FP4_BASELINE - bar.height}
+            y={CHART_BASELINE - bar.height}
             width="44"
             height={bar.height}
             rx="2"
@@ -1278,7 +1279,7 @@ function Fp4Scene({alt}: {alt: string}) {
           />
           <text
             x={bar.x + 22}
-            y={FP4_BASELINE - bar.height - 9}
+            y={CHART_BASELINE - bar.height - 9}
             fontFamily="var(--font-family-mono)"
             fontSize="11"
             textAnchor="middle"
@@ -1294,7 +1295,7 @@ function Fp4Scene({alt}: {alt: string}) {
         fill="var(--dracula-comment)"
         textAnchor="middle">
         {FP4_BARS.map(bar => (
-          <text key={bar.name} x={bar.x + 22} y={FP4_BASELINE + 16}>
+          <text key={bar.name} x={bar.x + 22} y={CHART_BASELINE + 16}>
             {bar.name}
           </text>
         ))}
@@ -1343,13 +1344,13 @@ const EVAL_BARS = [
   },
 ];
 
-const EVAL_BASELINE = 176;
+// (shares CHART_BASELINE above: the linear 0-80 scale sits on the same axis height)
 
 function EvalScene({alt}: {alt: string}) {
   return (
     <SceneFrame label={alt}>
       <path
-        d={`M40 ${EVAL_BASELINE} H360`}
+        d={`M40 ${CHART_BASELINE} H360`}
         stroke="var(--dracula-comment)"
         strokeOpacity={0.4}
       />
@@ -1357,7 +1358,7 @@ function EvalScene({alt}: {alt: string}) {
         <g key={bar.name}>
           <rect
             x={bar.x}
-            y={EVAL_BASELINE - bar.height}
+            y={CHART_BASELINE - bar.height}
             width="48"
             height={bar.height}
             rx="2"
@@ -1366,7 +1367,7 @@ function EvalScene({alt}: {alt: string}) {
           />
           <text
             x={bar.x + 24 + (bar.labelDx ?? 0)}
-            y={EVAL_BASELINE - bar.height - 9 + (bar.labelDy ?? 0)}
+            y={CHART_BASELINE - bar.height - 9 + (bar.labelDy ?? 0)}
             fontFamily="var(--font-family-mono)"
             fontSize="11"
             textAnchor="middle"
@@ -1382,7 +1383,7 @@ function EvalScene({alt}: {alt: string}) {
         fill="var(--dracula-comment)"
         textAnchor="middle">
         {EVAL_BARS.map(bar => (
-          <text key={bar.name} x={bar.x + 24} y={EVAL_BASELINE + 16}>
+          <text key={bar.name} x={bar.x + 24} y={CHART_BASELINE + 16}>
             {bar.name}
           </text>
         ))}
@@ -1399,64 +1400,49 @@ function EvalScene({alt}: {alt: string}) {
   );
 }
 
+type TechReportScene = {node: (alt: string) => ReactNode; alt: string};
+
+const TECH_REPORT_SCENES: Record<string, TechReportScene> = {
+  abstract: {
+    node: alt => <FootprintScene alt={alt} />,
+    alt: 'Bars on a log scale showing the global KV cache per token falling from 437 times the DeepSeek-V4.1-Flash footprint at DeepSeek-V1, to 4 times at V4-Flash, to 890 bytes per token at V4.1-Flash',
+  },
+  'at-a-glance': {
+    node: alt => <ArchitectureScene alt={alt} />,
+    alt: 'One tick per layer across the 40-layer backbone: two sliding-window-only layers, an 18-layer CSA2 encoder, and a 20-layer decoder, with global KV projected across the boundary from the last encoder layer',
+  },
+  csa2: {
+    node: alt => <IndexerScene alt={alt} />,
+    alt: 'A grid of block rows in the shared candidate pool, with the blocks kept by their top score highlighted and a few positions inside them marked as the Top-512 selection',
+  },
+  mhc: {
+    node: alt => <MhcShiftScene alt={alt} />,
+    alt: 'Two bars comparing residual memory traffic per block at expansion factor 4: twenty units of hidden size for the original three-kernel path against ten for Single-Pass mHC, annotated with the one-block coefficient shift',
+  },
+  auxiliary: {
+    node: alt => <Fp4Scene alt={alt} />,
+    alt: 'Two bars showing main KV storage per value halving from FP8 to four-bit FP4, annotated with a format ceiling of 2688 against the largest magnitude seen in training, about 10',
+  },
+  inference: {
+    node: alt => <FlopsScene alt={alt} />,
+    alt: 'Line chart of single-token decode FLOPs against context length: the DeepSeek-V4.1-Flash curve stays almost flat from 4K to 1M tokens while the DeepSeek-V4-Flash curve rises steeply',
+  },
+  'swa-replay': {
+    node: alt => <ReplayScene alt={alt} />,
+    alt: 'A prompt strip split into cached prefix, the replayed window, and the uncached suffix, above two replay-work bars showing a full layer stack against a single window',
+  },
+  conclusion: {
+    node: alt => <EvalScene alt={alt} />,
+    alt: 'Bars comparing DeepSWE resolved rates: 54.4 percent for DeepSeek-V4-Flash, 74.2 for DeepSeek-V4.1-Flash, 74.0 for Opus-5',
+  },
+};
+
 function ChapterArt({chapterId}: {chapterId: string}) {
-  if (chapterId === 'abstract') {
-    return (
-      <ChapterArtFrame>
-        <FootprintScene alt="Bars on a log scale showing the global KV cache per token falling from 437 times the DeepSeek-V4.1-Flash footprint at DeepSeek-V1, to 4 times at V4-Flash, to 890 bytes per token at V4.1-Flash" />
-      </ChapterArtFrame>
-    );
+  const scene = TECH_REPORT_SCENES[chapterId];
+  if (scene == null) {
+    return null;
   }
-  if (chapterId === 'at-a-glance') {
-    return (
-      <ChapterArtFrame>
-        <ArchitectureScene alt="One tick per layer across the 40-layer backbone: two sliding-window-only layers, an 18-layer CSA2 encoder, and a 20-layer decoder, with global KV projected across the boundary from the last encoder layer" />
-      </ChapterArtFrame>
-    );
-  }
-  if (chapterId === 'csa2') {
-    return (
-      <ChapterArtFrame>
-        <IndexerScene alt="A grid of block rows in the shared candidate pool, with the blocks kept by their top score highlighted and a few positions inside them marked as the Top-512 selection" />
-      </ChapterArtFrame>
-    );
-  }
-  if (chapterId === 'mhc') {
-    return (
-      <ChapterArtFrame>
-        <MhcShiftScene alt="Two bars comparing residual memory traffic per block at expansion factor 4: twenty units of hidden size for the original three-kernel path against ten for Single-Pass mHC, annotated with the one-block coefficient shift" />
-      </ChapterArtFrame>
-    );
-  }
-  if (chapterId === 'auxiliary') {
-    return (
-      <ChapterArtFrame>
-        <Fp4Scene alt="Two bars showing main KV storage per value halving from FP8 to four-bit FP4, annotated with a format ceiling of 2688 against the largest magnitude seen in training, about 10" />
-      </ChapterArtFrame>
-    );
-  }
-  if (chapterId === 'inference') {
-    return (
-      <ChapterArtFrame>
-        <FlopsScene alt="Line chart of single-token decode FLOPs against context length: the DeepSeek-V4.1-Flash curve stays almost flat from 4K to 1M tokens while the DeepSeek-V4-Flash curve rises steeply" />
-      </ChapterArtFrame>
-    );
-  }
-  if (chapterId === 'swa-replay') {
-    return (
-      <ChapterArtFrame>
-        <ReplayScene alt="A prompt strip split into cached prefix, the replayed window, and the uncached suffix, above two replay-work bars showing a full layer stack against a single window" />
-      </ChapterArtFrame>
-    );
-  }
-  if (chapterId === 'conclusion') {
-    return (
-      <ChapterArtFrame>
-        <EvalScene alt="Bars comparing DeepSWE resolved rates: 54.4 percent for DeepSeek-V4-Flash, 74.2 for DeepSeek-V4.1-Flash, 74.0 for Opus-5" />
-      </ChapterArtFrame>
-    );
-  }
-  return null;
+  return <ChapterArtFrame>{scene.node(scene.alt)}</ChapterArtFrame>;
 }
 
 export default function TechReport() {

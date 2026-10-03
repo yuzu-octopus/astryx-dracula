@@ -6,7 +6,7 @@
  * Table Grouped — the night-shift issue tracker: a grouped, collapsible issue table with a PowerSearch bar and a resizable detail inspector. (Frame/responsive/container: see XLE header above.)
  */
 
-import React, {useRef, useState, useMemo} from 'react';
+import React, {useState, useMemo} from 'react';
 import {useResizable, ResizeHandle} from '@astryxdesign/core/Resizable';
 import type {ResizableProps} from '@astryxdesign/core/Resizable';
 import {
@@ -71,37 +71,6 @@ const groupHeaderCell: React.CSSProperties = {
   padding: 'var(--spacing-3) var(--spacing-4)',
 };
 
-// Chrome above the scroller, never an overlay on it: the Actions menu is the
-// last column inside the overflow, and a sticky element covering row controls
-// is a defect (SKILL.md, responsive rules).
-const scrollCueBar: React.CSSProperties = {
-  padding: 'var(--spacing-2) var(--spacing-4)',
-};
-
-// Whether the table currently overflows its scroller. Measured rather than
-// derived from a breakpoint: the pane narrows both on window resize and when
-// the (resizable) inspector opens, and the scroller is core's own, so a media
-// query would disagree with what the reader actually sees. This is the
-// scroller's own overflow test, so the hint can never contradict the scroll.
-function useTableOverflows(paneRef: React.RefObject<HTMLDivElement | null>) {
-  const [overflows, setOverflows] = useState(false);
-  React.useLayoutEffect(() => {
-    // The <table>'s parent is the scroll container core renders around it.
-    const scroller = paneRef.current?.querySelector('table')?.parentElement;
-    if (!scroller) {
-      return;
-    }
-    const measure = () => {
-      setOverflows(scroller.scrollWidth > scroller.clientWidth + 1);
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(scroller);
-    return () => observer.disconnect();
-  }, [paneRef]);
-  return overflows;
-}
-
 // Types
 type TaskStatus = 'in_progress' | 'todo' | 'backlog' | 'done';
 type TaskPriority = 'urgent' | 'high' | 'medium' | 'low' | 'none';
@@ -116,9 +85,7 @@ interface TaskRow extends Record<string, unknown> {
   project: string;
   tags: string[];
   created: string;
-  createdISO: string;
   updated: string;
-  updatedISO: string;
   assignee: string;
 }
 
@@ -155,9 +122,7 @@ const allTasks: TaskRow[] = [
     project: 'Castle gate integration 2.0',
     tags: [],
     created: 'Jul 3',
-    createdISO: '2025-07-03',
     updated: 'Jul 3',
-    updatedISO: '2025-07-03',
     assignee: 'Olivia Martin',
   },
   {
@@ -170,9 +135,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 1',
-    createdISO: '2025-07-01',
     updated: 'Jul 3',
-    updatedISO: '2025-07-03',
     assignee: 'Jackson Lee',
   },
   {
@@ -185,9 +148,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 1',
-    createdISO: '2025-07-01',
     updated: 'Jul 3',
-    updatedISO: '2025-07-03',
     assignee: 'Isabella Nguyen',
   },
   {
@@ -200,9 +161,7 @@ const allTasks: TaskRow[] = [
     project: 'Castle gate integration 2.0',
     tags: [],
     created: 'Jul 3',
-    createdISO: '2025-07-03',
     updated: 'Jul 3',
-    updatedISO: '2025-07-03',
     assignee: 'William Kim',
   },
   {
@@ -215,9 +174,7 @@ const allTasks: TaskRow[] = [
     project: 'Castle gate integration 2.0',
     tags: [],
     created: 'Jul 3',
-    createdISO: '2025-07-03',
     updated: 'Jul 3',
-    updatedISO: '2025-07-03',
     assignee: 'Sofia Davis',
   },
   {
@@ -230,9 +187,7 @@ const allTasks: TaskRow[] = [
     project: 'Castle gate integration 2.0',
     tags: [],
     created: 'Jul 3',
-    createdISO: '2025-07-03',
     updated: 'Jul 3',
-    updatedISO: '2025-07-03',
     assignee: 'Mia Wilson',
   },
   {
@@ -245,9 +200,7 @@ const allTasks: TaskRow[] = [
     project: 'Castle gate integration 2.0',
     tags: ['Improvement', '3rd Party'],
     created: 'Jul 3',
-    createdISO: '2025-07-03',
     updated: 'Jul 3',
-    updatedISO: '2025-07-03',
     assignee: 'Lucas Brown',
   },
   {
@@ -260,9 +213,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 3',
-    createdISO: '2025-07-03',
     updated: 'Jul 3',
-    updatedISO: '2025-07-03',
     assignee: 'Ethan Jones',
   },
   {
@@ -275,9 +226,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 1',
-    createdISO: '2025-07-01',
     updated: 'Jul 1',
-    updatedISO: '2025-07-01',
     assignee: 'Ava Taylor',
   },
   {
@@ -290,9 +239,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 1',
-    createdISO: '2025-07-01',
     updated: 'Jul 3',
-    updatedISO: '2025-07-03',
     assignee: 'Noah Garcia',
   },
   {
@@ -305,9 +252,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 1',
-    createdISO: '2025-07-01',
     updated: 'Jul 3',
-    updatedISO: '2025-07-03',
     assignee: 'Olivia Martin',
   },
   {
@@ -320,9 +265,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 1',
-    createdISO: '2025-07-01',
     updated: 'Jul 3',
-    updatedISO: '2025-07-03',
     assignee: 'Jackson Lee',
   },
   {
@@ -335,9 +278,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 1',
-    createdISO: '2025-07-01',
     updated: 'Jul 3',
-    updatedISO: '2025-07-03',
     assignee: 'Isabella Nguyen',
   },
   {
@@ -350,9 +291,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 1',
-    createdISO: '2025-07-01',
     updated: 'Jul 3',
-    updatedISO: '2025-07-03',
     assignee: 'William Kim',
   },
   {
@@ -365,9 +304,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 1',
-    createdISO: '2025-07-01',
     updated: 'Jul 3',
-    updatedISO: '2025-07-03',
     assignee: 'Sofia Davis',
   },
   {
@@ -380,9 +317,7 @@ const allTasks: TaskRow[] = [
     project: 'Castle gate integration 2.0',
     tags: [],
     created: 'Jul 4',
-    createdISO: '2025-07-04',
     updated: 'Jul 5',
-    updatedISO: '2025-07-05',
     assignee: 'Lucas Brown',
   },
   {
@@ -395,9 +330,7 @@ const allTasks: TaskRow[] = [
     project: 'Castle gate integration 2.0',
     tags: [],
     created: 'Jul 4',
-    createdISO: '2025-07-04',
     updated: 'Jul 5',
-    updatedISO: '2025-07-05',
     assignee: 'Ethan Jones',
   },
   {
@@ -410,9 +343,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 2',
-    createdISO: '2025-07-02',
     updated: 'Jul 5',
-    updatedISO: '2025-07-05',
     assignee: 'Ava Taylor',
   },
   {
@@ -425,9 +356,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 5',
-    createdISO: '2025-07-05',
     updated: 'Jul 5',
-    updatedISO: '2025-07-05',
     assignee: 'Noah Garcia',
   },
   {
@@ -440,9 +369,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 4',
-    createdISO: '2025-07-04',
     updated: 'Jul 5',
-    updatedISO: '2025-07-05',
     assignee: 'Olivia Martin',
   },
   {
@@ -455,9 +382,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 3',
-    createdISO: '2025-07-03',
     updated: 'Jul 4',
-    updatedISO: '2025-07-04',
     assignee: 'Mia Wilson',
   },
   {
@@ -470,9 +395,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 5',
-    createdISO: '2025-07-05',
     updated: 'Jul 5',
-    updatedISO: '2025-07-05',
     assignee: 'Jackson Lee',
   },
   {
@@ -485,9 +408,7 @@ const allTasks: TaskRow[] = [
     project: 'Castle gate integration 2.0',
     tags: [],
     created: 'Jul 4',
-    createdISO: '2025-07-04',
     updated: 'Jul 5',
-    updatedISO: '2025-07-05',
     assignee: 'William Kim',
   },
   {
@@ -500,9 +421,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 2',
-    createdISO: '2025-07-02',
     updated: 'Jul 3',
-    updatedISO: '2025-07-03',
     assignee: 'Sofia Davis',
   },
   {
@@ -515,9 +434,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 1',
-    createdISO: '2025-07-01',
     updated: 'Jul 2',
-    updatedISO: '2025-07-02',
     assignee: 'Isabella Nguyen',
   },
   {
@@ -530,9 +447,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 3',
-    createdISO: '2025-07-03',
     updated: 'Jul 4',
-    updatedISO: '2025-07-04',
     assignee: 'Ethan Jones',
   },
   {
@@ -545,9 +460,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jul 2',
-    createdISO: '2025-07-02',
     updated: 'Jul 3',
-    updatedISO: '2025-07-03',
     assignee: 'Ava Taylor',
   },
   {
@@ -560,9 +473,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jun 28',
-    createdISO: '2025-06-28',
     updated: 'Jul 3',
-    updatedISO: '2025-07-03',
     assignee: 'Noah Garcia',
   },
   {
@@ -575,9 +486,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jun 25',
-    createdISO: '2025-06-25',
     updated: 'Jul 1',
-    updatedISO: '2025-07-01',
     assignee: 'Lucas Brown',
   },
   {
@@ -590,9 +499,7 @@ const allTasks: TaskRow[] = [
     project: '',
     tags: [],
     created: 'Jun 30',
-    createdISO: '2025-06-30',
     updated: 'Jul 2',
-    updatedISO: '2025-07-02',
     assignee: 'Mia Wilson',
   },
 ];
@@ -603,8 +510,6 @@ const STATUS_LABEL: Record<TaskStatus, string> = {
   backlog: 'Backlog',
   done: 'Done',
 };
-
-const GROUP_ORDER: TaskStatus[] = ['in_progress', 'todo', 'backlog', 'done'];
 
 type GroupByField = 'status' | 'priority' | 'project' | 'assignee' | 'none';
 
@@ -641,14 +546,10 @@ function getGroupLabel(groupBy: GroupByField, key: string): string {
     return STATUS_LABEL[key as TaskStatus] ?? key;
   }
   if (groupBy === 'priority') {
-    const labels: Record<string, string> = {
-      urgent: 'Urgent',
-      high: 'High',
-      medium: 'Medium',
-      low: 'Low',
-      none: 'No priority',
-    };
-    return labels[key] ?? key;
+    // Group headers say "No priority" for the unprioritized bucket while the
+    // inspector keeps the "None" filter vocabulary — same key, different
+    // surface, so the shared label map is overridden only here.
+    return {...PRIORITY_LABEL, none: 'No priority'}[key as TaskPriority] ?? key;
   }
   return key;
 }
@@ -663,9 +564,9 @@ function getGroupLabel(groupBy: GroupByField, key: string): string {
 // real value in the column plus the 24px of balanced-density cell padding, so
 // no value in the data is ever narrower than its own content.
 // The consequence is an honest min-width of 1014px, which is why the table
-// scrolls in its own container below that and why the cue below it exists:
-// at 390 the status and the Issue column both land on screen, and the
-// remaining columns are one swipe away.
+// scrolls in the scroller core renders around it: at 390 the status and the
+// Issue column both land on screen, and the remaining columns are one swipe
+// away.
 const columns: TableColumn<TaskRow>[] = [
   {
     key: 'status',
@@ -875,7 +776,7 @@ export default function TableGrouped() {
   );
   const [groupBy, setGroupBy] = useState<GroupByField>('status');
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(
-    () => new Set(GROUP_ORDER as string[]),
+    () => new Set(['in_progress', 'todo', 'backlog', 'done']),
   );
 
   // Responsive contract (see file header): below 1024px the inspector would
@@ -917,12 +818,7 @@ export default function TableGrouped() {
     maxSize: 500,
   });
 
-  const COL_COUNT = columns.length;
   const resolvedWidths = resolveColumnWidths(columns);
-
-  // The pane the table scrolls inside, and whether it currently needs to.
-  const paneRef = useRef<HTMLDivElement | null>(null);
-  const tableOverflows = useTableOverflows(paneRef);
 
   return (
     <>
@@ -986,22 +882,7 @@ export default function TableGrouped() {
           </LayoutHeader>
         }
         content={
-          <LayoutContent role="main" padding={0} ref={paneRef}>
-            {/* The visible cue for the scroller core already owns: the table
-                carries a real min-width, so below it the columns past Issue
-                live off-screen. Appears only while that is true — measured,
-                not assumed — so it is never a stale promise at 1440. */}
-            {tableOverflows && (
-              <>
-                <HStack gap={2} vAlign="center" style={scrollCueBar}>
-                  <Icon icon={ChevronRight} size="sm" color="secondary" />
-                  <Text type="supporting" color="secondary">
-                    Scroll the table sideways to see every column
-                  </Text>
-                </HStack>
-                <Divider />
-              </>
-            )}
+          <LayoutContent role="main" padding={0}>
             <Table
               columns={columns}
               density="balanced"
@@ -1049,7 +930,7 @@ export default function TableGrouped() {
                             toggleGroup(key);
                           }
                         }}>
-                        <TableCell colSpan={COL_COUNT} style={groupHeaderCell}>
+                        <TableCell colSpan={columns.length} style={groupHeaderCell}>
                           <HStack gap={2} vAlign="center">
                             <Icon
                               icon={
@@ -1167,37 +1048,13 @@ export default function TableGrouped() {
                               }}
                               hasChevron={false}
                               items={[
-                                {
-                                  label: 'Edit issue',
-                                  icon: Pencil,
-                                  onClick: () => {},
-                                },
-                                {
-                                  label: 'Assign to...',
-                                  icon: User,
-                                  onClick: () => {},
-                                },
-                                {
-                                  label: 'Add label',
-                                  icon: Tag,
-                                  onClick: () => {},
-                                },
-                                {
-                                  label: 'Duplicate',
-                                  icon: Copy,
-                                  onClick: () => {},
-                                },
-                                {
-                                  label: 'Move to project',
-                                  icon: ArrowRight,
-                                  onClick: () => {},
-                                },
+                                {label: 'Edit issue', icon: Pencil},
+                                {label: 'Assign to...', icon: User},
+                                {label: 'Add label', icon: Tag},
+                                {label: 'Duplicate', icon: Copy},
+                                {label: 'Move to project', icon: ArrowRight},
                                 {type: 'divider' as const},
-                                {
-                                  label: 'Delete issue',
-                                  icon: Trash,
-                                  onClick: () => {},
-                                },
+                                {label: 'Delete issue', icon: Trash},
                               ]}
                             />
                           </TableCell>
@@ -1243,7 +1100,6 @@ export default function TableGrouped() {
                   label="Title"
                   placeholder="Issue title"
                   value=""
-                  onChange={() => {}}
                 />
                 <Selector
                   label="Status"
@@ -1253,7 +1109,6 @@ export default function TableGrouped() {
                     {value: 'todo', label: 'Todo'},
                     {value: 'backlog', label: 'Backlog'},
                   ]}
-                  onChange={() => {}}
                 />
                 <Selector
                   label="Priority"
@@ -1265,13 +1120,11 @@ export default function TableGrouped() {
                     {value: 'low', label: 'Low'},
                     {value: 'none', label: 'No priority'},
                   ]}
-                  onChange={() => {}}
                 />
                 <TextInput
                   label="Project"
                   placeholder="Project name"
                   value=""
-                  onChange={() => {}}
                 />
               </VStack>
             </LayoutContent>

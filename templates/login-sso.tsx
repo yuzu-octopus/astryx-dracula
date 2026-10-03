@@ -5,7 +5,8 @@
 //   Step-conditional h1: the email and SSO-confirm steps each render their own
 //   h1 (email entry vs provider confirm); the password fallback reuses the
 //   family heading, so exactly one h1 shows per step.
-import {useState, useTransition, type CSSProperties} from 'react';
+import {useState, useTransition} from 'react';
+import {authPageStyle as pageStyle, inputAutoComplete} from 'astryx-dracula/shared/auth-chrome-config';
 import {demoLogin} from 'astryx-dracula/shared/login-demo';
 import {
   AUTH_HEADING,
@@ -25,7 +26,6 @@ import {Text, Heading} from '@astryxdesign/core/Text';
 import {TextInput} from '@astryxdesign/core/TextInput';
 import {Button} from '@astryxdesign/core/Button';
 import {Card} from '@astryxdesign/core/Card';
-import {Section} from '@astryxdesign/core/Section';
 import {Link} from '@astryxdesign/core/Link';
 import {Divider} from '@astryxdesign/core/Divider';
 import {Icon} from '@astryxdesign/core/Icon';
@@ -34,18 +34,6 @@ import {Avatar} from '@astryxdesign/core/Avatar';
 // ============= ICONS (verified lucide-react exports) =============
 // ShieldCheck ← ShieldCheckIcon.
 import {ShieldCheck} from 'lucide-react';
-import {inputAutoComplete} from 'astryx-dracula/shared/auth-chrome-config';
-
-// ---------------------------------------------------------------------------
-// Styles
-// ---------------------------------------------------------------------------
-
-// Standalone auth page paints its own body background (no host shell).
-const pageStyle: CSSProperties = {
-  minHeight: '100%',
-  backgroundColor: 'var(--color-background-body)',
-  padding: 'var(--spacing-6)',
-};
 
 type SSOProvider = {
   name: string;
@@ -208,25 +196,16 @@ export default function LoginSso() {
                 </Text>
               </VStack>
 
-              {/* The gutter lives on the Card, not the Section. A Section
-                  escapes its container's --container-padding-* (Section.tsx:
-                  56-71), but with Card padding={0} that published var is
-                  --spacing-0, so the escape cancelled nothing and the muted
-                  fill painted flush to the card border. 3 + 1 keeps the text
-                  inset at the 16px it already had while giving the fill a
-                  real one. */}
-              <Card padding={3}>
-                <Section variant="muted" padding={1}>
-                  <HStack gap={2} vAlign="center">
-                    <Icon icon={ShieldCheck} color="secondary" />
-                    <VStack gap={0}>
-                      <Text type="label">{provider.name}</Text>
-                      <Text type="supporting" color="secondary">
-                        {email}
-                      </Text>
-                    </VStack>
-                  </HStack>
-                </Section>
+              <Card padding={4} variant="muted">
+                <HStack gap={2} vAlign="center">
+                  <Icon icon={ShieldCheck} color="secondary" />
+                  <VStack gap={0}>
+                    <Text type="label">{provider.name}</Text>
+                    <Text type="supporting" color="secondary">
+                      {email}
+                    </Text>
+                  </VStack>
+                </HStack>
               </Card>
 
               <VStack gap={3}>

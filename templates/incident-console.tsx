@@ -269,17 +269,16 @@ const INCIDENTS: Incident[] = [
 
 const STATUS_ORDER: Status[] = ['investigating', 'mitigated', 'resolved'];
 
-const STATUS_LABEL: Record<Status, string> = {
-  investigating: 'Investigating',
-  mitigated: 'Mitigated',
-  resolved: 'Resolved',
-};
-
-const STATUS_TOKEN_COLOR: Record<Status, 'cyan' | 'yellow' | 'green'> = {
-  // Info vocab: an open investigation pulses cyan, never red.
-  investigating: 'cyan',
-  mitigated: 'yellow',
-  resolved: 'green',
+// One union: label for group headings + row tokens, color for row tokens.
+// SEVERITY_DOT stays separate — it keys on severity (sev1/2/3), a different
+// axis than status, so merging would conflate two domains in one map.
+const STATUS: Record<
+  Status,
+  {label: string; tokenColor: 'cyan' | 'yellow' | 'green'}
+> = {
+  investigating: {label: 'Investigating', tokenColor: 'cyan'},
+  mitigated: {label: 'Mitigated', tokenColor: 'yellow'},
+  resolved: {label: 'Resolved', tokenColor: 'green'},
 };
 
 const SEVERITY_DOT: Record<Severity, 'error' | 'warning' | 'neutral'> = {
@@ -287,6 +286,30 @@ const SEVERITY_DOT: Record<Severity, 'error' | 'warning' | 'neutral'> = {
   sev2: 'warning',
   sev3: 'neutral',
 };
+
+// SEV badge shared by rows and the inspector: dot + uppercase word travel
+// together (a bare dot leaves SEV1/2/3 as hue alone; StatusDot's label is
+// aria-only on a role="img" span and paints nothing).
+function SeverityBadge({
+  severity,
+  isPulsing = false,
+}: {
+  severity: Severity;
+  isPulsing?: boolean;
+}) {
+  return (
+    <HStack gap={1} vAlign="center">
+      <StatusDot
+        variant={SEVERITY_DOT[severity]}
+        label={severity.toUpperCase()}
+        isPulsing={isPulsing}
+      />
+      <Text type="supporting" color="secondary">
+        {severity.toUpperCase()}
+      </Text>
+    </HStack>
+  );
+}
 
 const SERVICE_VALUES = [
   {value: 'checkout-api', label: 'checkout-api'},
@@ -350,7 +373,7 @@ function IncidentRows({
                 floor. The group heading is the string this sidebar is scanned
                 for. Hierarchy comes from the two type roles (principle 6),
                 not from dimming the count. */}
-            <Text type="label">{STATUS_LABEL[group.status]}</Text>
+            <Text type="label">{STATUS[group.status].label}</Text>
             <Text type="supporting" hasTabularNumbers>
               {group.items.length}
             </Text>
@@ -362,27 +385,17 @@ function IncidentRows({
                 label={incident.title}
                 description={`${incident.id} · ${incident.service} · ${incident.impact}`}
                 startContent={
-                  // StatusDot's label is aria-label on a role="img" span
-                  // (core StatusDot.js:107-120), so it reaches assistive tech
-                  // and paints nothing. A bare dot leaves SEV1/2/3 as hue
-                  // alone. Dot and word travel together, as at :751-757.
-                  <HStack gap={1} vAlign="center">
-                    <StatusDot
-                      variant={SEVERITY_DOT[incident.severity]}
-                      label={incident.severity.toUpperCase()}
-                      isPulsing={incident.status === 'investigating'}
-                    />
-                    <Text type="supporting" color="secondary">
-                      {incident.severity.toUpperCase()}
-                    </Text>
-                  </HStack>
+                  <SeverityBadge
+                    severity={incident.severity}
+                    isPulsing={incident.status === 'investigating'}
+                  />
                 }
                 endContent={
                   <HStack gap={3} vAlign="center">
                     <Token
                       size="sm"
-                      color={STATUS_TOKEN_COLOR[incident.status]}
-                      label={STATUS_LABEL[incident.status]}
+                      color={STATUS[incident.status].tokenColor}
+                      label={STATUS[incident.status].label}
                     />
                     <Timestamp
                       value={incident.startedAt}
@@ -414,27 +427,23 @@ function IncidentInspector({incident}: {incident: Incident}) {
     <VStack gap={4} style={styles.inspector}>
       <VStack gap={2}>
         <HStack gap={1} vAlign="center">
-          <StatusDot
-            variant={SEVERITY_DOT[incident.severity]}
-            label={incident.severity.toUpperCase()}
+          <SeverityBadge
+            severity={incident.severity}
             isPulsing={incident.status === 'investigating'}
           />
-          <Text type="supporting" color="secondary">
-            {incident.severity.toUpperCase()}
-          </Text>
           <Text type="supporting" color="secondary">
             {incident.id}
           </Text>
           <Token
             size="sm"
-            color={STATUS_TOKEN_COLOR[incident.status]}
-            label={STATUS_LABEL[incident.status]}
+            color={STATUS[incident.status].tokenColor}
+            label={STATUS[incident.status].label}
           />
         </HStack>
         <Heading level={2}>{incident.title}</Heading>
       </VStack>
 
-      <HStack gap={2}>
+      <HStack gap={2} wrap="wrap">
         <Button label={nextAction} variant="primary" />
         <Button label="Escalate" variant="secondary" />
       </HStack>
@@ -535,18 +544,11 @@ export default function IncidentConsole() {
   // phone, and the counter beside it then wraps too and detaches into the
   // corner. Stacking keeps the counter on the title's own line at any width
   // the title needs more than one, and costs nothing at desktop.
-  const titleGroup = isNarrow ? (
-    <VStack gap={1}>
+  const titleGroup = (
+    <HStack gap={2} vAlign="center" wrap="wrap">
       <Heading level={1} type="display-2">
         Night watch
       </Heading>
-      <Text type="supporting" color="secondary" hasTabularNumbers>
-        {openCount} investigating
-      </Text>
-    </VStack>
-  ) : (
-    <HStack gap={2} vAlign="center">
-      <Heading level={1} type="display-2">Night watch</Heading>
       <Text type="supporting" color="secondary" hasTabularNumbers>
         {openCount} investigating
       </Text>

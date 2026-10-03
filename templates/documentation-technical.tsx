@@ -1,12 +1,11 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
 // XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LC > V[g=8] > (V[g=2] > Hd"Getting started with Astryx Dracula"[level=1] + Tx"Last updated March 30, 2026"[t=supporting]) + (C > V[g=3] > (H[j=between] > (H[g=2] > Ic + Tx"AI Assistance"[t=body]) + (H > B"Copy prompt" + DM)) + Tx"Prompt description"[t=body]) + (V[g=4] > Hd"Prerequisites"[level=2] + UL) + D + (V[g=4] > Hd"Install the package"[level=2] + Tx"Description"[t=body] + (V[g=2] > Tx"Step"[t=body] + Cd)*3) + D + (V[g=4] > Hd"Configure theming"[level=2] + Tx"Description"[t=body] + Cd + Tx"Note"[t=body]) + D + (V[g=4] > Hd"Next steps"[level=2] + UL)) + (LP > Outline)
+//   L > (LC > V[g=8] > (V[g=2] > Hd"Getting started with Astryx Dracula"[level=1] + Tx"Last updated March 30, 2026"[t=supporting]) + (C > V[g=3] > (H[j=between] > (H[g=2] > Ic + Tx"AI Assistance"[t=body]) + B"Copy prompt") + Tx"Prompt description"[t=body]) + (V[g=4] > Hd"Prerequisites"[level=2] + UL) + D + (V[g=4] > Hd"Install the package"[level=2] + Tx"Description"[t=body] + (V[g=2] > Tx"Step"[t=body] + Cd)*3) + D + (V[g=4] > Hd"Configure theming"[level=2] + Tx"Description"[t=body] + Cd + Tx"Note"[t=body]) + D + (V[g=4] > Hd"Next steps"[level=2] + UL)) + (LP > Outline)
 
 import {useCallback, useState} from 'react';
 import {Heading, Text} from '@astryxdesign/core/Text';
 import {Button} from '@astryxdesign/core/Button';
 import {Card} from '@astryxdesign/core/Card';
-import {DropdownMenu} from '@astryxdesign/core/DropdownMenu';
 import {List, ListItem} from '@astryxdesign/core/List';
 import {CodeBlock} from '@astryxdesign/core/CodeBlock';
 import {Selector} from '@astryxdesign/core/Selector';
@@ -16,7 +15,7 @@ import {Divider} from '@astryxdesign/core/Divider';
 import {Icon} from '@astryxdesign/core/Icon';
 import {Outline, type OutlineItem} from '@astryxdesign/core/Outline';
 import {useMediaQuery} from '@astryxdesign/core/hooks';
-import {Sparkles, ClipboardCopy, ChevronDown} from 'lucide-react';
+import {Sparkles, ClipboardCopy} from 'lucide-react';
 import {outlinePanel} from 'astryx-dracula/shared/chaptered-doc-config';
 
 // ---------------------------------------------------------------------------
@@ -32,15 +31,6 @@ import {outlinePanel} from 'astryx-dracula/shared/chaptered-doc-config';
 const SETUP_PROMPT =
   'Help me get set up with Astryx Dracula. Based on my project, do the following: 1. Install @astryxdesign/core and the StyleX compiler. 2. Wrap my app in the Theme component. 3. Replace one existing component with an Astryx equivalent. After setup, suggest relevant next steps based on my project.';
 
-// Copies the setup prompt in the shape each tool wants to receive it. The
-// menu cannot navigate anywhere from a static template, so the action says
-// what it does.
-const PROMPT_TARGETS = ['v0', 'Claude', 'ChatGPT', 'Cursor'].map(target => ({
-  label: `Copy for ${target}`,
-  onClick: () => {
-    void navigator.clipboard.writeText(SETUP_PROMPT);
-  },
-}));
 
 const OUTLINE_ITEMS: OutlineItem[] = [
   {id: 'prerequisites', label: 'Prerequisites', level: 2},
@@ -123,16 +113,6 @@ export default function DocumentationTechnical() {
                     onClick={() => {
                       void navigator.clipboard.writeText(SETUP_PROMPT);
                     }}
-                  />
-                  <DropdownMenu
-                    button={{
-                      label: 'More options',
-                      variant: 'ghost',
-                      size: 'sm',
-                      isIconOnly: true,
-                      icon: <Icon icon={ChevronDown} />,
-                    }}
-                    items={PROMPT_TARGETS}
                   />
                 </HStack>
                 <Text type="body" color="secondary">

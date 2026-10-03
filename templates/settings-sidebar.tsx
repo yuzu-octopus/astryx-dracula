@@ -35,12 +35,10 @@ import {
   ShieldCheck,
   Wrench,
   Monitor,
-  SquarePen,
-  Share2,
   ArrowLeft,
   ChevronRight,
 } from 'lucide-react';
-import {NAV_ITEMS, LOGIN_ROWS, SOCIAL_ROWS, DEVICE_ROWS, INFO_TILES, iconBox, actionNoWrap, sideNavHeading} from 'astryx-dracula/shared/settings-data';
+import {NAV_ITEMS, LOGIN_ROWS, SOCIAL_ROWS, DEVICE_ROWS, INFO_TILES, LANGUAGES, CURRENCIES, TIMEZONES, iconBox, actionNoWrap, sideNavHeading} from 'astryx-dracula/shared/settings-data';
 import {InfoRowItem, ExpandableRow} from 'astryx-dracula/shared/settings-rows';
 import type {InfoRow} from 'astryx-dracula/shared/settings-data';
 
@@ -53,77 +51,48 @@ const fillViewport: CSSProperties = {
 const rowPadding: CSSProperties = {
   paddingBlock: 'var(--spacing-4)',
 };
-const sideNavPadding: CSSProperties = {
-  paddingBlock: 'var(--spacing-4)',
-  paddingInline: 'var(--spacing-3)',
-};
 
 // Same-route hash: demo links stay focusable anchors without escaping the
 // template through the hash router (bare "#" would drop back to the home page).
 const SELF_HASH = '#/templates/settings-sidebar';
 
-// Section title shown beside the mobile back button (matches each section's
-// in-content heading, which is hidden on mobile to avoid a duplicate).
-const SECTION_TITLES: Record<string, string> = {
-  'Personal information': 'Personal information',
-  'Login & security': 'Login & security',
-  Privacy: 'Privacy',
-  Notifications: 'Notifications',
-  Taxes: 'Taxes',
-  Payments: 'Payments',
-  'Languages & currency': 'Languages & currency',
-  'Travel for work': 'Travel for work',
-  'Professional hosting tools': 'Hosting tools',
-};
+// Title beside the mobile back button: the section's own heading, except the
+// long "Professional hosting tools" which shortens to "Hosting tools".
+const HOSTING_TOOLS_TITLE = 'Professional hosting tools';
 
-const TAX_ROWS: InfoRow[] = [
-  {label: 'Tax scrolls', value: 'Not provided', action: 'Add'},
-  {
-    label: 'Past scrolls',
-    value: 'No scrolls yet',
-    action: 'View',
-    actionKind: 'destination',
-    href: SELF_HASH,
-  },
-];
+// Both record sections pair a setup row ("Add") with a history row that
+// navigates to past records — one factory, not two copied arrays.
+function recordRows(
+  currentLabel: string,
+  currentValue: string,
+  pastLabel: string,
+  pastValue: string,
+): InfoRow[] {
+  return [
+    {label: currentLabel, value: currentValue, action: 'Add'},
+    {
+      label: pastLabel,
+      value: pastValue,
+      action: 'View',
+      actionKind: 'destination',
+      href: SELF_HASH,
+    },
+  ];
+}
 
-const PAYOUT_ROWS: InfoRow[] = [
-  {label: 'Payout crypt', value: 'Not set up', action: 'Add'},
-  {
-    label: 'Past payouts',
-    value: 'No tributes yet',
-    action: 'View',
-    actionKind: 'destination',
-    href: SELF_HASH,
-  },
-];
+const TAX_ROWS = recordRows(
+  'Tax scrolls',
+  'Not provided',
+  'Past scrolls',
+  'No scrolls yet',
+);
 
-
-const LANGUAGES = [
-  {label: 'English (Canada)', value: 'en-CA'},
-  {label: 'English (US)', value: 'en-US'},
-  {label: 'French', value: 'fr'},
-  {label: 'Spanish', value: 'es'},
-  {label: 'German', value: 'de'},
-  {label: 'Japanese', value: 'ja'},
-];
-
-const CURRENCIES = [
-  {label: 'Canadian dollar (CAD)', value: 'CAD'},
-  {label: 'US dollar (USD)', value: 'USD'},
-  {label: 'Euro (EUR)', value: 'EUR'},
-  {label: 'British pound (GBP)', value: 'GBP'},
-  {label: 'Japanese yen (JPY)', value: 'JPY'},
-];
-
-const TIMEZONES = [
-  {label: '(GMT-05:00) Eastern Time (US & Canada)', value: 'ET'},
-  {label: '(GMT-06:00) Central Time (US & Canada)', value: 'CT'},
-  {label: '(GMT-07:00) Mountain Time (US & Canada)', value: 'MT'},
-  {label: '(GMT-08:00) Pacific Time (US & Canada)', value: 'PT'},
-  {label: '(GMT+00:00) UTC', value: 'UTC'},
-  {label: '(GMT+01:00) London', value: 'GMT+1'},
-];
+const PAYOUT_ROWS = recordRows(
+  'Payout crypt',
+  'Not set up',
+  'Past payouts',
+  'No tributes yet',
+);
 
 export default function SettingsSidebar() {
   const isNarrow = useMediaQuery('(max-width: 768px)');
@@ -163,7 +132,7 @@ export default function SettingsSidebar() {
   };
 
   const navList = (
-    <VStack gap={4} style={sideNavPadding}>
+    <VStack gap={4} paddingBlock={4} paddingInline={3}>
       <Text type="label" style={sideNavHeading}>
         Account settings
       </Text>
@@ -200,10 +169,10 @@ export default function SettingsSidebar() {
         height="fill"
         style={fillViewport}
         // padding={0}, not padding={2}. This wraps the SAME navList element
-        // the desktop LayoutPanel renders with padding={0}, and sideNavPadding
-        // already supplies the list's 12px inline inset. The extra 8px here is
-        // what made the same nav list measure 20px on mobile against 12px on
-        // desktop -- and against 24px further down, so the two mobile states
+        // the desktop LayoutPanel renders with padding={0}, and the navList's
+        // own paddingBlock/paddingInline props supply the 16px/12px inset.
+        // The extra 8px here is what made the same nav list measure 20px on
+        // mobile against 12px on desktop -- and against 24px further down,
         // disagreed with each other too. The container owns no gutter; the
         // list owns its own.
         content={<LayoutContent padding={0}>{navList}</LayoutContent>}
@@ -232,7 +201,7 @@ export default function SettingsSidebar() {
                 flush with the content edge. */}
             {isNarrow && (
               <Toolbar
-                label={`Back to Account settings: ${SECTION_TITLES[activeNav]}`}
+                label={`Back to Account settings: ${activeNav === HOSTING_TOOLS_TITLE ? 'Hosting tools' : activeNav}`}
                 gap={2}
                 startContent={
                   <>
@@ -244,7 +213,7 @@ export default function SettingsSidebar() {
                       icon={<Icon icon={ArrowLeft} size="sm" />}
                       onClick={() => setMobileView('nav')}
                     />
-                    <Heading level={1}>{SECTION_TITLES[activeNav]}</Heading>
+                    <Heading level={1}>{activeNav === HOSTING_TOOLS_TITLE ? 'Hosting tools' : activeNav}</Heading>
                   </>
                 }
               />
@@ -295,8 +264,6 @@ export default function SettingsSidebar() {
                           <Icon icon={Monitor} />
                           <StackItem size="fill">
                             <VStack gap={1}>
-                              {/* wrap: the label plus the session status
-                                  exceed the content width on a phone. */}
                               <HStack gap={2} vAlign="center" wrap="wrap">
                                 <Text type="body" weight="semibold">
                                   {device.label}
