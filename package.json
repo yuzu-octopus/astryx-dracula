@@ -115,7 +115,7 @@
     "@astryxdesign/cli"
   ],
   "type": "module",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "patchedDependencies": {
     "@astryxdesign/core@0.6.3": "patches/@astryxdesign%2Fcore@0.6.3.patch"
   }
