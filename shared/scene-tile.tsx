@@ -22,11 +22,7 @@
 // site with the exact offending value named.
 
 import {galleryImage} from 'astryx-dracula/shared/gallery-image';
-import {
-  SCENE_HUES,
-  type SceneHue,
-  type SceneTileSize,
-} from 'astryx-dracula/shared/scene-hues';
+import type {SceneHue, SceneTileSize} from 'astryx-dracula/shared/scene-hues';
 
 
 interface SceneTileProps {
@@ -43,9 +39,6 @@ interface SceneTileProps {
   label: string;
   /** `lg` for grid thumbs, `sm` for the classic/side landscape tiles. */
   size?: SceneTileSize;
-  /** Star wash for the sm landscape. Decorative, and purple-free by the same
-   *  remit as `hue`, so it takes the same union. */
-  stars?: SceneHue;
   /** Positional seed so repeated sm tiles vary moon, hills, and star field.
    *  Ignored by the lg fork (one centered glyph, no variance). */
   index?: number;
@@ -56,7 +49,6 @@ export function SceneTile({
   hue,
   label,
   size = 'lg',
-  stars = 'var(--dracula-comment)',
   index = 0,
 }: SceneTileProps) {
   const moonX = 90 + ((index * 53) % 220);
@@ -73,8 +65,8 @@ export function SceneTile({
       <rect width="400" height="300" fill="var(--dracula-bg-light)" />
       {size === 'sm' && (
         <>
-          {/* Stars */}
-          <g fill={stars} opacity={0.55}>
+          {/* Stars: decorative wash, comment so purple stays reserved for tappables. */}
+          <g fill="var(--dracula-comment)" opacity={0.55}>
             <circle cx={40 + ((index * 37) % 320)} cy={30} r={2} />
             <circle cx={120 + ((index * 23) % 200)} cy={52} r={1.6} />
             <circle cx={260 + ((index * 11) % 110)} cy={26} r={2.2} />

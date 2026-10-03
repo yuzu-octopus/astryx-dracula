@@ -29,8 +29,6 @@ function useHash(): string {
 
 function Router() {
   const params = new URLSearchParams(window.location.search);
-  // Screenshot harness: `?shot=bento` keeps rendering the bento page.
-  const shot = params.get('shot');
   // `?bare=<id>` renders a template with no viewer chrome. The templates index
   // loads each page through this so the template gets a frame of its own.
   // Unknown and empty values render the index instead: a blank screen has no
@@ -45,19 +43,13 @@ function Router() {
     );
   }
   // The bento is a showcase page, so it gets the site chrome like every other
-  // one -- the nav is how a visitor finds the rest of the kit. `?shot=` renders
-  // it bare, because the harness wants the grid alone and chrome would only
-  // push it out of frame.
-  if (shot === 'bento' || hash === '#/bento') {
+  // one -- the nav is how a visitor finds the rest of the kit.
+  if (hash === '#/bento') {
     return (
       <Suspense fallback={null}>
-        {shot === 'bento' ? (
+        <SiteShell ctaHref="#/templates" isWide>
           <Bento />
-        ) : (
-          <SiteShell ctaHref="#/templates" isWide>
-            <Bento />
-          </SiteShell>
-        )}
+        </SiteShell>
       </Suspense>
     );
   }

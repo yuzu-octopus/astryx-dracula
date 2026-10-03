@@ -20,8 +20,3 @@ export const CHART_HUES = {
 } as const;
 
 export type ChartHue = (typeof CHART_HUES)[keyof typeof CHART_HUES];
-
-// The value list exists for the gate: it reads the object's VALUES, never a
-// grep across shared/. A text-level filter cannot separate the sanctioned rows
-// from a drifting neighbour, which is why the check is here and not in a lint.
-export const CHART_HUE_VALUES: readonly ChartHue[] = Object.values(CHART_HUES);
