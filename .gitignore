@@ -51,3 +51,6 @@ local/
 
 # Generated - fonts:sync rebuilds from fonts/
 public/fonts/
+
+# npm verification leftovers; this repo locks with bun
+package-lock.json

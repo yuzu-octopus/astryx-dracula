@@ -36,22 +36,15 @@ const NAV_LINKS = [
 // TopNav renders this list twice: inline in the bar above the breakpoint, and
 // stacked inside the drawer below it. Collapsing the drawer on click is a no-op
 // above the breakpoint, so both placements can share the same handler.
-// Top-bar links are standalone, not inline: they are destinations sitting
-// beside the wordmark, so they take the `lg` step (--font-size-lg, 17px — the
-// same step as a level-3 heading) rather than inheriting body 14. At 14px in
-// JetBrains Mono Regular the bar read as a row of small purple smudges next to
-// a semibold wordmark. Purple on the surface tier is 4.89:1, so AA holds at the
-// larger size — the size change costs no contrast.
+// Top-bar links match the CTA button at body 14. They previously took
+// `size="lg"` (17px) and out-shouted the wordmark, which is the wrong
+// hierarchy: the wordmark names the site, the links are destinations. `Link`
+// forwards `size` to a nested Text span, so the size is applied there — the
+// <a> wrapper still computes 14 and hides it.
 function SiteNavLinks({ isVertical }: { isVertical: boolean }) {
   const { closeMobileNav } = useAppShellMobile();
   const links = NAV_LINKS.map((link) => (
-    <Link
-      key={link.href}
-      href={link.href}
-      onClick={closeMobileNav}
-      isStandalone
-      size="lg"
-    >
+    <Link key={link.href} href={link.href} onClick={closeMobileNav}>
       {link.label}
     </Link>
   ));
@@ -110,14 +103,10 @@ export function SiteShell({
                     <Link
                       href="https://github.com/yuzu-octopus/astryx-dracula"
                       isExternalLink
-                      isStandalone
-                      size="lg"
                     >
                       GitHub
                     </Link>
-                    <Link href="./llms.txt" isStandalone size="lg">
-                      llms.txt
-                    </Link>
+                    <Link href="./llms.txt">llms.txt</Link>
                   </>
                 )}
                 <Button label="Use this theme" variant="primary" href={ctaHref} onClick={onCta} />
