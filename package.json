@@ -1,122 +1,122 @@
 {
-  "author": "Yuzu Octopus",
-  "bugs": {
-    "url": "https://github.com/yuzu-octopus/astryx-dracula/issues"
-  },
-  "dependencies": {
-    "lucide-react": "^1.45.0"
-  },
-  "description": "Pure Dracula brand theme for Astryx React sites. Dark-only tokens, syntax highlighting, and chart colors with prebuilt CSS.",
-  "devDependencies": {
-    "@astryxdesign/cli": "0.6.3",
-    "@astryxdesign/core": "0.6.3",
-    "@types/bun": "^1.4.2",
-    "@types/node": "^26.5.1",
-    "@types/react": "^19.3.0",
-    "@types/react-dom": "^19.3.0",
-    "@vitejs/plugin-react": "^6.1.1",
-    "typescript": "^7.0.2",
-    "vite": "^8.3.0"
-  },
-  "exports": {
-    "./shared/auth-chrome": "./shared/auth-chrome.tsx",
-    "./shared/auth-chrome-config": "./shared/auth-chrome-config.ts",
-    "./shared/auth-copy": "./shared/auth-copy.ts",
-    "./shared/chaptered-doc": "./shared/chaptered-doc.tsx",
-    "./shared/chaptered-doc-config": "./shared/chaptered-doc-config.ts",
-    "./shared/chart-hues": "./shared/chart-hues.ts",
-    "./shared/chart-labels": "./shared/chart-labels.tsx",
-    "./shared/chart-legend": "./shared/chart-legend.tsx",
-    "./shared/chart-panel-style": "./shared/chart-panel-style.ts",
-    "./shared/data-bar": "./shared/data-bar.tsx",
-    "./shared/gallery-image": "./shared/gallery-image.ts",
-    "./shared/login-demo": "./shared/login-demo.ts",
-    "./shared/metric-delta": "./shared/metric-delta.tsx",
-    "./shared/order-desk": "./shared/order-desk.tsx",
-    "./shared/revenue-chart": "./shared/revenue-chart.tsx",
-    "./shared/scene-castle": "./shared/scene-castle.tsx",
-    "./shared/scene-frame": "./shared/scene-frame.tsx",
-    "./shared/scene-hues": "./shared/scene-hues.ts",
-    "./shared/scene-tile": "./shared/scene-tile.tsx",
-    "./shared/settings-data": "./shared/settings-data.ts",
-    "./shared/settings-rows": "./shared/settings-rows.tsx",
-    "./shared/sparkline": "./shared/sparkline.tsx",
-    "./shared/format-money": "./shared/format-money.ts",
-    "./shared/metric-card": "./shared/metric-card.tsx",
-    "./shared/stars": "./shared/stars.tsx",
-    "./shared/sso-icons": "./shared/sso-icons.tsx",
-    ".": {
-      "types": "./astryx-dracula.d.ts",
-      "default": "./astryx-dracula.js"
-    },
-    "./astryx.integration.mjs": "./astryx.integration.mjs",
-    "./package.json": "./package.json",
-    "./templates/*": "./templates/*",
-    "./theme.css": "./theme.css",
-    "./tokens.css": "./tokens.css"
-  },
-  "files": [
-    "BRAND.md",
-    "LICENSE",
-    "README.md",
-    "USAGE.md",
-    "astryx-dracula.d.ts",
-    "astryx-dracula.js",
-    "astryx-dracula.variants.d.ts",
-    "fonts/",
-    "icons.mjs",
-    "icons.tsx",
-    "shared/",
-    "theme.css",
-    "tokens.css",
-    "templates/",
-    "astryx.integration.mjs"
-  ],
-  "keywords": [
-    "astryx",
-    "dracula",
-    "dracula-theme",
-    "theme",
-    "design-system",
-    "dark-theme",
-    "react",
-    "tokens"
-  ],
-  "license": "MIT",
-  "name": "astryx-dracula",
-  "peerDependencies": {
-    "@astryxdesign/core": "^0.6.3",
-    "lucide-react": "^1.45.0",
-    "react": ">=19.0.0",
-    "react-dom": ">=19.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/yuzu-octopus/astryx-dracula.git"
-  },
-  "scripts": {
-    "audit": "bun run fonts:sync && bun scripts/check.ts",
-    "fonts:sync": "mkdir -p public/fonts && cp fonts/*.woff2 public/fonts/",
-    "build": "tsc --noEmit && vite build",
-    "dev": "vite",
-    "preview": "vite preview",
-    "theme:build": "bun run icons:build && bunx astryx theme build astryx-theme.ts -o theme.css --icons-specifier ./icons.mjs",
-    "icons:build": "bun build icons.tsx --outfile icons.mjs --format esm --external react --external lucide-react",
-    "theme:check": "bun run icons:check && bunx astryx theme build astryx-theme.ts -o theme.css --icons-specifier ./icons.mjs --check --json | bun -e 'const r = JSON.parse(await Bun.stdin.text()); if (r.type !== \"theme.build.check\") { console.error(\"theme:check: unexpected CLI response \" + JSON.stringify(r).slice(0, 200)); process.exit(1); } const stale = r.data.stale.filter(s => s.path !== \"astryx-dracula.js\"); for (const s of stale) console.error(\"stale: \" + s.path + \" (\" + s.reason + \")\"); if (stale.length) process.exit(1); const entry = await import(\"./astryx-dracula.js\"); if (!entry.astryxDraculaTheme || !entry.draculaIconRegistry) { console.error(\"astryx-dracula.js is missing its theme or icon registry export\"); process.exit(1); } console.log(\"theme outputs up to date; astryx-dracula.js (hand-maintained) loads and exports\");' && bun run entry:check",
-    "icons:check": "bun build icons.tsx --outfile .tmp-icons.mjs --format esm --external react --external lucide-react; s=$?; cmp -s .tmp-icons.mjs icons.mjs; c=$?; rm -f .tmp-icons.mjs; [ $s -eq 0 ] && [ $c -eq 0 ] || { echo 'stale: icons.mjs (rerun bun run icons:build)'; exit 1; }",
-    "entry:check": "node -e \"const{pathToFileURL}=require('url');const{resolve}=require('path');import(pathToFileURL(resolve('astryx-dracula.js')).href).then(m=>{if(!m.astryxDraculaTheme||!m.draculaIconRegistry){console.error('astryx-dracula.js is missing its theme or icon registry export');process.exit(1)}console.log('astryx-dracula.js loads under plain Node ESM')}).catch(e=>{console.error('astryx-dracula.js is not importable by Node ESM: '+e.message);process.exit(1)})\"",
-    "prepublishOnly": "bun run theme:check && bun run icons:check && bun run entry:check && bun run audit && tsc --noEmit && bunx react-doctor@latest --score"
-  },
-  "sideEffects": [
-    "**/*.css"
-  ],
-  "trustedDependencies": [
-    "@astryxdesign/core",
-    "@astryxdesign/cli"
-  ],
-  "type": "module",
-  "version": "0.5.0",
-  "patchedDependencies": {
-    "@astryxdesign/core@0.6.3": "patches/@astryxdesign%2Fcore@0.6.3.patch"
-  }
+	"author": "Yuzu Octopus",
+	"bugs": {
+		"url": "https://github.com/yuzu-octopus/astryx-dracula/issues"
+	},
+	"dependencies": {
+		"lucide-react": "^1.53.0"
+	},
+	"description": "Pure Dracula brand theme for Astryx React sites. Dark-only tokens, syntax highlighting, and chart colors with prebuilt CSS.",
+	"devDependencies": {
+		"@astryxdesign/cli": "0.6.3",
+		"@astryxdesign/core": "0.6.3",
+		"@types/bun": "^1.4.2",
+		"@types/node": "^26.6.4",
+		"@types/react": "^19.3.0",
+		"@types/react-dom": "^19.3.0",
+		"@vitejs/plugin-react": "^6.1.2",
+		"typescript": "^7.0.2",
+		"vite": "^8.3.3"
+	},
+	"exports": {
+		"./shared/auth-chrome": "./shared/auth-chrome.tsx",
+		"./shared/auth-chrome-config": "./shared/auth-chrome-config.ts",
+		"./shared/auth-copy": "./shared/auth-copy.ts",
+		"./shared/chaptered-doc": "./shared/chaptered-doc.tsx",
+		"./shared/chaptered-doc-config": "./shared/chaptered-doc-config.ts",
+		"./shared/chart-hues": "./shared/chart-hues.ts",
+		"./shared/chart-labels": "./shared/chart-labels.tsx",
+		"./shared/chart-legend": "./shared/chart-legend.tsx",
+		"./shared/chart-panel-style": "./shared/chart-panel-style.ts",
+		"./shared/data-bar": "./shared/data-bar.tsx",
+		"./shared/gallery-image": "./shared/gallery-image.ts",
+		"./shared/login-demo": "./shared/login-demo.ts",
+		"./shared/metric-delta": "./shared/metric-delta.tsx",
+		"./shared/order-desk": "./shared/order-desk.tsx",
+		"./shared/revenue-chart": "./shared/revenue-chart.tsx",
+		"./shared/scene-castle": "./shared/scene-castle.tsx",
+		"./shared/scene-frame": "./shared/scene-frame.tsx",
+		"./shared/scene-hues": "./shared/scene-hues.ts",
+		"./shared/scene-tile": "./shared/scene-tile.tsx",
+		"./shared/settings-data": "./shared/settings-data.ts",
+		"./shared/settings-rows": "./shared/settings-rows.tsx",
+		"./shared/sparkline": "./shared/sparkline.tsx",
+		"./shared/format-money": "./shared/format-money.ts",
+		"./shared/metric-card": "./shared/metric-card.tsx",
+		"./shared/stars": "./shared/stars.tsx",
+		"./shared/sso-icons": "./shared/sso-icons.tsx",
+		".": {
+			"types": "./astryx-dracula.d.ts",
+			"default": "./astryx-dracula.js"
+		},
+		"./astryx.integration.mjs": "./astryx.integration.mjs",
+		"./package.json": "./package.json",
+		"./templates/*": "./templates/*",
+		"./theme.css": "./theme.css",
+		"./tokens.css": "./tokens.css"
+	},
+	"files": [
+		"BRAND.md",
+		"LICENSE",
+		"README.md",
+		"USAGE.md",
+		"astryx-dracula.d.ts",
+		"astryx-dracula.js",
+		"astryx-dracula.variants.d.ts",
+		"fonts/",
+		"icons.mjs",
+		"icons.tsx",
+		"shared/",
+		"theme.css",
+		"tokens.css",
+		"templates/",
+		"astryx.integration.mjs"
+	],
+	"keywords": [
+		"astryx",
+		"dracula",
+		"dracula-theme",
+		"theme",
+		"design-system",
+		"dark-theme",
+		"react",
+		"tokens"
+	],
+	"license": "MIT",
+	"name": "astryx-dracula",
+	"peerDependencies": {
+		"@astryxdesign/core": "^0.6.3",
+		"lucide-react": "^1.45.0",
+		"react": ">=19.0.0",
+		"react-dom": ">=19.0.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/yuzu-octopus/astryx-dracula.git"
+	},
+	"scripts": {
+		"audit": "bun run fonts:sync && bun scripts/check.ts",
+		"fonts:sync": "mkdir -p public/fonts && cp fonts/*.woff2 public/fonts/",
+		"build": "tsc --noEmit && vite build",
+		"dev": "vite",
+		"preview": "vite preview",
+		"theme:build": "bun run icons:build && bunx astryx theme build astryx-theme.ts -o theme.css --icons-specifier ./icons.mjs",
+		"icons:build": "bun build icons.tsx --outfile icons.mjs --format esm --external react --external lucide-react",
+		"theme:check": "bun run icons:check && bunx astryx theme build astryx-theme.ts -o theme.css --icons-specifier ./icons.mjs --check --json | bun -e 'const r = JSON.parse(await Bun.stdin.text()); if (r.type !== \"theme.build.check\") { console.error(\"theme:check: unexpected CLI response \" + JSON.stringify(r).slice(0, 200)); process.exit(1); } const stale = r.data.stale.filter(s => s.path !== \"astryx-dracula.js\"); for (const s of stale) console.error(\"stale: \" + s.path + \" (\" + s.reason + \")\"); if (stale.length) process.exit(1); const entry = await import(\"./astryx-dracula.js\"); if (!entry.astryxDraculaTheme || !entry.draculaIconRegistry) { console.error(\"astryx-dracula.js is missing its theme or icon registry export\"); process.exit(1); } console.log(\"theme outputs up to date; astryx-dracula.js (hand-maintained) loads and exports\");' && bun run entry:check",
+		"icons:check": "bun build icons.tsx --outfile .tmp-icons.mjs --format esm --external react --external lucide-react; s=$?; cmp -s .tmp-icons.mjs icons.mjs; c=$?; rm -f .tmp-icons.mjs; [ $s -eq 0 ] && [ $c -eq 0 ] || { echo 'stale: icons.mjs (rerun bun run icons:build)'; exit 1; }",
+		"entry:check": "node -e \"const{pathToFileURL}=require('url');const{resolve}=require('path');import(pathToFileURL(resolve('astryx-dracula.js')).href).then(m=>{if(!m.astryxDraculaTheme||!m.draculaIconRegistry){console.error('astryx-dracula.js is missing its theme or icon registry export');process.exit(1)}console.log('astryx-dracula.js loads under plain Node ESM')}).catch(e=>{console.error('astryx-dracula.js is not importable by Node ESM: '+e.message);process.exit(1)})\"",
+		"prepublishOnly": "bun run theme:check && bun run icons:check && bun run entry:check && bun run audit && tsc --noEmit && bunx react-doctor@latest --score"
+	},
+	"sideEffects": [
+		"**/*.css"
+	],
+	"trustedDependencies": [
+		"@astryxdesign/core",
+		"@astryxdesign/cli"
+	],
+	"type": "module",
+	"version": "0.5.1",
+	"patchedDependencies": {
+		"@astryxdesign/core@0.6.3": "patches/@astryxdesign%2Fcore@0.6.3.patch"
+	}
 }

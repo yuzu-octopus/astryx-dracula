@@ -2,57 +2,57 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   Ctr > S.transparent[p=10] > V[g=10] > (G[c={min:280,max:2} g=10] > (V[g=6] > (V[g=3] > Hd"Let's conjure together"[level=1 t=display-1] + Tx"Tell us what you're brewing"[t=body]) + AR) + (C[p=4] > V[g=4] > Hd"Your details"[level=2] + TI"Full name"[req] + (G[c={min:180} g=3] > TI"Email"[req] + TI"Company") + (G[c={min:180} g=3] > TI"Job title" + TI"Phone") + (V[g=2] > Tx"Reason"[t=label] + (H[g=2] > Tk"Reason"*7)) + SE"Budget" + TA"Project details" + B.primary"Send it into the night")) + (V[g=6] > D + (G[c={min:200} g=6] > (V[g=1 a=center] > Tx"General"[t=supporting] + Lk"hello@castle.dracula")*3))
 
-import {useState, type CSSProperties} from 'react';
-import {VStack, HStack} from '@astryxdesign/core/Layout';
-import {Center} from '@astryxdesign/core/Center';
-import {Section} from '@astryxdesign/core/Section';
-import {Grid} from '@astryxdesign/core/Grid';
-import {AspectRatio} from '@astryxdesign/core/AspectRatio';
-import {galleryImageClip} from 'astryx-dracula/shared/gallery-image';
-import {Button} from '@astryxdesign/core/Button';
-import {Text, Heading} from '@astryxdesign/core/Text';
-import {TextInput} from '@astryxdesign/core/TextInput';
-import {Token} from '@astryxdesign/core/Token';
-import {TextArea} from '@astryxdesign/core/TextArea';
-import {Link} from '@astryxdesign/core/Link';
-import {Divider} from '@astryxdesign/core/Divider';
-import {Card} from '@astryxdesign/core/Card';
-import {Selector} from '@astryxdesign/core/Selector';
-import {Banner} from '@astryxdesign/core/Banner';
-import {Icon} from '@astryxdesign/core/Icon';
-import {Check} from 'lucide-react';
-import {SceneCastle} from 'astryx-dracula/shared/scene-castle';
+import { AspectRatio } from "@astryxdesign/core/AspectRatio";
+import { Banner } from "@astryxdesign/core/Banner";
+import { Button } from "@astryxdesign/core/Button";
+import { Card } from "@astryxdesign/core/Card";
+import { Center } from "@astryxdesign/core/Center";
+import { Divider } from "@astryxdesign/core/Divider";
+import { Grid } from "@astryxdesign/core/Grid";
+import { Icon } from "@astryxdesign/core/Icon";
+import { HStack, VStack } from "@astryxdesign/core/Layout";
+import { Link } from "@astryxdesign/core/Link";
+import { Section } from "@astryxdesign/core/Section";
+import { Selector } from "@astryxdesign/core/Selector";
+import { Heading, Text } from "@astryxdesign/core/Text";
+import { TextArea } from "@astryxdesign/core/TextArea";
+import { TextInput } from "@astryxdesign/core/TextInput";
+import { Token } from "@astryxdesign/core/Token";
+import { galleryImageClip } from "astryx-dracula/shared/gallery-image";
+import { SceneCastle } from "astryx-dracula/shared/scene-castle";
+import { Check } from "lucide-react";
+import { type CSSProperties, useState } from "react";
 
 const INQUIRY_REASONS = [
-  'New business',
-  'General inquiry',
-  'Press & media',
-  'Partnerships',
-  'Product feedback',
-  'Technical support',
-  'Other',
+	"New business",
+	"General inquiry",
+	"Press & media",
+	"Partnerships",
+	"Product feedback",
+	"Technical support",
+	"Other",
 ];
 
 const BUDGET_OPTIONS = [
-  'Under $10k',
-  '$10k – $50k',
-  '$50k – $100k',
-  '$100k – $500k',
-  '$500k+',
-  'Not sure yet',
+	"Under $10k",
+	"$10k – $50k",
+	"$50k – $100k",
+	"$100k – $500k",
+	"$500k+",
+	"Not sure yet",
 ];
 
 const CONTACT_COLUMNS = [
-  {label: 'General inquiries', email: 'hello@castle.dracula'},
-  {label: 'New business', email: 'newbiz@castle.dracula'},
-  {label: 'Press & partnerships', email: 'press@castle.dracula'},
+	{ label: "General inquiries", email: "hello@castle.dracula" },
+	{ label: "New business", email: "newbiz@castle.dracula" },
+	{ label: "Press & partnerships", email: "press@castle.dracula" },
 ];
 
 // Castle illustration lives in shared/scene-castle (`card` variant:
 // harvest-yellow moon, fg-stroke bats). Fill + radius-clip live in
 // shared/gallery-image (no Image primitive, #2582).
 const pageStyle: CSSProperties = {
-  minHeight: '100%',
+	minHeight: "100%",
 };
 
 /**
@@ -70,183 +70,162 @@ const pageStyle: CSSProperties = {
  *   from 504px, one column below.
  */
 export default function TwoColumnForm() {
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [company, setCompany] = useState('');
-  const [jobTitle, setJobTitle] = useState('');
-  const [phone, setPhone] = useState('');
-  const [inquiryReason, setInquiryReason] = useState('');
-  const [budget, setBudget] = useState('');
-  const [details, setDetails] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+	const [fullName, setFullName] = useState("");
+	const [email, setEmail] = useState("");
+	const [company, setCompany] = useState("");
+	const [jobTitle, setJobTitle] = useState("");
+	const [phone, setPhone] = useState("");
+	const [inquiryReason, setInquiryReason] = useState("");
+	const [budget, setBudget] = useState("");
+	const [details, setDetails] = useState("");
+	const [submitted, setSubmitted] = useState(false);
 
-  const errors = submitted
-    ? {
-        fullName: !fullName.trim() ? 'Required' : undefined,
-        email: !email.trim() ? 'Required' : undefined,
-        details: !details.trim() ? 'Required' : undefined,
-      }
-    : {};
+	const errors = submitted
+		? {
+				fullName: !fullName.trim() ? "Required" : undefined,
+				email: !email.trim() ? "Required" : undefined,
+				details: !details.trim() ? "Required" : undefined,
+			}
+		: {};
 
-  const isValid =
-    fullName.trim() !== '' &&
-    email.trim() !== '' &&
-    details.trim() !== '';
+	const isValid = fullName.trim() !== "" && email.trim() !== "" && details.trim() !== "";
 
-  const handleSubmit = () => setSubmitted(true);
+	const handleSubmit = () => setSubmitted(true);
 
-  return (
-    <Center style={pageStyle}>
-      <Section maxWidth={1100} width="100%" padding={10} variant="transparent">
-        <VStack gap={10}>
-          <Grid columns={{minWidth: 280, max: 2}} align="center" gap={10}>
-            <VStack gap={6}>
-              <VStack gap={3}>
-                <Heading level={1} type="display-1">
-                  Let&apos;s conjure together
-                </Heading>
-                <Text type="body" color="secondary">
-                  Tell us what you&apos;re brewing and we&apos;ll help you find
-                  the best path through the night.
-                </Text>
-              </VStack>
-              <AspectRatio ratio={4 / 3} style={galleryImageClip}>
-                <SceneCastle variant="card" />
-              </AspectRatio>
-            </VStack>
+	return (
+		<Center style={pageStyle}>
+			<Section maxWidth={1100} width="100%" padding={10} variant="transparent">
+				<VStack gap={10}>
+					<Grid columns={{ minWidth: 280, max: 2 }} align="center" gap={10}>
+						<VStack gap={6}>
+							<VStack gap={3}>
+								<Heading level={1} type="display-1">
+									Let&apos;s conjure together
+								</Heading>
+								<Text type="body" color="secondary">
+									Tell us what you&apos;re brewing and we&apos;ll help you find the best path
+									through the night.
+								</Text>
+							</VStack>
+							<AspectRatio ratio={4 / 3} style={galleryImageClip}>
+								<SceneCastle variant="card" />
+							</AspectRatio>
+						</VStack>
 
-            <Card padding={4}>
-              <VStack gap={4}>
-                <Heading level={2}>Your details</Heading>
-                <TextInput
-                  label="Full name"
-                  isRequired
-                  placeholder="Full name"
-                  value={fullName}
-                  onChange={setFullName}
-                  status={
-                    errors.fullName
-                      ? {type: 'error', message: errors.fullName}
-                      : undefined
-                  }
-                />
-                <Grid columns={{minWidth: 180}} gap={3}>
-                  <TextInput
-                    label="Email"
-                    isRequired
-                    placeholder="Email"
-                    value={email}
-                    onChange={setEmail}
-                    status={
-                      errors.email
-                        ? {type: 'error', message: errors.email}
-                        : undefined
-                    }
-                  />
-                  <TextInput
-                    label="Company name"
-                    placeholder="Company name"
-                    value={company}
-                    onChange={setCompany}
-                  />
-                </Grid>
-                <Grid columns={{minWidth: 180}} gap={3}>
-                  <TextInput
-                    label="Job title"
-                    placeholder="Job title"
-                    value={jobTitle}
-                    onChange={setJobTitle}
-                  />
-                  <TextInput
-                    label="Phone number"
-                    placeholder="Phone number"
-                    value={phone}
-                    onChange={setPhone}
-                  />
-                </Grid>
+						<Card padding={4}>
+							<VStack gap={4}>
+								<Heading level={2}>Your details</Heading>
+								<TextInput
+									label="Full name"
+									isRequired
+									placeholder="Full name"
+									value={fullName}
+									onChange={setFullName}
+									status={errors.fullName ? { type: "error", message: errors.fullName } : undefined}
+								/>
+								<Grid columns={{ minWidth: 180 }} gap={3}>
+									<TextInput
+										label="Email"
+										isRequired
+										placeholder="Email"
+										value={email}
+										onChange={setEmail}
+										status={errors.email ? { type: "error", message: errors.email } : undefined}
+									/>
+									<TextInput
+										label="Company name"
+										placeholder="Company name"
+										value={company}
+										onChange={setCompany}
+									/>
+								</Grid>
+								<Grid columns={{ minWidth: 180 }} gap={3}>
+									<TextInput
+										label="Job title"
+										placeholder="Job title"
+										value={jobTitle}
+										onChange={setJobTitle}
+									/>
+									<TextInput
+										label="Phone number"
+										placeholder="Phone number"
+										value={phone}
+										onChange={setPhone}
+									/>
+								</Grid>
 
-                <VStack gap={2}>
-                  <Text type="label">What are you reaching out about?</Text>
-                  <HStack gap={2} wrap="wrap">
-                    {INQUIRY_REASONS.map(reason => {
-                      const isSelected = inquiryReason === reason;
-                      return (
-                        <Token
-                          key={reason}
-                          label={reason}
-                          color={isSelected ? 'yellow' : 'default'}
-                          icon={
-                            isSelected ? (
-                              <Icon icon={Check} size="xsm" color="inherit" />
-                            ) : undefined
-                          }
-                          description={isSelected ? 'Selected' : undefined}
-                          onClick={() =>
-                            setInquiryReason(prev =>
-                              prev === reason ? '' : reason,
-                            )
-                          }
-                        />
-                      );
-                    })}
-                  </HStack>
-                </VStack>
-                <Selector
-                  label="Budget range"
-                  options={BUDGET_OPTIONS}
-                  value={budget}
-                  onChange={setBudget}
-                  placeholder="Select a budget range…"
-                />
-                <TextArea
-                  label="Project details"
-                  isRequired
-                  placeholder="Project details"
-                  value={details}
-                  onChange={setDetails}
-                  status={
-                    errors.details
-                      ? {type: 'error', message: errors.details}
-                      : undefined
-                  }
-                />
-                {submitted && isValid && (
-                  <Banner
-                    status="success"
-                    title="Sent into the night"
-                    description="The coven received your message and will answer after dark."
-                  />
-                )}
-                {/* hAlign="stretch" = full-width button workaround; Button
+								<VStack gap={2}>
+									<Text type="label">What are you reaching out about?</Text>
+									<HStack gap={2} wrap="wrap">
+										{INQUIRY_REASONS.map((reason) => {
+											const isSelected = inquiryReason === reason;
+											return (
+												<Token
+													key={reason}
+													label={reason}
+													color={isSelected ? "yellow" : "default"}
+													icon={
+														isSelected ? (
+															<Icon icon={Check} size="xsm" color="inherit" />
+														) : undefined
+													}
+													description={isSelected ? "Selected" : undefined}
+													onClick={() =>
+														setInquiryReason((prev) => (prev === reason ? "" : reason))
+													}
+												/>
+											);
+										})}
+									</HStack>
+								</VStack>
+								<Selector
+									label="Budget range"
+									options={BUDGET_OPTIONS}
+									value={budget}
+									onChange={setBudget}
+									placeholder="Select a budget range…"
+								/>
+								<TextArea
+									label="Project details"
+									isRequired
+									placeholder="Project details"
+									value={details}
+									onChange={setDetails}
+									status={errors.details ? { type: "error", message: errors.details } : undefined}
+								/>
+								{submitted && isValid && (
+									<Banner
+										status="success"
+										title="Sent into the night"
+										description="The coven received your message and will answer after dark."
+									/>
+								)}
+								{/* hAlign="stretch" = full-width button workaround; Button
                     has no full-width prop (#2600). */}
-                <VStack hAlign="stretch">
-                  <Button
-                    label="Send it into the night"
-                    variant="primary"
-                    onClick={handleSubmit}
-                  />
-                </VStack>
-              </VStack>
-            </Card>
-          </Grid>
+								<VStack hAlign="stretch">
+									<Button label="Send it into the night" variant="primary" onClick={handleSubmit} />
+								</VStack>
+							</VStack>
+						</Card>
+					</Grid>
 
-          <VStack gap={6}>
-            <Divider />
-            <Grid columns={{minWidth: 200}} gap={6}>
-              {CONTACT_COLUMNS.map(col => (
-                <VStack key={col.label} gap={1} hAlign="center">
-                  <Text type="supporting" color="secondary">
-                    {col.label}
-                  </Text>
-                  <Link href={`mailto:${col.email}`} hasUnderline>
-                    {col.email}
-                  </Link>
-                </VStack>
-              ))}
-            </Grid>
-          </VStack>
-        </VStack>
-      </Section>
-    </Center>
-  );
+					<VStack gap={6}>
+						<Divider />
+						<Grid columns={{ minWidth: 200 }} gap={6}>
+							{CONTACT_COLUMNS.map((col) => (
+								<VStack key={col.label} gap={1} hAlign="center">
+									<Text type="supporting" color="secondary">
+										{col.label}
+									</Text>
+									<Link href={`mailto:${col.email}`} hasUnderline>
+										{col.email}
+									</Link>
+								</VStack>
+							))}
+						</Grid>
+					</VStack>
+				</VStack>
+			</Section>
+		</Center>
+	);
 }

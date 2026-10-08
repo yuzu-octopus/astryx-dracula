@@ -36,125 +36,120 @@
 // Not interactive. A data bar is not a control, so it carries no hover channel
 // and no focus ring; the inset-ring decision belongs to interactive surfaces.
 
-import type {CSSProperties} from 'react';
-import {HStack, StackItem, VStack} from '@astryxdesign/core/Stack';
-import {Text} from '@astryxdesign/core/Text';
-import type {ChartHue} from './chart-hues';
+import { HStack, StackItem, VStack } from "@astryxdesign/core/Stack";
+import { Text } from "@astryxdesign/core/Text";
+import type { CSSProperties } from "react";
+import type { ChartHue } from "./chart-hues";
 
 export interface DataBarSegment {
-  /** Stable key for the segment. */
-  id: string;
-  value: number;
-  /** MUST be a --color-data-categorical-* or --color-data-<family>-N var.
-   *  Never a raw hex, never a --dracula-* primitive. Typed rather than
-   *  documented: `string` made the rule a comment nobody could break. */
-  color: ChartHue | `var(--color-data-${string})`;
+	/** Stable key for the segment. */
+	id: string;
+	value: number;
+	/** MUST be a --color-data-categorical-* or --color-data-<family>-N var.
+	 *  Never a raw hex, never a --dracula-* primitive. Typed rather than
+	 *  documented: `string` made the rule a comment nobody could break. */
+	color: ChartHue | `var(--color-data-${string})`;
 }
 
 /** Minimum segment share, so a tiny non-zero value stays visible. */
 const MIN_SEGMENT_PCT = 2;
 
 export interface DataBarProps {
-  /** Accessible name. Required — a bar with no name is an unlabelled graphic. */
-  label: string;
-  segments: readonly DataBarSegment[];
-  /** Bar thickness in px. @default 12 */
-  height?: number;
-  /** Show the summed value under the bar. @default false */
-  hasValueLabel?: boolean;
-  /** Formats the summed value. @default toLocaleString() */
-  formatValue?: (total: number) => string;
-  /** Gap between segments as a spacing-scale step. @default 0 */
-  gap?: 0 | 0.5 | 1 | 1.5 | 2 | 3;
+	/** Accessible name. Required — a bar with no name is an unlabelled graphic. */
+	label: string;
+	segments: readonly DataBarSegment[];
+	/** Bar thickness in px. @default 12 */
+	height?: number;
+	/** Show the summed value under the bar. @default false */
+	hasValueLabel?: boolean;
+	/** Formats the summed value. @default toLocaleString() */
+	formatValue?: (total: number) => string;
+	/** Gap between segments as a spacing-scale step. @default 0 */
+	gap?: 0 | 0.5 | 1 | 1.5 | 2 | 3;
 }
 
 const segmentStyle: CSSProperties = {
-  borderRadius: 'var(--radius-inner)',
+	borderRadius: "var(--radius-inner)",
 };
 
 export function DataBar({
-  label,
-  segments,
-  height = 12,
-  hasValueLabel = false,
-  formatValue = total => total.toLocaleString(),
-  gap = 0,
+	label,
+	segments,
+	height = 12,
+	hasValueLabel = false,
+	formatValue = (total) => total.toLocaleString(),
+	gap = 0,
 }: DataBarProps) {
-  // Negative values are not a magnitude and are clamped out before the ratio is
-  // taken: summing a negative into `total` inflates every other segment's
-  // share and can push the bar past 100%. An empty or all-zero bar falls
-  // through to the track fill below.
-  const total = segments.reduce(
-    (sum, segment) => sum + Math.max(0, segment.value),
-    0,
-  );
-  const visible = segments
-    .map(segment => {
-      if (segment.value <= 0) return null;
-      return {
-        id: segment.id,
-        color: segment.color,
-        share: (segment.value / total) * 100,
-      };
-    })
-    .filter((segment): segment is NonNullable<typeof segment> => segment !== null);
+	// Negative values are not a magnitude and are clamped out before the ratio is
+	// taken: summing a negative into `total` inflates every other segment's
+	// share and can push the bar past 100%. An empty or all-zero bar falls
+	// through to the track fill below.
+	const total = segments.reduce((sum, segment) => sum + Math.max(0, segment.value), 0);
+	const visible = segments
+		.map((segment) => {
+			if (segment.value <= 0) return null;
+			return {
+				id: segment.id,
+				color: segment.color,
+				share: (segment.value / total) * 100,
+			};
+		})
+		.filter((segment): segment is NonNullable<typeof segment> => segment !== null);
 
-  // A tiny non-zero value must stay visible, so each segment gets a floor —
-  // but the floors are taken OUT of the segments that can afford it. Flooring
-  // every segment independently overflows the bar (3 tiny + 1 huge measured
-  // 106%), and a bar wider than its track is worse than a missing speck.
-  const floorTotal = visible.length * MIN_SEGMENT_PCT;
-  const surplus = Math.max(0, 100 - floorTotal);
-  const slack = Math.max(
-    0,
-    visible.reduce(
-      (sum, segment) => sum + Math.max(0, segment.share - MIN_SEGMENT_PCT),
-      0,
-    ),
-  );
-  const widths = visible.map(segment => {
-    const room = Math.max(0, segment.share - MIN_SEGMENT_PCT);
-    const claim = slack > 0 ? (room / slack) * surplus : 0;
-    return Math.min(100, MIN_SEGMENT_PCT + claim);
-  });
-  const drawn = visible
-    .map((segment, index) => ({...segment, width: widths[index]}))
-    .filter(segment => segment.width > 0);
+	// A tiny non-zero value must stay visible, so each segment gets a floor —
+	// but the floors are taken OUT of the segments that can afford it. Flooring
+	// every segment independently overflows the bar (3 tiny + 1 huge measured
+	// 106%), and a bar wider than its track is worse than a missing speck.
+	const floorTotal = visible.length * MIN_SEGMENT_PCT;
+	const surplus = Math.max(0, 100 - floorTotal);
+	const slack = Math.max(
+		0,
+		visible.reduce((sum, segment) => sum + Math.max(0, segment.share - MIN_SEGMENT_PCT), 0),
+	);
+	const widths = visible.map((segment) => {
+		const room = Math.max(0, segment.share - MIN_SEGMENT_PCT);
+		const claim = slack > 0 ? (room / slack) * surplus : 0;
+		return Math.min(100, MIN_SEGMENT_PCT + claim);
+	});
+	const drawn = visible
+		.map((segment, index) => ({ ...segment, width: widths[index] }))
+		.filter((segment) => segment.width > 0);
 
-  const bar = (
-    <HStack
-      gap={gap}
-      height={height}
-      width="100%"
-      vAlign="stretch"
-      role="img"
-      aria-label={label}
-      style={
-        total > 0
-          ? undefined
-          : {
-              // Deliberately --color-progress-value, NOT a text token — see the header.
-              background: 'var(--color-progress-value)',
-              borderRadius: 'var(--radius-inner)',
-            }
-      }>
-      {drawn.map(segment => (
-        <StackItem
-          key={segment.id}
-          style={{...segmentStyle, flexBasis: `${segment.width}%`, background: segment.color}}
-        />
-      ))}
-    </HStack>
-  );
+	const bar = (
+		<HStack
+			gap={gap}
+			height={height}
+			width="100%"
+			vAlign="stretch"
+			role="img"
+			aria-label={label}
+			style={
+				total > 0
+					? undefined
+					: {
+							// Deliberately --color-progress-value, NOT a text token — see the header.
+							background: "var(--color-progress-value)",
+							borderRadius: "var(--radius-inner)",
+						}
+			}
+		>
+			{drawn.map((segment) => (
+				<StackItem
+					key={segment.id}
+					style={{ ...segmentStyle, flexBasis: `${segment.width}%`, background: segment.color }}
+				/>
+			))}
+		</HStack>
+	);
 
-  if (!hasValueLabel) return bar;
+	if (!hasValueLabel) return bar;
 
-  return (
-    <VStack gap={1}>
-      {bar}
-      <Text type="supporting" color="secondary" hasTabularNumbers>
-        {formatValue(total)}
-      </Text>
-    </VStack>
-  );
+	return (
+		<VStack gap={1}>
+			{bar}
+			<Text type="supporting" color="secondary" hasTabularNumbers>
+				{formatValue(total)}
+			</Text>
+		</VStack>
+	);
 }

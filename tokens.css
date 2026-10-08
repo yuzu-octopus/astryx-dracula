@@ -24,19 +24,19 @@
  * Fonts: copy `fonts/` to your app's served static dir (Vite: `public/fonts/`). */
 
 @font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/astryx-dracula/fonts/JetBrainsMono-Regular.woff2') format('woff2');
+	font-family: "JetBrains Mono";
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url("/astryx-dracula/fonts/JetBrainsMono-Regular.woff2") format("woff2");
 }
 
 @font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/astryx-dracula/fonts/JetBrainsMono-SemiBold.woff2') format('woff2');
+	font-family: "JetBrains Mono";
+	font-style: normal;
+	font-weight: 600;
+	font-display: swap;
+	src: url("/astryx-dracula/fonts/JetBrainsMono-SemiBold.woff2") format("woff2");
 }
 
 /* Canvas: the document scroller's track is transparent, so the unpainted
@@ -45,306 +45,306 @@
  * page read as one surface. */
 html,
 body {
-  background-color: #282A36;
+	background-color: #282a36;
 }
 
 /* Full plain-CSS mirror of astryx-theme.ts (frozen dark slots). Edit the theme,
  * not this file, then re-mirror. Unlayered by design so it beats core layers;
  * zero !important anywhere. */
 :root {
-  color-scheme: dark;
-  background-color: #282A36;
+	color-scheme: dark;
+	background-color: #282a36;
 
-  --dracula-bg: #282A36;
-  --dracula-current-line: #6272A4;
-  --dracula-selection: #44475A;
-  --dracula-fg: #F8F8F2;
-  --dracula-comment: #6272A4;
-  --dracula-cyan: #8BE9FD;
-  --dracula-green: #50FA7B;
-  --dracula-orange: #FFB86C;
-  --dracula-pink: #FF79C6;
-  --dracula-purple: #BD93F9;
-  --dracula-red: #FF5555;
-  --dracula-yellow: #F1FA8C;
-  --dracula-bg-light: #343746;
-  --dracula-bg-lighter: #424450;
-  --dracula-bg-dark: #21222C;
-  --dracula-functional-red: #DE5735;
-  --dracula-functional-orange: #A39514;
-  --dracula-functional-green: #089108;
-  --dracula-functional-cyan: #0081D6;
-  --dracula-functional-purple: #815CD6;
+	--dracula-bg: #282a36;
+	--dracula-current-line: #6272a4;
+	--dracula-selection: #44475a;
+	--dracula-fg: #f8f8f2;
+	--dracula-comment: #6272a4;
+	--dracula-cyan: #8be9fd;
+	--dracula-green: #50fa7b;
+	--dracula-orange: #ffb86c;
+	--dracula-pink: #ff79c6;
+	--dracula-purple: #bd93f9;
+	--dracula-red: #ff5555;
+	--dracula-yellow: #f1fa8c;
+	--dracula-bg-light: #343746;
+	--dracula-bg-lighter: #424450;
+	--dracula-bg-dark: #21222c;
+	--dracula-functional-red: #de5735;
+	--dracula-functional-orange: #a39514;
+	--dracula-functional-green: #089108;
+	--dracula-functional-cyan: #0081d6;
+	--dracula-functional-purple: #815cd6;
 
-  --space-gap: 24px;
-  --space-viewport: 16px;
-  --widget-content-vertical: 15px;
-  --widget-content-horizontal: 16px;
-  --widget-gap: 24px;
-  --tile-row: 96px;
-  --border-radius: 5px;
-  --radius-element: 5px;
-  --radius-inner: 4px;
-  --radius-container: 5px;
-  --radius-page: 5px;
-  --radius-chat: 5px;
-  --font-family-mono: 'JetBrains Mono', ui-monospace, monospace;
-  --font-family-body: 'JetBrains Mono', monospace;
-  --font-family-heading: 'JetBrains Mono', monospace;
-  --font-family-code: 'JetBrains Mono', monospace;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --font-size-4xs: 0.375rem;
-  --font-size-3xs: 0.4375rem;
-  --font-size-2xs: 0.5rem;
-  --font-size-xs: 0.625rem;
-  --font-size-sm: 0.75rem;
-  --font-size-base: 14px;
-  --font-size-lg: 1.0625rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
-  --font-size-3xl: 1.8125rem;
-  --font-size-4xl: 2.1875rem;
-  --font-size-5xl: 2.625rem;
-  --font-size-h1: 24px;
-  --font-size-h2: 20px;
-  --font-size-h3: 16px;
-  --font-size-h4: 14px;
-  --font-size-h5: 13px;
-  --font-size-h6: 12px;
-  --text-heading-1-size: var(--font-size-2xl);
-  --text-heading-1-weight: var(--font-weight-normal);
-  --text-heading-1-leading: 1.3333;
-  --text-heading-2-size: var(--font-size-xl);
-  --text-heading-2-weight: var(--font-weight-normal);
-  --text-heading-2-leading: 1.4;
-  --text-heading-3-size: var(--font-size-lg);
-  --text-heading-3-weight: var(--font-weight-normal);
-  --text-heading-3-leading: 1.4118;
-  --text-heading-4-size: var(--font-size-base);
-  --text-heading-4-weight: var(--font-weight-normal);
-  --text-heading-4-leading: 1.4286;
-  --text-heading-5-size: var(--font-size-sm);
-  --text-heading-5-weight: var(--font-weight-normal);
-  --text-heading-5-leading: 1.6667;
-  --text-heading-6-size: var(--font-size-xs);
-  --text-heading-6-weight: var(--font-weight-normal);
-  --text-heading-6-leading: 1.6;
-  --text-body-size: var(--font-size-base);
-  --text-body-weight: var(--font-weight-normal);
-  --text-body-leading: 1.4286;
-  --text-large-size: var(--font-size-lg);
-  --text-large-weight: var(--font-weight-semibold);
-  --text-large-leading: 1.4118;
-  --text-label-size: var(--font-size-base);
-  --text-label-weight: var(--font-weight-semibold);
-  --text-label-leading: 1.4286;
-  --text-code-size: var(--font-size-base);
-  --text-code-weight: var(--font-weight-normal);
-  --text-code-leading: 1.4286;
-  --text-supporting-size: var(--font-size-sm);
-  --text-supporting-weight: var(--font-weight-normal);
-  --text-supporting-leading: 1.6667;
-  --text-display-1-size: var(--font-size-5xl);
-  --text-display-1-weight: var(--font-weight-normal);
-  --text-display-1-leading: 1.2381;
-  --text-display-2-size: var(--font-size-4xl);
-  --text-display-2-weight: var(--font-weight-normal);
-  --text-display-2-leading: 1.2571;
-  --text-display-3-size: var(--font-size-3xl);
-  --text-display-3-weight: var(--font-weight-normal);
-  --text-display-3-leading: 1.3793;
-  --duration-fast-min: 130ms;
-  --duration-fast: 175ms;
-  --duration-fast-max: 235ms;
-  --duration-medium-min: 310ms;
-  --duration-medium: 410ms;
-  --duration-medium-max: 545ms;
-  --duration-slow-min: 730ms;
-  --duration-slow: 975ms;
-  --duration-slow-max: 1300ms;
-  --ease-standard: cubic-bezier(0.24, 1, 0.4, 1);
-  --shadow-low: 0 2px 4px #191A210D, 0 4px 8px #191A211A;
-  --shadow-med: 0 2px 4px #191A210D, 0 4px 12px #191A211A;
-  --shadow-high: 0 4px 6px #191A211A, 0 12px 24px #191A2126;
-  --shadow-inset-hover: inset 0px 0px 0px 2px #6272A430;
-  --shadow-inset-selected: inset 0px 0px 0px 2px #BD93F930;
-  --shadow-inset-success: inset 0px 0px 0px 2px #50FA7B30;
-  --shadow-inset-warning: inset 0px 0px 0px 2px #F1FA8C30;
-  --shadow-inset-error: inset 0px 0px 0px 2px #FF555530;
+	--space-gap: 24px;
+	--space-viewport: 16px;
+	--widget-content-vertical: 15px;
+	--widget-content-horizontal: 16px;
+	--widget-gap: 24px;
+	--tile-row: 96px;
+	--border-radius: 5px;
+	--radius-element: 5px;
+	--radius-inner: 4px;
+	--radius-container: 5px;
+	--radius-page: 5px;
+	--radius-chat: 5px;
+	--font-family-mono: "JetBrains Mono", ui-monospace, monospace;
+	--font-family-body: "JetBrains Mono", monospace;
+	--font-family-heading: "JetBrains Mono", monospace;
+	--font-family-code: "JetBrains Mono", monospace;
+	--font-weight-normal: 400;
+	--font-weight-medium: 500;
+	--font-weight-semibold: 600;
+	--font-weight-bold: 700;
+	--font-size-4xs: 0.375rem;
+	--font-size-3xs: 0.4375rem;
+	--font-size-2xs: 0.5rem;
+	--font-size-xs: 0.625rem;
+	--font-size-sm: 0.75rem;
+	--font-size-base: 14px;
+	--font-size-lg: 1.0625rem;
+	--font-size-xl: 1.25rem;
+	--font-size-2xl: 1.5rem;
+	--font-size-3xl: 1.8125rem;
+	--font-size-4xl: 2.1875rem;
+	--font-size-5xl: 2.625rem;
+	--font-size-h1: 24px;
+	--font-size-h2: 20px;
+	--font-size-h3: 16px;
+	--font-size-h4: 14px;
+	--font-size-h5: 13px;
+	--font-size-h6: 12px;
+	--text-heading-1-size: var(--font-size-2xl);
+	--text-heading-1-weight: var(--font-weight-normal);
+	--text-heading-1-leading: 1.3333;
+	--text-heading-2-size: var(--font-size-xl);
+	--text-heading-2-weight: var(--font-weight-normal);
+	--text-heading-2-leading: 1.4;
+	--text-heading-3-size: var(--font-size-lg);
+	--text-heading-3-weight: var(--font-weight-normal);
+	--text-heading-3-leading: 1.4118;
+	--text-heading-4-size: var(--font-size-base);
+	--text-heading-4-weight: var(--font-weight-normal);
+	--text-heading-4-leading: 1.4286;
+	--text-heading-5-size: var(--font-size-sm);
+	--text-heading-5-weight: var(--font-weight-normal);
+	--text-heading-5-leading: 1.6667;
+	--text-heading-6-size: var(--font-size-xs);
+	--text-heading-6-weight: var(--font-weight-normal);
+	--text-heading-6-leading: 1.6;
+	--text-body-size: var(--font-size-base);
+	--text-body-weight: var(--font-weight-normal);
+	--text-body-leading: 1.4286;
+	--text-large-size: var(--font-size-lg);
+	--text-large-weight: var(--font-weight-semibold);
+	--text-large-leading: 1.4118;
+	--text-label-size: var(--font-size-base);
+	--text-label-weight: var(--font-weight-semibold);
+	--text-label-leading: 1.4286;
+	--text-code-size: var(--font-size-base);
+	--text-code-weight: var(--font-weight-normal);
+	--text-code-leading: 1.4286;
+	--text-supporting-size: var(--font-size-sm);
+	--text-supporting-weight: var(--font-weight-normal);
+	--text-supporting-leading: 1.6667;
+	--text-display-1-size: var(--font-size-5xl);
+	--text-display-1-weight: var(--font-weight-normal);
+	--text-display-1-leading: 1.2381;
+	--text-display-2-size: var(--font-size-4xl);
+	--text-display-2-weight: var(--font-weight-normal);
+	--text-display-2-leading: 1.2571;
+	--text-display-3-size: var(--font-size-3xl);
+	--text-display-3-weight: var(--font-weight-normal);
+	--text-display-3-leading: 1.3793;
+	--duration-fast-min: 130ms;
+	--duration-fast: 175ms;
+	--duration-fast-max: 235ms;
+	--duration-medium-min: 310ms;
+	--duration-medium: 410ms;
+	--duration-medium-max: 545ms;
+	--duration-slow-min: 730ms;
+	--duration-slow: 975ms;
+	--duration-slow-max: 1300ms;
+	--ease-standard: cubic-bezier(0.24, 1, 0.4, 1);
+	--shadow-low: 0 2px 4px #191a210d, 0 4px 8px #191a211a;
+	--shadow-med: 0 2px 4px #191a210d, 0 4px 12px #191a211a;
+	--shadow-high: 0 4px 6px #191a211a, 0 12px 24px #191a2126;
+	--shadow-inset-hover: inset 0px 0px 0px 2px #6272a430;
+	--shadow-inset-selected: inset 0px 0px 0px 2px #bd93f930;
+	--shadow-inset-success: inset 0px 0px 0px 2px #50fa7b30;
+	--shadow-inset-warning: inset 0px 0px 0px 2px #f1fa8c30;
+	--shadow-inset-error: inset 0px 0px 0px 2px #ff555530;
 
-  --color-background-body: #282A36;
-  --color-background: var(--color-background-body);
-  --color-background-surface: #343746;
-  --color-background-card: #343746;
-  --color-background-popover: #424450;
-  --color-background-muted: #44475A;
-  --color-background-inverted: #F8F8F2;
-  --color-background-error-inverted: #FFD5CC;
-  --color-overlay: #191A21CC;
-  --color-overlay-hover: #0000001F;
-  --color-overlay-pressed: #00000033;
-  --color-border: #6272A4;
-  --color-border-emphasized: #9AA1BC;
-  --color-neutral: #F8F8F21A;
-  --color-tint-hover: #FFFFFF;
-  --color-on-dark: #F8F8F2;
-  --color-on-light: #000000;
-  --color-shadow: #21222C;
-  --color-track: #6272A4;
-  --color-skeleton: #6272A4;
-  --color-accent: #BD93F9;
-  --color-success: #50FA7B;
-  --color-error: #FF5555;
-  --color-warning: #F1FA8C;
-  --color-info: #8BE9FD;
-  --color-accent-muted: var(--color-background-purple);
-  --color-success-muted: var(--color-background-green);
-  --color-warning-muted: var(--color-background-yellow);
-  --color-error-muted: var(--color-background-red);
-  --color-info-muted: var(--color-background-cyan);
-  --color-text-primary: #F8F8F2;
-  --color-text-secondary: #9AA1BC;
-  --color-text-disabled: #6272A4;
-  --color-text-accent: #BD93F9;
-  --color-text-highlight: #F8F8F2;
-  --color-text-paragraph: #B0B3C4;
-  --color-text-base: #9AA1BC;
-  --color-text-base-muted: #8288A6;
-  --color-text-subdue: #4C5067;
-  --color-icon-primary: #F8F8F2;
-  --color-icon-secondary: #9AA1BC;
-  --color-icon-disabled: #6272A4;
-  --color-icon-accent: #BD93F9;
-  --color-on-accent: #21222C;
-  --color-on-success: #21222C;
-  --color-on-warning: #21222C;
-  --color-on-error: #21222C;
-  --color-on-info: #21222C;
-  --color-functional-red: #DE5735;
-  --color-functional-orange: #A39514;
-  --color-functional-green: #089108;
-  --color-functional-cyan: #0081D6;
-  --color-functional-purple: #815CD6;
-  --color-background-blue: #6272A41A;
-  --color-border-blue: #6272A44D;
-  --color-icon-blue: #6272A4;
-  --color-text-blue: #6272A4;
-  --color-background-cyan: #8BE9FD1A;
-  --color-border-cyan: #8BE9FD4D;
-  --color-icon-cyan: #8BE9FD;
-  --color-text-cyan: #8BE9FD;
-  --color-background-gray: #9AA1BC1A;
-  --color-border-gray: #9AA1BC4D;
-  --color-icon-gray: #9AA1BC;
-  --color-text-gray: #9AA1BC;
-  --color-background-green: #50FA7B1A;
-  --color-border-green: #50FA7B4D;
-  --color-icon-green: #50FA7B;
-  --color-text-green: #50FA7B;
-  --color-background-orange: #FFB86C1A;
-  --color-border-orange: #FFB86C4D;
-  --color-icon-orange: #FFB86C;
-  --color-text-orange: #FFB86C;
-  --color-background-pink: #FF79C61A;
-  --color-border-pink: #FF79C64D;
-  --color-icon-pink: #FF79C6;
-  --color-text-pink: #FF79C6;
-  --color-background-purple: #BD93F91A;
-  --color-border-purple: #BD93F94D;
-  --color-icon-purple: #BD93F9;
-  --color-text-purple: #BD93F9;
-  --color-background-red: #FF55551A;
-  --color-border-red: #FF55554D;
-  --color-icon-red: #FF5555;
-  --color-text-red: #FF5555;
-  --color-background-teal: #A4FFFF1A;
-  --color-border-teal: #A4FFFF4D;
-  --color-icon-teal: #A4FFFF;
-  --color-text-teal: #A4FFFF;
-  --color-background-yellow: #F1FA8C1A;
-  --color-border-yellow: #F1FA8C4D;
-  --color-icon-yellow: #F1FA8C;
-  --color-text-yellow: #F1FA8C;
-  --color-data-categorical-blue: #6272A4;
-  --color-data-categorical-orange: #FFB86C;
-  --color-data-categorical-green: #50FA7B;
-  --color-data-categorical-pink: #FF79C6;
-  --color-data-categorical-cyan: #8BE9FD;
-  --color-data-categorical-red: #FF5555;
-  --color-data-categorical-teal: #A4FFFF;
-  --color-data-categorical-indigo: #D6ACFF;
-  --color-data-neutral: #8C939B;
-  --color-data-purple-5: hsl(264.71 89.47% 28%);
-  --color-data-purple-4: hsl(264.71 89.47% 44%);
-  --color-data-purple-3: hsl(264.71 89.47% 60%);
-  --color-data-purple-2: hsl(264.71 89.47% 74%);
-  --color-data-purple-1: hsl(264.71 89.47% 88%);
-  --color-data-pink-5: hsl(325.52 100% 28%);
-  --color-data-pink-4: hsl(325.52 100% 44%);
-  --color-data-pink-3: hsl(325.52 100% 60%);
-  --color-data-pink-2: hsl(325.52 100% 74%);
-  --color-data-pink-1: hsl(325.52 100% 88%);
-  --color-data-red-5: hsl(0 100% 28%);
-  --color-data-red-4: hsl(0 100% 44%);
-  --color-data-red-3: hsl(0 100% 60%);
-  --color-data-red-2: hsl(0 100% 74%);
-  --color-data-red-1: hsl(0 100% 88%);
-  --color-data-orange-5: hsl(31.02 100% 28%);
-  --color-data-orange-4: hsl(31.02 100% 44%);
-  --color-data-orange-3: hsl(31.02 100% 60%);
-  --color-data-orange-2: hsl(31.02 100% 74%);
-  --color-data-orange-1: hsl(31.02 100% 88%);
-  --color-data-yellow-5: hsl(64.91 91.67% 28%);
-  --color-data-yellow-4: hsl(64.91 91.67% 44%);
-  --color-data-yellow-3: hsl(64.91 91.67% 60%);
-  --color-data-yellow-2: hsl(64.91 91.67% 74%);
-  --color-data-yellow-1: hsl(64.91 91.67% 88%);
-  --color-data-teal-5: hsl(180 100% 28%);
-  --color-data-teal-4: hsl(180 100% 44%);
-  --color-data-teal-3: hsl(180 100% 60%);
-  --color-data-teal-2: hsl(180 100% 74%);
-  --color-data-teal-1: hsl(180 100% 88%);
-  --color-data-blue-5: hsl(225.45 26.61% 28%);
-  --color-data-blue-4: hsl(225.45 26.61% 44%);
-  --color-data-blue-3: hsl(225.45 26.61% 60%);
-  --color-data-blue-2: hsl(225.45 26.61% 74%);
-  --color-data-blue-1: hsl(225.45 26.61% 88%);
-  --color-data-shamrock-5: hsl(135.18 94.44% 28%);
-  --color-data-shamrock-4: hsl(135.18 94.44% 44%);
-  --color-data-shamrock-3: hsl(135.18 94.44% 60%);
-  --color-data-shamrock-2: hsl(135.18 94.44% 74%);
-  --color-data-shamrock-1: hsl(135.18 94.44% 88%);
-  --color-data-gray-5: hsl(231.43 14.89% 28%);
-  --color-data-gray-4: hsl(231.43 14.89% 44%);
-  --color-data-gray-3: hsl(231.43 14.89% 60%);
-  --color-data-gray-2: hsl(231.43 14.89% 74%);
-  --color-data-gray-1: hsl(231.43 14.89% 88%);
-  --color-widget-background: #343746;
-  --color-widget-content-border: #6272A4;
-  --color-widget-background-highlight: #44475A;
-  --color-separator: #44475A;
-  --color-popover-background: #424450;
-  --color-popover-border: #6272A4;
-  --color-progress-border: #44475A;
-  --color-progress-value: #6272A4;
-  --color-vertical-progress-value: #6272A4;
-  --color-graph-gridlines: #44475A;
-  --color-widget-shadow: #21222C;
-  --color-current-line: #6272A4;
-  --color-selection: #44475A;
-  --color-primary: #BD93F9;
-  --color-positive: #50FA7B;
-  --color-negative: #FF5555;
-  --color-tag-orange: #FFB86C;
-  --color-tag-pink: #FF79C6;
-  --color-tag-cyan: #8BE9FD;
-  --color-tag-yellow: #F1FA8C;
-  --color-tag-green: #50FA7B;
-  --color-tag-purple: #BD93F9;
-  /* Renamed in 0.3.0 from `tag-blue`, which held this same #BD93F9. Dracula
+	--color-background-body: #282a36;
+	--color-background: var(--color-background-body);
+	--color-background-surface: #343746;
+	--color-background-card: #343746;
+	--color-background-popover: #424450;
+	--color-background-muted: #44475a;
+	--color-background-inverted: #f8f8f2;
+	--color-background-error-inverted: #ffd5cc;
+	--color-overlay: #191a21cc;
+	--color-overlay-hover: #0000001f;
+	--color-overlay-pressed: #00000033;
+	--color-border: #6272a4;
+	--color-border-emphasized: #9aa1bc;
+	--color-neutral: #f8f8f21a;
+	--color-tint-hover: #ffffff;
+	--color-on-dark: #f8f8f2;
+	--color-on-light: #000000;
+	--color-shadow: #21222c;
+	--color-track: #6272a4;
+	--color-skeleton: #6272a4;
+	--color-accent: #bd93f9;
+	--color-success: #50fa7b;
+	--color-error: #ff5555;
+	--color-warning: #f1fa8c;
+	--color-info: #8be9fd;
+	--color-accent-muted: var(--color-background-purple);
+	--color-success-muted: var(--color-background-green);
+	--color-warning-muted: var(--color-background-yellow);
+	--color-error-muted: var(--color-background-red);
+	--color-info-muted: var(--color-background-cyan);
+	--color-text-primary: #f8f8f2;
+	--color-text-secondary: #9aa1bc;
+	--color-text-disabled: #6272a4;
+	--color-text-accent: #bd93f9;
+	--color-text-highlight: #f8f8f2;
+	--color-text-paragraph: #b0b3c4;
+	--color-text-base: #9aa1bc;
+	--color-text-base-muted: #8288a6;
+	--color-text-subdue: #4c5067;
+	--color-icon-primary: #f8f8f2;
+	--color-icon-secondary: #9aa1bc;
+	--color-icon-disabled: #6272a4;
+	--color-icon-accent: #bd93f9;
+	--color-on-accent: #21222c;
+	--color-on-success: #21222c;
+	--color-on-warning: #21222c;
+	--color-on-error: #21222c;
+	--color-on-info: #21222c;
+	--color-functional-red: #de5735;
+	--color-functional-orange: #a39514;
+	--color-functional-green: #089108;
+	--color-functional-cyan: #0081d6;
+	--color-functional-purple: #815cd6;
+	--color-background-blue: #6272a41a;
+	--color-border-blue: #6272a44d;
+	--color-icon-blue: #6272a4;
+	--color-text-blue: #6272a4;
+	--color-background-cyan: #8be9fd1a;
+	--color-border-cyan: #8be9fd4d;
+	--color-icon-cyan: #8be9fd;
+	--color-text-cyan: #8be9fd;
+	--color-background-gray: #9aa1bc1a;
+	--color-border-gray: #9aa1bc4d;
+	--color-icon-gray: #9aa1bc;
+	--color-text-gray: #9aa1bc;
+	--color-background-green: #50fa7b1a;
+	--color-border-green: #50fa7b4d;
+	--color-icon-green: #50fa7b;
+	--color-text-green: #50fa7b;
+	--color-background-orange: #ffb86c1a;
+	--color-border-orange: #ffb86c4d;
+	--color-icon-orange: #ffb86c;
+	--color-text-orange: #ffb86c;
+	--color-background-pink: #ff79c61a;
+	--color-border-pink: #ff79c64d;
+	--color-icon-pink: #ff79c6;
+	--color-text-pink: #ff79c6;
+	--color-background-purple: #bd93f91a;
+	--color-border-purple: #bd93f94d;
+	--color-icon-purple: #bd93f9;
+	--color-text-purple: #bd93f9;
+	--color-background-red: #ff55551a;
+	--color-border-red: #ff55554d;
+	--color-icon-red: #ff5555;
+	--color-text-red: #ff5555;
+	--color-background-teal: #a4ffff1a;
+	--color-border-teal: #a4ffff4d;
+	--color-icon-teal: #a4ffff;
+	--color-text-teal: #a4ffff;
+	--color-background-yellow: #f1fa8c1a;
+	--color-border-yellow: #f1fa8c4d;
+	--color-icon-yellow: #f1fa8c;
+	--color-text-yellow: #f1fa8c;
+	--color-data-categorical-blue: #6272a4;
+	--color-data-categorical-orange: #ffb86c;
+	--color-data-categorical-green: #50fa7b;
+	--color-data-categorical-pink: #ff79c6;
+	--color-data-categorical-cyan: #8be9fd;
+	--color-data-categorical-red: #ff5555;
+	--color-data-categorical-teal: #a4ffff;
+	--color-data-categorical-indigo: #d6acff;
+	--color-data-neutral: #8c939b;
+	--color-data-purple-5: hsl(264.71 89.47% 28%);
+	--color-data-purple-4: hsl(264.71 89.47% 44%);
+	--color-data-purple-3: hsl(264.71 89.47% 60%);
+	--color-data-purple-2: hsl(264.71 89.47% 74%);
+	--color-data-purple-1: hsl(264.71 89.47% 88%);
+	--color-data-pink-5: hsl(325.52 100% 28%);
+	--color-data-pink-4: hsl(325.52 100% 44%);
+	--color-data-pink-3: hsl(325.52 100% 60%);
+	--color-data-pink-2: hsl(325.52 100% 74%);
+	--color-data-pink-1: hsl(325.52 100% 88%);
+	--color-data-red-5: hsl(0 100% 28%);
+	--color-data-red-4: hsl(0 100% 44%);
+	--color-data-red-3: hsl(0 100% 60%);
+	--color-data-red-2: hsl(0 100% 74%);
+	--color-data-red-1: hsl(0 100% 88%);
+	--color-data-orange-5: hsl(31.02 100% 28%);
+	--color-data-orange-4: hsl(31.02 100% 44%);
+	--color-data-orange-3: hsl(31.02 100% 60%);
+	--color-data-orange-2: hsl(31.02 100% 74%);
+	--color-data-orange-1: hsl(31.02 100% 88%);
+	--color-data-yellow-5: hsl(64.91 91.67% 28%);
+	--color-data-yellow-4: hsl(64.91 91.67% 44%);
+	--color-data-yellow-3: hsl(64.91 91.67% 60%);
+	--color-data-yellow-2: hsl(64.91 91.67% 74%);
+	--color-data-yellow-1: hsl(64.91 91.67% 88%);
+	--color-data-teal-5: hsl(180 100% 28%);
+	--color-data-teal-4: hsl(180 100% 44%);
+	--color-data-teal-3: hsl(180 100% 60%);
+	--color-data-teal-2: hsl(180 100% 74%);
+	--color-data-teal-1: hsl(180 100% 88%);
+	--color-data-blue-5: hsl(225.45 26.61% 28%);
+	--color-data-blue-4: hsl(225.45 26.61% 44%);
+	--color-data-blue-3: hsl(225.45 26.61% 60%);
+	--color-data-blue-2: hsl(225.45 26.61% 74%);
+	--color-data-blue-1: hsl(225.45 26.61% 88%);
+	--color-data-shamrock-5: hsl(135.18 94.44% 28%);
+	--color-data-shamrock-4: hsl(135.18 94.44% 44%);
+	--color-data-shamrock-3: hsl(135.18 94.44% 60%);
+	--color-data-shamrock-2: hsl(135.18 94.44% 74%);
+	--color-data-shamrock-1: hsl(135.18 94.44% 88%);
+	--color-data-gray-5: hsl(231.43 14.89% 28%);
+	--color-data-gray-4: hsl(231.43 14.89% 44%);
+	--color-data-gray-3: hsl(231.43 14.89% 60%);
+	--color-data-gray-2: hsl(231.43 14.89% 74%);
+	--color-data-gray-1: hsl(231.43 14.89% 88%);
+	--color-widget-background: #343746;
+	--color-widget-content-border: #6272a4;
+	--color-widget-background-highlight: #44475a;
+	--color-separator: #44475a;
+	--color-popover-background: #424450;
+	--color-popover-border: #6272a4;
+	--color-progress-border: #44475a;
+	--color-progress-value: #6272a4;
+	--color-vertical-progress-value: #6272a4;
+	--color-graph-gridlines: #44475a;
+	--color-widget-shadow: #21222c;
+	--color-current-line: #6272a4;
+	--color-selection: #44475a;
+	--color-primary: #bd93f9;
+	--color-positive: #50fa7b;
+	--color-negative: #ff5555;
+	--color-tag-orange: #ffb86c;
+	--color-tag-pink: #ff79c6;
+	--color-tag-cyan: #8be9fd;
+	--color-tag-yellow: #f1fa8c;
+	--color-tag-green: #50fa7b;
+	--color-tag-purple: #bd93f9;
+	/* Renamed in 0.3.0 from `tag-blue`, which held this same #BD93F9. Dracula
    * has no blue; Purple is what the rest of the kit already uses for a fourth
    * accent, so the VALUE was right and the NAME was the lie. Renamed rather
    * than repinned, because a `blue` tag that paints purple is wrong in a way
@@ -387,35 +387,35 @@ body {
  * rules cannot be verified there. Check them in a real Chrome against
  * /templates and /bento: resting thumb Current Line, hover Purple. */
 @supports (scrollbar-color: auto) and (not (-webkit-hyphens: none)) {
-  :root {
-    scrollbar-color: var(--dracula-current-line) transparent;
-  }
+	:root {
+		scrollbar-color: var(--dracula-current-line) transparent;
+	}
 }
 
 @supports selector(::-webkit-scrollbar) {
-  *::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-    background: transparent;
-  }
+	*::-webkit-scrollbar {
+		width: 10px;
+		height: 10px;
+		background: transparent;
+	}
 
-  *::-webkit-scrollbar-track,
-  *::-webkit-scrollbar-corner {
-    background: transparent;
-  }
+	*::-webkit-scrollbar-track,
+	*::-webkit-scrollbar-corner {
+		background: transparent;
+	}
 
-  *::-webkit-scrollbar-thumb {
-    background-color: var(--dracula-current-line);
-    border-radius: 5px;
-    border: 2px solid transparent;
-    background-clip: content-box;
-  }
+	*::-webkit-scrollbar-thumb {
+		background-color: var(--dracula-current-line);
+		border-radius: 5px;
+		border: 2px solid transparent;
+		background-clip: content-box;
+	}
 
-  *::-webkit-scrollbar-thumb:hover {
-    background-color: var(--dracula-purple);
-    border: 2px solid transparent;
-    background-clip: content-box;
-  }
+	*::-webkit-scrollbar-thumb:hover {
+		background-color: var(--dracula-purple);
+		border: 2px solid transparent;
+		background-clip: content-box;
+	}
 }
 
 /* A resizable SideNav reports exactly 1px of horizontal overflow: the resize
@@ -433,7 +433,7 @@ body {
  * (overflow:auto on both axes) reports scrollWidth 301 > 300 — the permanent
  * bar is back. Keep. */
 .astryx-app-shell-sidenav .astryx-resize-handle {
-  overflow: hidden;
+	overflow: hidden;
 }
 
 /* Astryx leaves the resize handle's drag surface translated -50% along the
@@ -447,12 +447,10 @@ body {
  * [-50%,+50%] of the rail and the bottom half is dead (elementFromPoint hits
  * the handle, which has no pointer handler). Upstream workaround; drop it if
  * the component starts positioning its own hit area. */
-.astryx-app-shell-sidenav
-  .astryx-resize-handle
-  > :not(.astryx-resize-handle-pill) {
-  top: 50%;
-  bottom: auto;
-  height: 100%;
+.astryx-app-shell-sidenav .astryx-resize-handle > :not(.astryx-resize-handle-pill) {
+	top: 50%;
+	bottom: auto;
+	height: 100%;
 }
 
 /* Everything below this line is UNLAYERED on purpose, and that is load-bearing,
@@ -486,17 +484,17 @@ body {
  * carousel relies on a layered `scrollbar-width: none` to hide its bar and a
  * universal rule here would un-hide it (the one scrollbar-width in the stack). */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms;
-    animation-iteration-count: 1;
-    transition-duration: 0.01ms;
-  }
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms;
+		animation-iteration-count: 1;
+		transition-duration: 0.01ms;
+	}
 
-  html {
-    scroll-behavior: auto;
-  }
+	html {
+		scroll-behavior: auto;
+	}
 }
 
 /* Sticky-header focus and in-page anchor offset. AppShell in `auto` mode pins
@@ -519,6 +517,5 @@ body {
  * correct at every viewport width and in both AppShell modes — with
  * `--spacing-8` only as the fallback for pages that have no sticky header at all. */
 :where(:focus-visible, h1, h2, h3, h4, [id]) {
-  scroll-margin-block: var(--appshell-header-height, var(--spacing-8))
-    var(--space-viewport);
+	scroll-margin-block: var(--appshell-header-height, var(--spacing-8)) var(--space-viewport);
 }

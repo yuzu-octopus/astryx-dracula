@@ -21,21 +21,21 @@
 //
 // Not interactive. A legend is a key, not a control: no hover, no focus ring.
 
-import type {ReactNode} from 'react';
-import {HStack, StackItem, VStack} from '@astryxdesign/core/Stack';
-import {Text} from '@astryxdesign/core/Text';
-import type {ChartHue} from 'astryx-dracula/shared/chart-hues';
+import { HStack, StackItem, VStack } from "@astryxdesign/core/Stack";
+import { Text } from "@astryxdesign/core/Text";
+import type { ChartHue } from "astryx-dracula/shared/chart-hues";
+import type { ReactNode } from "react";
 
 export interface ChartLegendEntry {
-  /** REQUIRED. The hue never travels alone — this is the 1.4.1 contract. */
-  label: string;
-  /** A --color-data-* var, or a --color-background-* surface. Never a raw
-   *  hex, never a --dracula-* primitive.
-   *
-   *  The surface arm is not optional: a legend whose first row is a recessive
-   *  surface is normal (the heatmap's zero cell), so a data-only type would
-   *  reject the value the heatmap is supposed to paint. */
-  color: ChartHue | `var(--color-data-${string})` | `var(--color-background-${string})`;
+	/** REQUIRED. The hue never travels alone — this is the 1.4.1 contract. */
+	label: string;
+	/** A --color-data-* var, or a --color-background-* surface. Never a raw
+	 *  hex, never a --dracula-* primitive.
+	 *
+	 *  The surface arm is not optional: a legend whose first row is a recessive
+	 *  surface is normal (the heatmap's zero cell), so a data-only type would
+	 *  reject the value the heatmap is supposed to paint. */
+	color: ChartHue | `var(--color-data-${string})` | `var(--color-background-${string})`;
 }
 
 // Kept as a string-keyed fall-through on purpose, and DO NOT narrow it: call
@@ -47,53 +47,52 @@ export interface ChartLegendEntry {
 // none does. The behaviour is correct; only the comment was wrong.
 
 export interface ChartLegendProps {
-  entries: readonly ChartLegendEntry[];
-  /** Spacing step between entries. @default 2 */
-  gap?: 1 | 2 | 3 | 4 | 6;
-  /** Accessible name for the legend as a group. */
-  label?: string;
-  /** Swatch size in px. @default 10 */
-  swatchSize?: number;
-  /** Caption under the legend, e.g. "Hourly intervals · trailing 24 hours". */
-  caption?: ReactNode;
-  /** Orientation. @default 'row' */
-  direction?: 'row' | 'column';
+	entries: readonly ChartLegendEntry[];
+	/** Spacing step between entries. @default 2 */
+	gap?: 1 | 2 | 3 | 4 | 6;
+	/** Accessible name for the legend as a group. */
+	label?: string;
+	/** Swatch size in px. @default 10 */
+	swatchSize?: number;
+	/** Caption under the legend, e.g. "Hourly intervals · trailing 24 hours". */
+	caption?: ReactNode;
+	/** Orientation. @default 'row' */
+	direction?: "row" | "column";
 }
 
-
 export function ChartLegend({
-  entries,
-  gap = 2,
-  swatchSize = 10,
-  label,
-  caption,
-  direction = 'row',
+	entries,
+	gap = 2,
+	swatchSize = 10,
+	label,
+	caption,
+	direction = "row",
 }: ChartLegendProps) {
-  const Stack = direction === 'row' ? HStack : VStack;
-  return (
-    <VStack gap={1}>
-      <Stack gap={gap} vAlign="center" role="list" aria-label={label}>
-        {entries.map(entry => (
-          <HStack key={entry.label} gap={1} vAlign="center" role="listitem">
-            <StackItem
-              style={{
-                width: `${swatchSize}px`,
-                height: `${swatchSize}px`,
-                flexShrink: 0,
-                background: entry.color,
-                borderRadius: 'var(--radius-inner)',
-              }}
-            />
-            {/* supporting, not body: a legend label is metadata by the
+	const Stack = direction === "row" ? HStack : VStack;
+	return (
+		<VStack gap={1}>
+			<Stack gap={gap} vAlign="center" role="list" aria-label={label}>
+				{entries.map((entry) => (
+					<HStack key={entry.label} gap={1} vAlign="center" role="listitem">
+						<StackItem
+							style={{
+								width: `${swatchSize}px`,
+								height: `${swatchSize}px`,
+								flexShrink: 0,
+								background: entry.color,
+								borderRadius: "var(--radius-inner)",
+							}}
+						/>
+						{/* supporting, not body: a legend label is metadata by the
                 typography doctrine, and it never carries a sentence the page
                 needs the reader to have. */}
-            <Text type="supporting" color="secondary" hasTabularNumbers>
-              {entry.label}
-            </Text>
-          </HStack>
-        ))}
-      </Stack>
-      {caption}
-    </VStack>
-  );
+						<Text type="supporting" color="secondary" hasTabularNumbers>
+							{entry.label}
+						</Text>
+					</HStack>
+				))}
+			</Stack>
+			{caption}
+		</VStack>
+	);
 }

@@ -2,314 +2,277 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   Ctr > V[a=center] > S.transparent[p=6] > V[g=6] > (V[g=2 a=center] > Hd"Let's brew after dark"[level=1] + Tx"Tell us a bit"[t=body]) + (V[g=4] > Hd"Why work with us"[level=2] + (G[c={min:200} g=4] > (C > V[g=3] > Ic + (V[g=1] > Hd"Title"[level=3] + Tx"Desc"[t=body]))*3)) + (V[g=4] > Hd"Your details"[level=2] + (G[c={min:260} g=4] > TI"Full name" + TI"Email") + (G[c={min:260} g=4] > TI"Company" + TI"Phone")) + D + (V[g=4] > Hd"Your project"[level=2] + (Fd"Goals"[req] > (H[g=2] > Tk"Goal"*10)) + SE"Timeline" + SE"Budget" + (RL"Source" > RLI*5) + TA"Notes" + CB"Decision maker") + (V[g=3] > B.primary"Send it into the night" + (Tx[t=supporting] > Lk"Privacy Policy"))
 
-import {useState} from 'react';
-import {VStack, HStack} from '@astryxdesign/core/Layout';
-import {Center} from '@astryxdesign/core/Center';
-import {Section} from '@astryxdesign/core/Section';
-import {Grid} from '@astryxdesign/core/Grid';
-import {Card} from '@astryxdesign/core/Card';
-import {Button} from '@astryxdesign/core/Button';
-import {Text, Heading} from '@astryxdesign/core/Text';
-import {Icon} from '@astryxdesign/core/Icon';
-import {TextInput} from '@astryxdesign/core/TextInput';
-import {Selector} from '@astryxdesign/core/Selector';
-import {CheckboxInput} from '@astryxdesign/core/CheckboxInput';
-import {Link} from '@astryxdesign/core/Link';
-import {Token} from '@astryxdesign/core/Token';
-import {RadioList, RadioListItem} from '@astryxdesign/core/RadioList';
-import {TextArea} from '@astryxdesign/core/TextArea';
-import {Divider} from '@astryxdesign/core/Divider';
-import {Field} from '@astryxdesign/core/Field';
-import {Rocket, SlidersHorizontal, Hand, Check} from 'lucide-react';
+import { Button } from "@astryxdesign/core/Button";
+import { Card } from "@astryxdesign/core/Card";
+import { Center } from "@astryxdesign/core/Center";
+import { CheckboxInput } from "@astryxdesign/core/CheckboxInput";
+import { Divider } from "@astryxdesign/core/Divider";
+import { Field } from "@astryxdesign/core/Field";
+import { Grid } from "@astryxdesign/core/Grid";
+import { Icon } from "@astryxdesign/core/Icon";
+import { HStack, VStack } from "@astryxdesign/core/Layout";
+import { Link } from "@astryxdesign/core/Link";
+import { RadioList, RadioListItem } from "@astryxdesign/core/RadioList";
+import { Section } from "@astryxdesign/core/Section";
+import { Selector } from "@astryxdesign/core/Selector";
+import { Heading, Text } from "@astryxdesign/core/Text";
+import { TextArea } from "@astryxdesign/core/TextArea";
+import { TextInput } from "@astryxdesign/core/TextInput";
+import { Token } from "@astryxdesign/core/Token";
+import { Check, Hand, Rocket, SlidersHorizontal } from "lucide-react";
+import { useState } from "react";
 
 const CAMPAIGN_GOALS = [
-  'Brand Awareness',
-  'Product Sampling',
-  'Product Launch',
-  'Event Promotion',
-  'Retail / In-Store',
-  'Trade Show',
-  'Influencer Activation',
-  'Community Building',
-  'Seasonal Campaign',
-  'Other',
+	"Brand Awareness",
+	"Product Sampling",
+	"Product Launch",
+	"Event Promotion",
+	"Retail / In-Store",
+	"Trade Show",
+	"Influencer Activation",
+	"Community Building",
+	"Seasonal Campaign",
+	"Other",
 ];
 
 const LAUNCH_OPTIONS = [
-  'Within 30 days',
-  '1\u20133 months',
-  '3\u20136 months',
-  '6\u201312 months',
-  '12+ months',
+	"Within 30 days",
+	"1\u20133 months",
+	"3\u20136 months",
+	"6\u201312 months",
+	"12+ months",
 ];
 
 const BUDGET_OPTIONS = [
-  'Under $5K/mo',
-  '$5K\u2013$15K/mo',
-  '$15K\u2013$50K/mo',
-  '$50K\u2013$100K/mo',
-  '$100K+/mo',
+	"Under $5K/mo",
+	"$5K\u2013$15K/mo",
+	"$15K\u2013$50K/mo",
+	"$50K\u2013$100K/mo",
+	"$100K+/mo",
 ];
 
 const WHY_US = [
-  {
-    icon: Rocket,
-    title: 'We ship before sunrise',
-    description: 'We cut through the fog and land the work before dawn.',
-  },
-  {
-    icon: SlidersHorizontal,
-    title: 'We tune around you',
-    description: "Every dial set to what you're trying to summon.",
-  },
-  {
-    icon: Hand,
-    title: 'We answer after dark',
-    description: 'A dedicated coven that knows your brand and haunts your roadmap.',
-  },
+	{
+		icon: Rocket,
+		title: "We ship before sunrise",
+		description: "We cut through the fog and land the work before dawn.",
+	},
+	{
+		icon: SlidersHorizontal,
+		title: "We tune around you",
+		description: "Every dial set to what you're trying to summon.",
+	},
+	{
+		icon: Hand,
+		title: "We answer after dark",
+		description: "A dedicated coven that knows your brand and haunts your roadmap.",
+	},
 ];
 
 /**
  * Contact Form — lead capture form template
  */
 export default function ContactForm() {
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [company, setCompany] = useState('');
-  const [phone, setPhone] = useState('');
-  const [goals, setGoals] = useState<string[]>([]);
-  const [timeline, setTimeline] = useState('');
-  const [budget, setBudget] = useState('');
-  const [message, setMessage] = useState('');
-  const [hearAboutUs, setHearAboutUs] = useState('');
-  const [isDecider, setIsDecider] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+	const [fullName, setFullName] = useState("");
+	const [email, setEmail] = useState("");
+	const [company, setCompany] = useState("");
+	const [phone, setPhone] = useState("");
+	const [goals, setGoals] = useState<string[]>([]);
+	const [timeline, setTimeline] = useState("");
+	const [budget, setBudget] = useState("");
+	const [message, setMessage] = useState("");
+	const [hearAboutUs, setHearAboutUs] = useState("");
+	const [isDecider, setIsDecider] = useState(false);
+	const [submitted, setSubmitted] = useState(false);
 
-  const errors = submitted
-    ? {
-        fullName: !fullName.trim() ? 'Required' : undefined,
-        email: !email.trim() ? 'Required' : undefined,
-        company: !company.trim() ? 'Required' : undefined,
-        phone: !phone.trim() ? 'Required' : undefined,
-        goals: goals.length === 0 ? 'Pick at least one' : undefined,
-        timeline: !timeline ? 'Required' : undefined,
-        budget: !budget ? 'Required' : undefined,
-      }
-    : {};
+	const errors = submitted
+		? {
+				fullName: !fullName.trim() ? "Required" : undefined,
+				email: !email.trim() ? "Required" : undefined,
+				company: !company.trim() ? "Required" : undefined,
+				phone: !phone.trim() ? "Required" : undefined,
+				goals: goals.length === 0 ? "Pick at least one" : undefined,
+				timeline: !timeline ? "Required" : undefined,
+				budget: !budget ? "Required" : undefined,
+			}
+		: {};
 
-  const toggleGoal = (goal: string) =>
-    setGoals(prev =>
-      prev.includes(goal) ? prev.filter(g => g !== goal) : [...prev, goal],
-    );
+	const toggleGoal = (goal: string) =>
+		setGoals((prev) => (prev.includes(goal) ? prev.filter((g) => g !== goal) : [...prev, goal]));
 
-  return (
-    <Center axis="horizontal">
-      <VStack hAlign="center" width="100%">
-        <Section maxWidth={800} width="100%" padding={6} variant="transparent">
-          <VStack gap={6}>
-            {/* Header */}
-            <VStack gap={2} hAlign="center" style={{textAlign: 'center'}}>
-              <Heading level={1} type="display-2">
-                Let&apos;s brew after dark
-              </Heading>
-              <Text type="body" color="secondary">
-                Tell us a bit about what you&apos;re summoning, and the coven
-                would love to help it take flight.
-              </Text>
-            </VStack>
+	return (
+		<Center axis="horizontal">
+			<VStack hAlign="center" width="100%">
+				<Section maxWidth={800} width="100%" padding={6} variant="transparent">
+					<VStack gap={6}>
+						{/* Header */}
+						<VStack gap={2} hAlign="center" style={{ textAlign: "center" }}>
+							<Heading level={1} type="display-2">
+								Let&apos;s brew after dark
+							</Heading>
+							<Text type="body" color="secondary">
+								Tell us a bit about what you&apos;re summoning, and the coven would love to help it
+								take flight.
+							</Text>
+						</VStack>
 
-            {/* Why work with us */}
-            <VStack gap={4}>
-              <Heading level={2}>Why work with us</Heading>
-              <Grid columns={{minWidth: 200}} gap={4}>
-                {WHY_US.map(item => (
-                  <Card key={item.title}>
-                    <VStack gap={3}>
-                      <Icon icon={item.icon} size="lg" color="secondary" />
-                      <VStack gap={1}>
-                        <Heading level={3}>{item.title}</Heading>
-                        <Text type="body" color="secondary">
-                          {item.description}
-                        </Text>
-                      </VStack>
-                    </VStack>
-                  </Card>
-                ))}
-              </Grid>
-            </VStack>
+						{/* Why work with us */}
+						<VStack gap={4}>
+							<Heading level={2}>Why work with us</Heading>
+							<Grid columns={{ minWidth: 200 }} gap={4}>
+								{WHY_US.map((item) => (
+									<Card key={item.title}>
+										<VStack gap={3}>
+											<Icon icon={item.icon} size="lg" color="secondary" />
+											<VStack gap={1}>
+												<Heading level={3}>{item.title}</Heading>
+												<Text type="body" color="secondary">
+													{item.description}
+												</Text>
+											</VStack>
+										</VStack>
+									</Card>
+								))}
+							</Grid>
+						</VStack>
 
-            {/* Your details */}
-            <VStack gap={4}>
-              <Heading level={2}>Your details</Heading>
-              <Grid columns={{minWidth: 260}} gap={4}>
-                <TextInput
-                  label="Full name"
-                  isRequired
-                  placeholder="Full name"
-                  value={fullName}
-                  onChange={setFullName}
-                  status={
-                    errors.fullName
-                      ? {type: 'error', message: errors.fullName}
-                      : undefined
-                  }
-                />
-                <TextInput
-                  label="Email"
-                  isRequired
-                  placeholder="you@company.com"
-                  value={email}
-                  onChange={setEmail}
-                  status={
-                    errors.email
-                      ? {type: 'error', message: errors.email}
-                      : undefined
-                  }
-                />
-              </Grid>
-              <Grid columns={{minWidth: 260}} gap={4}>
-                <TextInput
-                  label="Company"
-                  isRequired
-                  placeholder="Company"
-                  value={company}
-                  onChange={setCompany}
-                  status={
-                    errors.company
-                      ? {type: 'error', message: errors.company}
-                      : undefined
-                  }
-                />
-                <TextInput
-                  label="Phone"
-                  isRequired
-                  placeholder="Phone number"
-                  value={phone}
-                  onChange={setPhone}
-                  status={
-                    errors.phone
-                      ? {type: 'error', message: errors.phone}
-                      : undefined
-                  }
-                />
-              </Grid>
-            </VStack>
+						{/* Your details */}
+						<VStack gap={4}>
+							<Heading level={2}>Your details</Heading>
+							<Grid columns={{ minWidth: 260 }} gap={4}>
+								<TextInput
+									label="Full name"
+									isRequired
+									placeholder="Full name"
+									value={fullName}
+									onChange={setFullName}
+									status={errors.fullName ? { type: "error", message: errors.fullName } : undefined}
+								/>
+								<TextInput
+									label="Email"
+									isRequired
+									placeholder="you@company.com"
+									value={email}
+									onChange={setEmail}
+									status={errors.email ? { type: "error", message: errors.email } : undefined}
+								/>
+							</Grid>
+							<Grid columns={{ minWidth: 260 }} gap={4}>
+								<TextInput
+									label="Company"
+									isRequired
+									placeholder="Company"
+									value={company}
+									onChange={setCompany}
+									status={errors.company ? { type: "error", message: errors.company } : undefined}
+								/>
+								<TextInput
+									label="Phone"
+									isRequired
+									placeholder="Phone number"
+									value={phone}
+									onChange={setPhone}
+									status={errors.phone ? { type: "error", message: errors.phone } : undefined}
+								/>
+							</Grid>
+						</VStack>
 
-            <Divider />
+						<Divider />
 
-            {/* Your project */}
-            <VStack gap={4}>
-              <Heading level={2}>Your project</Heading>
-              <Field
-                label="What are you going for?"
-                inputID="campaign-goals"
-                labelID="campaign-goals-label"
-                isGroupLabel
-                isRequired
-                status={
-                  errors.goals
-                    ? {type: 'error', message: errors.goals}
-                    : undefined
-                }>
-                <HStack
-                  gap={2}
-                  wrap="wrap"
-                  role="group"
-                  aria-labelledby="campaign-goals-label">
-                  {CAMPAIGN_GOALS.map(goal => {
-                    const isSelected = goals.includes(goal);
-                    return (
-                      <Token
-                        key={goal}
-                        label={goal}
-                        color={isSelected ? 'yellow' : 'default'}
-                        icon={
-                          isSelected ? (
-                            <Icon icon={Check} size="xsm" color="inherit" />
-                          ) : undefined
-                        }
-                        description={isSelected ? 'Selected' : undefined}
-                        onClick={() => toggleGoal(goal)}
-                      />
-                    );
-                  })}
-                </HStack>
-              </Field>
+						{/* Your project */}
+						<VStack gap={4}>
+							<Heading level={2}>Your project</Heading>
+							<Field
+								label="What are you going for?"
+								inputID="campaign-goals"
+								labelID="campaign-goals-label"
+								isGroupLabel
+								isRequired
+								status={errors.goals ? { type: "error", message: errors.goals } : undefined}
+							>
+								<HStack gap={2} wrap="wrap" role="group" aria-labelledby="campaign-goals-label">
+									{CAMPAIGN_GOALS.map((goal) => {
+										const isSelected = goals.includes(goal);
+										return (
+											<Token
+												key={goal}
+												label={goal}
+												color={isSelected ? "yellow" : "default"}
+												icon={
+													isSelected ? <Icon icon={Check} size="xsm" color="inherit" /> : undefined
+												}
+												description={isSelected ? "Selected" : undefined}
+												onClick={() => toggleGoal(goal)}
+											/>
+										);
+									})}
+								</HStack>
+							</Field>
 
-              <Selector
-                label="When are you thinking?"
-                isRequired
-                placeholder="When are you thinking of launching?"
-                options={LAUNCH_OPTIONS}
-                value={timeline}
-                onChange={setTimeline}
-                status={
-                  errors.timeline
-                    ? {type: 'error', message: errors.timeline}
-                    : undefined
-                }
-              />
+							<Selector
+								label="When are you thinking?"
+								isRequired
+								placeholder="When are you thinking of launching?"
+								options={LAUNCH_OPTIONS}
+								value={timeline}
+								onChange={setTimeline}
+								status={errors.timeline ? { type: "error", message: errors.timeline } : undefined}
+							/>
 
-              <Selector
-                label="Ballpark budget?"
-                isRequired
-                placeholder="What's your rough monthly budget?"
-                options={BUDGET_OPTIONS}
-                value={budget}
-                onChange={setBudget}
-                status={
-                  errors.budget
-                    ? {type: 'error', message: errors.budget}
-                    : undefined
-                }
-              />
+							<Selector
+								label="Ballpark budget?"
+								isRequired
+								placeholder="What's your rough monthly budget?"
+								options={BUDGET_OPTIONS}
+								value={budget}
+								onChange={setBudget}
+								status={errors.budget ? { type: "error", message: errors.budget } : undefined}
+							/>
 
-              <RadioList
-                label="How did you hear about us?"
-                value={hearAboutUs}
-                onChange={setHearAboutUs}>
-                <RadioListItem label="Social media" value="social" />
-                <RadioListItem label="Word of mouth" value="word-of-mouth" />
-                <RadioListItem label="Search engine" value="search" />
-                <RadioListItem label="Event or conference" value="event" />
-                <RadioListItem label="Other" value="other" />
-              </RadioList>
+							<RadioList
+								label="How did you hear about us?"
+								value={hearAboutUs}
+								onChange={setHearAboutUs}
+							>
+								<RadioListItem label="Social media" value="social" />
+								<RadioListItem label="Word of mouth" value="word-of-mouth" />
+								<RadioListItem label="Search engine" value="search" />
+								<RadioListItem label="Event or conference" value="event" />
+								<RadioListItem label="Other" value="other" />
+							</RadioList>
 
-              <TextArea
-                label="Anything else?"
-                placeholder="Tell us whatever else is on your mind…"
-                value={message}
-                onChange={setMessage}
-              />
+							<TextArea
+								label="Anything else?"
+								placeholder="Tell us whatever else is on your mind…"
+								value={message}
+								onChange={setMessage}
+							/>
 
-              <CheckboxInput
-                label="I'm a budget decision-maker"
-                value={isDecider}
-                onChange={setIsDecider}
-              />
-            </VStack>
+							<CheckboxInput
+								label="I'm a budget decision-maker"
+								value={isDecider}
+								onChange={setIsDecider}
+							/>
+						</VStack>
 
-            {/* Submit */}
-            <VStack gap={3}>
-              <Button
-                label="Send it into the night"
-                variant="primary"
-                onClick={() => setSubmitted(true)}
-              />
-              <Text type="supporting" color="secondary">
-                By submitting you agree to our{' '}
-                <Link
-                  href="#/templates/contact-form"
-                  type="supporting"
-                  hasUnderline>
-                  Privacy Policy
-                </Link>
-                .
-              </Text>
-            </VStack>
-          </VStack>
-        </Section>
-      </VStack>
-    </Center>
-  );
+						{/* Submit */}
+						<VStack gap={3}>
+							<Button
+								label="Send it into the night"
+								variant="primary"
+								onClick={() => setSubmitted(true)}
+							/>
+							<Text type="supporting" color="secondary">
+								By submitting you agree to our{" "}
+								<Link href="#/templates/contact-form" type="supporting" hasUnderline>
+									Privacy Policy
+								</Link>
+								.
+							</Text>
+						</VStack>
+					</VStack>
+				</Section>
+			</VStack>
+		</Center>
+	);
 }

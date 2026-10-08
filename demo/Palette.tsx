@@ -1,74 +1,120 @@
-import { Card, Grid, Heading, HStack, Text, VStack } from '@astryxdesign/core';
+import { Card, Grid, Heading, HStack, Text, VStack } from "@astryxdesign/core";
 
 interface Swatch {
-  name: string;
-  hex: string;
-  token: string;
-  role: string;
+	name: string;
+	hex: string;
+	token: string;
+	role: string;
 }
 
 const SWATCHES: Swatch[] = [
-  { name: 'Background', hex: '#282A36', token: '--dracula-bg', role: 'Canvas & page wash' },
-  { name: 'Current Line', hex: '#6272A4', token: '--dracula-current-line', role: 'Active line & visible edges' },
-  { name: 'Selection', hex: '#44475A', token: '--dracula-selection', role: 'Selected rows & quiet borders' },
-  { name: 'Foreground', hex: '#F8F8F2', token: '--dracula-fg', role: 'Primary high-contrast text' },
-  { name: 'Comment', hex: '#6272A4', token: '--dracula-comment', role: 'Subdued captions & disabled text' },
-  { name: 'Purple', hex: '#BD93F9', token: '--dracula-purple', role: 'Primary accent & tappable titles' },
-  { name: 'Cyan', hex: '#8BE9FD', token: '--dracula-cyan', role: 'Informational alerts & secondary links' },
-  { name: 'Green', hex: '#50FA7B', token: '--dracula-green', role: 'Success, online status & added lines' },
-  { name: 'Orange', hex: '#FFB86C', token: '--dracula-orange', role: 'Warnings & categorical charts' },
-  { name: 'Pink', hex: '#FF79C6', token: '--dracula-pink', role: 'Accent flair & syntax keywords' },
-  { name: 'Yellow', hex: '#F1FA8C', token: '--dracula-yellow', role: 'Tags, chips & string literals' },
-  { name: 'Red', hex: '#FF5555', token: '--dracula-red', role: 'Errors, destructive actions & deletions' },
+	{ name: "Background", hex: "#282A36", token: "--dracula-bg", role: "Canvas & page wash" },
+	{
+		name: "Current Line",
+		hex: "#6272A4",
+		token: "--dracula-current-line",
+		role: "Active line & visible edges",
+	},
+	{
+		name: "Selection",
+		hex: "#44475A",
+		token: "--dracula-selection",
+		role: "Selected rows & quiet borders",
+	},
+	{ name: "Foreground", hex: "#F8F8F2", token: "--dracula-fg", role: "Primary high-contrast text" },
+	{
+		name: "Comment",
+		hex: "#6272A4",
+		token: "--dracula-comment",
+		role: "Subdued captions & disabled text",
+	},
+	{
+		name: "Purple",
+		hex: "#BD93F9",
+		token: "--dracula-purple",
+		role: "Primary accent & tappable titles",
+	},
+	{
+		name: "Cyan",
+		hex: "#8BE9FD",
+		token: "--dracula-cyan",
+		role: "Informational alerts & secondary links",
+	},
+	{
+		name: "Green",
+		hex: "#50FA7B",
+		token: "--dracula-green",
+		role: "Success, online status & added lines",
+	},
+	{
+		name: "Orange",
+		hex: "#FFB86C",
+		token: "--dracula-orange",
+		role: "Warnings & categorical charts",
+	},
+	{ name: "Pink", hex: "#FF79C6", token: "--dracula-pink", role: "Accent flair & syntax keywords" },
+	{
+		name: "Yellow",
+		hex: "#F1FA8C",
+		token: "--dracula-yellow",
+		role: "Tags, chips & string literals",
+	},
+	{
+		name: "Red",
+		hex: "#FF5555",
+		token: "--dracula-red",
+		role: "Errors, destructive actions & deletions",
+	},
 ];
 
 export function Palette() {
-  return (
-    <VStack gap={5}>
-      <VStack gap={1}>
-        <Heading level={2}>Spec Palette</Heading>
-        <Text type="body" color="secondary">
-          Twelve pinned hex values from the official Dracula specification. Every component token resolves to this palette.
-        </Text>
-      </VStack>
+	return (
+		<VStack gap={5}>
+			<VStack gap={1}>
+				<Heading level={2}>Spec Palette</Heading>
+				<Text type="body" color="secondary">
+					Twelve pinned hex values from the official Dracula specification. Every component token
+					resolves to this palette.
+				</Text>
+			</VStack>
 
-      <Grid columns={{ minWidth: 240, max: 4 }} gap={3}>
-        {SWATCHES.map((s) => (
-          <Card key={s.name} padding={3}>
-            <VStack gap={2}>
-              {/* Raw hex is correct here: the swatch shows the pinned spec
+			<Grid columns={{ minWidth: 240, max: 4 }} gap={3}>
+				{SWATCHES.map((s) => (
+					<Card key={s.name} padding={3}>
+						<VStack gap={2}>
+							{/* Raw hex is correct here: the swatch shows the pinned spec
                   value, so it paints s.hex rather than var(--dracula-*);
                   a token reference could not reveal a drifted token. */}
-              <Card
-                padding={0}
-                style={{
-                  backgroundColor: s.hex,
-                  height: 'var(--spacing-8)',
-                  width: '100%',
-                  borderRadius: 'var(--border-radius)',
-                  border: 'var(--border-width) solid var(--color-separator)',
-                }}
-              >
-                <></>
-              </Card>
-              <VStack gap={0.5}>
-                <HStack justify="between" vAlign="center">
-                  <Text weight="semibold">{s.name}</Text>
-                  <Text type="code" color="secondary">
-                    {s.hex}
-                  </Text>
-                </HStack>
-                <Text type="code" color="secondary">
-                  {s.token}
-                </Text>
-                <Text type="supporting" color="secondary">
-                  {s.role}
-                </Text>
-              </VStack>
-            </VStack>
-          </Card>
-        ))}
-      </Grid>
-    </VStack>
-  );
+							<Card
+								padding={0}
+								style={{
+									backgroundColor: s.hex,
+									height: "var(--spacing-8)",
+									width: "100%",
+									borderRadius: "var(--border-radius)",
+									border: "var(--border-width) solid var(--color-separator)",
+								}}
+							>
+								<></>
+							</Card>
+							<VStack gap={0.5}>
+								<HStack justify="between" vAlign="center">
+									<Text weight="semibold">{s.name}</Text>
+									<Text type="code" color="secondary">
+										{s.hex}
+									</Text>
+								</HStack>
+								<Text type="code" color="secondary">
+									{s.token}
+								</Text>
+								<Text type="supporting" color="secondary">
+									{s.role}
+								</Text>
+							</VStack>
+						</VStack>
+					</Card>
+				))}
+			</Grid>
+		</VStack>
+	);
 }

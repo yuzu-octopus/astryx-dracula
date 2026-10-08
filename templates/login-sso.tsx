@@ -2,310 +2,307 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   Ctr > C[p=4 mw=400] > V[g=4] > ((V[g=1 a=center] > Hd"Welcome back to the night"[level=1] + Tx"Whisper your details to enter the night"[t=body]) + (V[g=1] > TI"Work email"[t=email] + Lk"Having trouble signing in?") + B.primary"Continue" + D"Or continue with" + B.secondary"Continue with SSO" + (V[a=center] > Tx"New to the castle?"[t=supporting] + Lk"Request access") + (V[g=2 a=center] > Av + Hd"Sign in with Google Workspace"[level=1] + Tx"You will be redirected back after signing in."[t=body]) + (C[p=0] > S[p=4 muted] > (H[g=2 a=center] > Ic + (V[g=0] > Tx"Google Workspace"[t=label] + Tx"vlad@castle.ro"[t=supporting]))) + (V[g=3] > B.primary"Continue with Google Workspace" + B.ghost"Use a different email") + (V[g=1 a=center] > Hd"Welcome back to the night"[level=1] + Tx"vlad@castle.ro"[t=body]) + (V[g=4] > (V[g=1] > TI"Password"[t=password] + Lk"Forgot password?") + (V[g=3] > B.primary"Enter the night" + B.ghost"Use a different email")) + (V[a=center] > Tx"By clicking continue, you agree to our Terms of service and Privacy policy"[t=supporting]))
 
+import { Avatar } from "@astryxdesign/core/Avatar";
+import { Button } from "@astryxdesign/core/Button";
+import { Card } from "@astryxdesign/core/Card";
+import { Center } from "@astryxdesign/core/Center";
+import { Divider } from "@astryxdesign/core/Divider";
+import { Icon } from "@astryxdesign/core/Icon";
+import { HStack, VStack } from "@astryxdesign/core/Layout";
+import { Link } from "@astryxdesign/core/Link";
+import { Heading, Text } from "@astryxdesign/core/Text";
+import { TextInput } from "@astryxdesign/core/TextInput";
+import {
+	inputAutoComplete,
+	authPageStyle as pageStyle,
+} from "astryx-dracula/shared/auth-chrome-config";
+import {
+	AUTH_EMAIL_PLACEHOLDER,
+	AUTH_ERROR_MESSAGE,
+	AUTH_FORGOT_PASSWORD,
+	AUTH_HEADING,
+	AUTH_PRIMARY_CTA,
+	AUTH_SIGNUP_PROMPT,
+	AUTH_SSO_DIVIDER,
+	AUTH_TERMS_PREFIX,
+	AUTH_TERMS_PRIVACY,
+	AUTH_TERMS_SERVICE,
+} from "astryx-dracula/shared/auth-copy";
+import { demoLogin } from "astryx-dracula/shared/login-demo";
+// ============= ICONS (verified lucide-react exports) =============
+// ShieldCheck ← ShieldCheckIcon.
+import { ShieldCheck } from "lucide-react";
 //   Step-conditional h1: the email and SSO-confirm steps each render their own
 //   h1 (email entry vs provider confirm); the password fallback reuses the
 //   family heading, so exactly one h1 shows per step.
-import {useState, useTransition} from 'react';
-import {authPageStyle as pageStyle, inputAutoComplete} from 'astryx-dracula/shared/auth-chrome-config';
-import {demoLogin} from 'astryx-dracula/shared/login-demo';
-import {
-  AUTH_HEADING,
-  AUTH_PRIMARY_CTA,
-  AUTH_SIGNUP_PROMPT,
-  AUTH_SSO_DIVIDER,
-  AUTH_FORGOT_PASSWORD,
-  AUTH_ERROR_MESSAGE,
-  AUTH_EMAIL_PLACEHOLDER,
-  AUTH_TERMS_PREFIX,
-  AUTH_TERMS_SERVICE,
-  AUTH_TERMS_PRIVACY,
-} from 'astryx-dracula/shared/auth-copy';
-import {VStack, HStack} from '@astryxdesign/core/Layout';
-import {Center} from '@astryxdesign/core/Center';
-import {Text, Heading} from '@astryxdesign/core/Text';
-import {TextInput} from '@astryxdesign/core/TextInput';
-import {Button} from '@astryxdesign/core/Button';
-import {Card} from '@astryxdesign/core/Card';
-import {Link} from '@astryxdesign/core/Link';
-import {Divider} from '@astryxdesign/core/Divider';
-import {Icon} from '@astryxdesign/core/Icon';
-import {Avatar} from '@astryxdesign/core/Avatar';
-
-// ============= ICONS (verified lucide-react exports) =============
-// ShieldCheck ← ShieldCheckIcon.
-import {ShieldCheck} from 'lucide-react';
+import { useState, useTransition } from "react";
 
 type SSOProvider = {
-  name: string;
-  abbr: string;
+	name: string;
+	abbr: string;
 };
 const SSO_PROVIDERS: Record<string, SSOProvider> = {
-  'google.com': {name: 'Google Workspace', abbr: 'G'},
-  'microsoft.com': {name: 'Microsoft Entra ID', abbr: 'M'},
-  'okta.com': {name: 'Okta', abbr: 'O'},
-  'meta.com': {name: 'Meta SSO', abbr: 'M'},
-  'apple.com': {name: 'Apple Business', abbr: 'A'},
+	"google.com": { name: "Google Workspace", abbr: "G" },
+	"microsoft.com": { name: "Microsoft Entra ID", abbr: "M" },
+	"okta.com": { name: "Okta", abbr: "O" },
+	"meta.com": { name: "Meta SSO", abbr: "M" },
+	"apple.com": { name: "Apple Business", abbr: "A" },
 };
 
 function getProvider(email: string) {
-  const domain = email.split('@')[1]?.toLowerCase();
-  return domain ? (SSO_PROVIDERS[domain] ?? null) : null;
+	const domain = email.split("@")[1]?.toLowerCase();
+	return domain ? (SSO_PROVIDERS[domain] ?? null) : null;
 }
 
 function isValidEmail(email: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
-type Step = 'email' | 'sso-confirm' | 'password-fallback';
+type Step = "email" | "sso-confirm" | "password-fallback";
 
 export default function LoginSso() {
-  const [step, setStep] = useState<Step>('email');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, startTransition] = useTransition();
+	const [step, setStep] = useState<Step>("email");
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
+	const [error, setError] = useState<string | null>(null);
+	const [isLoading, startTransition] = useTransition();
 
-  const provider = getProvider(email);
-  const emailValid = isValidEmail(email);
+	const provider = getProvider(email);
+	const emailValid = isValidEmail(email);
 
-  const handleContinue = () => {
-    if (!emailValid) {
-      // The Continue buttons stay enabled and explain themselves. Disabling
-      // them greyed the buttons out with no stated reason, so a malformed
-      // address produced silence rather than guidance.
-      setError('Enter a valid email address to continue.');
-      return;
-    }
-    setError(null);
-    if (provider) {
-      setStep('sso-confirm');
-    } else {
-      setStep('password-fallback');
-    }
-  };
+	const handleContinue = () => {
+		if (!emailValid) {
+			// The Continue buttons stay enabled and explain themselves. Disabling
+			// them greyed the buttons out with no stated reason, so a malformed
+			// address produced silence rather than guidance.
+			setError("Enter a valid email address to continue.");
+			return;
+		}
+		setError(null);
+		if (provider) {
+			setStep("sso-confirm");
+		} else {
+			setStep("password-fallback");
+		}
+	};
 
-  const handleBack = () => {
-    setStep('email');
-    setError(null);
-  };
+	const handleBack = () => {
+		setStep("email");
+		setError(null);
+	};
 
-  const handleSignIn = () => {
-    if (!password) {
-      setError(AUTH_ERROR_MESSAGE);
-      return;
-    }
-    setError(null);
-    startTransition(async () => {
-      await demoLogin();
-      setError(AUTH_ERROR_MESSAGE);
-    });
-  };
+	const handleSignIn = () => {
+		if (!password) {
+			setError(AUTH_ERROR_MESSAGE);
+			return;
+		}
+		setError(null);
+		startTransition(async () => {
+			await demoLogin();
+			setError(AUTH_ERROR_MESSAGE);
+		});
+	};
 
-  return (
-    <Center axis="both" style={pageStyle}>
-      <Card padding={4} width="100%" maxWidth={400}>
-        <VStack gap={4} hAlign="stretch">
-          {/* ── Step 1: Email entry, route by domain ──
+	return (
+		<Center axis="both" style={pageStyle}>
+			<Card padding={4} width="100%" maxWidth={400}>
+				<VStack gap={4} hAlign="stretch">
+					{/* ── Step 1: Email entry, route by domain ──
               The password is collected on the fallback step below, never
               here: a recognised domain goes straight to SSO. */}
-          {step === 'email' && (
-            <>
-              <VStack gap={1} hAlign="center">
-                <Heading level={1} type="display-2">
-                  {AUTH_HEADING}
-                </Heading>
-                <Text type="body" color="secondary">
-                  Whisper your details to enter the night
-                </Text>
-              </VStack>
+					{step === "email" && (
+						<>
+							<VStack gap={1} hAlign="center">
+								<Heading level={1} type="display-2">
+									{AUTH_HEADING}
+								</Heading>
+								<Text type="body" color="secondary">
+									Whisper your details to enter the night
+								</Text>
+							</VStack>
 
-              {/* The helper link belongs to the field above it, so the two
+							{/* The helper link belongs to the field above it, so the two
                   share a gap={1} group — as the password step below groups
                   its own. As siblings in the outer gap={4} flow it read as
                   one more control in the button column, 16px from each. */}
-              <VStack gap={1}>
-                <TextInput
-                  label="Work email"
-                  isLabelHidden
-                  type="email"
-                  {...inputAutoComplete('email')}
-                  placeholder={AUTH_EMAIL_PLACEHOLDER}
-                  value={email}
-                  onChange={(v: string) => {
-                    setEmail(v);
-                    setError(null);
-                  }}
-                  size="lg"
-                  onKeyDown={(e: React.KeyboardEvent) => {
-                    if (e.key === 'Enter') {
-                      handleContinue();
-                    }
-                  }}
-                  status={error ? {type: 'error', message: error} : undefined}
-                />
+							<VStack gap={1}>
+								<TextInput
+									label="Work email"
+									isLabelHidden
+									type="email"
+									{...inputAutoComplete("email")}
+									placeholder={AUTH_EMAIL_PLACEHOLDER}
+									value={email}
+									onChange={(v: string) => {
+										setEmail(v);
+										setError(null);
+									}}
+									size="lg"
+									onKeyDown={(e: React.KeyboardEvent) => {
+										if (e.key === "Enter") {
+											handleContinue();
+										}
+									}}
+									status={error ? { type: "error", message: error } : undefined}
+								/>
 
-                <Link href="#/templates/login-sso" isStandalone>
-                  Having trouble signing in?
-                </Link>
-              </VStack>
+								<Link href="#/templates/login-sso" isStandalone>
+									Having trouble signing in?
+								</Link>
+							</VStack>
 
-              <Button
-                label="Continue"
-                variant="primary"
-                size="lg"
-                onClick={handleContinue}
-              />
+							<Button label="Continue" variant="primary" size="lg" onClick={handleContinue} />
 
-              <Divider label={AUTH_SSO_DIVIDER} />
+							<Divider label={AUTH_SSO_DIVIDER} />
 
-              <Button
-                label="Continue with SSO"
-                variant="secondary"
-                size="lg"
-                onClick={handleContinue}
-              />
+							<Button
+								label="Continue with SSO"
+								variant="secondary"
+								size="lg"
+								onClick={handleContinue}
+							/>
 
-              {/* Prose link: colour alone is not a cue inside a sentence
+							{/* Prose link: colour alone is not a cue inside a sentence
                   (WCAG 1.4.1 / F73), so it asks for the underline the kit
                   only gives on hover. */}
-              <VStack hAlign="center">
-                <Text type="supporting" color="secondary">
-                  {AUTH_SIGNUP_PROMPT}{' '}
-                  <Link href="#/templates/login-sso" type="supporting" hasUnderline>
-                    Request access
-                  </Link>
-                </Text>
-              </VStack>
-            </>
-          )}
+							<VStack hAlign="center">
+								<Text type="supporting" color="secondary">
+									{AUTH_SIGNUP_PROMPT}{" "}
+									<Link href="#/templates/login-sso" type="supporting" hasUnderline>
+										Request access
+									</Link>
+								</Text>
+							</VStack>
+						</>
+					)}
 
-          {/* ── Step 2a: SSO provider detected ── */}
-          {step === 'sso-confirm' && provider && (
-            <>
-              <VStack gap={2} hAlign="center">
-                <Avatar name={provider.name} size={48} />
-                <Heading level={1} type="display-2">
-                  Sign in with {provider.name}
-                </Heading>
-                <Text type="body" color="secondary">
-                  You will be redirected back after signing in.
-                </Text>
-              </VStack>
+					{/* ── Step 2a: SSO provider detected ── */}
+					{step === "sso-confirm" && provider && (
+						<>
+							<VStack gap={2} hAlign="center">
+								<Avatar name={provider.name} size={48} />
+								<Heading level={1} type="display-2">
+									Sign in with {provider.name}
+								</Heading>
+								<Text type="body" color="secondary">
+									You will be redirected back after signing in.
+								</Text>
+							</VStack>
 
-              <Card padding={4} variant="muted">
-                <HStack gap={2} vAlign="center">
-                  <Icon icon={ShieldCheck} color="secondary" />
-                  <VStack gap={0}>
-                    <Text type="label">{provider.name}</Text>
-                    <Text type="supporting" color="secondary">
-                      {email}
-                    </Text>
-                  </VStack>
-                </HStack>
-              </Card>
+							<Card padding={4} variant="muted">
+								<HStack gap={2} vAlign="center">
+									<Icon icon={ShieldCheck} color="secondary" />
+									<VStack gap={0}>
+										<Text type="label">{provider.name}</Text>
+										<Text type="supporting" color="secondary">
+											{email}
+										</Text>
+									</VStack>
+								</HStack>
+							</Card>
 
-              <VStack gap={3}>
-                <Button
-                  label={`Continue with ${provider.name}`}
-                  variant="primary"
-                  size="lg"
-                  isLoading={isLoading}
-                  onClick={() => {
-                    startTransition(async () => {
-                      await demoLogin();
-                    });
-                  }}
-                />
-                <Button
-                  label="Use a different email"
-                  variant="ghost"
-                  size="lg"
-                  onClick={handleBack}
-                />
-              </VStack>
-            </>
-          )}
+							<VStack gap={3}>
+								<Button
+									label={`Continue with ${provider.name}`}
+									variant="primary"
+									size="lg"
+									isLoading={isLoading}
+									onClick={() => {
+										startTransition(async () => {
+											await demoLogin();
+										});
+									}}
+								/>
+								<Button
+									label="Use a different email"
+									variant="ghost"
+									size="lg"
+									onClick={handleBack}
+								/>
+							</VStack>
+						</>
+					)}
 
-          {/* ── Step 2b: No SSO — password fallback ── */}
-          {step === 'password-fallback' && (
-            <>
-              <VStack gap={1} hAlign="center">
-                <Heading level={1} type="display-2">
-                  {AUTH_HEADING}
-                </Heading>
-                <Text type="body" color="secondary">
-                  {email}
-                </Text>
-              </VStack>
+					{/* ── Step 2b: No SSO — password fallback ── */}
+					{step === "password-fallback" && (
+						<>
+							<VStack gap={1} hAlign="center">
+								<Heading level={1} type="display-2">
+									{AUTH_HEADING}
+								</Heading>
+								<Text type="body" color="secondary">
+									{email}
+								</Text>
+							</VStack>
 
-              <VStack gap={4}>
-                <VStack gap={1}>
-                  <TextInput
-                    label="Password"
-                    type="password"
-                    {...inputAutoComplete('current-password')}
-                    value={password}
-                    size="lg"
-                    onChange={(v: string) => {
-                      setPassword(v);
-                      setError(null);
-                    }}
-                    onEnter={handleSignIn}
-                    status={error ? {type: 'error', message: error} : undefined}
-                  />
-                  {error && (
-                    <VStack hAlign="end">
-                      <Link href="#/templates/login-sso" isStandalone>
-                        {AUTH_FORGOT_PASSWORD}
-                      </Link>
-                    </VStack>
-                  )}
-                </VStack>
+							<VStack gap={4}>
+								<VStack gap={1}>
+									<TextInput
+										label="Password"
+										type="password"
+										{...inputAutoComplete("current-password")}
+										value={password}
+										size="lg"
+										onChange={(v: string) => {
+											setPassword(v);
+											setError(null);
+										}}
+										onEnter={handleSignIn}
+										status={error ? { type: "error", message: error } : undefined}
+									/>
+									{error && (
+										<VStack hAlign="end">
+											<Link href="#/templates/login-sso" isStandalone>
+												{AUTH_FORGOT_PASSWORD}
+											</Link>
+										</VStack>
+									)}
+								</VStack>
 
-                {/* gap={3} is the family rhythm for a button pair: the
+								{/* gap={3} is the family rhythm for a button pair: the
                     primary/ghost pair in the confirm step above, the social
                     pairs in login-card and login-split. At the outer gap={4}
                     the same two buttons sat 4px further apart in this step
                     than in the step above it. */}
-                <VStack gap={3}>
-                  <Button
-                    label={AUTH_PRIMARY_CTA}
-                    variant="primary"
-                    size="lg"
-                    isLoading={isLoading}
-                    onClick={handleSignIn}
-                  />
-                  <Button
-                    label="Use a different email"
-                    variant="ghost"
-                    size="lg"
-                    onClick={handleBack}
-                  />
-                </VStack>
-              </VStack>
-            </>
-          )}
+								<VStack gap={3}>
+									<Button
+										label={AUTH_PRIMARY_CTA}
+										variant="primary"
+										size="lg"
+										isLoading={isLoading}
+										onClick={handleSignIn}
+									/>
+									<Button
+										label="Use a different email"
+										variant="ghost"
+										size="lg"
+										onClick={handleBack}
+									/>
+								</VStack>
+							</VStack>
+						</>
+					)}
 
-          {/* Terms — family line, shown on every step */}
-          <VStack hAlign="center" width="100%">
-            <Text type="supporting" color="secondary" justify="center">
-              {AUTH_TERMS_PREFIX}{' '}
-              <Link href="#/templates/login-sso" type="supporting" hasUnderline>
-                {AUTH_TERMS_SERVICE}
-              </Link>{' '}
-              and{' '}
-              <Link href="#/templates/login-sso" type="supporting" hasUnderline>
-                {AUTH_TERMS_PRIVACY}
-              </Link>
-            .
-            </Text>
-          </VStack>
-        </VStack>
-      </Card>
-    </Center>
-  );
+					{/* Terms — family line, shown on every step */}
+					<VStack hAlign="center" width="100%">
+						<Text type="supporting" color="secondary" justify="center">
+							{AUTH_TERMS_PREFIX}{" "}
+							<Link href="#/templates/login-sso" type="supporting" hasUnderline>
+								{AUTH_TERMS_SERVICE}
+							</Link>{" "}
+							and{" "}
+							<Link href="#/templates/login-sso" type="supporting" hasUnderline>
+								{AUTH_TERMS_PRIVACY}
+							</Link>
+							.
+						</Text>
+					</VStack>
+				</VStack>
+			</Card>
+		</Center>
+	);
 }

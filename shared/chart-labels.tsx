@@ -3,42 +3,43 @@
 // (nothing meaningful below 12px, ever). The mono family resolves from the
 // `--font-family-mono` theme token, single-sourced with the body/code faces.
 
-import type {ReactNode} from 'react';
+import type { ReactNode } from "react";
 
-export const CHART_LABEL_FILL = 'var(--color-text-paragraph)';
+export const CHART_LABEL_FILL = "var(--color-text-paragraph)";
 export const CHART_LABEL_SIZE = 13;
 
 interface ChartLabelProps {
-  x: number | string;
-  y: number | string;
-  textAnchor?: 'start' | 'middle' | 'end';
-  /** Defaults to the paragraph token; pass an explicit fill for values drawn
-   *  on colored fills (e.g. in-cell heatmap counts).
-   *
-   *  Deliberately NOT the chart-legend union: this paints TEXT, so its arms
-   *  are a text role and the on-fill role, and neither is a --color-data-*
-   *  var. Reusing the legend type here would reject the one use it exists
-   *  for. */
-  fill?: `var(--color-text-${string})` | `var(--color-on-${string})`;
-  children: ReactNode;
+	x: number | string;
+	y: number | string;
+	textAnchor?: "start" | "middle" | "end";
+	/** Defaults to the paragraph token; pass an explicit fill for values drawn
+	 *  on colored fills (e.g. in-cell heatmap counts).
+	 *
+	 *  Deliberately NOT the chart-legend union: this paints TEXT, so its arms
+	 *  are a text role and the on-fill role, and neither is a --color-data-*
+	 *  var. Reusing the legend type here would reject the one use it exists
+	 *  for. */
+	fill?: `var(--color-text-${string})` | `var(--color-on-${string})`;
+	children: ReactNode;
 }
 
 export function ChartLabel({
-  x,
-  y,
-  textAnchor = 'middle',
-  fill = CHART_LABEL_FILL,
-  children,
+	x,
+	y,
+	textAnchor = "middle",
+	fill = CHART_LABEL_FILL,
+	children,
 }: ChartLabelProps) {
-  return (
-    <text
-      x={x}
-      y={y}
-      textAnchor={textAnchor}
-      fontSize={CHART_LABEL_SIZE}
-      fill={fill}
-      fontFamily="var(--font-family-mono)">
-      {children}
-    </text>
-  );
+	return (
+		<text
+			x={x}
+			y={y}
+			textAnchor={textAnchor}
+			fontSize={CHART_LABEL_SIZE}
+			fill={fill}
+			fontFamily="var(--font-family-mono)"
+		>
+			{children}
+		</text>
+	);
 }

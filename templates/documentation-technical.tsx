@@ -2,21 +2,21 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   L > (LC > V[g=8] > (V[g=2] > Hd"Getting started with Astryx Dracula"[level=1] + Tx"Last updated March 30, 2026"[t=supporting]) + (C > V[g=3] > (H[j=between] > (H[g=2] > Ic + Tx"AI Assistance"[t=body]) + B"Copy prompt") + Tx"Prompt description"[t=body]) + (V[g=4] > Hd"Prerequisites"[level=2] + UL) + D + (V[g=4] > Hd"Install the package"[level=2] + Tx"Description"[t=body] + (V[g=2] > Tx"Step"[t=body] + Cd)*3) + D + (V[g=4] > Hd"Configure theming"[level=2] + Tx"Description"[t=body] + Cd + Tx"Note"[t=body]) + D + (V[g=4] > Hd"Next steps"[level=2] + UL)) + (LP > Outline)
 
-import {useCallback, useState} from 'react';
-import {Heading, Text} from '@astryxdesign/core/Text';
-import {Button} from '@astryxdesign/core/Button';
-import {Card} from '@astryxdesign/core/Card';
-import {List, ListItem} from '@astryxdesign/core/List';
-import {CodeBlock} from '@astryxdesign/core/CodeBlock';
-import {Selector} from '@astryxdesign/core/Selector';
-import {HStack, VStack, StackItem} from '@astryxdesign/core/Stack';
-import {Layout, LayoutContent, LayoutPanel} from '@astryxdesign/core/Layout';
-import {Divider} from '@astryxdesign/core/Divider';
-import {Icon} from '@astryxdesign/core/Icon';
-import {Outline, type OutlineItem} from '@astryxdesign/core/Outline';
-import {useMediaQuery} from '@astryxdesign/core/hooks';
-import {Sparkles, ClipboardCopy} from 'lucide-react';
-import {outlinePanel} from 'astryx-dracula/shared/chaptered-doc-config';
+import { Button } from "@astryxdesign/core/Button";
+import { Card } from "@astryxdesign/core/Card";
+import { CodeBlock } from "@astryxdesign/core/CodeBlock";
+import { Divider } from "@astryxdesign/core/Divider";
+import { useMediaQuery } from "@astryxdesign/core/hooks";
+import { Icon } from "@astryxdesign/core/Icon";
+import { Layout, LayoutContent, LayoutPanel } from "@astryxdesign/core/Layout";
+import { List, ListItem } from "@astryxdesign/core/List";
+import { Outline, type OutlineItem } from "@astryxdesign/core/Outline";
+import { Selector } from "@astryxdesign/core/Selector";
+import { HStack, StackItem, VStack } from "@astryxdesign/core/Stack";
+import { Heading, Text } from "@astryxdesign/core/Text";
+import { outlinePanel } from "astryx-dracula/shared/chaptered-doc-config";
+import { ClipboardCopy, Sparkles } from "lucide-react";
+import { useCallback, useState } from "react";
 
 // ---------------------------------------------------------------------------
 // Main component
@@ -29,187 +29,182 @@ import {outlinePanel} from 'astryx-dracula/shared/chaptered-doc-config';
 // Same prompt in the copy action and the visible body: one string, so the
 // two can never drift.
 const SETUP_PROMPT =
-  'Help me get set up with Astryx Dracula. Based on my project, do the following: 1. Install @astryxdesign/core and the StyleX compiler. 2. Wrap my app in the Theme component. 3. Replace one existing component with an Astryx equivalent. After setup, suggest relevant next steps based on my project.';
-
+	"Help me get set up with Astryx Dracula. Based on my project, do the following: 1. Install @astryxdesign/core and the StyleX compiler. 2. Wrap my app in the Theme component. 3. Replace one existing component with an Astryx equivalent. After setup, suggest relevant next steps based on my project.";
 
 const OUTLINE_ITEMS: OutlineItem[] = [
-  {id: 'prerequisites', label: 'Prerequisites', level: 2},
-  {id: 'install-package', label: 'Install the package', level: 2},
-  {id: 'configure-theming', label: 'Configure theming', level: 2},
-  {id: 'next-steps', label: 'Next steps', level: 2},
+	{ id: "prerequisites", label: "Prerequisites", level: 2 },
+	{ id: "install-package", label: "Install the package", level: 2 },
+	{ id: "configure-theming", label: "Configure theming", level: 2 },
+	{ id: "next-steps", label: "Next steps", level: 2 },
 ];
 
-const OUTLINE_OPTIONS = OUTLINE_ITEMS.map(item => ({
-  value: item.id,
-  label: item.label,
+const OUTLINE_OPTIONS = OUTLINE_ITEMS.map((item) => ({
+	value: item.id,
+	label: item.label,
 }));
 
 export default function DocumentationTechnical() {
-  const [activeId, setActiveId] = useState<string | undefined>(
-    OUTLINE_ITEMS[0]?.id,
-  );
-  const isMobile = useMediaQuery('(max-width: 768px)');
+	const [activeId, setActiveId] = useState<string | undefined>(OUTLINE_ITEMS[0]?.id);
+	const isMobile = useMediaQuery("(max-width: 768px)");
 
-  const scrollToId = useCallback((id: string) => {
-    setActiveId(id);
-    const target = document.getElementById(id);
-    if (target != null) {
-      target.scrollIntoView({behavior: 'smooth', block: 'start'});
-      window.history.pushState(null, '', `#${id}`);
-    }
-  }, []);
+	const scrollToId = useCallback((id: string) => {
+		setActiveId(id);
+		const target = document.getElementById(id);
+		if (target != null) {
+			target.scrollIntoView({ behavior: "smooth", block: "start" });
+			window.history.pushState(null, "", `#${id}`);
+		}
+	}, []);
 
-  return (
-    <Layout
-      height="auto"
-      contentWidth={960}
-      end={
-        isMobile ? undefined : (
-          <LayoutPanel
-            isScrollable={false}
-            label="On this page"
-            role="complementary"
-            style={outlinePanel}>
-            <Outline items={OUTLINE_ITEMS} onActiveIdChange={setActiveId} />
-          </LayoutPanel>
-        )
-      }
-      content={
-        <LayoutContent isScrollable={false} padding={8}>
-          <VStack gap={8}>
-            <VStack gap={2}>
-              <Heading level={1}>Getting started with Astryx Dracula</Heading>
-              <Text type="supporting" color="secondary" hasTabularNumbers>
-                Last updated March 30, 2026
-              </Text>
-              {isMobile && (
-                <Selector
-                  label="On this page"
-                  isLabelHidden
-                  options={OUTLINE_OPTIONS}
-                  value={activeId}
-                  onChange={scrollToId}
-                  width="100%"
-                />
-              )}
-            </VStack>
+	return (
+		<Layout
+			height="auto"
+			contentWidth={960}
+			end={
+				isMobile ? undefined : (
+					<LayoutPanel
+						isScrollable={false}
+						label="On this page"
+						role="complementary"
+						style={outlinePanel}
+					>
+						<Outline items={OUTLINE_ITEMS} onActiveIdChange={setActiveId} />
+					</LayoutPanel>
+				)
+			}
+			content={
+				<LayoutContent isScrollable={false} padding={8}>
+					<VStack gap={8}>
+						<VStack gap={2}>
+							<Heading level={1}>Getting started with Astryx Dracula</Heading>
+							<Text type="supporting" color="secondary" hasTabularNumbers>
+								Last updated March 30, 2026
+							</Text>
+							{isMobile && (
+								<Selector
+									label="On this page"
+									isLabelHidden
+									options={OUTLINE_OPTIONS}
+									value={activeId}
+									onChange={scrollToId}
+									width="100%"
+								/>
+							)}
+						</VStack>
 
-            <Card>
-              <VStack gap={3}>
-                <HStack gap={2} vAlign="center">
-                  <StackItem size="fill">
-                    <HStack gap={2} vAlign="center">
-                      <Icon icon={Sparkles} size="sm" color="secondary" />
-                      <Text type="body" weight="semibold">
-                        AI Assistance
-                      </Text>
-                    </HStack>
-                  </StackItem>
-                  <Button
-                    label="Copy prompt"
-                    variant="ghost"
-                    size="sm"
-                    icon={<Icon icon={ClipboardCopy} />}
-                    onClick={() => {
-                      void navigator.clipboard.writeText(SETUP_PROMPT);
-                    }}
-                  />
-                </HStack>
-                <Text type="body" color="secondary">
-                  Help me get set up with Astryx Dracula. Based on my project,
-                  do the following: 1. Install @astryxdesign/core and the
-                  StyleX compiler. 2. Wrap my app in the Theme component. 3.
-                  Replace one existing component with an Astryx equivalent.
-                </Text>
-              </VStack>
-            </Card>
+						<Card>
+							<VStack gap={3}>
+								<HStack gap={2} vAlign="center">
+									<StackItem size="fill">
+										<HStack gap={2} vAlign="center">
+											<Icon icon={Sparkles} size="sm" color="secondary" />
+											<Text type="body" weight="semibold">
+												AI Assistance
+											</Text>
+										</HStack>
+									</StackItem>
+									<Button
+										label="Copy prompt"
+										variant="ghost"
+										size="sm"
+										icon={<Icon icon={ClipboardCopy} />}
+										onClick={() => {
+											void navigator.clipboard.writeText(SETUP_PROMPT);
+										}}
+									/>
+								</HStack>
+								<Text type="body" color="secondary">
+									Help me get set up with Astryx Dracula. Based on my project, do the following: 1.
+									Install @astryxdesign/core and the StyleX compiler. 2. Wrap my app in the Theme
+									component. 3. Replace one existing component with an Astryx equivalent.
+								</Text>
+							</VStack>
+						</Card>
 
-            <VStack gap={4}>
-              <Heading id="prerequisites" level={2}>
-                Prerequisites
-              </Heading>
-              <List density="compact" listStyle="disc">
-                <ListItem label="Node.js 18+" />
-                <ListItem label="React 18 or 19" />
-                <ListItem
-                  label="A package manager"
-                  description={
-                    <Text type="body" color="secondary" textWrap="wrap">
-                      npm, yarn, or pnpm
-                    </Text>
-                  }
-                />
-              </List>
-            </VStack>
+						<VStack gap={4}>
+							<Heading id="prerequisites" level={2}>
+								Prerequisites
+							</Heading>
+							<List density="compact" listStyle="disc">
+								<ListItem label="Node.js 18+" />
+								<ListItem label="React 18 or 19" />
+								<ListItem
+									label="A package manager"
+									description={
+										<Text type="body" color="secondary" textWrap="wrap">
+											npm, yarn, or pnpm
+										</Text>
+									}
+								/>
+							</List>
+						</VStack>
 
-            <Divider />
+						<Divider />
 
-            <VStack gap={4}>
-              <Heading id="install-package" level={2}>
-                Install the package
-              </Heading>
-              <Text type="body">
-                Every project starts with installing the core package. This
-                gives you access to all components, tokens, and utilities.
-              </Text>
-              <VStack gap={2}>
-                <Text type="body" weight="semibold">
-                  Step 1: Install the core package
-                </Text>
-                <CodeBlock
-                  code="npm install @astryxdesign/core"
-                  language="bash"
-                  width="100%"
-                  hasCopyButton
-                />
-              </VStack>
-              <VStack gap={2}>
-                <Text type="body" weight="semibold">
-                  Step 2: Import the precompiled styles
-                </Text>
-                <Text type="body" color="secondary">
-                  Astryx ships precompiled CSS, so there is no build plugin to
-                  configure. Import the reset and component stylesheets once at
-                  your app entry point.
-                </Text>
-                <CodeBlock
-                  code={`import '@astryxdesign/core/reset.css';
+						<VStack gap={4}>
+							<Heading id="install-package" level={2}>
+								Install the package
+							</Heading>
+							<Text type="body">
+								Every project starts with installing the core package. This gives you access to all
+								components, tokens, and utilities.
+							</Text>
+							<VStack gap={2}>
+								<Text type="body" weight="semibold">
+									Step 1: Install the core package
+								</Text>
+								<CodeBlock
+									code="npm install @astryxdesign/core"
+									language="bash"
+									width="100%"
+									hasCopyButton
+								/>
+							</VStack>
+							<VStack gap={2}>
+								<Text type="body" weight="semibold">
+									Step 2: Import the precompiled styles
+								</Text>
+								<Text type="body" color="secondary">
+									Astryx ships precompiled CSS, so there is no build plugin to configure. Import the
+									reset and component stylesheets once at your app entry point.
+								</Text>
+								<CodeBlock
+									code={`import '@astryxdesign/core/reset.css';
 import '@astryxdesign/core/astryx.css';`}
-                  language="tsx"
-                  width="100%"
-                  hasCopyButton
-                />
-              </VStack>
-              <VStack gap={2}>
-                <Text type="body" weight="semibold">
-                  Step 3: Import your first component
-                </Text>
-                <CodeBlock
-                  code={`import { Button } from '@astryxdesign/core/Button';
+									language="tsx"
+									width="100%"
+									hasCopyButton
+								/>
+							</VStack>
+							<VStack gap={2}>
+								<Text type="body" weight="semibold">
+									Step 3: Import your first component
+								</Text>
+								<CodeBlock
+									code={`import { Button } from '@astryxdesign/core/Button';
 
 export default function App() {
   return <Button label="Hello Astryx" variant="primary" />;
 }`}
-                  language="tsx"
-                  width="100%"
-                  hasCopyButton
-                />
-              </VStack>
-            </VStack>
+									language="tsx"
+									width="100%"
+									hasCopyButton
+								/>
+							</VStack>
+						</VStack>
 
-            <Divider />
+						<Divider />
 
-            <VStack gap={4}>
-              <Heading id="configure-theming" level={2}>
-                Configure theming
-              </Heading>
-              <Text type="body">
-                Astryx ships with a default theme that works out of the box. To
-                customize colors, typography, and spacing, wrap your app in the
-                Theme component.
-              </Text>
-              <CodeBlock
-                code={`import { type ReactNode } from 'react';
+						<VStack gap={4}>
+							<Heading id="configure-theming" level={2}>
+								Configure theming
+							</Heading>
+							<Text type="body">
+								Astryx ships with a default theme that works out of the box. To customize colors,
+								typography, and spacing, wrap your app in the Theme component.
+							</Text>
+							<CodeBlock
+								code={`import { type ReactNode } from 'react';
 import { Theme } from '@astryxdesign/core/theme';
 import { astryxDraculaTheme } from 'astryx-dracula';
 
@@ -220,67 +215,67 @@ export default function App({ children }: { children: ReactNode }) {
     </Theme>
   );
 }`}
-                language="tsx"
-                width="100%"
-                hasCopyButton
-              />
-              <Text type="body" color="secondary">
-                See the theming guide for the full list of customizable tokens.
-              </Text>
-            </VStack>
+								language="tsx"
+								width="100%"
+								hasCopyButton
+							/>
+							<Text type="body" color="secondary">
+								See the theming guide for the full list of customizable tokens.
+							</Text>
+						</VStack>
 
-            <Divider />
+						<Divider />
 
-            <VStack gap={4}>
-              <Heading id="next-steps" level={2}>
-                Next steps
-              </Heading>
-              <List density="compact" listStyle="disc">
-                <ListItem
-                  label="Fundamental concepts"
-                  description={
-                    <Text type="body" color="secondary" textWrap="wrap">
-                      How theming, layout, and composition work
-                    </Text>
-                  }
-                />
-                <ListItem
-                  label="Component API reference"
-                  description={
-                    <Text type="body" color="secondary" textWrap="wrap">
-                      Props, variants, and examples for every component
-                    </Text>
-                  }
-                />
-                <ListItem
-                  label="Accessibility"
-                  description={
-                    <Text type="body" color="secondary" textWrap="wrap">
-                      Built-in a11y features and ARIA patterns
-                    </Text>
-                  }
-                />
-                <ListItem
-                  label="CLI tools"
-                  description={
-                    <Text type="body" color="secondary" textWrap="wrap">
-                      Scaffold projects and manage templates
-                    </Text>
-                  }
-                />
-                <ListItem
-                  label="Design tokens"
-                  description={
-                    <Text type="body" color="secondary" textWrap="wrap">
-                      Colors, spacing, typography, and sizing
-                    </Text>
-                  }
-                />
-              </List>
-            </VStack>
-          </VStack>
-        </LayoutContent>
-      }
-    />
-  );
+						<VStack gap={4}>
+							<Heading id="next-steps" level={2}>
+								Next steps
+							</Heading>
+							<List density="compact" listStyle="disc">
+								<ListItem
+									label="Fundamental concepts"
+									description={
+										<Text type="body" color="secondary" textWrap="wrap">
+											How theming, layout, and composition work
+										</Text>
+									}
+								/>
+								<ListItem
+									label="Component API reference"
+									description={
+										<Text type="body" color="secondary" textWrap="wrap">
+											Props, variants, and examples for every component
+										</Text>
+									}
+								/>
+								<ListItem
+									label="Accessibility"
+									description={
+										<Text type="body" color="secondary" textWrap="wrap">
+											Built-in a11y features and ARIA patterns
+										</Text>
+									}
+								/>
+								<ListItem
+									label="CLI tools"
+									description={
+										<Text type="body" color="secondary" textWrap="wrap">
+											Scaffold projects and manage templates
+										</Text>
+									}
+								/>
+								<ListItem
+									label="Design tokens"
+									description={
+										<Text type="body" color="secondary" textWrap="wrap">
+											Colors, spacing, typography, and sizing
+										</Text>
+									}
+								/>
+							</List>
+						</VStack>
+					</VStack>
+				</LayoutContent>
+			}
+		/>
+	);
 }

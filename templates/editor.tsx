@@ -2,286 +2,279 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   L > (LP[w=320] > V[g=4] > (S[p=4] > V[g=4] > Hd"Page Editor"[level=1] + Tbar) + (V[g=4] > (TL > Tab"Blocks"! + Tab"Properties") + D + (S[p=4] > V[g=2] > Hd"Add Block"[level=3] + UL + Hd"Layers"[level=3] + UL))) + (LC > V[g=4] > C*3)
 
+import { Button } from "@astryxdesign/core/Button";
+import { Center } from "@astryxdesign/core/Center";
+import { Dialog } from "@astryxdesign/core/Dialog";
+import { Divider } from "@astryxdesign/core/Divider";
+import { EmptyState } from "@astryxdesign/core/EmptyState";
+import { useMediaQuery } from "@astryxdesign/core/hooks";
+import { Icon } from "@astryxdesign/core/Icon";
 import {
-  useState,
-  useCallback,
-  type ComponentType,
-  type CSSProperties,
-  type KeyboardEvent,
-  type MouseEvent,
-  type ReactNode,
-  type SVGProps,
-} from 'react';
-import {useMediaQuery} from '@astryxdesign/core/hooks';
-import {Button} from '@astryxdesign/core/Button';
-import {SelectableCard} from '@astryxdesign/core/SelectableCard';
-import {Center} from '@astryxdesign/core/Center';
-import {Dialog} from '@astryxdesign/core/Dialog';
-import {Divider} from '@astryxdesign/core/Divider';
-import {EmptyState} from '@astryxdesign/core/EmptyState';
+	HStack,
+	Layout,
+	LayoutContent,
+	LayoutHeader,
+	LayoutPanel,
+	VStack,
+} from "@astryxdesign/core/Layout";
+import { List, ListItem } from "@astryxdesign/core/List";
+import { Section } from "@astryxdesign/core/Section";
+import { SegmentedControl, SegmentedControlItem } from "@astryxdesign/core/SegmentedControl";
+import { SelectableCard } from "@astryxdesign/core/SelectableCard";
+import { Selector } from "@astryxdesign/core/Selector";
+import { Tab, TabList } from "@astryxdesign/core/TabList";
+import type { TableColumn } from "@astryxdesign/core/Table";
+import { proportional, Table } from "@astryxdesign/core/Table";
+import { Heading, Text } from "@astryxdesign/core/Text";
+import { TextArea } from "@astryxdesign/core/TextArea";
+import { TextInput } from "@astryxdesign/core/TextInput";
+import { Toolbar } from "@astryxdesign/core/Toolbar";
 import {
-  HStack,
-  VStack,
-  Layout,
-  LayoutContent,
-  LayoutHeader,
-  LayoutPanel,
-} from '@astryxdesign/core/Layout';
-import {Icon} from '@astryxdesign/core/Icon';
-import {List, ListItem} from '@astryxdesign/core/List';
-import {Table, proportional} from '@astryxdesign/core/Table';
-import type {TableColumn} from '@astryxdesign/core/Table';
-import {Section} from '@astryxdesign/core/Section';
+	Banknote,
+	CarFront,
+	ChevronDown,
+	ChevronUp,
+	CirclePlay,
+	CirclePlus,
+	Columns,
+	Eye,
+	FileText,
+	Image,
+	LayoutGrid,
+	Lock,
+	Megaphone,
+	Monitor,
+	MousePointerClick,
+	ShoppingBag,
+	ShoppingCart,
+	SlidersHorizontal,
+	Smartphone,
+	Sparkles,
+	Tablet,
+	Trash2,
+	X,
+} from "lucide-react";
 import {
-  SegmentedControl,
-  SegmentedControlItem,
-} from '@astryxdesign/core/SegmentedControl';
-import {Selector} from '@astryxdesign/core/Selector';
-import {TabList, Tab} from '@astryxdesign/core/TabList';
-import {Text, Heading} from '@astryxdesign/core/Text';
-import {TextArea} from '@astryxdesign/core/TextArea';
-import {TextInput} from '@astryxdesign/core/TextInput';
-import {Toolbar} from '@astryxdesign/core/Toolbar';
-import {
-  LayoutGrid,
-  FileText,
-  Image,
-  MousePointerClick,
-  Columns,
-  Sparkles,
-  Megaphone,
-  Trash2,
-  ChevronUp,
-  ChevronDown,
-  Monitor,
-  Tablet,
-  Smartphone,
-  Eye,
-  SlidersHorizontal,
-  X,
-  CirclePlus,
-  ShoppingBag,
-  ShoppingCart,
-  Banknote,
-  CarFront,
-  CirclePlay,
-  Lock,
-} from 'lucide-react';
+	type ComponentType,
+	type CSSProperties,
+	type KeyboardEvent,
+	type MouseEvent,
+	type ReactNode,
+	type SVGProps,
+	useCallback,
+	useState,
+} from "react";
 
-type BlockType =
-  'hero' | 'text' | 'image' | 'button' | 'cards' | 'features' | 'cta';
+type BlockType = "hero" | "text" | "image" | "button" | "cards" | "features" | "cta";
 
 interface Block {
-  id: string;
-  type: BlockType;
-  label: string;
-  props: Record<string, unknown>;
+	id: string;
+	type: BlockType;
+	label: string;
+	props: Record<string, unknown>;
 }
 
-type ViewportSize = 'desktop' | 'tablet' | 'phone';
-type SidebarTab = 'blocks' | 'properties';
+type ViewportSize = "desktop" | "tablet" | "phone";
+type SidebarTab = "blocks" | "properties";
 type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
-const BLOCK_META: Record<BlockType, {label: string; icon: IconComponent}> = {
-  hero: {label: 'Hero', icon: LayoutGrid},
-  text: {label: 'Text', icon: FileText},
-  image: {label: 'Image', icon: Image},
-  button: {label: 'Button', icon: MousePointerClick},
-  cards: {label: 'Cards', icon: Columns},
-  features: {label: 'Features', icon: Sparkles},
-  cta: {label: 'CTA', icon: Megaphone},
+const BLOCK_META: Record<BlockType, { label: string; icon: IconComponent }> = {
+	hero: { label: "Hero", icon: LayoutGrid },
+	text: { label: "Text", icon: FileText },
+	image: { label: "Image", icon: Image },
+	button: { label: "Button", icon: MousePointerClick },
+	cards: { label: "Cards", icon: Columns },
+	features: { label: "Features", icon: Sparkles },
+	cta: { label: "CTA", icon: Megaphone },
 };
 
 type Transaction = {
-  id: string;
-  name: string;
-  category: string;
-  date: string;
-  amount: string;
-  isPositive?: boolean;
+	id: string;
+	name: string;
+	category: string;
+	date: string;
+	amount: string;
+	isPositive?: boolean;
 };
 
 const CATEGORY_ICONS: Record<string, IconComponent> = {
-  'Food & Drink': ShoppingBag,
-  Groceries: ShoppingCart,
-  Income: Banknote,
-  Transport: CarFront,
-  Entertainment: CirclePlay,
+	"Food & Drink": ShoppingBag,
+	Groceries: ShoppingCart,
+	Income: Banknote,
+	Transport: CarFront,
+	Entertainment: CirclePlay,
 };
 
 // The minimums clear the 375px phone canvas once the preview card's 24px
 // padding is taken out; the widest column carries the slack and every cell
 // truncates rather than pushing the table past the card.
 const TRANSACTION_COLUMNS: TableColumn<Transaction>[] = [
-  {
-    key: 'name',
-    header: 'Transaction',
-    width: proportional(2, {minWidth: 104}),
-    renderCell: (item: Transaction) => (
-      <HStack gap={3} vAlign="center">
-        <Icon icon={CATEGORY_ICONS[item.category] || Sparkles} />
-        <VStack gap={0}>
-          <Text type="body" weight="semibold">
-            {item.name}
-          </Text>
-          <Text type="supporting" color="secondary">
-            {item.category}
-          </Text>
-        </VStack>
-      </HStack>
-    ),
-  },
-  {
-    key: 'date',
-    header: 'Date',
-    width: proportional(1, {minWidth: 64}),
-    renderCell: (item: Transaction) => (
-      <Text type="body" color="secondary" hasTabularNumbers>
-        {item.date}
-      </Text>
-    ),
-  },
-  {
-    key: 'amount',
-    header: 'Amount',
-    width: proportional(1, {minWidth: 88}),
-    renderCell: (item: Transaction) => (
-      <Text type="body" weight="semibold" hasTabularNumbers>
-        {item.amount}
-      </Text>
-    ),
-  },
+	{
+		key: "name",
+		header: "Transaction",
+		width: proportional(2, { minWidth: 104 }),
+		renderCell: (item: Transaction) => (
+			<HStack gap={3} vAlign="center">
+				<Icon icon={CATEGORY_ICONS[item.category] || Sparkles} />
+				<VStack gap={0}>
+					<Text type="body" weight="semibold">
+						{item.name}
+					</Text>
+					<Text type="supporting" color="secondary">
+						{item.category}
+					</Text>
+				</VStack>
+			</HStack>
+		),
+	},
+	{
+		key: "date",
+		header: "Date",
+		width: proportional(1, { minWidth: 64 }),
+		renderCell: (item: Transaction) => (
+			<Text type="body" color="secondary" hasTabularNumbers>
+				{item.date}
+			</Text>
+		),
+	},
+	{
+		key: "amount",
+		header: "Amount",
+		width: proportional(1, { minWidth: 88 }),
+		renderCell: (item: Transaction) => (
+			<Text type="body" weight="semibold" hasTabularNumbers>
+				{item.amount}
+			</Text>
+		),
+	},
 ];
 
 const VIEWPORT_MAX: Record<ViewportSize, number> = {
-  desktop: 960,
-  tablet: 768,
-  phone: 375,
+	desktop: 960,
+	tablet: 768,
+	phone: 375,
 };
 
-
 const DEFAULT_BLOCKS: Block[] = [
-  {
-    id: '2',
-    type: 'features',
-    label: 'Recent Transactions',
-    props: {
-      heading: 'Recent Transactions',
-      description: 'Your latest account activity.',
-      items: [
-        {
-          id: 't1',
-          name: 'Midnight Oil Coffee',
-          category: 'Food & Drink',
-          date: 'Today, 10:24 AM',
-          amount: '-$6.50',
-        },
-        {
-          id: 't2',
-          name: 'Moonlit Market',
-          category: 'Groceries',
-          date: 'Yesterday',
-          amount: '-$142.30',
-        },
-        {
-          id: 't3',
-          name: 'Night Shift Payout',
-          category: 'Income',
-          date: 'Oct 12',
-          amount: '+$4,200.00',
-          isPositive: true,
-        },
-        {
-          id: 't4',
-          name: 'Night Owl Rides',
-          category: 'Transport',
-          date: 'Oct 11',
-          amount: '-$24.10',
-        },
-        {
-          id: 't5',
-          name: 'Cryptflix Subscription',
-          category: 'Entertainment',
-          date: 'Oct 10',
-          amount: '-$19.99',
-        },
-      ],
-    },
-  },
-  {
-    id: '3',
-    type: 'text',
-    label: 'Syncing State',
-    props: {
-      heading: 'Syncing your accounts',
-      description:
-        "We're pulling in your latest transactions.\nThis usually takes a few seconds.",
-      buttonLabel: 'Cancel',
-    },
-  },
-  {
-    id: '4',
-    type: 'cta',
-    label: 'Trust Notice',
-    props: {
-      heading: 'Adding devices from people you trust',
-      description:
-        "When you approve a request, you grant someone full access to your account. They'll be able to change reservations and send messages on your behalf.",
-    },
-  },
+	{
+		id: "2",
+		type: "features",
+		label: "Recent Transactions",
+		props: {
+			heading: "Recent Transactions",
+			description: "Your latest account activity.",
+			items: [
+				{
+					id: "t1",
+					name: "Midnight Oil Coffee",
+					category: "Food & Drink",
+					date: "Today, 10:24 AM",
+					amount: "-$6.50",
+				},
+				{
+					id: "t2",
+					name: "Moonlit Market",
+					category: "Groceries",
+					date: "Yesterday",
+					amount: "-$142.30",
+				},
+				{
+					id: "t3",
+					name: "Night Shift Payout",
+					category: "Income",
+					date: "Oct 12",
+					amount: "+$4,200.00",
+					isPositive: true,
+				},
+				{
+					id: "t4",
+					name: "Night Owl Rides",
+					category: "Transport",
+					date: "Oct 11",
+					amount: "-$24.10",
+				},
+				{
+					id: "t5",
+					name: "Cryptflix Subscription",
+					category: "Entertainment",
+					date: "Oct 10",
+					amount: "-$19.99",
+				},
+			],
+		},
+	},
+	{
+		id: "3",
+		type: "text",
+		label: "Syncing State",
+		props: {
+			heading: "Syncing your accounts",
+			description: "We're pulling in your latest transactions.\nThis usually takes a few seconds.",
+			buttonLabel: "Cancel",
+		},
+	},
+	{
+		id: "4",
+		type: "cta",
+		label: "Trust Notice",
+		props: {
+			heading: "Adding devices from people you trust",
+			description:
+				"When you approve a request, you grant someone full access to your account. They'll be able to change reservations and send messages on your behalf.",
+		},
+	},
 ];
 
 function defaultProps(type: BlockType): Record<string, unknown> {
-  switch (type) {
-    case 'hero':
-      return {
-        heading: 'Midnight at the Castle Gates',
-        subheading: 'Gather the coven — the night is young and the candles are lit.',
-        buttonLabel: 'Enter the night',
-        alignment: 'center',
-      };
-    case 'text':
-      return {content: 'Enter your text here.'};
-    case 'image':
-      return {};
-    case 'button':
-      return {label: 'Button', variant: 'primary', size: 'md'};
-    case 'cards':
-      return {
-        cards: [
-          {
-            title: 'Pricing',
-            description: 'Flexible plans for every team size.',
-          },
-          {
-            title: 'Support',
-            description: 'Get help whenever you need it.',
-          },
-        ],
-      };
-    case 'features':
-      return {
-        heading: 'Activity',
-        description: '',
-        items: [
-          {
-            id: 't1',
-            name: 'New Item',
-            category: 'General',
-            date: 'Today',
-            amount: '$0.00',
-          },
-        ],
-      };
-    case 'cta':
-      return {
-        heading: 'Join the Midnight Coven',
-        description:
-          'Claim your seat at the table — letters from the crypt, once a moon.',
-        primaryLabel: 'Join the coven',
-        secondaryLabel: 'Read the lore',
-      };
-  }
+	switch (type) {
+		case "hero":
+			return {
+				heading: "Midnight at the Castle Gates",
+				subheading: "Gather the coven — the night is young and the candles are lit.",
+				buttonLabel: "Enter the night",
+				alignment: "center",
+			};
+		case "text":
+			return { content: "Enter your text here." };
+		case "image":
+			return {};
+		case "button":
+			return { label: "Button", variant: "primary", size: "md" };
+		case "cards":
+			return {
+				cards: [
+					{
+						title: "Pricing",
+						description: "Flexible plans for every team size.",
+					},
+					{
+						title: "Support",
+						description: "Get help whenever you need it.",
+					},
+				],
+			};
+		case "features":
+			return {
+				heading: "Activity",
+				description: "",
+				items: [
+					{
+						id: "t1",
+						name: "New Item",
+						category: "General",
+						date: "Today",
+						amount: "$0.00",
+					},
+				],
+			};
+		case "cta":
+			return {
+				heading: "Join the Midnight Coven",
+				description: "Claim your seat at the table — letters from the crypt, once a moon.",
+				primaryLabel: "Join the coven",
+				secondaryLabel: "Read the lore",
+			};
+	}
 }
 
 // ---------------------------------------------------------------------------
@@ -296,12 +289,12 @@ function defaultProps(type: BlockType): Record<string, unknown> {
 // against a definite height — and the host's <html>/<body> don't set one, so
 // the layout anchors a definite viewport height itself. No background; the
 // host owns the page surface.
-const pageStyle: CSSProperties = {height: '100dvh'};
+const pageStyle: CSSProperties = { height: "100dvh" };
 // Canvas reflows to the chosen viewport width; VStack has no maxWidth prop.
 const canvasStyle = (maxWidth: number): CSSProperties => ({
-  maxWidth,
-  width: '100%',
-  marginInline: 'auto',
+	maxWidth,
+	width: "100%",
+	marginInline: "auto",
 });
 // `clickable` and `selectedCard` are gone: the eight block cards are core's
 // `SelectableCard` now, which supplies the cursor, the hover overlay
@@ -313,12 +306,12 @@ const canvasStyle = (maxWidth: number): CSSProperties => ({
 // ring colour is unchanged and still stands: Comment #6272A4 cannot reach
 // 3:1 on #343746 at any alpha, and core's own selected ring has that ceiling.
 // The sidebar keeps its width when the canvas is wider than the window.
-const panelShrink: CSSProperties = {flexShrink: 0};
+const panelShrink: CSSProperties = { flexShrink: 0 };
 // Square muted chip behind the CTA icon — Center handles the centering
 // and sizing; only the surface (radius + fill) needs custom CSS.
 const iconCircle: CSSProperties = {
-  borderRadius: 'var(--radius-element)',
-  backgroundColor: 'var(--color-selection)',
+	borderRadius: "var(--radius-element)",
+	backgroundColor: "var(--color-selection)",
 };
 
 // ---------------------------------------------------------------------------
@@ -329,132 +322,132 @@ const iconCircle: CSSProperties = {
 // Hero labels it "Subheading" and adds its own button/alignment controls;
 // the merge keeps the shared pair, not the per-branch extras.
 function HeadingDescriptionGroup({
-  props,
-  onUpdate,
-  descriptionKey,
-  descriptionLabel,
+	props,
+	onUpdate,
+	descriptionKey,
+	descriptionLabel,
 }: {
-  props: Record<string, unknown>;
-  onUpdate: (key: string, value: unknown) => void;
-  descriptionKey: string;
-  descriptionLabel: string;
+	props: Record<string, unknown>;
+	onUpdate: (key: string, value: unknown) => void;
+	descriptionKey: string;
+	descriptionLabel: string;
 }) {
-  return (
-    <>
-      <TextInput
-        label="Heading"
-        value={(props.heading as string) ?? ''}
-        onChange={(v: string) => onUpdate('heading', v)}
-      />
-      <TextArea
-        label={descriptionLabel}
-        value={(props[descriptionKey] as string) ?? ''}
-        onChange={(v: string) => onUpdate(descriptionKey, v)}
-      />
-    </>
-  );
+	return (
+		<>
+			<TextInput
+				label="Heading"
+				value={(props.heading as string) ?? ""}
+				onChange={(v: string) => onUpdate("heading", v)}
+			/>
+			<TextArea
+				label={descriptionLabel}
+				value={(props[descriptionKey] as string) ?? ""}
+				onChange={(v: string) => onUpdate(descriptionKey, v)}
+			/>
+		</>
+	);
 }
 
 function PropertiesForm({
-  block,
-  onUpdate,
+	block,
+	onUpdate,
 }: {
-  block: Block;
-  onUpdate: (key: string, value: unknown) => void;
+	block: Block;
+	onUpdate: (key: string, value: unknown) => void;
 }) {
-  const {type, props} = block;
+	const { type, props } = block;
 
-  switch (type) {
-    case 'hero':
-      return (
-        <VStack gap={4}>
-          <HeadingDescriptionGroup
-            props={props}
-            onUpdate={onUpdate}
-            descriptionKey="subheading"
-            descriptionLabel="Subheading"
-          />
-          <TextInput
-            label="Button Label"
-            value={(props.buttonLabel as string) ?? ''}
-            onChange={(v: string) => onUpdate('buttonLabel', v)}
-          />
-          <Selector
-            label="Alignment"
-            value={(props.alignment as string) ?? 'center'}
-            onChange={(v: string) => onUpdate('alignment', v)}
-            options={[
-              {label: 'Left', value: 'left'},
-              {label: 'Center', value: 'center'},
-              {label: 'Right', value: 'right'},
-            ]}
-          />
-        </VStack>
-      );
+	switch (type) {
+		case "hero":
+			return (
+				<VStack gap={4}>
+					<HeadingDescriptionGroup
+						props={props}
+						onUpdate={onUpdate}
+						descriptionKey="subheading"
+						descriptionLabel="Subheading"
+					/>
+					<TextInput
+						label="Button Label"
+						value={(props.buttonLabel as string) ?? ""}
+						onChange={(v: string) => onUpdate("buttonLabel", v)}
+					/>
+					<Selector
+						label="Alignment"
+						value={(props.alignment as string) ?? "center"}
+						onChange={(v: string) => onUpdate("alignment", v)}
+						options={[
+							{ label: "Left", value: "left" },
+							{ label: "Center", value: "center" },
+							{ label: "Right", value: "right" },
+						]}
+					/>
+				</VStack>
+			);
 
-    case 'text':
-      return (
-        <VStack gap={4}>
-          <HeadingDescriptionGroup
-            props={props}
-            onUpdate={onUpdate}
-            descriptionKey="description"
-            descriptionLabel="Description"
-          />
-          <TextInput
-            label="Button Label"
-            value={(props.buttonLabel as string) ?? ''}
-            onChange={(v: string) => onUpdate('buttonLabel', v)}
-          />
-        </VStack>
-      );
-    case 'features':
-    case 'cta':
-      return (
-        <VStack gap={4}>
-          <HeadingDescriptionGroup
-            props={props}
-            onUpdate={onUpdate}
-            descriptionKey="description"
-            descriptionLabel="Description"
-          />
-        </VStack>
-      );
+		case "text":
+			return (
+				<VStack gap={4}>
+					<HeadingDescriptionGroup
+						props={props}
+						onUpdate={onUpdate}
+						descriptionKey="description"
+						descriptionLabel="Description"
+					/>
+					<TextInput
+						label="Button Label"
+						value={(props.buttonLabel as string) ?? ""}
+						onChange={(v: string) => onUpdate("buttonLabel", v)}
+					/>
+				</VStack>
+			);
+		case "features":
+		case "cta":
+			return (
+				<VStack gap={4}>
+					<HeadingDescriptionGroup
+						props={props}
+						onUpdate={onUpdate}
+						descriptionKey="description"
+						descriptionLabel="Description"
+					/>
+				</VStack>
+			);
 
-    case 'button':
-      return (
-        <VStack gap={4}>
-          <TextInput
-            label="Label"
-            value={(props.label as string) ?? ''}
-            onChange={(v: string) => onUpdate('label', v)}
-          />
-          <Selector
-            label="Variant"
-            value={(props.variant as string) ?? 'primary'}
-            onChange={(v: string) => onUpdate('variant', v)}
-            options={[
-              {label: 'Primary', value: 'primary'},
-              {label: 'Secondary', value: 'secondary'},
-              {label: 'Ghost', value: 'ghost'},
-            ]}
-          />
-          <Selector
-            label="Size"
-            value={(props.size as string) ?? 'md'}
-            onChange={(v: string) => onUpdate('size', v)}
-            options={[
-              {label: 'Small', value: 'sm'},
-              {label: 'Medium', value: 'md'},
-              {label: 'Large', value: 'lg'},
-            ]}
-          />
-        </VStack>
-      );
+		case "button":
+			return (
+				<VStack gap={4}>
+					<TextInput
+						label="Label"
+						value={(props.label as string) ?? ""}
+						onChange={(v: string) => onUpdate("label", v)}
+					/>
+					<Selector
+						label="Variant"
+						value={(props.variant as string) ?? "primary"}
+						onChange={(v: string) => onUpdate("variant", v)}
+						options={[
+							{ label: "Primary", value: "primary" },
+							{ label: "Secondary", value: "secondary" },
+							{ label: "Ghost", value: "ghost" },
+						]}
+					/>
+					<Selector
+						label="Size"
+						value={(props.size as string) ?? "md"}
+						onChange={(v: string) => onUpdate("size", v)}
+						options={[
+							{ label: "Small", value: "sm" },
+							{ label: "Medium", value: "md" },
+							{ label: "Large", value: "lg" },
+						]}
+					/>
+				</VStack>
+			);
 
-    default:
-      return <EmptyState title="No configurable properties" isCompact />;
-  }
+		default:
+			return <EmptyState title="No configurable properties" isCompact />;
+	}
 }
 
 // ---------------------------------------------------------------------------
@@ -462,166 +455,139 @@ function PropertiesForm({
 // ---------------------------------------------------------------------------
 
 function BlockPreview({
-  block,
-  isSelected,
-  onSelect,
+	block,
+	isSelected,
+	onSelect,
 }: {
-  block: Block;
-  isSelected: boolean;
-  onSelect: () => void;
+	block: Block;
+	isSelected: boolean;
+	onSelect: () => void;
 }) {
-  const {type, props} = block;
+	const { type, props } = block;
 
-  // One SelectableCard wrapper for every block; only the inner content
-  // switches. Keeps padding/label/selection in one place.
-  let content: ReactNode;
-  switch (type) {
-    case 'hero':
-      content = (
-        <VStack gap={4}>
-          <Heading level={3}>
-            {(props.heading as string) || 'Hero Heading'}
-          </Heading>
-          <Text type="body" color="secondary">
-            {(props.subheading as string) || 'A whisper from the crypt…'}
-          </Text>
-          {(props.buttonLabel as string) && (
-            <Button label={props.buttonLabel as string} />
-          )}
-        </VStack>
-      );
-      break;
+	// One SelectableCard wrapper for every block; only the inner content
+	// switches. Keeps padding/label/selection in one place.
+	let content: ReactNode;
+	switch (type) {
+		case "hero":
+			content = (
+				<VStack gap={4}>
+					<Heading level={3}>{(props.heading as string) || "Hero Heading"}</Heading>
+					<Text type="body" color="secondary">
+						{(props.subheading as string) || "A whisper from the crypt…"}
+					</Text>
+					{(props.buttonLabel as string) && <Button label={props.buttonLabel as string} />}
+				</VStack>
+			);
+			break;
 
-    case 'text':
-      content = props.heading ? (
-        <EmptyState
-          title={props.heading as string}
-          description={props.description as string}
-          icon={<Icon icon={FileText} color="secondary" />}
-          actions={
-            (props.buttonLabel as string) ? (
-              <Button
-                label={props.buttonLabel as string}
-                variant="secondary"
-              />
-            ) : undefined
-          }
-        />
-      ) : (
-        <Text type="body">
-          {(props.content as string) || 'Ink your midnight thoughts here…'}
-        </Text>
-      );
-      break;
-    case 'image':
-      content = (
-        <EmptyState
-          title="Image Block"
-          description="Drop an image or enter a URL"
-          icon={<Icon icon={Image} color="secondary" />}
-          isCompact
-        />
-      );
-      break;
+		case "text":
+			content = props.heading ? (
+				<EmptyState
+					title={props.heading as string}
+					description={props.description as string}
+					icon={<Icon icon={FileText} color="secondary" />}
+					actions={
+						(props.buttonLabel as string) ? (
+							<Button label={props.buttonLabel as string} variant="secondary" />
+						) : undefined
+					}
+				/>
+			) : (
+				<Text type="body">{(props.content as string) || "Ink your midnight thoughts here…"}</Text>
+			);
+			break;
+		case "image":
+			content = (
+				<EmptyState
+					title="Image Block"
+					description="Drop an image or enter a URL"
+					icon={<Icon icon={Image} color="secondary" />}
+					isCompact
+				/>
+			);
+			break;
 
-    case 'button':
-      content = (
-        <Center>
-          <Button
-            label={(props.label as string) || 'Button'}
-            variant={
-              (props.variant as 'primary' | 'secondary' | 'ghost') ||
-              'primary'
-            }
-            size={(props.size as 'sm' | 'md' | 'lg') || 'md'}
-          />
-        </Center>
-      );
-      break;
+		case "button":
+			content = (
+				<Center>
+					<Button
+						label={(props.label as string) || "Button"}
+						variant={(props.variant as "primary" | "secondary" | "ghost") || "primary"}
+						size={(props.size as "sm" | "md" | "lg") || "md"}
+					/>
+				</Center>
+			);
+			break;
 
+		case "features": {
+			const items = (props.items as Transaction[]) || [];
+			content = (
+				<VStack gap={4}>
+					<HStack gap={3} vAlign="start" hAlign="between">
+						<VStack gap={1}>
+							<Heading level={3}>{(props.heading as string) || "Features"}</Heading>
+							{(props.description as string) && (
+								<Text type="body" color="secondary">
+									{props.description as string}
+								</Text>
+							)}
+						</VStack>
+						<Button label="View All" variant="secondary" />
+					</HStack>
+					<Table
+						data={items}
+						columns={TRANSACTION_COLUMNS}
+						idKey="id"
+						hasHover
+						textOverflow="truncate"
+					/>
+				</VStack>
+			);
+			break;
+		}
 
-    case 'features': {
-      const items = (props.items as Transaction[]) || [];
-      content = (
-        <VStack gap={4}>
-          <HStack gap={3} vAlign="start" hAlign="between">
-            <VStack gap={1}>
-              <Heading level={3}>
-                {(props.heading as string) || 'Features'}
-              </Heading>
-              {(props.description as string) && (
-                <Text type="body" color="secondary">
-                  {props.description as string}
-                </Text>
-              )}
-            </VStack>
-            <Button label="View All" variant="secondary" />
-          </HStack>
-          <Table
-            data={items}
-            columns={TRANSACTION_COLUMNS}
-            idKey="id"
-            hasHover
-            textOverflow="truncate"
-          />
-        </VStack>
-      );
-      break;
-    }
+		case "cards": {
+			const cardItems = (props.cards as Array<{ title: string; description: string }>) || [];
+			content = (
+				<VStack gap={4}>
+					<Heading level={3}>Cards</Heading>
+					<Divider />
+					<List density="balanced" hasDividers={false}>
+						{cardItems.map((card) => (
+							<ListItem key={card.title} label={card.title} description={card.description} />
+						))}
+					</List>
+				</VStack>
+			);
+			break;
+		}
 
-    case 'cards': {
-      const cardItems =
-        (props.cards as Array<{title: string; description: string}>) || [];
-      content = (
-        <VStack gap={4}>
-          <Heading level={3}>Cards</Heading>
-          <Divider />
-          <List density="balanced" hasDividers={false}>
-            {cardItems.map(card => (
-              <ListItem
-                key={card.title}
-                label={card.title}
-                description={card.description}
-              />
-            ))}
-          </List>
-        </VStack>
-      );
-      break;
-    }
+		case "cta":
+			content = (
+				<HStack gap={4} vAlign="start">
+					<Center width={40} height={40} style={iconCircle}>
+						<Icon icon={Lock} color="secondary" />
+					</Center>
+					<VStack gap={1}>
+						<Heading level={3}>{(props.heading as string) || "Notice"}</Heading>
+						<Text type="body" color="secondary">
+							{(props.description as string) || "Words from the crypt gather here…"}
+						</Text>
+					</VStack>
+				</HStack>
+			);
+			break;
 
-    case 'cta':
-      content = (
-        <HStack gap={4} vAlign="start">
-          <Center width={40} height={40} style={iconCircle}>
-            <Icon icon={Lock} color="secondary" />
-          </Center>
-          <VStack gap={1}>
-            <Heading level={3}>
-              {(props.heading as string) || 'Notice'}
-            </Heading>
-            <Text type="body" color="secondary">
-              {(props.description as string) ||
-                'Words from the crypt gather here…'}
-            </Text>
-          </VStack>
-        </HStack>
-      );
-      break;
+		default:
+			return null;
+	}
 
-    default:
-      return null;
-  }
-
-  return (
-    <SelectableCard
-      padding={4}
-      label={block.label}
-      isSelected={isSelected}
-      onChange={onSelect}>
-      {content}
-    </SelectableCard>
-  );
+	return (
+		<SelectableCard padding={4} label={block.label} isSelected={isSelected} onChange={onSelect}>
+			{content}
+		</SelectableCard>
+	);
 }
 
 // ---------------------------------------------------------------------------
@@ -629,344 +595,343 @@ function BlockPreview({
 // ---------------------------------------------------------------------------
 
 export default function PageEditor() {
-  const [blocks, setBlocks] = useState<Block[]>(DEFAULT_BLOCKS);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [sidebarTab, setSidebarTab] = useState<SidebarTab>('blocks');
-  const [pageTitle, setPageTitle] = useState('Page Editor');
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [viewport, setViewport] = useState<ViewportSize>('desktop');
-  // Mobile only: the customizations (tabs + Add Block/Layers) open in a
-  // fullscreen dialog over the preview, since there's no room to dock them.
-  const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
+	const [blocks, setBlocks] = useState<Block[]>(DEFAULT_BLOCKS);
+	const [selectedId, setSelectedId] = useState<string | null>(null);
+	const [sidebarTab, setSidebarTab] = useState<SidebarTab>("blocks");
+	const [pageTitle, setPageTitle] = useState("Page Editor");
+	const [isEditingTitle, setIsEditingTitle] = useState(false);
+	const [viewport, setViewport] = useState<ViewportSize>("desktop");
+	// Mobile only: the customizations (tabs + Add Block/Layers) open in a
+	// fullscreen dialog over the preview, since there's no room to dock them.
+	const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
 
-  // On phones the editor stacks: the panel sits in the header slot (full width,
-  // above the canvas) showing just its toolbar, so the canvas isn't crushed
-  // beside a 320px sidebar. On desktop the full panel (tabs + lists) shows.
-  const isMobile = useMediaQuery('(max-width: 768px)');
+	// On phones the editor stacks: the panel sits in the header slot (full width,
+	// above the canvas) showing just its toolbar, so the canvas isn't crushed
+	// beside a 320px sidebar. On desktop the full panel (tabs + lists) shows.
+	const isMobile = useMediaQuery("(max-width: 768px)");
 
-  const selectedBlock = blocks.find(b => b.id === selectedId) ?? null;
+	const selectedBlock = blocks.find((b) => b.id === selectedId) ?? null;
 
-  const updateBlockProp = useCallback(
-    (id: string, key: string, value: unknown) => {
-      setBlocks(prev =>
-        prev.map(b =>
-          b.id === id ? {...b, props: {...b.props, [key]: value}} : b,
-        ),
-      );
-    },
-    [],
-  );
+	const updateBlockProp = useCallback((id: string, key: string, value: unknown) => {
+		setBlocks((prev) =>
+			prev.map((b) => (b.id === id ? { ...b, props: { ...b.props, [key]: value } } : b)),
+		);
+	}, []);
 
-  const moveBlock = useCallback((id: string, dir: -1 | 1) => {
-    setBlocks(prev => {
-      const idx = prev.findIndex(b => b.id === id);
-      if (idx < 0) {
-        return prev;
-      }
-      const target = idx + dir;
-      if (target < 0 || target >= prev.length) {
-        return prev;
-      }
-      const next = [...prev];
-      [next[idx], next[target]] = [next[target], next[idx]];
-      return next;
-    });
-  }, []);
+	const moveBlock = useCallback((id: string, dir: -1 | 1) => {
+		setBlocks((prev) => {
+			const idx = prev.findIndex((b) => b.id === id);
+			if (idx < 0) {
+				return prev;
+			}
+			const target = idx + dir;
+			if (target < 0 || target >= prev.length) {
+				return prev;
+			}
+			const next = [...prev];
+			[next[idx], next[target]] = [next[target], next[idx]];
+			return next;
+		});
+	}, []);
 
-  const deleteBlock = useCallback(
-    (id: string) => {
-      setBlocks(prev => prev.filter(b => b.id !== id));
-      if (selectedId === id) {
-        setSelectedId(null);
-      }
-    },
-    [selectedId],
-  );
+	const deleteBlock = useCallback(
+		(id: string) => {
+			setBlocks((prev) => prev.filter((b) => b.id !== id));
+			if (selectedId === id) {
+				setSelectedId(null);
+			}
+		},
+		[selectedId],
+	);
 
-  const addBlock = useCallback((type: BlockType) => {
-    const id = crypto.randomUUID();
-    const newBlock: Block = {
-      id,
-      type,
-      label: BLOCK_META[type].label,
-      props: defaultProps(type),
-    };
-    setBlocks(prev => [...prev, newBlock]);
-    setSelectedId(id);
-    setSidebarTab('properties');
-  }, []);
+	const addBlock = useCallback((type: BlockType) => {
+		const id = crypto.randomUUID();
+		const newBlock: Block = {
+			id,
+			type,
+			label: BLOCK_META[type].label,
+			props: defaultProps(type),
+		};
+		setBlocks((prev) => [...prev, newBlock]);
+		setSelectedId(id);
+		setSidebarTab("properties");
+	}, []);
 
-  const selectBlock = useCallback(
-    (id: string) => {
-      setSelectedId(prev => (prev === id ? null : id));
-      setSidebarTab('properties');
-      // On mobile, tapping a block on the canvas opens its properties dialog.
-      if (isMobile) {
-        setIsCustomizeOpen(true);
-      }
-    },
-    [isMobile],
-  );
+	const selectBlock = useCallback(
+		(id: string) => {
+			setSelectedId((prev) => (prev === id ? null : id));
+			setSidebarTab("properties");
+			// On mobile, tapping a block on the canvas opens its properties dialog.
+			if (isMobile) {
+				setIsCustomizeOpen(true);
+			}
+		},
+		[isMobile],
+	);
 
-  // --- sidebar content ---
+	// --- sidebar content ---
 
-  const blocksTabContent = (
-    <VStack gap={2}>
-      <VStack gap={1}>
-        <Heading level={3}>Add Block</Heading>
-        <List density="balanced" hasDividers={false}>
-          {(Object.keys(BLOCK_META) as BlockType[]).map(type => (
-            <ListItem
-              key={type}
-              label={BLOCK_META[type].label}
-              startContent={
-                <Icon icon={BLOCK_META[type].icon} color="secondary" />
-              }
-              onClick={() => addBlock(type)}
-            />
-          ))}
-        </List>
-      </VStack>
+	const blocksTabContent = (
+		<VStack gap={2}>
+			<VStack gap={1}>
+				<Heading level={3}>Add Block</Heading>
+				<List density="balanced" hasDividers={false}>
+					{(Object.keys(BLOCK_META) as BlockType[]).map((type) => (
+						<ListItem
+							key={type}
+							label={BLOCK_META[type].label}
+							startContent={<Icon icon={BLOCK_META[type].icon} color="secondary" />}
+							onClick={() => addBlock(type)}
+						/>
+					))}
+				</List>
+			</VStack>
 
-      <VStack gap={1}>
-        <Heading level={3}>Layers</Heading>
-        <List density="balanced" hasDividers={false}>
-          {blocks.map(block => (
-            <ListItem
-              key={block.id}
-              label={block.label}
-              isSelected={block.id === selectedId}
-              onClick={() => selectBlock(block.id)}
-              startContent={
-                <Icon icon={BLOCK_META[block.type].icon} color="secondary" />
-              }
-              endContent={
-                <HStack gap={1}>
-                  <Button
-                    label="Move up"
-                    icon={<Icon icon={ChevronUp} size="sm" />}
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e: MouseEvent) => {
-                      e.stopPropagation();
-                      moveBlock(block.id, -1);
-                    }}
-                    isIconOnly
-                  />
-                  <Button
-                    label="Move down"
-                    icon={<Icon icon={ChevronDown} size="sm" />}
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e: MouseEvent) => {
-                      e.stopPropagation();
-                      moveBlock(block.id, 1);
-                    }}
-                    isIconOnly
-                  />
-                  <Button
-                    label="Delete"
-                    icon={<Icon icon={Trash2} size="sm" />}
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e: MouseEvent) => {
-                      e.stopPropagation();
-                      deleteBlock(block.id);
-                    }}
-                    isIconOnly
-                  />
-                </HStack>
-              }
-            />
-          ))}
-        </List>
-      </VStack>
-    </VStack>
-  );
+			<VStack gap={1}>
+				<Heading level={3}>Layers</Heading>
+				<List density="balanced" hasDividers={false}>
+					{blocks.map((block) => (
+						<ListItem
+							key={block.id}
+							label={block.label}
+							isSelected={block.id === selectedId}
+							onClick={() => selectBlock(block.id)}
+							startContent={<Icon icon={BLOCK_META[block.type].icon} color="secondary" />}
+							endContent={
+								<HStack gap={1}>
+									<Button
+										label="Move up"
+										icon={<Icon icon={ChevronUp} size="sm" />}
+										variant="ghost"
+										size="sm"
+										onClick={(e: MouseEvent) => {
+											e.stopPropagation();
+											moveBlock(block.id, -1);
+										}}
+										isIconOnly
+									/>
+									<Button
+										label="Move down"
+										icon={<Icon icon={ChevronDown} size="sm" />}
+										variant="ghost"
+										size="sm"
+										onClick={(e: MouseEvent) => {
+											e.stopPropagation();
+											moveBlock(block.id, 1);
+										}}
+										isIconOnly
+									/>
+									<Button
+										label="Delete"
+										icon={<Icon icon={Trash2} size="sm" />}
+										variant="ghost"
+										size="sm"
+										onClick={(e: MouseEvent) => {
+											e.stopPropagation();
+											deleteBlock(block.id);
+										}}
+										isIconOnly
+									/>
+								</HStack>
+							}
+						/>
+					))}
+				</List>
+			</VStack>
+		</VStack>
+	);
 
-  const propertiesTabContent = selectedBlock ? (
-    <PropertiesForm
-      block={selectedBlock}
-      onUpdate={(key, value) => updateBlockProp(selectedBlock.id, key, value)}
-    />
-  ) : (
-    <EmptyState
-      title="No block selected"
-      description="Select a block to edit its properties"
-      isCompact
-    />
-  );
+	const propertiesTabContent = selectedBlock ? (
+		<PropertiesForm
+			block={selectedBlock}
+			onUpdate={(key, value) => updateBlockProp(selectedBlock.id, key, value)}
+		/>
+	) : (
+		<EmptyState
+			title="No block selected"
+			description="Select a block to edit its properties"
+			isCompact
+		/>
+	);
 
-  // Tabs + the active tab's content. Shown inline in the sidebar on desktop,
-  // and inside a fullscreen dialog on mobile.
-  const editingContent = (
-    <VStack gap={4}>
-      <VStack gap={0}>
-        <TabList
-          layout="fill"
-          value={sidebarTab}
-          onChange={(v: string) => setSidebarTab(v as SidebarTab)}>
-          <Tab value="blocks" label="Blocks" />
-          <Tab value="properties" label="Properties" />
-        </TabList>
-        <Divider />
-      </VStack>
-      <Section variant="transparent" padding={4}>
-        {sidebarTab === 'blocks' ? blocksTabContent : propertiesTabContent}
-      </Section>
-    </VStack>
-  );
+	// Tabs + the active tab's content. Shown inline in the sidebar on desktop,
+	// and inside a fullscreen dialog on mobile.
+	const editingContent = (
+		<VStack gap={4}>
+			<VStack gap={0}>
+				<TabList
+					layout="fill"
+					value={sidebarTab}
+					onChange={(v: string) => setSidebarTab(v as SidebarTab)}
+				>
+					<Tab value="blocks" label="Blocks" />
+					<Tab value="properties" label="Properties" />
+				</TabList>
+				<Divider />
+			</VStack>
+			<Section variant="transparent" padding={4}>
+				{sidebarTab === "blocks" ? blocksTabContent : propertiesTabContent}
+			</Section>
+		</VStack>
+	);
 
-  const sidebar = (
-    <LayoutPanel
-      hasDivider={!isMobile}
-      padding={0}
-      width={isMobile ? '100%' : 320}
-      style={panelShrink}>
-      <VStack gap={4}>
-        {/* Panel Header — mobile/desktop branches are exclusive: exactly one h1. */}
-        <Section variant="transparent" padding={4}>
-          {isMobile ? (
-            // Mobile: the title, an Edit button that opens the customizations
-            // dialog, and the primary action.
-            <HStack gap={3} vAlign="center" hAlign="between">
-              <Heading level={1} type="display-2">{pageTitle}</Heading>
-              <HStack gap={2} vAlign="center">
-                <Button
-                  label="Edit"
-                  icon={<Icon icon={SlidersHorizontal} size="sm" />}
-                  variant="ghost"
-                  isIconOnly
-                  onClick={() => setIsCustomizeOpen(true)}
-                />
-                <Button label="Publish" variant="primary" />
-              </HStack>
-            </HStack>
-          ) : (
-            <VStack gap={4}>
-              {isEditingTitle ? (
-                <TextInput
-                  label="Page title"
-                  isLabelHidden
-                  value={pageTitle}
-                  onChange={setPageTitle}
-                  onKeyDown={(e: KeyboardEvent) => {
-                    if (e.key === 'Enter') {
-                      setIsEditingTitle(false);
-                    }
-                  }}
-                  hasAutoFocus
-                  onBlur={() => setIsEditingTitle(false)}
-                />
-              ) : (
-                <Heading level={1} type="display-2">{pageTitle}</Heading>
-              )}
+	const sidebar = (
+		<LayoutPanel
+			hasDivider={!isMobile}
+			padding={0}
+			width={isMobile ? "100%" : 320}
+			style={panelShrink}
+		>
+			<VStack gap={4}>
+				{/* Panel Header — mobile/desktop branches are exclusive: exactly one h1. */}
+				<Section variant="transparent" padding={4}>
+					{isMobile ? (
+						// Mobile: the title, an Edit button that opens the customizations
+						// dialog, and the primary action.
+						<HStack gap={3} vAlign="center" hAlign="between">
+							<Heading level={1} type="display-2">
+								{pageTitle}
+							</Heading>
+							<HStack gap={2} vAlign="center">
+								<Button
+									label="Edit"
+									icon={<Icon icon={SlidersHorizontal} size="sm" />}
+									variant="ghost"
+									isIconOnly
+									onClick={() => setIsCustomizeOpen(true)}
+								/>
+								<Button label="Publish" variant="primary" />
+							</HStack>
+						</HStack>
+					) : (
+						<VStack gap={4}>
+							{isEditingTitle ? (
+								<TextInput
+									label="Page title"
+									isLabelHidden
+									value={pageTitle}
+									onChange={setPageTitle}
+									onKeyDown={(e: KeyboardEvent) => {
+										if (e.key === "Enter") {
+											setIsEditingTitle(false);
+										}
+									}}
+									hasAutoFocus
+									onBlur={() => setIsEditingTitle(false)}
+								/>
+							) : (
+								<Heading level={1} type="display-2">
+									{pageTitle}
+								</Heading>
+							)}
 
-              <Toolbar
-                label="Viewport and actions"
-                startContent={
-                  <SegmentedControl
-                    label="Viewport size"
-                    value={viewport}
-                    onChange={(v: string) => setViewport(v as ViewportSize)}>
-                    <SegmentedControlItem
-                      value="desktop"
-                      label="Desktop"
-                      icon={<Icon icon={Monitor} size="sm" />}
-                      isLabelHidden
-                    />
-                    <SegmentedControlItem
-                      value="tablet"
-                      label="Tablet"
-                      icon={<Icon icon={Tablet} size="sm" />}
-                      isLabelHidden
-                    />
-                    <SegmentedControlItem
-                      value="phone"
-                      label="Phone"
-                      icon={<Icon icon={Smartphone} size="sm" />}
-                      isLabelHidden
-                    />
-                  </SegmentedControl>
-                }
-                endContent={
-                  <HStack gap={2}>
-                    <Button
-                      label="Preview"
-                      icon={<Icon icon={Eye} size="sm" />}
-                      variant="ghost"
-                      isIconOnly
-                    />
-                    <Button label="Publish" variant="primary" />
-                  </HStack>
-                }
-              />
-            </VStack>
-          )}
-        </Section>
+							<Toolbar
+								label="Viewport and actions"
+								startContent={
+									<SegmentedControl
+										label="Viewport size"
+										value={viewport}
+										onChange={(v: string) => setViewport(v as ViewportSize)}
+									>
+										<SegmentedControlItem
+											value="desktop"
+											label="Desktop"
+											icon={<Icon icon={Monitor} size="sm" />}
+											isLabelHidden
+										/>
+										<SegmentedControlItem
+											value="tablet"
+											label="Tablet"
+											icon={<Icon icon={Tablet} size="sm" />}
+											isLabelHidden
+										/>
+										<SegmentedControlItem
+											value="phone"
+											label="Phone"
+											icon={<Icon icon={Smartphone} size="sm" />}
+											isLabelHidden
+										/>
+									</SegmentedControl>
+								}
+								endContent={
+									<HStack gap={2}>
+										<Button
+											label="Preview"
+											icon={<Icon icon={Eye} size="sm" />}
+											variant="ghost"
+											isIconOnly
+										/>
+										<Button label="Publish" variant="primary" />
+									</HStack>
+								}
+							/>
+						</VStack>
+					)}
+				</Section>
 
-        {!isMobile && editingContent}
-      </VStack>
-    </LayoutPanel>
-  );
+				{!isMobile && editingContent}
+			</VStack>
+		</LayoutPanel>
+	);
 
-  return (
-    <>
-      <Layout
-        style={pageStyle}
-        height="fill"
-        header={isMobile ? sidebar : undefined}
-        start={isMobile ? undefined : sidebar}
-        content={
-          <LayoutContent padding={8}>
-            <VStack gap={4} style={canvasStyle(VIEWPORT_MAX[viewport])}>
-              {blocks.length > 0 ? (
-                blocks.map(block => (
-                  <BlockPreview
-                    key={block.id}
-                    block={block}
-                    isSelected={block.id === selectedId}
-                    onSelect={() => selectBlock(block.id)}
-                  />
-                ))
-              ) : (
-                <EmptyState
-                  title="No blocks yet"
-                  description="Add blocks from the sidebar to start building your page"
-                  icon={<Icon icon={CirclePlus} color="secondary" />}
-                />
-              )}
-            </VStack>
-          </LayoutContent>
-        }
-      />
+	return (
+		<>
+			<Layout
+				style={pageStyle}
+				height="fill"
+				header={isMobile ? sidebar : undefined}
+				start={isMobile ? undefined : sidebar}
+				content={
+					<LayoutContent padding={8}>
+						<VStack gap={4} style={canvasStyle(VIEWPORT_MAX[viewport])}>
+							{blocks.length > 0 ? (
+								blocks.map((block) => (
+									<BlockPreview
+										key={block.id}
+										block={block}
+										isSelected={block.id === selectedId}
+										onSelect={() => selectBlock(block.id)}
+									/>
+								))
+							) : (
+								<EmptyState
+									title="No blocks yet"
+									description="Add blocks from the sidebar to start building your page"
+									icon={<Icon icon={CirclePlus} color="secondary" />}
+								/>
+							)}
+						</VStack>
+					</LayoutContent>
+				}
+			/>
 
-      {/* Mobile: customizations open in a fullscreen dialog over the preview. */}
-      <Dialog
-        isOpen={isMobile && isCustomizeOpen}
-        onOpenChange={setIsCustomizeOpen}
-        variant="fullscreen"
-        purpose="info"
-        padding={0}>
-        <Layout
-          height="fill"
-          header={
-            <LayoutHeader hasDivider>
-              <HStack gap={3} vAlign="center" hAlign="between">
-                <Heading level={3}>Customize</Heading>
-                <Button
-                  label="Close"
-                  icon={<Icon icon={X} size="sm" />}
-                  variant="ghost"
-                  isIconOnly
-                  onClick={() => setIsCustomizeOpen(false)}
-                />
-              </HStack>
-            </LayoutHeader>
-          }
-          content={<LayoutContent padding={0}>{editingContent}</LayoutContent>}
-        />
-      </Dialog>
-    </>
-  );
+			{/* Mobile: customizations open in a fullscreen dialog over the preview. */}
+			<Dialog
+				isOpen={isMobile && isCustomizeOpen}
+				onOpenChange={setIsCustomizeOpen}
+				variant="fullscreen"
+				purpose="info"
+				padding={0}
+			>
+				<Layout
+					height="fill"
+					header={
+						<LayoutHeader hasDivider>
+							<HStack gap={3} vAlign="center" hAlign="between">
+								<Heading level={3}>Customize</Heading>
+								<Button
+									label="Close"
+									icon={<Icon icon={X} size="sm" />}
+									variant="ghost"
+									isIconOnly
+									onClick={() => setIsCustomizeOpen(false)}
+								/>
+							</HStack>
+						</LayoutHeader>
+					}
+					content={<LayoutContent padding={0}>{editingContent}</LayoutContent>}
+				/>
+			</Dialog>
+		</>
+	);
 }

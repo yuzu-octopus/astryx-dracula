@@ -2,623 +2,597 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   L > (Tbar[size=sm] > (H > IB"Go back" + IB"Go forward" + Tx"Folder"[t=label]) + (SG"View mode" > SGI*4) + (H > IB"Group" + IB"Share" + IB"Tags" + IB"More" + IB"Search")) + (LC[p=0 !scroll] > (Hd"File Explorer"[level=1] + H[h=fill] > (S.transparent[p=2 w=240 dv=[end]] > UL[density=compact !hasDividers] > (LI > Ic + Tx"Item"[t=body])*3)*3 + (S.transparent[p=6] > V[g=4 a=center] > Av[size=96] + (V[g=1 a=center] > Tx"Name"[t=body] + Tx"Kind"[t=supporting]) + (ML"Information" > MLI*3))))
 
-import {useState, useMemo} from 'react';
-import {Layout, LayoutContent} from '@astryxdesign/core/Layout';
-import {Toolbar} from '@astryxdesign/core/Toolbar';
-import {List, ListItem} from '@astryxdesign/core/List';
-import {HStack, VStack} from '@astryxdesign/core/Layout';
-import {useMediaQuery} from '@astryxdesign/core/hooks';
-import {Text} from '@astryxdesign/core/Text';
-import {VisuallyHidden} from '@astryxdesign/core/VisuallyHidden';
-import {Icon} from '@astryxdesign/core/Icon';
-import {IconButton} from '@astryxdesign/core/IconButton';
-import {Section} from '@astryxdesign/core/Section';
-import {EmptyState} from '@astryxdesign/core/EmptyState';
-import {Avatar} from '@astryxdesign/core/Avatar';
-import {MetadataList, MetadataListItem} from '@astryxdesign/core/MetadataList';
+import { Avatar } from "@astryxdesign/core/Avatar";
+import { EmptyState } from "@astryxdesign/core/EmptyState";
+import { useMediaQuery } from "@astryxdesign/core/hooks";
+import { Icon } from "@astryxdesign/core/Icon";
+import { IconButton } from "@astryxdesign/core/IconButton";
+import { HStack, Layout, LayoutContent, VStack } from "@astryxdesign/core/Layout";
+import { List, ListItem } from "@astryxdesign/core/List";
+import { MetadataList, MetadataListItem } from "@astryxdesign/core/MetadataList";
+import { Section } from "@astryxdesign/core/Section";
+import { SegmentedControl, SegmentedControlItem } from "@astryxdesign/core/SegmentedControl";
+import { Text } from "@astryxdesign/core/Text";
+import { Toolbar } from "@astryxdesign/core/Toolbar";
+import { VisuallyHidden } from "@astryxdesign/core/VisuallyHidden";
 import {
-  SegmentedControl,
-  SegmentedControlItem,
-} from '@astryxdesign/core/SegmentedControl';
-import {
-  ChevronLeft,
-  ChevronRight,
-  Search,
-  Share2,
-  Tag,
-  Ellipsis,
-  Columns,
-  LayoutGrid,
-  Rows3,
-  Table,
-  SlidersHorizontal,
-  FileText,
-  Folder,
-} from 'lucide-react';
+	ChevronLeft,
+	ChevronRight,
+	Columns,
+	Ellipsis,
+	FileText,
+	Folder,
+	LayoutGrid,
+	Rows3,
+	Search,
+	Share2,
+	SlidersHorizontal,
+	Table,
+	Tag,
+} from "lucide-react";
+import { useMemo, useState } from "react";
 
 interface FileSystemItem {
-  id: string;
-  name: string;
-  type: 'file' | 'folder';
-  children?: FileSystemItem[];
+	id: string;
+	name: string;
+	type: "file" | "folder";
+	children?: FileSystemItem[];
 }
 
 const FILESYSTEM: FileSystemItem[] = [
-  {
-    id: 'applications',
-    name: 'Applications',
-    type: 'folder',
-    children: [
-      {
-        id: 'chrome-apps',
-        name: 'Chrome Apps',
-        type: 'folder',
-        children: [
-          {id: 'component-lab', name: 'Palette Lab.app', type: 'file'},
-          {id: 'google-chat', name: 'Night Chat.app', type: 'file'},
-          {id: 'workchat', name: 'Coven.app', type: 'file'},
-        ],
-      },
-      {id: 'figma', name: 'Figma.app', type: 'file'},
-      {id: 'safari', name: 'Safari.app', type: 'file'},
-      {id: 'slack', name: 'Slack.app', type: 'file'},
-      {id: 'terminal', name: 'Terminal.app', type: 'file'},
-      {id: 'vscode', name: 'Visual Studio Code.app', type: 'file'},
-      {id: 'xcode', name: 'Xcode.app', type: 'file'},
-    ],
-  },
-  {id: 'debug-log', name: 'debug-nocturne.log', type: 'file'},
-  {
-    id: 'desktop',
-    name: 'Desktop',
-    type: 'folder',
-    children: [
-      {id: 'screenshot1', name: 'Screenshot 2026-10-31.png', type: 'file'},
-      {id: 'notes-txt', name: 'midnight-notes.txt', type: 'file'},
-      {
-        id: 'projects',
-        name: 'Projects',
-        type: 'folder',
-        children: [
-          {id: 'readme-proj', name: 'README.md', type: 'file'},
-          {
-            id: 'src-folder',
-            name: 'src',
-            type: 'folder',
-            children: [
-              {id: 'index-ts', name: 'index.ts', type: 'file'},
-              {id: 'app-tsx', name: 'App.tsx', type: 'file'},
-            ],
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'documents',
-    name: 'Documents',
-    type: 'folder',
-    children: [
-      {id: 'design-spec', name: 'dracula-spec.pdf', type: 'file'},
-      {id: 'resume', name: 'resume.docx', type: 'file'},
-      {
-        id: 'work',
-        name: 'Work',
-        type: 'folder',
-        children: [
-          {id: 'q1-report', name: 'Q1-report.xlsx', type: 'file'},
-          {id: 'presentation', name: 'team-presentation.pptx', type: 'file'},
-        ],
-      },
-    ],
-  },
-  {
-    id: 'downloads',
-    name: 'Downloads',
-    type: 'folder',
-    children: [
-      {id: 'archive', name: 'archive.zip', type: 'file'},
-      {id: 'installer', name: 'installer.dmg', type: 'file'},
-      {id: 'photo', name: 'castle-2026.jpg', type: 'file'},
-    ],
-  },
-  {id: 'login-screenshot', name: 'login-midnight-screenshot.png', type: 'file'},
-  {
-    id: 'movies',
-    name: 'Movies',
-    type: 'folder',
-    children: [{id: 'recording', name: 'screen-recording.mov', type: 'file'}],
-  },
-  {
-    id: 'music',
-    name: 'Music',
-    type: 'folder',
-    children: [{id: 'playlist', name: 'favorites.m3u', type: 'file'}],
-  },
-  {
-    id: 'node-modules',
-    name: 'node_modules',
-    type: 'folder',
-    children: [
-      {
-        id: 'react',
-        name: 'react',
-        type: 'folder',
-        children: [{id: 'react-index', name: 'index.js', type: 'file'}],
-      },
-      {
-        id: 'react-dom',
-        name: 'react-dom',
-        type: 'folder',
-        children: [{id: 'react-dom-index', name: 'index.js', type: 'file'}],
-      },
-    ],
-  },
-  {
-    id: 'pictures',
-    name: 'Pictures',
-    type: 'folder',
-    children: [
-      {
-        id: 'vacation',
-        name: 'transylvania-2026',
-        type: 'folder',
-        children: [
-          {id: 'img1', name: 'IMG_0001.jpg', type: 'file'},
-          {id: 'img2', name: 'IMG_0002.jpg', type: 'file'},
-          {id: 'img3', name: 'IMG_0003.jpg', type: 'file'},
-        ],
-      },
-      {
-        id: 'screenshots-folder',
-        name: 'Screenshots',
-        type: 'folder',
-        children: [
-          {id: 'ss1', name: 'Screen Shot 1.png', type: 'file'},
-          {id: 'ss2', name: 'Screen Shot 2.png', type: 'file'},
-        ],
-      },
-    ],
-  },
-  {
-    id: 'public',
-    name: 'Public',
-    type: 'folder',
-    children: [
-      {id: 'drop-box', name: 'Drop Box', type: 'folder', children: []},
-    ],
-  },
-  {
-    id: 'astryx',
-    name: 'astryx',
-    type: 'folder',
-    children: [
-      {id: 'astryx-readme', name: 'README.md', type: 'file'},
-      {id: 'astryx-pkg', name: 'package.json', type: 'file'},
-      {
-        id: 'astryx-packages',
-        name: 'packages',
-        type: 'folder',
-        children: [
-          {
-            id: 'astryx-core',
-            name: 'core',
-            type: 'folder',
-            children: [
-              {
-                id: 'core-src',
-                name: 'src',
-                type: 'folder',
-                children: [
-                  {id: 'button-tsx', name: 'Button.tsx', type: 'file'},
-                  {id: 'card-tsx', name: 'Card.tsx', type: 'file'},
-                  {id: 'text-tsx', name: 'Text.tsx', type: 'file'},
-                ],
-              },
-            ],
-          },
-          {
-            id: 'astryx-cli',
-            name: 'cli',
-            type: 'folder',
-            children: [{id: 'cli-index', name: 'index.ts', type: 'file'}],
-          },
-        ],
-      },
-      {
-        id: 'astryx-apps',
-        name: 'apps',
-        type: 'folder',
-        children: [
-          {
-            id: 'storybook',
-            name: 'storybook',
-            type: 'folder',
-            children: [
-              {
-                id: 'sb-config',
-                name: '.storybook',
-                type: 'folder',
-                children: [],
-              },
-            ],
-          },
-          {
-            id: 'sandbox-app',
-            name: 'sandbox',
-            type: 'folder',
-            children: [
-              {
-                id: 'sandbox-src',
-                name: 'src',
-                type: 'folder',
-                children: [],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
+	{
+		id: "applications",
+		name: "Applications",
+		type: "folder",
+		children: [
+			{
+				id: "chrome-apps",
+				name: "Chrome Apps",
+				type: "folder",
+				children: [
+					{ id: "component-lab", name: "Palette Lab.app", type: "file" },
+					{ id: "google-chat", name: "Night Chat.app", type: "file" },
+					{ id: "workchat", name: "Coven.app", type: "file" },
+				],
+			},
+			{ id: "figma", name: "Figma.app", type: "file" },
+			{ id: "safari", name: "Safari.app", type: "file" },
+			{ id: "slack", name: "Slack.app", type: "file" },
+			{ id: "terminal", name: "Terminal.app", type: "file" },
+			{ id: "vscode", name: "Visual Studio Code.app", type: "file" },
+			{ id: "xcode", name: "Xcode.app", type: "file" },
+		],
+	},
+	{ id: "debug-log", name: "debug-nocturne.log", type: "file" },
+	{
+		id: "desktop",
+		name: "Desktop",
+		type: "folder",
+		children: [
+			{ id: "screenshot1", name: "Screenshot 2026-10-31.png", type: "file" },
+			{ id: "notes-txt", name: "midnight-notes.txt", type: "file" },
+			{
+				id: "projects",
+				name: "Projects",
+				type: "folder",
+				children: [
+					{ id: "readme-proj", name: "README.md", type: "file" },
+					{
+						id: "src-folder",
+						name: "src",
+						type: "folder",
+						children: [
+							{ id: "index-ts", name: "index.ts", type: "file" },
+							{ id: "app-tsx", name: "App.tsx", type: "file" },
+						],
+					},
+				],
+			},
+		],
+	},
+	{
+		id: "documents",
+		name: "Documents",
+		type: "folder",
+		children: [
+			{ id: "design-spec", name: "dracula-spec.pdf", type: "file" },
+			{ id: "resume", name: "resume.docx", type: "file" },
+			{
+				id: "work",
+				name: "Work",
+				type: "folder",
+				children: [
+					{ id: "q1-report", name: "Q1-report.xlsx", type: "file" },
+					{ id: "presentation", name: "team-presentation.pptx", type: "file" },
+				],
+			},
+		],
+	},
+	{
+		id: "downloads",
+		name: "Downloads",
+		type: "folder",
+		children: [
+			{ id: "archive", name: "archive.zip", type: "file" },
+			{ id: "installer", name: "installer.dmg", type: "file" },
+			{ id: "photo", name: "castle-2026.jpg", type: "file" },
+		],
+	},
+	{ id: "login-screenshot", name: "login-midnight-screenshot.png", type: "file" },
+	{
+		id: "movies",
+		name: "Movies",
+		type: "folder",
+		children: [{ id: "recording", name: "screen-recording.mov", type: "file" }],
+	},
+	{
+		id: "music",
+		name: "Music",
+		type: "folder",
+		children: [{ id: "playlist", name: "favorites.m3u", type: "file" }],
+	},
+	{
+		id: "node-modules",
+		name: "node_modules",
+		type: "folder",
+		children: [
+			{
+				id: "react",
+				name: "react",
+				type: "folder",
+				children: [{ id: "react-index", name: "index.js", type: "file" }],
+			},
+			{
+				id: "react-dom",
+				name: "react-dom",
+				type: "folder",
+				children: [{ id: "react-dom-index", name: "index.js", type: "file" }],
+			},
+		],
+	},
+	{
+		id: "pictures",
+		name: "Pictures",
+		type: "folder",
+		children: [
+			{
+				id: "vacation",
+				name: "transylvania-2026",
+				type: "folder",
+				children: [
+					{ id: "img1", name: "IMG_0001.jpg", type: "file" },
+					{ id: "img2", name: "IMG_0002.jpg", type: "file" },
+					{ id: "img3", name: "IMG_0003.jpg", type: "file" },
+				],
+			},
+			{
+				id: "screenshots-folder",
+				name: "Screenshots",
+				type: "folder",
+				children: [
+					{ id: "ss1", name: "Screen Shot 1.png", type: "file" },
+					{ id: "ss2", name: "Screen Shot 2.png", type: "file" },
+				],
+			},
+		],
+	},
+	{
+		id: "public",
+		name: "Public",
+		type: "folder",
+		children: [{ id: "drop-box", name: "Drop Box", type: "folder", children: [] }],
+	},
+	{
+		id: "astryx",
+		name: "astryx",
+		type: "folder",
+		children: [
+			{ id: "astryx-readme", name: "README.md", type: "file" },
+			{ id: "astryx-pkg", name: "package.json", type: "file" },
+			{
+				id: "astryx-packages",
+				name: "packages",
+				type: "folder",
+				children: [
+					{
+						id: "astryx-core",
+						name: "core",
+						type: "folder",
+						children: [
+							{
+								id: "core-src",
+								name: "src",
+								type: "folder",
+								children: [
+									{ id: "button-tsx", name: "Button.tsx", type: "file" },
+									{ id: "card-tsx", name: "Card.tsx", type: "file" },
+									{ id: "text-tsx", name: "Text.tsx", type: "file" },
+								],
+							},
+						],
+					},
+					{
+						id: "astryx-cli",
+						name: "cli",
+						type: "folder",
+						children: [{ id: "cli-index", name: "index.ts", type: "file" }],
+					},
+				],
+			},
+			{
+				id: "astryx-apps",
+				name: "apps",
+				type: "folder",
+				children: [
+					{
+						id: "storybook",
+						name: "storybook",
+						type: "folder",
+						children: [
+							{
+								id: "sb-config",
+								name: ".storybook",
+								type: "folder",
+								children: [],
+							},
+						],
+					},
+					{
+						id: "sandbox-app",
+						name: "sandbox",
+						type: "folder",
+						children: [
+							{
+								id: "sandbox-src",
+								name: "src",
+								type: "folder",
+								children: [],
+							},
+						],
+					},
+				],
+			},
+		],
+	},
 ];
 
 // Static toolbar content, hoisted out of the render path: neither element
 // reads component state, so rebuilding them per render buys nothing.
 const viewSwitcher = (
-  <SegmentedControl value="column" onChange={() => {}} label="View mode">
-    <SegmentedControlItem
-      value="grid"
-      label="Grid"
-      icon={<Icon icon={LayoutGrid} size="sm" />}
-      isLabelHidden
-    />
-    <SegmentedControlItem
-      value="list"
-      label="List"
-      icon={<Icon icon={Rows3} size="sm" />}
-      isLabelHidden
-    />
-    <SegmentedControlItem
-      value="column"
-      label="Column"
-      icon={<Icon icon={Columns} size="sm" />}
-      isLabelHidden
-    />
-    <SegmentedControlItem
-      value="gallery"
-      label="Gallery"
-      icon={<Icon icon={Table} size="sm" />}
-      isLabelHidden
-    />
-  </SegmentedControl>
+	<SegmentedControl value="column" onChange={() => {}} label="View mode">
+		<SegmentedControlItem
+			value="grid"
+			label="Grid"
+			icon={<Icon icon={LayoutGrid} size="sm" />}
+			isLabelHidden
+		/>
+		<SegmentedControlItem
+			value="list"
+			label="List"
+			icon={<Icon icon={Rows3} size="sm" />}
+			isLabelHidden
+		/>
+		<SegmentedControlItem
+			value="column"
+			label="Column"
+			icon={<Icon icon={Columns} size="sm" />}
+			isLabelHidden
+		/>
+		<SegmentedControlItem
+			value="gallery"
+			label="Gallery"
+			icon={<Icon icon={Table} size="sm" />}
+			isLabelHidden
+		/>
+	</SegmentedControl>
 );
 const fileActions = (
-  <>
-    <IconButton
-      variant="ghost"
-      size="sm"
-      icon={<Icon icon={SlidersHorizontal} size="sm" />}
-      label="Group"
-      tooltip="Group"
-    />
-    <IconButton
-      variant="ghost"
-      size="sm"
-      icon={<Icon icon={Share2} size="sm" />}
-      label="Share"
-      tooltip="Share"
-    />
-    <IconButton
-      variant="ghost"
-      size="sm"
-      icon={<Icon icon={Tag} size="sm" />}
-      label="Tags"
-      tooltip="Tags"
-    />
-    <IconButton
-      variant="ghost"
-      size="sm"
-      icon={<Icon icon={Ellipsis} size="sm" />}
-      label="More"
-      tooltip="More"
-    />
-    <IconButton
-      variant="ghost"
-      size="sm"
-      icon={<Icon icon={Search} size="sm" />}
-      label="Search"
-      tooltip="Search"
-    />
-  </>
+	<>
+		<IconButton
+			variant="ghost"
+			size="sm"
+			icon={<Icon icon={SlidersHorizontal} size="sm" />}
+			label="Group"
+			tooltip="Group"
+		/>
+		<IconButton
+			variant="ghost"
+			size="sm"
+			icon={<Icon icon={Share2} size="sm" />}
+			label="Share"
+			tooltip="Share"
+		/>
+		<IconButton
+			variant="ghost"
+			size="sm"
+			icon={<Icon icon={Tag} size="sm" />}
+			label="Tags"
+			tooltip="Tags"
+		/>
+		<IconButton
+			variant="ghost"
+			size="sm"
+			icon={<Icon icon={Ellipsis} size="sm" />}
+			label="More"
+			tooltip="More"
+		/>
+		<IconButton
+			variant="ghost"
+			size="sm"
+			icon={<Icon icon={Search} size="sm" />}
+			label="Search"
+			tooltip="Search"
+		/>
+	</>
 );
 
 function findItem(items: FileSystemItem[], id: string): FileSystemItem | null {
-  for (const item of items) {
-    if (item.id === id) {
-      return item;
-    }
-    if (item.children) {
-      const found = findItem(item.children, id);
-      if (found) {
-        return found;
-      }
-    }
-  }
-  return null;
+	for (const item of items) {
+		if (item.id === id) {
+			return item;
+		}
+		if (item.children) {
+			const found = findItem(item.children, id);
+			if (found) {
+				return found;
+			}
+		}
+	}
+	return null;
 }
 
 function getFileExtension(name: string): string {
-  const dot = name.lastIndexOf('.');
-  return dot > 0 ? name.substring(dot + 1).toUpperCase() : 'File';
+	const dot = name.lastIndexOf(".");
+	return dot > 0 ? name.substring(dot + 1).toUpperCase() : "File";
 }
 
 export default function FileExplorer() {
-  const [selectedPath, setSelectedPath] = useState<string[]>([
-    'applications',
-    'chrome-apps',
-    'component-lab',
-  ]);
+	const [selectedPath, setSelectedPath] = useState<string[]>([
+		"applications",
+		"chrome-apps",
+		"component-lab",
+	]);
 
-  const isNarrow = useMediaQuery('(max-width: 768px)');
+	const isNarrow = useMediaQuery("(max-width: 768px)");
 
-  const columns = useMemo(() => {
-    // `id` names the folder a column lists, so the React key stays put when
-    // narrow mode slices the row down to the last visible column.
-    const cols: {
-      id: string;
-      items: FileSystemItem[];
-      selectedId: string | null;
-    }[] = [];
-    cols.push({
-      id: 'root',
-      items: FILESYSTEM,
-      selectedId: selectedPath[0] ?? null,
-    });
-    let currentItems: FileSystemItem[] = FILESYSTEM;
-    for (let i = 0; i < selectedPath.length; i++) {
-      const selected = currentItems.find(item => item.id === selectedPath[i]);
-      if (selected?.children && selected.children.length > 0) {
-        cols.push({
-          id: selectedPath[i],
-          items: selected.children,
-          selectedId: selectedPath[i + 1] ?? null,
-        });
-        currentItems = selected.children;
-      } else {
-        break;
-      }
-    }
-    return cols;
-  }, [selectedPath]);
+	const columns = useMemo(() => {
+		// `id` names the folder a column lists, so the React key stays put when
+		// narrow mode slices the row down to the last visible column.
+		const cols: {
+			id: string;
+			items: FileSystemItem[];
+			selectedId: string | null;
+		}[] = [];
+		cols.push({
+			id: "root",
+			items: FILESYSTEM,
+			selectedId: selectedPath[0] ?? null,
+		});
+		let currentItems: FileSystemItem[] = FILESYSTEM;
+		for (let i = 0; i < selectedPath.length; i++) {
+			const selected = currentItems.find((item) => item.id === selectedPath[i]);
+			if (selected?.children && selected.children.length > 0) {
+				cols.push({
+					id: selectedPath[i],
+					items: selected.children,
+					selectedId: selectedPath[i + 1] ?? null,
+				});
+				currentItems = selected.children;
+			} else {
+				break;
+			}
+		}
+		return cols;
+	}, [selectedPath]);
 
-  const columnOffset = isNarrow ? Math.max(columns.length - 1, 0) : 0;
-  const visibleColumns = isNarrow ? columns.slice(-1) : columns;
+	const columnOffset = isNarrow ? Math.max(columns.length - 1, 0) : 0;
+	const visibleColumns = isNarrow ? columns.slice(-1) : columns;
 
-  const currentFolderName = useMemo(() => {
-    if (selectedPath.length === 0) {
-      return 'Home';
-    }
-    const lastId = selectedPath[selectedPath.length - 1];
-    const item = findItem(FILESYSTEM, lastId);
-    if (item?.type === 'folder') {
-      return item.name;
-    }
-    if (selectedPath.length >= 2) {
-      const parent = findItem(
-        FILESYSTEM,
-        selectedPath[selectedPath.length - 2],
-      );
-      return parent?.name ?? 'Home';
-    }
-    return 'Home';
-  }, [selectedPath]);
+	const currentFolderName = useMemo(() => {
+		if (selectedPath.length === 0) {
+			return "Home";
+		}
+		const lastId = selectedPath[selectedPath.length - 1];
+		const item = findItem(FILESYSTEM, lastId);
+		if (item?.type === "folder") {
+			return item.name;
+		}
+		if (selectedPath.length >= 2) {
+			const parent = findItem(FILESYSTEM, selectedPath[selectedPath.length - 2]);
+			return parent?.name ?? "Home";
+		}
+		return "Home";
+	}, [selectedPath]);
 
-  const selectedFile = useMemo(() => {
-    if (selectedPath.length === 0) {
-      return null;
-    }
-    const lastId = selectedPath[selectedPath.length - 1];
-    const item = findItem(FILESYSTEM, lastId);
-    return item?.type === 'file' ? item : null;
-  }, [selectedPath]);
+	const selectedFile = useMemo(() => {
+		if (selectedPath.length === 0) {
+			return null;
+		}
+		const lastId = selectedPath[selectedPath.length - 1];
+		const item = findItem(FILESYSTEM, lastId);
+		return item?.type === "file" ? item : null;
+	}, [selectedPath]);
 
-  // Narrow mode is one pane at a time, the same master→detail shape the
-  // folder columns already use: the deepest column, or the file preview when
-  // the selection ends on a file. Beside each other the column and the
-  // preview need 240 + 320 = 560px, so in a 390px pane the preview was cut at
-  // the viewport edge with nothing to scroll it into view. "Go back" (:464)
-  // pops the selected file off the path, so it is also the way back from the
-  // preview to the column.
-  const isPreviewPane = isNarrow && selectedFile != null;
+	// Narrow mode is one pane at a time, the same master→detail shape the
+	// folder columns already use: the deepest column, or the file preview when
+	// the selection ends on a file. Beside each other the column and the
+	// preview need 240 + 320 = 560px, so in a 390px pane the preview was cut at
+	// the viewport edge with nothing to scroll it into view. "Go back" (:464)
+	// pops the selected file off the path, so it is also the way back from the
+	// preview to the column.
+	const isPreviewPane = isNarrow && selectedFile != null;
 
-  const handleSelect = (columnIndex: number, itemId: string) => {
-    setSelectedPath([...selectedPath.slice(0, columnIndex), itemId]);
-  };
+	const handleSelect = (columnIndex: number, itemId: string) => {
+		setSelectedPath([...selectedPath.slice(0, columnIndex), itemId]);
+	};
 
-  const titleContent = (
-    <>
-      <IconButton
-        variant="ghost"
-        size="sm"
-        icon={<Icon icon={ChevronLeft} size="sm" />}
-        onClick={() => {
-          if (selectedPath.length > 0) {
-            setSelectedPath(selectedPath.slice(0, -1));
-          }
-        }}
-        isDisabled={selectedPath.length === 0}
-        label="Go back"
-        tooltip="Go back"
-      />
-      <IconButton
-        variant="ghost"
-        size="sm"
-        icon={<Icon icon={ChevronRight} size="sm" />}
-        isDisabled
-        label="Go forward"
-        tooltip="Go forward"
-      />
-      <Text type="label" maxLines={1}>
-        {currentFolderName}
-      </Text>
-    </>
-  );
+	const titleContent = (
+		<>
+			<IconButton
+				variant="ghost"
+				size="sm"
+				icon={<Icon icon={ChevronLeft} size="sm" />}
+				onClick={() => {
+					if (selectedPath.length > 0) {
+						setSelectedPath(selectedPath.slice(0, -1));
+					}
+				}}
+				isDisabled={selectedPath.length === 0}
+				label="Go back"
+				tooltip="Go back"
+			/>
+			<IconButton
+				variant="ghost"
+				size="sm"
+				icon={<Icon icon={ChevronRight} size="sm" />}
+				isDisabled
+				label="Go forward"
+				tooltip="Go forward"
+			/>
+			<Text type="label" maxLines={1}>
+				{currentFolderName}
+			</Text>
+		</>
+	);
 
-  return (
-    <Layout
-      style={{height: '100dvh'}}
-      height="fill"
-      header={
-        <>
-          <Toolbar
-            label="File Explorer"
-            size="sm"
-            dividers={isNarrow ? undefined : ['bottom']}
-            startContent={titleContent}
-            centerContent={isNarrow ? undefined : viewSwitcher}
-            endContent={isNarrow ? undefined : fileActions}
-          />
-          {isNarrow && (
-            <Section
-              variant="transparent"
-              padding={2}
-              dividers={['bottom']}>
-              <HStack
-                gap={2}
-                vAlign="center"
-                style={{overflowX: 'auto'}}
-                role="region"
-                aria-label="View and file actions"
-                tabIndex={0}>
-                {viewSwitcher}
-                {fileActions}
-              </HStack>
-            </Section>
-          )}
-        </>
-      }
-      content={
-        <LayoutContent padding={0} isScrollable={false}>
-          <VisuallyHidden as="h1">
-            File Explorer
-          </VisuallyHidden>
-          <HStack height="100%" style={{overflowX: 'auto', overflowY: 'hidden'}}>
-            {!isPreviewPane &&
-              visibleColumns.map((col, colIndex) => {
-                const trueIndex = columnOffset + colIndex;
-                const showDivider =
-                  trueIndex < columns.length - 1 || selectedFile != null;
-                return (
-                  <Section
-                    key={col.id}
-                    width={240}
-                    padding={2}
-                    variant="transparent"
-                    dividers={showDivider ? ['end'] : undefined}
-                    style={{overflowY: 'auto', flexShrink: 0}}
-                    role="region"
-                    aria-label={`Folder column ${trueIndex + 1}`}
-                    tabIndex={0}>
-                    {col.items.length === 0 ? (
-                      <EmptyState
-                        title="Quiet in the crypt"
-                        description="This folder holds no scrolls yet."
-                        isCompact
-                      />
-                    ) : (
-                    <List density="compact" hasDividers={false}>
-                      {col.items.map(item => {
-                        const isSelected = col.selectedId === item.id;
-                        const hasChildren =
-                          item.type === 'folder' &&
-                          item.children != null &&
-                          item.children.length > 0;
-                        return (
-                          <ListItem
-                            key={item.id}
-                            label={
-                              <Text type="body" maxLines={1}>
-                                {item.name}
-                              </Text>
-                            }
-                            startContent={
-                              <Icon
-                                icon={
-                                  item.type === 'folder'
-                                    ? Folder
-                                    : FileText
-                                }
-                                color={
-                                  item.type === 'folder'
-                                    ? 'accent'
-                                    : 'secondary'
-                                }
-                                size="sm"
-                              />
-                            }
-                            endContent={
-                              hasChildren ? (
-                                <Icon
-                                  icon={ChevronRight}
-                                  size="xsm"
-                                  color="secondary"
-                                />
-                              ) : undefined
-                            }
-                            onClick={() => handleSelect(trueIndex, item.id)}
-                            isSelected={isSelected}
-                          />
-                        );
-                      })}
-                    </List>
-                    )}
-                  </Section>
-                );
-              })}
-            {selectedFile && (
-              <Section
-                width={isPreviewPane ? '100%' : 320}
-                // 16px, not 24. The sibling column at :529 is padding={2}
-                // (8px) because it holds a dense compact List, and these two
-                // sit in one HStack (:519) as columns of the same view --
-                // 24 beside 8 made the compact column look broken rather
-                // than compact. 16 is the outer-inset value this repo already
-                // uses for exactly this (scaffolds.md new-site recipe).
-                padding={4}
-                variant="transparent"
-                style={{overflowY: 'auto', flexGrow: 1, flexShrink: 0}}
-                role="region"
-                aria-label={`Details for ${selectedFile.name}`}
-                tabIndex={0}>
-                <VStack gap={4} hAlign="center">
-                  <Avatar name={selectedFile.name} size={96} />
-                  <VStack gap={1} hAlign="center">
-                    <Text type="body" weight="semibold" maxLines={1}>
-                      {selectedFile.name}
-                    </Text>
-                    <Text type="supporting" color="secondary">
-                      {getFileExtension(selectedFile.name)} Document
-                    </Text>
-                  </VStack>
-                  <MetadataList title="Information">
-                    <MetadataListItem label="Created">
-                      <Text type="body">March 28, 2026 at 2:15 PM</Text>
-                    </MetadataListItem>
-                    <MetadataListItem label="Modified">
-                      <Text type="body">Yesterday, 10:27 PM</Text>
-                    </MetadataListItem>
-                    <MetadataListItem label="Kind">
-                      <Text type="body">
-                        {getFileExtension(selectedFile.name)} Document
-                      </Text>
-                    </MetadataListItem>
-                  </MetadataList>
-                </VStack>
-              </Section>
-            )}
-          </HStack>
-        </LayoutContent>
-      }
-    />
-  );
+	return (
+		<Layout
+			style={{ height: "100dvh" }}
+			height="fill"
+			header={
+				<>
+					<Toolbar
+						label="File Explorer"
+						size="sm"
+						dividers={isNarrow ? undefined : ["bottom"]}
+						startContent={titleContent}
+						centerContent={isNarrow ? undefined : viewSwitcher}
+						endContent={isNarrow ? undefined : fileActions}
+					/>
+					{isNarrow && (
+						<Section variant="transparent" padding={2} dividers={["bottom"]}>
+							<HStack
+								gap={2}
+								vAlign="center"
+								style={{ overflowX: "auto" }}
+								role="region"
+								aria-label="View and file actions"
+								tabIndex={0}
+							>
+								{viewSwitcher}
+								{fileActions}
+							</HStack>
+						</Section>
+					)}
+				</>
+			}
+			content={
+				<LayoutContent padding={0} isScrollable={false}>
+					<VisuallyHidden as="h1">File Explorer</VisuallyHidden>
+					<HStack height="100%" style={{ overflowX: "auto", overflowY: "hidden" }}>
+						{!isPreviewPane &&
+							visibleColumns.map((col, colIndex) => {
+								const trueIndex = columnOffset + colIndex;
+								const showDivider = trueIndex < columns.length - 1 || selectedFile != null;
+								return (
+									<Section
+										key={col.id}
+										width={240}
+										padding={2}
+										variant="transparent"
+										dividers={showDivider ? ["end"] : undefined}
+										style={{ overflowY: "auto", flexShrink: 0 }}
+										role="region"
+										aria-label={`Folder column ${trueIndex + 1}`}
+										tabIndex={0}
+									>
+										{col.items.length === 0 ? (
+											<EmptyState
+												title="Quiet in the crypt"
+												description="This folder holds no scrolls yet."
+												isCompact
+											/>
+										) : (
+											<List density="compact" hasDividers={false}>
+												{col.items.map((item) => {
+													const isSelected = col.selectedId === item.id;
+													const hasChildren =
+														item.type === "folder" &&
+														item.children != null &&
+														item.children.length > 0;
+													return (
+														<ListItem
+															key={item.id}
+															label={
+																<Text type="body" maxLines={1}>
+																	{item.name}
+																</Text>
+															}
+															startContent={
+																<Icon
+																	icon={item.type === "folder" ? Folder : FileText}
+																	color={item.type === "folder" ? "accent" : "secondary"}
+																	size="sm"
+																/>
+															}
+															endContent={
+																hasChildren ? (
+																	<Icon icon={ChevronRight} size="xsm" color="secondary" />
+																) : undefined
+															}
+															onClick={() => handleSelect(trueIndex, item.id)}
+															isSelected={isSelected}
+														/>
+													);
+												})}
+											</List>
+										)}
+									</Section>
+								);
+							})}
+						{selectedFile && (
+							<Section
+								width={isPreviewPane ? "100%" : 320}
+								// 16px, not 24. The sibling column at :529 is padding={2}
+								// (8px) because it holds a dense compact List, and these two
+								// sit in one HStack (:519) as columns of the same view --
+								// 24 beside 8 made the compact column look broken rather
+								// than compact. 16 is the outer-inset value this repo already
+								// uses for exactly this (scaffolds.md new-site recipe).
+								padding={4}
+								variant="transparent"
+								style={{ overflowY: "auto", flexGrow: 1, flexShrink: 0 }}
+								role="region"
+								aria-label={`Details for ${selectedFile.name}`}
+								tabIndex={0}
+							>
+								<VStack gap={4} hAlign="center">
+									<Avatar name={selectedFile.name} size={96} />
+									<VStack gap={1} hAlign="center">
+										<Text type="body" weight="semibold" maxLines={1}>
+											{selectedFile.name}
+										</Text>
+										<Text type="supporting" color="secondary">
+											{getFileExtension(selectedFile.name)} Document
+										</Text>
+									</VStack>
+									<MetadataList title="Information">
+										<MetadataListItem label="Created">
+											<Text type="body">March 28, 2026 at 2:15 PM</Text>
+										</MetadataListItem>
+										<MetadataListItem label="Modified">
+											<Text type="body">Yesterday, 10:27 PM</Text>
+										</MetadataListItem>
+										<MetadataListItem label="Kind">
+											<Text type="body">{getFileExtension(selectedFile.name)} Document</Text>
+										</MetadataListItem>
+									</MetadataList>
+								</VStack>
+							</Section>
+						)}
+					</HStack>
+				</LayoutContent>
+			}
+		/>
+	);
 }

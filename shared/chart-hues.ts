@@ -7,16 +7,16 @@
 // legend row (dashboard.tsx:229, :253) -- a labelled data category, not chrome.
 
 export const CHART_HUES = {
-  cyan: 'var(--color-data-categorical-cyan)',
-  orange: 'var(--color-data-categorical-orange)',
-  green: 'var(--color-data-categorical-green)',
-  pink: 'var(--color-data-categorical-pink)',
-  muted: 'var(--color-data-categorical-blue)',
-  // Added because --color-data-categorical-red exists in the palette
-  // (tokens.css:276) and heat maps need a severity colour, but no module
-  // exposed it. Without this, a chart could not reach red through the
-  // sanctioned source at all.
-  red: 'var(--color-data-categorical-red)',
+	cyan: "var(--color-data-categorical-cyan)",
+	orange: "var(--color-data-categorical-orange)",
+	green: "var(--color-data-categorical-green)",
+	pink: "var(--color-data-categorical-pink)",
+	muted: "var(--color-data-categorical-blue)",
+	// Added because --color-data-categorical-red exists in the palette
+	// (tokens.css:276) and heat maps need a severity colour, but no module
+	// exposed it. Without this, a chart could not reach red through the
+	// sanctioned source at all.
+	red: "var(--color-data-categorical-red)",
 } as const;
 
 export type ChartHue = (typeof CHART_HUES)[keyof typeof CHART_HUES];

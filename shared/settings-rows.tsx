@@ -3,35 +3,35 @@
 // exports only components -- a .tsx exporting non-components breaks React Fast
 // Refresh, and three templates read that data, so it was never private to here.
 
+import { Button } from "@astryxdesign/core/Button";
+import { Divider } from "@astryxdesign/core/Divider";
+import { HStack, VStack } from "@astryxdesign/core/Layout";
+import { Link } from "@astryxdesign/core/Link";
+import { Text } from "@astryxdesign/core/Text";
 import {
-  DEVICE_ROWS,
-  INFO_TILES,
-  LOGIN_ROWS,
-  SOCIAL_ROWS,
-  actionNoWrap,
-  iconBox,
-  type DeviceRow,
-  type InfoRow,
-  type InfoTileData,
-  type SettingsNavItem,
-} from 'astryx-dracula/shared/settings-data';
+	actionNoWrap,
+	DEVICE_ROWS,
+	type DeviceRow,
+	INFO_TILES,
+	type InfoRow,
+	type InfoTileData,
+	iconBox,
+	LOGIN_ROWS,
+	type SettingsNavItem,
+	SOCIAL_ROWS,
+} from "astryx-dracula/shared/settings-data";
 import {
-  Lock,
-  ShieldCheck,
-  Bell,
-  FileText,
-  CreditCard,
-  Globe,
-  Briefcase,
-  SquarePen,
-  Share2,
-} from 'lucide-react';
-import type {CSSProperties, ReactNode} from 'react';
-import {VStack, HStack} from '@astryxdesign/core/Layout';
-import {Text} from '@astryxdesign/core/Text';
-import {Button} from '@astryxdesign/core/Button';
-import {Link} from '@astryxdesign/core/Link';
-import {Divider} from '@astryxdesign/core/Divider';
+	Bell,
+	Briefcase,
+	CreditCard,
+	FileText,
+	Globe,
+	Lock,
+	Share2,
+	ShieldCheck,
+	SquarePen,
+} from "lucide-react";
+import type { CSSProperties, ReactNode } from "react";
 
 // ─── Row components ──────────────────────────────────────────────────────────
 // The row renderers themselves, moved here from both templates. The two copies
@@ -75,151 +75,136 @@ import {Divider} from '@astryxdesign/core/Divider';
 // read only when `actionKind` says the row navigates.
 
 export function InfoRowItem({
-  label,
-  value,
-  action,
-  actionKind,
-  href,
-  variant = 'secondary',
-  onAction,
-  style,
-  hasDivider = true,
+	label,
+	value,
+	action,
+	actionKind,
+	href,
+	variant = "secondary",
+	onAction,
+	style,
+	hasDivider = true,
 }: InfoRow & {
-  style?: CSSProperties;
-  /** Draw a Divider after the row. True only at a group boundary. */
-  hasDivider?: boolean;
+	style?: CSSProperties;
+	/** Draw a Divider after the row. True only at a group boundary. */
+	hasDivider?: boolean;
 }) {
-  return (
-    <>
-      <HStack hAlign="between" vAlign="start" style={style}>
-        <VStack gap={1}>
-          <Text type="body" weight="semibold" display="block">
-            {label}
-          </Text>
-          <Text type="body" color="secondary" display="block">
-            {value}
-          </Text>
-        </VStack>
-        {action &&
-          (actionKind === 'destination' && href ? (
-            <Link href={href} style={actionNoWrap}>
-              {action}
-            </Link>
-          ) : (
-            <Button
-              label={action}
-              variant={variant}
-              size="sm"
-              style={actionNoWrap}
-              onClick={onAction}
-            />
-          ))}
-      </HStack>
-      {hasDivider && <Divider />}
-    </>
-  );
+	return (
+		<>
+			<HStack hAlign="between" vAlign="start" style={style}>
+				<VStack gap={1}>
+					<Text type="body" weight="semibold" display="block">
+						{label}
+					</Text>
+					<Text type="body" color="secondary" display="block">
+						{value}
+					</Text>
+				</VStack>
+				{action &&
+					(actionKind === "destination" && href ? (
+						<Link href={href} style={actionNoWrap}>
+							{action}
+						</Link>
+					) : (
+						<Button
+							label={action}
+							variant={variant}
+							size="sm"
+							style={actionNoWrap}
+							onClick={onAction}
+						/>
+					))}
+			</HStack>
+			{hasDivider && <Divider />}
+		</>
+	);
 }
 
 function ExpandableRowEditing({
-  label,
-  children,
-  onCancel,
-  onSave,
-  style,
+	label,
+	children,
+	onCancel,
+	onSave,
+	style,
 }: {
-  label: string;
-  children: ReactNode;
-  onCancel: () => void;
-  onSave: () => void;
-  style?: CSSProperties;
+	label: string;
+	children: ReactNode;
+	onCancel: () => void;
+	onSave: () => void;
+	style?: CSSProperties;
 }) {
-  return (
-    <VStack gap={4} style={style}>
-      <Text type="body" weight="semibold" display="block">
-        {label}
-      </Text>
-      {children}
-      <HStack gap={2}>
-        <Button label="Save" variant="primary" onClick={onSave} />
-        <Button label="Cancel" variant="ghost" onClick={onCancel} />
-      </HStack>
-    </VStack>
-  );
+	return (
+		<VStack gap={4} style={style}>
+			<Text type="body" weight="semibold" display="block">
+				{label}
+			</Text>
+			{children}
+			<HStack gap={2}>
+				<Button label="Save" variant="primary" onClick={onSave} />
+				<Button label="Cancel" variant="ghost" onClick={onCancel} />
+			</HStack>
+		</VStack>
+	);
 }
 
 function ExpandableRowViewing({
-  label,
-  value,
-  onEdit,
-  style,
+	label,
+	value,
+	onEdit,
+	style,
 }: {
-  label: string;
-  value: string;
-  onEdit: () => void;
-  style?: CSSProperties;
+	label: string;
+	value: string;
+	onEdit: () => void;
+	style?: CSSProperties;
 }) {
-  return (
-    <HStack hAlign="between" vAlign="start" style={style}>
-      <VStack gap={1}>
-        <Text type="body" weight="semibold" display="block">
-          {label}
-        </Text>
-        <Text type="body" color="secondary" display="block">
-          {value}
-        </Text>
-      </VStack>
-      <Button
-        label="Edit"
-        variant="secondary"
-        size="sm"
-        style={actionNoWrap}
-        onClick={onEdit}
-      />
-    </HStack>
-  );
+	return (
+		<HStack hAlign="between" vAlign="start" style={style}>
+			<VStack gap={1}>
+				<Text type="body" weight="semibold" display="block">
+					{label}
+				</Text>
+				<Text type="body" color="secondary" display="block">
+					{value}
+				</Text>
+			</VStack>
+			<Button label="Edit" variant="secondary" size="sm" style={actionNoWrap} onClick={onEdit} />
+		</HStack>
+	);
 }
 
 export function ExpandableRow({
-  label,
-  value,
-  children,
-  isExpanded,
-  onEdit,
-  onCancel,
-  onSave,
-  style,
-  hasDivider = true,
+	label,
+	value,
+	children,
+	isExpanded,
+	onEdit,
+	onCancel,
+	onSave,
+	style,
+	hasDivider = true,
 }: {
-  label: string;
-  value: string;
-  children: ReactNode;
-  isExpanded: boolean;
-  onEdit: () => void;
-  onCancel: () => void;
-  onSave: () => void;
-  style?: CSSProperties;
-  /** Draw a Divider after the row. True only at a group boundary. */
-  hasDivider?: boolean;
+	label: string;
+	value: string;
+	children: ReactNode;
+	isExpanded: boolean;
+	onEdit: () => void;
+	onCancel: () => void;
+	onSave: () => void;
+	style?: CSSProperties;
+	/** Draw a Divider after the row. True only at a group boundary. */
+	hasDivider?: boolean;
 }) {
-  return (
-    <>
-      {isExpanded ? (
-        <ExpandableRowEditing
-          label={label}
-          onCancel={onCancel}
-          onSave={onSave}
-          style={style}>
-          {children}
-        </ExpandableRowEditing>
-      ) : (
-        <ExpandableRowViewing
-          label={label}
-          value={value}
-          onEdit={onEdit}
-          style={style}
-        />
-      )}
-      {hasDivider && <Divider />}
-    </>
-  );
+	return (
+		<>
+			{isExpanded ? (
+				<ExpandableRowEditing label={label} onCancel={onCancel} onSave={onSave} style={style}>
+					{children}
+				</ExpandableRowEditing>
+			) : (
+				<ExpandableRowViewing label={label} value={value} onEdit={onEdit} style={style} />
+			)}
+			{hasDivider && <Divider />}
+		</>
+	);
 }

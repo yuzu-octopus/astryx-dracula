@@ -4,172 +4,145 @@
 // Note: skeleton placeholders carry no Hd by design (skill skeleton-shell
 // exemption) — routed pages supply the h1.
 
-import {useState} from 'react';
-import {AppShell} from '@astryxdesign/core/AppShell';
-import {Divider} from '@astryxdesign/core/Divider';
-import {Layout, LayoutContent, LayoutFooter} from '@astryxdesign/core/Layout';
-import {
-  SideNav,
-  SideNavHeading,
-  SideNavItem,
-  SideNavSection,
-} from '@astryxdesign/core/SideNav';
-import {NavIcon} from '@astryxdesign/core/NavIcon';
-import {Icon} from '@astryxdesign/core/Icon';
-import {StatusDot} from '@astryxdesign/core/StatusDot';
-import {Card} from '@astryxdesign/core/Card';
-import {TextInput} from '@astryxdesign/core/TextInput';
-import {VStack, HStack} from '@astryxdesign/core/Stack';
-import {
-  Sparkles,
-  Plus,
-  Search,
-  BookOpen,
-  Settings,
-  CircleUserRound,
-  User,
-} from 'lucide-react';
+import { AppShell } from "@astryxdesign/core/AppShell";
+import { Card } from "@astryxdesign/core/Card";
+import { Divider } from "@astryxdesign/core/Divider";
+import { Icon } from "@astryxdesign/core/Icon";
+import { Layout, LayoutContent, LayoutFooter } from "@astryxdesign/core/Layout";
+import { NavIcon } from "@astryxdesign/core/NavIcon";
+import { SideNav, SideNavHeading, SideNavItem, SideNavSection } from "@astryxdesign/core/SideNav";
+import { HStack, VStack } from "@astryxdesign/core/Stack";
+import { StatusDot } from "@astryxdesign/core/StatusDot";
+import { TextInput } from "@astryxdesign/core/TextInput";
+import { BookOpen, CircleUserRound, Plus, Search, Settings, Sparkles, User } from "lucide-react";
+import { useState } from "react";
 
 const WORKSPACES = [
-  {
-    name: 'Personal',
-    icon: User,
-    chats: [
-      {
-        label: 'Full-moon rite planning',
-        status: 'success',
-        statusLabel: 'Active',
-      },
-      {
-        label: 'Potion recipes for the week',
-        status: 'neutral',
-        statusLabel: 'Idle',
-      },
-      {
-        label: 'Grimoire recommendations',
-        status: 'warning',
-        statusLabel: 'Needs review',
-      },
-    ],
-  },
+	{
+		name: "Personal",
+		icon: User,
+		chats: [
+			{
+				label: "Full-moon rite planning",
+				status: "success",
+				statusLabel: "Active",
+			},
+			{
+				label: "Potion recipes for the week",
+				status: "neutral",
+				statusLabel: "Idle",
+			},
+			{
+				label: "Grimoire recommendations",
+				status: "warning",
+				statusLabel: "Needs review",
+			},
+		],
+	},
 ] as const;
 
-const SELECTED_CHAT = 'Full-moon rite planning';
+const SELECTED_CHAT = "Full-moon rite planning";
 // Same-route hash: demo links stay focusable anchors without escaping the
 // template through the hash router (bare "#" would drop back to the home page).
-const SELF_HASH = '#/templates/shell-side-nav';
+const SELF_HASH = "#/templates/shell-side-nav";
 
 // `id` carries the React key: the bubbles are positional placeholders, and an
 // index key would remount every row below an inserted one.
 const MESSAGES = [
-  {id: 'context', role: 'assistant', width: '78%', height: 104},
-  {id: 'follow-up', role: 'user', width: '48%', height: 48},
-  {id: 'answer', role: 'assistant', width: '64%', height: 132},
-  {id: 'reply', role: 'user', width: '38%', height: 40},
+	{ id: "context", role: "assistant", width: "78%", height: 104 },
+	{ id: "follow-up", role: "user", width: "48%", height: 48 },
+	{ id: "answer", role: "assistant", width: "64%", height: 132 },
+	{ id: "reply", role: "user", width: "38%", height: 40 },
 ];
 
-
 export default function ShellSideNav() {
-  const [selectedChat, setSelectedChat] = useState(SELECTED_CHAT);
-  const [draft, setDraft] = useState('');
-  return (
-    <AppShell
-      contentPadding={0}
-      sideNav={
-        <SideNav
-          collapsible
-          resizable={{defaultWidth: 300, minWidth: 220, maxWidth: 420}}
-          header={
-            <SideNavHeading
-              heading="Night Owl"
-              icon={<NavIcon icon={<Icon icon={Sparkles} size="sm" />} />}
-              headingHref={SELF_HASH}
-            />
-          }
-          footer={
-            <SideNavSection title="Account" isHeaderHidden>
-              <SideNavItem label="Settings" icon={Settings} href={SELF_HASH} />
-              <SideNavItem
-                label="Sarah Chen"
-                icon={CircleUserRound}
-                href={SELF_HASH}
-              />
-            </SideNavSection>
-          }>
-          <SideNavSection title="Menu" isHeaderHidden>
-            <SideNavItem label="New chat" icon={Plus} href={SELF_HASH} />
-            <SideNavItem label="Search" icon={Search} href={SELF_HASH} />
-            <SideNavItem label="Library" icon={BookOpen} href={SELF_HASH} />
-          </SideNavSection>
-          <Divider />
-          <SideNavSection title="Workspaces" isHeaderHidden>
-            {WORKSPACES.map(workspace => (
-              <SideNavItem
-                key={workspace.name}
-                label={workspace.name}
-                icon={workspace.icon}
-                collapsible={{defaultIsCollapsed: false}}>
-                <VStack gap={0.5}>
-                  {workspace.chats.map(chat => (
-                    // The hover-only MoreMenu was four dead actions unreachable
-                    // by keyboard and touch, so it goes: the status dot stays
-                    // always visible (its label doubles as the tooltip), and
-                    // selecting a conversation switches selection.
-                    <SideNavItem
-                      key={chat.label}
-                      label={chat.label}
-                      href={SELF_HASH}
-                      isSelected={chat.label === selectedChat}
-                      onClick={() => setSelectedChat(chat.label)}
-                      endContent={
-                        <StatusDot
-                          variant={chat.status}
-                          label={chat.statusLabel}
-                        />
-                      }
-                    />
-                  ))}
-                </VStack>
-              </SideNavItem>
-            ))}
-          </SideNavSection>
-        </SideNav>
-      }>
-      <Layout
-        height="fill"
-        contentWidth={768}
-        content={
-          <LayoutContent padding={6}>
-            {/* Skeleton chrome only — the routed conversation supplies the h1. */}
-            <VStack gap={5}>
-              {MESSAGES.map(message => (
-                <HStack
-                  key={message.id}
-                  hAlign={message.role === 'assistant' ? 'start' : 'end'}>
-                  <Card
-                    variant="muted"
-                    padding={0}
-                    width={message.width}
-                    height={message.height}
-                  />
-                </HStack>
-              ))}
-            </VStack>
-          </LayoutContent>
-        }
-        footer={
-          <LayoutFooter>
-            <TextInput
-              label="Message Night Owl"
-              isLabelHidden
-              placeholder="Message Night Owl…"
-              value={draft}
-              onChange={setDraft}
-              width="100%"
-            />
-          </LayoutFooter>
-        }
-      />
-    </AppShell>
-  );
+	const [selectedChat, setSelectedChat] = useState(SELECTED_CHAT);
+	const [draft, setDraft] = useState("");
+	return (
+		<AppShell
+			contentPadding={0}
+			sideNav={
+				<SideNav
+					collapsible
+					resizable={{ defaultWidth: 300, minWidth: 220, maxWidth: 420 }}
+					header={
+						<SideNavHeading
+							heading="Night Owl"
+							icon={<NavIcon icon={<Icon icon={Sparkles} size="sm" />} />}
+							headingHref={SELF_HASH}
+						/>
+					}
+					footer={
+						<SideNavSection title="Account" isHeaderHidden>
+							<SideNavItem label="Settings" icon={Settings} href={SELF_HASH} />
+							<SideNavItem label="Sarah Chen" icon={CircleUserRound} href={SELF_HASH} />
+						</SideNavSection>
+					}
+				>
+					<SideNavSection title="Menu" isHeaderHidden>
+						<SideNavItem label="New chat" icon={Plus} href={SELF_HASH} />
+						<SideNavItem label="Search" icon={Search} href={SELF_HASH} />
+						<SideNavItem label="Library" icon={BookOpen} href={SELF_HASH} />
+					</SideNavSection>
+					<Divider />
+					<SideNavSection title="Workspaces" isHeaderHidden>
+						{WORKSPACES.map((workspace) => (
+							<SideNavItem
+								key={workspace.name}
+								label={workspace.name}
+								icon={workspace.icon}
+								collapsible={{ defaultIsCollapsed: false }}
+							>
+								<VStack gap={0.5}>
+									{workspace.chats.map((chat) => (
+										// The hover-only MoreMenu was four dead actions unreachable
+										// by keyboard and touch, so it goes: the status dot stays
+										// always visible (its label doubles as the tooltip), and
+										// selecting a conversation switches selection.
+										<SideNavItem
+											key={chat.label}
+											label={chat.label}
+											href={SELF_HASH}
+											isSelected={chat.label === selectedChat}
+											onClick={() => setSelectedChat(chat.label)}
+											endContent={<StatusDot variant={chat.status} label={chat.statusLabel} />}
+										/>
+									))}
+								</VStack>
+							</SideNavItem>
+						))}
+					</SideNavSection>
+				</SideNav>
+			}
+		>
+			<Layout
+				height="fill"
+				contentWidth={768}
+				content={
+					<LayoutContent padding={6}>
+						{/* Skeleton chrome only — the routed conversation supplies the h1. */}
+						<VStack gap={5}>
+							{MESSAGES.map((message) => (
+								<HStack key={message.id} hAlign={message.role === "assistant" ? "start" : "end"}>
+									<Card variant="muted" padding={0} width={message.width} height={message.height} />
+								</HStack>
+							))}
+						</VStack>
+					</LayoutContent>
+				}
+				footer={
+					<LayoutFooter>
+						<TextInput
+							label="Message Night Owl"
+							isLabelHidden
+							placeholder="Message Night Owl…"
+							value={draft}
+							onChange={setDraft}
+							width="100%"
+						/>
+					</LayoutFooter>
+				}
+			/>
+		</AppShell>
+	);
 }

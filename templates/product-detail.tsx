@@ -2,28 +2,25 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   L > LC[p=6] > G[c={min:280} g=8] > (V[g=3] > AR[ratio=4/5] + (G[c=3 g=2] > (AR[ratio=1] > SelectableCard)*6)) + (V[g=8] > (V[g=3] > Hd"Midnight Ceremony Mug & Plate Set"[level=1 t=display-2] + (H[g=1] > Ic*5 + Tx"4.3 (128)") + (H[g=2] > Tx"$89.00"[t=large] + Tx"$119.00"[t=body] + Tk"Sale")) + Tx"A hand-thrown mug and plate set"[t=large] + (V[g=3] > Tx"Glaze"[t=label] + SG) + (V[g=3] > Tx"Finish"[t=label] + SG) + (V[g=3] > Tx"Quantity"[t=label] + (H[g=1] > B.ghost"-" + TI"1" + B.ghost"+")) + (V[g=3] > B.primary"Add to cart" + B.secondary"Buy it now") + (ColG > Col"Composition" + Col"Delivery & Returns" + Col"Dimensions"))
 
-import {useState} from 'react';
-import {VStack, HStack, Layout, LayoutContent} from '@astryxdesign/core/Layout';
-import {Center} from '@astryxdesign/core/Center';
-import {Grid} from '@astryxdesign/core/Grid';
-import {Text, Heading} from '@astryxdesign/core/Text';
-import {Button} from '@astryxdesign/core/Button';
-import {NumberInput} from '@astryxdesign/core/NumberInput';
-import {Icon} from '@astryxdesign/core/Icon';
-import {
-  SegmentedControl,
-  SegmentedControlItem,
-} from '@astryxdesign/core/SegmentedControl';
-import {Token} from '@astryxdesign/core/Token';
-import {Banner} from '@astryxdesign/core/Banner';
-import {Collapsible, CollapsibleGroup} from '@astryxdesign/core/Collapsible';
-import {AspectRatio} from '@astryxdesign/core/AspectRatio';
-import {SelectableCard} from '@astryxdesign/core/SelectableCard';
-import type {CSSProperties} from 'react';
-import {galleryImageClip} from 'astryx-dracula/shared/gallery-image';
-import {SceneTile} from 'astryx-dracula/shared/scene-tile';
-import {StarRating} from 'astryx-dracula/shared/stars';
-import {formatMoney} from 'astryx-dracula/shared/format-money';
+import { AspectRatio } from "@astryxdesign/core/AspectRatio";
+import { Banner } from "@astryxdesign/core/Banner";
+import { Button } from "@astryxdesign/core/Button";
+import { Center } from "@astryxdesign/core/Center";
+import { Collapsible, CollapsibleGroup } from "@astryxdesign/core/Collapsible";
+import { Grid } from "@astryxdesign/core/Grid";
+import { Icon } from "@astryxdesign/core/Icon";
+import { HStack, Layout, LayoutContent, VStack } from "@astryxdesign/core/Layout";
+import { NumberInput } from "@astryxdesign/core/NumberInput";
+import { SegmentedControl, SegmentedControlItem } from "@astryxdesign/core/SegmentedControl";
+import { SelectableCard } from "@astryxdesign/core/SelectableCard";
+import { Heading, Text } from "@astryxdesign/core/Text";
+import { Token } from "@astryxdesign/core/Token";
+import { formatMoney } from "astryx-dracula/shared/format-money";
+import { galleryImageClip } from "astryx-dracula/shared/gallery-image";
+import { SceneTile } from "astryx-dracula/shared/scene-tile";
+import { StarRating } from "astryx-dracula/shared/stars";
+import type { CSSProperties } from "react";
+import { useState } from "react";
 
 // Custom CSS here is limited to what Astryx components can't express today:
 // - image radius-clip (no Image primitive — #2582, see shared/gallery-image)
@@ -31,284 +28,269 @@ import {formatMoney} from 'astryx-dracula/shared/format-money';
 // Keeps the info column in view while the gallery scrolls. No sticky prop on
 // Astryx layout primitives.
 const stickyInfo: CSSProperties = {
-  position: 'sticky',
-  top: 'var(--spacing-8)',
-  alignSelf: 'start',
+	position: "sticky",
+	top: "var(--spacing-8)",
+	alignSelf: "start",
 };
-import {Minus, Plus} from 'lucide-react';
-import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
+
+import type { SceneHue } from "astryx-dracula/shared/scene-hues";
+import { Minus, Plus } from "lucide-react";
 
 // ─── Image hues ─────────────────────────────────────────────────────────────
 // IMAGES[selected] is the hero; all six double as thumbnails so the 3-column
 // grid closes into two full rows (a slice(1) subset left a ragged 3+2 row and
 // a fallback entry that never rendered).
 const IMAGES: readonly SceneHue[] = [
-  'var(--dracula-cyan)',
-  'var(--dracula-pink)',
-  'var(--dracula-yellow)',
-  'var(--dracula-green)',
-  'var(--dracula-orange)',
-  // The sixth is `muted` (Comment): a legal / neutral / out-of-stock
-  // register, which is exactly what a product photo set needs an extra slot
-  // for. Cyan, pink, yellow, green and orange are all saturated identity
-  // colours; a sixth saturated one would read as a sixth product variant
-  // rather than as "this one is the plain shot". Keeps the 3-column grid
-  // closing on two full rows, which is the reason the set exists.
-  'var(--dracula-comment)',
+	"var(--dracula-cyan)",
+	"var(--dracula-pink)",
+	"var(--dracula-yellow)",
+	"var(--dracula-green)",
+	"var(--dracula-orange)",
+	// The sixth is `muted` (Comment): a legal / neutral / out-of-stock
+	// register, which is exactly what a product photo set needs an extra slot
+	// for. Cyan, pink, yellow, green and orange are all saturated identity
+	// colours; a sixth saturated one would read as a sixth product variant
+	// rather than as "this one is the plain shot". Keeps the 3-column grid
+	// closing on two full rows, which is the reason the set exists.
+	"var(--dracula-comment)",
 ];
 
 // ─── Product Data ───────────────────────────────────────────────────────────
 const PRODUCT = {
-  name: 'Midnight Ceremony Mug & Plate Set',
-  price: 89.0,
-  originalPrice: 119.0,
-  description:
-    'A hand-thrown mug and plate set that brings quiet warmth to every midnight meal. The mug sits easy in the hand with a generous 12 oz capacity, while the 8-inch plate works for everything from toast to tapas. Each piece is kiln-fired at 2,300\u00B0F for a finish that resists chips and stains. Subtle variations in the reactive glaze pool like night mist, so no two sets are exactly alike. Dishwasher and microwave safe.',
-  composition:
-    'High-fire stoneware clay, wheel-thrown and trimmed by hand. Reactive glaze applied by dipping \u2014 color pools and breaks naturally over the clay body. Lead-free and food-safe. Unglazed foot ring reveals the raw clay underneath. Each piece is bisque-fired, glazed, then fired again to cone 10 in a gas reduction kiln.',
-  deliveryReturns:
-    'Free shipping on all ceramics orders over $75. Each piece is individually wrapped in recycled kraft paper and cushioned for transit. Returns accepted within 30 days \u2014 items must be unused and in original packaging. Replacement pieces available individually.',
-  dimensions:
-    'Mug height: 9.5 cm / 3.75 in. Mug diameter: 8.5 cm / 3.35 in. Capacity: 350 ml / 12 oz. Plate diameter: 20 cm / 8 in. Plate height: 2 cm / 0.75 in. Weight: 680 g / 1.5 lb (set).',
+	name: "Midnight Ceremony Mug & Plate Set",
+	price: 89.0,
+	originalPrice: 119.0,
+	description:
+		"A hand-thrown mug and plate set that brings quiet warmth to every midnight meal. The mug sits easy in the hand with a generous 12 oz capacity, while the 8-inch plate works for everything from toast to tapas. Each piece is kiln-fired at 2,300\u00B0F for a finish that resists chips and stains. Subtle variations in the reactive glaze pool like night mist, so no two sets are exactly alike. Dishwasher and microwave safe.",
+	composition:
+		"High-fire stoneware clay, wheel-thrown and trimmed by hand. Reactive glaze applied by dipping \u2014 color pools and breaks naturally over the clay body. Lead-free and food-safe. Unglazed foot ring reveals the raw clay underneath. Each piece is bisque-fired, glazed, then fired again to cone 10 in a gas reduction kiln.",
+	deliveryReturns:
+		"Free shipping on all ceramics orders over $75. Each piece is individually wrapped in recycled kraft paper and cushioned for transit. Returns accepted within 30 days \u2014 items must be unused and in original packaging. Replacement pieces available individually.",
+	dimensions:
+		"Mug height: 9.5 cm / 3.75 in. Mug diameter: 8.5 cm / 3.35 in. Capacity: 350 ml / 12 oz. Plate diameter: 20 cm / 8 in. Plate height: 2 cm / 0.75 in. Weight: 680 g / 1.5 lb (set).",
 };
 
 const COLORS = [
-  {value: 'midnight', label: 'Midnight'},
-  {value: 'crypt', label: 'Crypt'},
-  {value: 'moonlight', label: 'Moonlight'},
+	{ value: "midnight", label: "Midnight" },
+	{ value: "crypt", label: "Crypt" },
+	{ value: "moonlight", label: "Moonlight" },
 ];
 
 const FINISHES = [
-  {value: 'matte', label: 'Matte'},
-  {value: 'satin', label: 'Satin'},
-  {value: 'speckled', label: 'Speckled'},
+	{ value: "matte", label: "Matte" },
+	{ value: "satin", label: "Satin" },
+	{ value: "speckled", label: "Speckled" },
 ];
 
 // ─── Image Gallery ──────────────────────────────────────────────────────────
-function ImageGallery({
-  selected,
-  onSelect,
-}: {
-  selected: number;
-  onSelect: (i: number) => void;
-}) {
-  const heroHue: SceneHue = IMAGES[selected];
-  const thumbnails = IMAGES;
+function ImageGallery({ selected, onSelect }: { selected: number; onSelect: (i: number) => void }) {
+	const heroHue: SceneHue = IMAGES[selected];
+	const thumbnails = IMAGES;
 
-  return (
-    <VStack gap={3}>
-      <AspectRatio ratio={4 / 5} style={galleryImageClip}>
-        <SceneTile label={PRODUCT.name} hue={heroHue} size="lg" />
-      </AspectRatio>
-      <Grid columns={3} gap={2}>
-        {thumbnails.map((hue, i) => (
-          <AspectRatio key={hue} ratio={1}>
-            <SelectableCard
-              label={`Product image ${i + 1}`}
-              isSelected={selected === i}
-              onChange={() => onSelect(i)}
-              variant="transparent"
-              padding={0}
-              width="100%"
-              height="100%">
-              <SceneTile label={`Product image ${i + 1}`} hue={hue} size="lg" />
-            </SelectableCard>
-          </AspectRatio>
-        ))}
-      </Grid>
-    </VStack>
-  );
+	return (
+		<VStack gap={3}>
+			<AspectRatio ratio={4 / 5} style={galleryImageClip}>
+				<SceneTile label={PRODUCT.name} hue={heroHue} size="lg" />
+			</AspectRatio>
+			<Grid columns={3} gap={2}>
+				{thumbnails.map((hue, i) => (
+					<AspectRatio key={hue} ratio={1}>
+						<SelectableCard
+							label={`Product image ${i + 1}`}
+							isSelected={selected === i}
+							onChange={() => onSelect(i)}
+							variant="transparent"
+							padding={0}
+							width="100%"
+							height="100%"
+						>
+							<SceneTile label={`Product image ${i + 1}`} hue={hue} size="lg" />
+						</SelectableCard>
+					</AspectRatio>
+				))}
+			</Grid>
+		</VStack>
+	);
 }
 
 // ─── Product Info ───────────────────────────────────────────────────────────
 function ProductInfo() {
-  const [color, setColor] = useState('midnight');
-  const [finish, setFinish] = useState('matte');
-  const [quantity, setQuantity] = useState<number | null>(1);
-  const [notice, setNotice] = useState<{
-    status: 'success' | 'info';
-    title: string;
-  } | null>(null);
+	const [color, setColor] = useState("midnight");
+	const [finish, setFinish] = useState("matte");
+	const [quantity, setQuantity] = useState<number | null>(1);
+	const [notice, setNotice] = useState<{
+		status: "success" | "info";
+		title: string;
+	} | null>(null);
 
-  const decrement = () => setQuantity(q => Math.max(1, (q ?? 1) - 1));
-  const increment = () => setQuantity(q => Math.min(10, (q ?? 1) + 1));
+	const decrement = () => setQuantity((q) => Math.max(1, (q ?? 1) - 1));
+	const increment = () => setQuantity((q) => Math.min(10, (q ?? 1) + 1));
 
-  return (
-    <VStack gap={8}>
-      <VStack gap={3}>
-        <Heading level={1} type="display-2">
-          {PRODUCT.name}
-        </Heading>
-        <StarRating rating={4.3} count={128} />
-        <HStack gap={2} vAlign="center">
-          <Text type="large" hasTabularNumbers>
-            {formatMoney(PRODUCT.price)}
-          </Text>
-          <Text type="body" color="secondary" hasStrikethrough hasTabularNumbers>
-            {formatMoney(PRODUCT.originalPrice)}
-          </Text>
-          <Token label="Sale" color="yellow" />
-        </HStack>
-      </VStack>
-      <Text type="large" weight="normal">
-        {PRODUCT.description}
-      </Text>
-      <VStack gap={3}>
-        <Text type="label">Glaze</Text>
-        <VStack hAlign="start">
-          <SegmentedControl value={color} onChange={setColor} label="Glaze">
-            {COLORS.map(c => (
-              <SegmentedControlItem
-                key={c.value}
-                value={c.value}
-                label={c.label}
-              />
-            ))}
-          </SegmentedControl>
-        </VStack>
-      </VStack>
-      <VStack gap={3}>
-        <Text type="label">Finish</Text>
-        <VStack hAlign="start">
-          <SegmentedControl value={finish} onChange={setFinish} label="Finish">
-            {FINISHES.map(f => (
-              <SegmentedControlItem
-                key={f.value}
-                value={f.value}
-                label={f.label}
-              />
-            ))}
-          </SegmentedControl>
-        </VStack>
-      </VStack>
-      <VStack gap={3}>
-        <Text type="label">Quantity</Text>
-        <HStack gap={1} vAlign="center">
-          <Button
-            label="Decrease quantity"
-            variant="ghost"
-            icon={<Icon icon={Minus} size="sm" />}
-            clickAction={decrement}
-            isDisabled={(quantity ?? 1) <= 1}
-            isIconOnly
-            tooltip="Decrease quantity"
-          />
-          <Center width={100}>
-            <NumberInput
-              label="Quantity"
-              isLabelHidden
-              value={quantity}
-              onChange={setQuantity}
-              min={1}
-              max={10}
-              isIntegerOnly
-            />
-          </Center>
-          <Button
-            label="Increase quantity"
-            variant="ghost"
-            icon={<Icon icon={Plus} size="sm" />}
-            clickAction={increment}
-            isDisabled={(quantity ?? 1) >= 10}
-            isIconOnly
-            tooltip="Increase quantity"
-          />
-        </HStack>
-      </VStack>
-      <VStack gap={3}>
-        {notice && (
-          <Banner
-            status={notice.status}
-            title={notice.title}
-            container="card"
-            isDismissable
-            onDismiss={() => setNotice(null)}
-          />
-        )}
-        <Button
-          label="Add to cart"
-          variant="primary"
-          size="lg"
-          clickAction={() =>
-            setNotice({
-              status: 'success',
-              title: `Added ${quantity ?? 1} × ${PRODUCT.name} to your cart.`,
-            })
-          }
-        />
-        <Button
-          label="Buy it now"
-          variant="secondary"
-          size="lg"
-          clickAction={() =>
-            setNotice({
-              status: 'info',
-              title: 'Checkout is disabled in this preview.',
-            })
-          }
-        />
-      </VStack>
-      <CollapsibleGroup
-        type="multiple"
-        defaultValue={['composition']}
-        hasDividers>
-        <Collapsible
-          value="composition"
-          trigger={
-            <Heading level={3} accessibilityLevel={2}>
-              Composition
-            </Heading>
-          }>
-          <Text type="body">{PRODUCT.composition}</Text>
-        </Collapsible>
-        <Collapsible
-          value="delivery"
-          defaultIsOpen={false}
-          trigger={
-            <Heading level={3} accessibilityLevel={2}>
-              Delivery &amp; Returns
-            </Heading>
-          }>
-          <Text type="body">{PRODUCT.deliveryReturns}</Text>
-        </Collapsible>
-        <Collapsible
-          value="dimensions"
-          defaultIsOpen={false}
-          trigger={
-            <Heading level={3} accessibilityLevel={2}>
-              Dimensions
-            </Heading>
-          }>
-          <Text type="body" hasTabularNumbers>
-            {PRODUCT.dimensions}
-          </Text>
-        </Collapsible>
-      </CollapsibleGroup>
-    </VStack>
-  );
+	return (
+		<VStack gap={8}>
+			<VStack gap={3}>
+				<Heading level={1} type="display-2">
+					{PRODUCT.name}
+				</Heading>
+				<StarRating rating={4.3} count={128} />
+				<HStack gap={2} vAlign="center">
+					<Text type="large" hasTabularNumbers>
+						{formatMoney(PRODUCT.price)}
+					</Text>
+					<Text type="body" color="secondary" hasStrikethrough hasTabularNumbers>
+						{formatMoney(PRODUCT.originalPrice)}
+					</Text>
+					<Token label="Sale" color="yellow" />
+				</HStack>
+			</VStack>
+			<Text type="large" weight="normal">
+				{PRODUCT.description}
+			</Text>
+			<VStack gap={3}>
+				<Text type="label">Glaze</Text>
+				<VStack hAlign="start">
+					<SegmentedControl value={color} onChange={setColor} label="Glaze">
+						{COLORS.map((c) => (
+							<SegmentedControlItem key={c.value} value={c.value} label={c.label} />
+						))}
+					</SegmentedControl>
+				</VStack>
+			</VStack>
+			<VStack gap={3}>
+				<Text type="label">Finish</Text>
+				<VStack hAlign="start">
+					<SegmentedControl value={finish} onChange={setFinish} label="Finish">
+						{FINISHES.map((f) => (
+							<SegmentedControlItem key={f.value} value={f.value} label={f.label} />
+						))}
+					</SegmentedControl>
+				</VStack>
+			</VStack>
+			<VStack gap={3}>
+				<Text type="label">Quantity</Text>
+				<HStack gap={1} vAlign="center">
+					<Button
+						label="Decrease quantity"
+						variant="ghost"
+						icon={<Icon icon={Minus} size="sm" />}
+						clickAction={decrement}
+						isDisabled={(quantity ?? 1) <= 1}
+						isIconOnly
+						tooltip="Decrease quantity"
+					/>
+					<Center width={100}>
+						<NumberInput
+							label="Quantity"
+							isLabelHidden
+							value={quantity}
+							onChange={setQuantity}
+							min={1}
+							max={10}
+							isIntegerOnly
+						/>
+					</Center>
+					<Button
+						label="Increase quantity"
+						variant="ghost"
+						icon={<Icon icon={Plus} size="sm" />}
+						clickAction={increment}
+						isDisabled={(quantity ?? 1) >= 10}
+						isIconOnly
+						tooltip="Increase quantity"
+					/>
+				</HStack>
+			</VStack>
+			<VStack gap={3}>
+				{notice && (
+					<Banner
+						status={notice.status}
+						title={notice.title}
+						container="card"
+						isDismissable
+						onDismiss={() => setNotice(null)}
+					/>
+				)}
+				<Button
+					label="Add to cart"
+					variant="primary"
+					size="lg"
+					clickAction={() =>
+						setNotice({
+							status: "success",
+							title: `Added ${quantity ?? 1} × ${PRODUCT.name} to your cart.`,
+						})
+					}
+				/>
+				<Button
+					label="Buy it now"
+					variant="secondary"
+					size="lg"
+					clickAction={() =>
+						setNotice({
+							status: "info",
+							title: "Checkout is disabled in this preview.",
+						})
+					}
+				/>
+			</VStack>
+			<CollapsibleGroup type="multiple" defaultValue={["composition"]} hasDividers>
+				<Collapsible
+					value="composition"
+					trigger={
+						<Heading level={3} accessibilityLevel={2}>
+							Composition
+						</Heading>
+					}
+				>
+					<Text type="body">{PRODUCT.composition}</Text>
+				</Collapsible>
+				<Collapsible
+					value="delivery"
+					defaultIsOpen={false}
+					trigger={
+						<Heading level={3} accessibilityLevel={2}>
+							Delivery &amp; Returns
+						</Heading>
+					}
+				>
+					<Text type="body">{PRODUCT.deliveryReturns}</Text>
+				</Collapsible>
+				<Collapsible
+					value="dimensions"
+					defaultIsOpen={false}
+					trigger={
+						<Heading level={3} accessibilityLevel={2}>
+							Dimensions
+						</Heading>
+					}
+				>
+					<Text type="body" hasTabularNumbers>
+						{PRODUCT.dimensions}
+					</Text>
+				</Collapsible>
+			</CollapsibleGroup>
+		</VStack>
+	);
 }
 
 // ─── Main Page ──────────────────────────────────────────────────────────────
 export default function ProductDetail() {
-  const [selectedThumb, setSelectedThumb] = useState(0);
+	const [selectedThumb, setSelectedThumb] = useState(0);
 
-  return (
-    <Layout
-      height="fill"
-      contentWidth={1200}
-      content={
-        <LayoutContent padding={6}>
-          <Grid columns={{minWidth: 280, repeat: 'fit'}} gap={8}>
-            <ImageGallery
-              selected={selectedThumb}
-              onSelect={setSelectedThumb}
-            />
-            <VStack gap={0} style={stickyInfo}>
-              <ProductInfo />
-            </VStack>
-          </Grid>
-        </LayoutContent>
-      }
-    />
-  );
+	return (
+		<Layout
+			height="fill"
+			contentWidth={1200}
+			content={
+				<LayoutContent padding={6}>
+					<Grid columns={{ minWidth: 280, repeat: "fit" }} gap={8}>
+						<ImageGallery selected={selectedThumb} onSelect={setSelectedThumb} />
+						<VStack gap={0} style={stickyInfo}>
+							<ProductInfo />
+						</VStack>
+					</Grid>
+				</LayoutContent>
+			}
+		/>
+	);
 }

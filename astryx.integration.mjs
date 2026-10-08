@@ -1,3 +1,3 @@
 export default {
-  templates: './templates',
+	templates: "./templates",
 };

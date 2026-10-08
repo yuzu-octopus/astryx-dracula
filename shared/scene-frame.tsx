@@ -47,42 +47,43 @@
 //
 // Not interactive. A scene is artwork, not a control: no hover, no focus ring.
 
-import type {CSSProperties, ReactNode} from 'react';
+import type { CSSProperties, ReactNode } from "react";
 
 export interface SceneFrameProps {
-  /** Accessible name for the art. Required and unique per instance: four or
-   *  more scenes sharing one name is the a11y defect the Sparkline `label` prop
-   *  was extracted to fix. */
-  label: string;
-  /** Scene contents. Any <defs> and gradient ids belong to the caller. */
-  children: ReactNode;
-  /** @default '0 0 400 225' */
-  viewBox?: string;
-  /** Backdrop fill painted behind the scene. @default 'var(--dracula-bg-dark)' */
-  fill?: string;
-  /** Paints the backdrop rect. Set false when the scene draws its own. @default true */
-  hasBackdrop?: boolean;
-  /** Forwarded to the root svg. */
-  style?: CSSProperties;
+	/** Accessible name for the art. Required and unique per instance: four or
+	 *  more scenes sharing one name is the a11y defect the Sparkline `label` prop
+	 *  was extracted to fix. */
+	label: string;
+	/** Scene contents. Any <defs> and gradient ids belong to the caller. */
+	children: ReactNode;
+	/** @default '0 0 400 225' */
+	viewBox?: string;
+	/** Backdrop fill painted behind the scene. @default 'var(--dracula-bg-dark)' */
+	fill?: string;
+	/** Paints the backdrop rect. Set false when the scene draws its own. @default true */
+	hasBackdrop?: boolean;
+	/** Forwarded to the root svg. */
+	style?: CSSProperties;
 }
 
 export function SceneFrame({
-  label,
-  children,
-  viewBox = '0 0 400 225',
-  fill = 'var(--dracula-bg-dark)',
-  hasBackdrop = true,
-  style,
+	label,
+	children,
+	viewBox = "0 0 400 225",
+	fill = "var(--dracula-bg-dark)",
+	hasBackdrop = true,
+	style,
 }: SceneFrameProps) {
-  return (
-    <svg
-      viewBox={viewBox}
-      preserveAspectRatio="xMidYMid slice"
-      style={{width: '100%', height: '100%', display: 'block', ...style}}
-      role="img"
-      aria-label={label}>
-      {hasBackdrop ? <rect width="100%" height="100%" fill={fill} /> : null}
-      {children}
-    </svg>
-  );
+	return (
+		<svg
+			viewBox={viewBox}
+			preserveAspectRatio="xMidYMid slice"
+			style={{ width: "100%", height: "100%", display: "block", ...style }}
+			role="img"
+			aria-label={label}
+		>
+			{hasBackdrop ? <rect width="100%" height="100%" fill={fill} /> : null}
+			{children}
+		</svg>
+	);
 }

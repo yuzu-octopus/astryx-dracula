@@ -2,47 +2,46 @@
 // XLE (canonical structure, validated with `bunx astryx layout check`):
 //   L > (LH[divider] > V[g=3] > ((H[g=4 a=start] > (SI > V[g=0] > (Lk"All orders" + (V[g=0] > Hd"#1001"[level=1] + (H[g=1 a=center] > Tx"5 ordered items"[t=supporting] + Av"Vlad Dracul" + SD"Unfulfilled" + Tx"02/23/2026"[t=supporting] + Lk"See all")))) + (H[g=2] > B"Restock" + B"Edit")) + (H[g=3 a=center] > (SI > TL > Tab"Details"! + Tab"Invoices" + Tab"Timeline" + TabMenu"More") + B.ghost))) + (LC > V[g=4] > ((S > V[g=4] > ((H[g=2 a=center] > Hd"Items"[level=2] + SD"Unfulfilled") + UL)) + (S > V[g=4] > ((H[g=2 a=center] > Hd"Invoice"[level=2] + SD"Paid") + ML)) + (S > V[g=4] > ((H[g=2 a=center] > Hd"Timeline"[level=2] + B.ghost) + UL)))) + (LP[w=320 p=4] > V[g=4] > Col"Notes" + Col"Customer" + Col"Fraud analysis")
 
-import {useState} from 'react';
-import {useMediaQuery} from '@astryxdesign/core/hooks';
+import { Avatar } from "@astryxdesign/core/Avatar";
+import { Button } from "@astryxdesign/core/Button";
+import { Collapsible } from "@astryxdesign/core/Collapsible";
+import { Dialog, DialogHeader } from "@astryxdesign/core/Dialog";
+import { Divider } from "@astryxdesign/core/Divider";
+import { useMediaQuery } from "@astryxdesign/core/hooks";
+import { Icon } from "@astryxdesign/core/Icon";
 import {
-  Layout,
-  LayoutHeader,
-  LayoutContent,
-  LayoutPanel,
-  VStack,
-  HStack,
-  StackItem,
-  Section,
-} from '@astryxdesign/core/Layout';
-import {Text, Heading} from '@astryxdesign/core/Text';
-import {StatusDot} from '@astryxdesign/core/StatusDot';
-import {Avatar} from '@astryxdesign/core/Avatar';
-import {Button} from '@astryxdesign/core/Button';
-import {TabList, Tab, TabMenu} from '@astryxdesign/core/TabList';
-import {Divider} from '@astryxdesign/core/Divider';
-import {Link} from '@astryxdesign/core/Link';
-import {List, ListItem} from '@astryxdesign/core/List';
-import {MetadataList, MetadataListItem} from '@astryxdesign/core/MetadataList';
-import {ProgressBar} from '@astryxdesign/core/ProgressBar';
-import {Collapsible} from '@astryxdesign/core/Collapsible';
-import {Icon} from '@astryxdesign/core/Icon';
-import {Dialog, DialogHeader} from '@astryxdesign/core/Dialog';
-import type {SceneHue} from 'astryx-dracula/shared/scene-hues';
-import {SceneFrame} from 'astryx-dracula/shared/scene-frame';
-import {formatMoney} from 'astryx-dracula/shared/format-money';
+	HStack,
+	Layout,
+	LayoutContent,
+	LayoutHeader,
+	LayoutPanel,
+	Section,
+	StackItem,
+	VStack,
+} from "@astryxdesign/core/Layout";
+import { Link } from "@astryxdesign/core/Link";
+import { List, ListItem } from "@astryxdesign/core/List";
+import { MetadataList, MetadataListItem } from "@astryxdesign/core/MetadataList";
+import { ProgressBar } from "@astryxdesign/core/ProgressBar";
+import { StatusDot } from "@astryxdesign/core/StatusDot";
+import { Tab, TabList, TabMenu } from "@astryxdesign/core/TabList";
+import { Heading, Text } from "@astryxdesign/core/Text";
+import { formatMoney } from "astryx-dracula/shared/format-money";
+import { SceneFrame } from "astryx-dracula/shared/scene-frame";
+import type { SceneHue } from "astryx-dracula/shared/scene-hues";
 import {
-  Calendar,
-  Flag,
-  Filter,
-  ThumbsUp,
-  Heart,
-  SquarePen,
-  ArrowLeft,
-  Columns2,
-} from 'lucide-react';
-
+	ArrowLeft,
+	Calendar,
+	Columns2,
+	Filter,
+	Flag,
+	Heart,
+	SquarePen,
+	ThumbsUp,
+} from "lucide-react";
 // ─── Styles ─────────────────────────────────────────────────────────────────
-import type {CSSProperties} from 'react';
+import type { CSSProperties } from "react";
+import { useState } from "react";
 
 // The only custom CSS in this template is small optical-alignment negative
 // margins: LayoutHeader/TabList have no edge-dock prop (#2622) and List
@@ -52,49 +51,49 @@ import type {CSSProperties} from 'react';
 // Bleed the tab bar to the header's content edges so the active-tab underline
 // meets the header divider. No edge-dock prop on TabList (#2622).
 const tabsRow: CSSProperties = {
-  marginInline: -12,
-  marginBottom: -16,
-  marginTop: 12,
+	marginInline: -12,
+	marginBottom: -16,
+	marginTop: 12,
 };
 // Pull the list items' inner padding back so their content optically aligns
 // with the section heading above (ListItem insets content by ~8px). No
 // edge/inset prop on List (#2626).
 const itemsList: CSSProperties = {
-  marginInline: -8,
+	marginInline: -8,
 };
 
 // ─── Product data ───────────────────────────────────────────────────────────
 const PRODUCTS = [
-  {
-    name: 'Midnight Mug',
-    details: 'Glaze: Moonlight\nFinish: Matte',
-    price: 89.0,
-    qty: 1,
-  },
-  {
-    name: 'Cinder Bowl',
-    details: 'Glaze: Sage\nSize: 6 in',
-    price: 42.0,
-    qty: 2,
-  },
-  {
-    name: 'Crypt Cup',
-    details: 'Glaze: Batwing\nSize: 14 in',
-    price: 65.0,
-    qty: 1,
-  },
-  {
-    name: 'Dusk Plate Set',
-    details: 'Glaze: Charcoal\nCapacity: 3 oz',
-    price: 34.0,
-    qty: 3,
-  },
-  {
-    name: 'Coven Salad Bowl',
-    details: 'Glaze: Moonlight\nHeight: 8 in',
-    price: 78.0,
-    qty: 1,
-  },
+	{
+		name: "Midnight Mug",
+		details: "Glaze: Moonlight\nFinish: Matte",
+		price: 89.0,
+		qty: 1,
+	},
+	{
+		name: "Cinder Bowl",
+		details: "Glaze: Sage\nSize: 6 in",
+		price: 42.0,
+		qty: 2,
+	},
+	{
+		name: "Crypt Cup",
+		details: "Glaze: Batwing\nSize: 14 in",
+		price: 65.0,
+		qty: 1,
+	},
+	{
+		name: "Dusk Plate Set",
+		details: "Glaze: Charcoal\nCapacity: 3 oz",
+		price: 34.0,
+		qty: 3,
+	},
+	{
+		name: "Coven Salad Bowl",
+		details: "Glaze: Moonlight\nHeight: 8 in",
+		price: 78.0,
+		qty: 1,
+	},
 ];
 
 // Per-product art tint, read positionally out of a never-reordered array so
@@ -105,41 +104,36 @@ const PRODUCTS = [
 // The art-treatment remit bans purple, so the leading entry changes to cyan on
 // the same pass.
 const PRODUCT_HUES: readonly SceneHue[] = [
-  'var(--dracula-cyan)',
-  'var(--dracula-cyan)',
-  'var(--dracula-pink)',
-  'var(--dracula-yellow)',
-  'var(--dracula-green)',
+	"var(--dracula-cyan)",
+	"var(--dracula-cyan)",
+	"var(--dracula-pink)",
+	"var(--dracula-yellow)",
+	"var(--dracula-green)",
 ];
 
 const sigilClip: CSSProperties = {
-  width: 40,
-  height: 40,
-  overflow: 'clip',
-  flexShrink: 0,
+	width: 40,
+	height: 40,
+	overflow: "clip",
+	flexShrink: 0,
 };
 
-function ProductSigil({index}: {name: string; index: number}) {
-  const hue = PRODUCT_HUES[index % PRODUCT_HUES.length];
-  return (
-    <div style={sigilClip}>
-      <SceneFrame label={`${PRODUCTS[index % PRODUCTS.length].name} sigil`} viewBox="0 0 40 40" hasBackdrop={false}>
-        <rect width="40" height="40" fill="var(--dracula-bg-light)" />
-        <circle cx={28} cy={11} r={7} fill={hue} />
-        <circle
-          cx={25}
-          cy={9}
-          r={5.5}
-          fill="var(--dracula-bg-light)"
-          opacity={0.5}
-        />
-        <path
-          d="M0 28 Q10 22 20 26 T40 24 V40 H0 Z"
-          fill="var(--dracula-current-line)"
-        />
-      </SceneFrame>
-    </div>
-  );
+function ProductSigil({ index }: { name: string; index: number }) {
+	const hue = PRODUCT_HUES[index % PRODUCT_HUES.length];
+	return (
+		<div style={sigilClip}>
+			<SceneFrame
+				label={`${PRODUCTS[index % PRODUCTS.length].name} sigil`}
+				viewBox="0 0 40 40"
+				hasBackdrop={false}
+			>
+				<rect width="40" height="40" fill="var(--dracula-bg-light)" />
+				<circle cx={28} cy={11} r={7} fill={hue} />
+				<circle cx={25} cy={9} r={5.5} fill="var(--dracula-bg-light)" opacity={0.5} />
+				<path d="M0 28 Q10 22 20 26 T40 24 V40 H0 Z" fill="var(--dracula-current-line)" />
+			</SceneFrame>
+		</div>
+	);
 }
 
 const SUBTOTAL = PRODUCTS.reduce((sum, p) => sum + p.price * p.qty, 0);
@@ -151,554 +145,503 @@ const TOTAL = SUBTOTAL - DISCOUNT + SHIPPING + TAX;
 
 // ─── Activity data ──────────────────────────────────────────────────────────
 const ACTIVITY = [
-  {
-    type: 'event' as const,
-    user: 'Vlad Dracul',
-    text: 'placed order #1001',
-    reactions: 2,
-    time: 'Feb 23 at 9:12 AM',
-  },
-  {
-    type: 'comment' as const,
-    user: 'Alex Rivera',
-    text: "Customer requested gift wrapping for the mug & plate set. I've added a note to the packing slip. Warehouse team should wrap in recycled kraft paper.",
-    reactions: 3,
-    time: 'Feb 23 at 10:45 AM',
-  },
-  {
-    type: 'update' as const,
-    user: 'System',
-    text: 'has several information changes',
-    time: 'Feb 23 at 11:30 AM',
-    changes: [
-      'Payment verified via Visa …7482',
-      'Fraud check passed, low risk',
-    ],
-  },
-  {
-    type: 'event' as const,
-    user: 'Alex Rivera',
-    text: 'marked order as ready for fulfillment',
-    reactions: 1,
-    time: 'Feb 23 at 2:15 PM',
-  },
+	{
+		type: "event" as const,
+		user: "Vlad Dracul",
+		text: "placed order #1001",
+		reactions: 2,
+		time: "Feb 23 at 9:12 AM",
+	},
+	{
+		type: "comment" as const,
+		user: "Alex Rivera",
+		text: "Customer requested gift wrapping for the mug & plate set. I've added a note to the packing slip. Warehouse team should wrap in recycled kraft paper.",
+		reactions: 3,
+		time: "Feb 23 at 10:45 AM",
+	},
+	{
+		type: "update" as const,
+		user: "System",
+		text: "has several information changes",
+		time: "Feb 23 at 11:30 AM",
+		changes: ["Payment verified via Visa …7482", "Fraud check passed, low risk"],
+	},
+	{
+		type: "event" as const,
+		user: "Alex Rivera",
+		text: "marked order as ready for fulfillment",
+		reactions: 1,
+		time: "Feb 23 at 2:15 PM",
+	},
 ];
 
 // ─── Bullet separator ───────────────────────────────────────────────────────
 function Bullet() {
-  return (
-    <Text type="supporting" color="secondary" aria-hidden="true">
-      {'・'}
-    </Text>
-  );
+	return (
+		<Text type="supporting" color="secondary" aria-hidden="true">
+			{"・"}
+		</Text>
+	);
 }
 
 // ─── Page Header ────────────────────────────────────────────────────────────
 function PageHeader({
-  activeTab,
-  onTabChange,
-  isPanelOpen,
-  onTogglePanel,
-  isNarrow,
+	activeTab,
+	onTabChange,
+	isPanelOpen,
+	onTogglePanel,
+	isNarrow,
 }: {
-  activeTab: string;
-  onTabChange: (v: string) => void;
-  isPanelOpen: boolean;
-  onTogglePanel: () => void;
-  isNarrow: boolean;
+	activeTab: string;
+	onTabChange: (v: string) => void;
+	isPanelOpen: boolean;
+	onTogglePanel: () => void;
+	isNarrow: boolean;
 }) {
-  return (
-    <LayoutHeader hasDivider padding={6}>
-      <VStack gap={3}>
-        <HStack gap={4} vAlign="start">
-          <StackItem size="fill">
-            {/* gap={2}: the breadcrumb is a control, not a text-baseline
+	return (
+		<LayoutHeader hasDivider padding={6}>
+			<VStack gap={3}>
+				<HStack gap={4} vAlign="start">
+					<StackItem size="fill">
+						{/* gap={2}: the breadcrumb is a control, not a text-baseline
                 pairing, so it needs separation from the H1 rather than 0. */}
-            <VStack gap={2}>
-              <Link href="#/templates/detail-page">
-                <HStack gap={1} vAlign="center">
-                  <Icon icon={ArrowLeft} size="sm" color="inherit" />
-                  All orders
-                </HStack>
-              </Link>
-              <VStack gap={0}>
-                <Heading level={1} maxLines={1}>
-                  #1001
-                </Heading>
-                {/* Metadata wraps to multiple lines on narrow screens (rather
+						<VStack gap={2}>
+							<Link href="#/templates/detail-page">
+								<HStack gap={1} vAlign="center">
+									<Icon icon={ArrowLeft} size="sm" color="inherit" />
+									All orders
+								</HStack>
+							</Link>
+							<VStack gap={0}>
+								<Heading level={1} maxLines={1}>
+									#1001
+								</Heading>
+								{/* Metadata wraps to multiple lines on narrow screens (rather
                     than collapsing items behind a "+N more" overflow). */}
-                <HStack gap={1} vAlign="center" wrap="wrap">
-                  <Text type="supporting" color="secondary" hasTabularNumbers>
-                    {PRODUCTS.length} ordered items
-                  </Text>
-                  <HStack gap={1} vAlign="center">
-                    <Bullet />
-                    <Avatar name="Vlad Dracul" size="sm" />
-                    <Text type="supporting" color="secondary" maxLines={1}>
-                      Vlad Dracul
-                    </Text>
-                  </HStack>
-                  <HStack gap={1} vAlign="center">
-                    <Bullet />
-                    <StatusDot variant="warning" label="Unfulfilled" />
-                    <Text type="supporting" color="secondary">
-                      Unfulfilled
-                    </Text>
-                  </HStack>
-                  <HStack gap={1} vAlign="center">
-                    <Bullet />
-                    <Icon icon={Calendar} size="sm" color="secondary" />
-                    <Text
-                      type="supporting"
-                      color="secondary"
-                      maxLines={1}
-                      hasTabularNumbers>
-                      02/23/2026
-                    </Text>
-                  </HStack>
-                  <HStack gap={1} vAlign="center">
-                    <Bullet />
-                    <Icon icon={Flag} size="sm" color="secondary" />
-                    <Text type="supporting" color="secondary" maxLines={1}>
-                      Needs attention
-                    </Text>
-                  </HStack>
-                  <HStack gap={1} vAlign="center">
-                    <Bullet />
-                    <Link href="#/templates/detail-page">
-                      See all
-                    </Link>
-                  </HStack>
-                </HStack>
-              </VStack>
-            </VStack>
-          </StackItem>
-          {!isNarrow && (
-            <HStack gap={2}>
-              <Button label="Restock" variant="secondary" />
-              <Button label="Edit" variant="secondary" />
-            </HStack>
-          )}
-        </HStack>
+								<HStack gap={1} vAlign="center" wrap="wrap">
+									<Text type="supporting" color="secondary" hasTabularNumbers>
+										{PRODUCTS.length} ordered items
+									</Text>
+									<HStack gap={1} vAlign="center">
+										<Bullet />
+										<Avatar name="Vlad Dracul" size="sm" />
+										<Text type="supporting" color="secondary" maxLines={1}>
+											Vlad Dracul
+										</Text>
+									</HStack>
+									<HStack gap={1} vAlign="center">
+										<Bullet />
+										<StatusDot variant="warning" label="Unfulfilled" />
+										<Text type="supporting" color="secondary">
+											Unfulfilled
+										</Text>
+									</HStack>
+									<HStack gap={1} vAlign="center">
+										<Bullet />
+										<Icon icon={Calendar} size="sm" color="secondary" />
+										<Text type="supporting" color="secondary" maxLines={1} hasTabularNumbers>
+											02/23/2026
+										</Text>
+									</HStack>
+									<HStack gap={1} vAlign="center">
+										<Bullet />
+										<Icon icon={Flag} size="sm" color="secondary" />
+										<Text type="supporting" color="secondary" maxLines={1}>
+											Needs attention
+										</Text>
+									</HStack>
+									<HStack gap={1} vAlign="center">
+										<Bullet />
+										<Link href="#/templates/detail-page">See all</Link>
+									</HStack>
+								</HStack>
+							</VStack>
+						</VStack>
+					</StackItem>
+					{!isNarrow && (
+						<HStack gap={2}>
+							<Button label="Restock" variant="secondary" />
+							<Button label="Edit" variant="secondary" />
+						</HStack>
+					)}
+				</HStack>
 
-        {/* Mobile: actions drop below the metadata as a full-width row. The
+				{/* Mobile: actions drop below the metadata as a full-width row. The
             VStack hAlign="stretch" wrapper is the full-width-button
             workaround — Button has no full-width prop (#2600). */}
-        {isNarrow && (
-          <HStack gap={2}>
-            <StackItem size="fill">
-              <VStack hAlign="stretch">
-                <Button label="Restock" variant="secondary" />
-              </VStack>
-            </StackItem>
-            <StackItem size="fill">
-              <VStack hAlign="stretch">
-                <Button label="Edit" variant="secondary" />
-              </VStack>
-            </StackItem>
-          </HStack>
-        )}
+				{isNarrow && (
+					<HStack gap={2}>
+						<StackItem size="fill">
+							<VStack hAlign="stretch">
+								<Button label="Restock" variant="secondary" />
+							</VStack>
+						</StackItem>
+						<StackItem size="fill">
+							<VStack hAlign="stretch">
+								<Button label="Edit" variant="secondary" />
+							</VStack>
+						</StackItem>
+					</HStack>
+				)}
 
-        <HStack vAlign="center" style={tabsRow}>
-          <StackItem size="fill">
-            <TabList value={activeTab} onChange={onTabChange} size="lg">
-              <Tab value="details" label="Details" />
-              <Tab value="invoices" label="Invoices" />
-              <Tab value="timeline" label="Timeline" />
-              <TabMenu
-                label="More"
-                options={[
-                  {value: 'customer', label: 'Customer'},
-                  {value: 'analysis', label: 'Analysis'},
-                ]}
-              />
-            </TabList>
-          </StackItem>
-          <Button
-            label={isPanelOpen ? 'Hide panel' : 'Show panel'}
-            variant="ghost"
-            size="md"
-            icon={<Icon icon={Columns2} size="sm" />}
-            isIconOnly
-            onClick={onTogglePanel}
-          />
-        </HStack>
-      </VStack>
-    </LayoutHeader>
-  );
+				<HStack vAlign="center" style={tabsRow}>
+					<StackItem size="fill">
+						<TabList value={activeTab} onChange={onTabChange} size="lg">
+							<Tab value="details" label="Details" />
+							<Tab value="invoices" label="Invoices" />
+							<Tab value="timeline" label="Timeline" />
+							<TabMenu
+								label="More"
+								options={[
+									{ value: "customer", label: "Customer" },
+									{ value: "analysis", label: "Analysis" },
+								]}
+							/>
+						</TabList>
+					</StackItem>
+					<Button
+						label={isPanelOpen ? "Hide panel" : "Show panel"}
+						variant="ghost"
+						size="md"
+						icon={<Icon icon={Columns2} size="sm" />}
+						isIconOnly
+						onClick={onTogglePanel}
+					/>
+				</HStack>
+			</VStack>
+		</LayoutHeader>
+	);
 }
 
 // ─── Items Card ─────────────────────────────────────────────────────────────
 function ItemsCard() {
-  return (
-    <Section>
-      <VStack gap={4}>
-        <HStack vAlign="center" gap={2} wrap="wrap">
-          <StackItem size="fill">
-            <HStack gap={2} vAlign="center">
-              <Heading level={2}>Items</Heading>
-              <StatusDot variant="warning" label="Unfulfilled" />
-              <Text type="supporting" color="secondary">
-                Unfulfilled
-              </Text>
-            </HStack>
-          </StackItem>
-          <HStack gap={2}>
-            <Button label="Fulfill item" variant="ghost" />
-            <Button label="Create label" variant="secondary" />
-          </HStack>
-        </HStack>
+	return (
+		<Section>
+			<VStack gap={4}>
+				<HStack vAlign="center" gap={2} wrap="wrap">
+					<StackItem size="fill">
+						<HStack gap={2} vAlign="center">
+							<Heading level={2}>Items</Heading>
+							<StatusDot variant="warning" label="Unfulfilled" />
+							<Text type="supporting" color="secondary">
+								Unfulfilled
+							</Text>
+						</HStack>
+					</StackItem>
+					<HStack gap={2}>
+						<Button label="Fulfill item" variant="ghost" />
+						<Button label="Create label" variant="secondary" />
+					</HStack>
+				</HStack>
 
-        <List density="spacious" style={itemsList}>
-          {PRODUCTS.map((product, i) => (
-            <ListItem
-              key={product.name}
-              label={product.name}
-              description={
-                <VStack gap={0}>
-                  {product.details.split('\n').map(line => (
-                    <Text
-                      key={line}
-                      type="supporting"
-                      color="secondary"
-                      hasTabularNumbers>
-                      {line}
-                    </Text>
-                  ))}
-                </VStack>
-              }
-              startContent={
-                <ProductSigil name={product.name} index={i} />
-              }
-              endContent={
-                <VStack gap={0} hAlign="end">
-                  <Text
-                    type="body"
-                    weight="semibold"
-                    maxLines={1}
-                    hasTabularNumbers>
-                    {formatMoney(product.price * product.qty)}
-                  </Text>
-                  <Text
-                    type="supporting"
-                    color="secondary"
-                    maxLines={1}
-                    hasTabularNumbers>
-                    {formatMoney(product.price)} {'×'} {product.qty}
-                  </Text>
-                </VStack>
-              }
-            />
-          ))}
-        </List>
-      </VStack>
-    </Section>
-  );
+				<List density="spacious" style={itemsList}>
+					{PRODUCTS.map((product, i) => (
+						<ListItem
+							key={product.name}
+							label={product.name}
+							description={
+								<VStack gap={0}>
+									{product.details.split("\n").map((line) => (
+										<Text key={line} type="supporting" color="secondary" hasTabularNumbers>
+											{line}
+										</Text>
+									))}
+								</VStack>
+							}
+							startContent={<ProductSigil name={product.name} index={i} />}
+							endContent={
+								<VStack gap={0} hAlign="end">
+									<Text type="body" weight="semibold" maxLines={1} hasTabularNumbers>
+										{formatMoney(product.price * product.qty)}
+									</Text>
+									<Text type="supporting" color="secondary" maxLines={1} hasTabularNumbers>
+										{formatMoney(product.price)} {"×"} {product.qty}
+									</Text>
+								</VStack>
+							}
+						/>
+					))}
+				</List>
+			</VStack>
+		</Section>
+	);
 }
 
 // ─── Invoice Card ───────────────────────────────────────────────────────────
 function InvoiceCard() {
-  return (
-    <Section>
-      <VStack gap={4}>
-        <HStack vAlign="center" gap={2} wrap="wrap">
-          <StackItem size="fill">
-            <HStack gap={2} vAlign="center">
-              <Heading level={2}>Invoice</Heading>
-              <StatusDot variant="success" label="Paid" />
-              <Text type="supporting" color="secondary">
-                Paid
-              </Text>
-            </HStack>
-          </StackItem>
-          <HStack gap={2}>
-            <Button label="Refund" variant="ghost" />
-            <Button label="Send Invoice" variant="secondary" />
-          </HStack>
-        </HStack>
+	return (
+		<Section>
+			<VStack gap={4}>
+				<HStack vAlign="center" gap={2} wrap="wrap">
+					<StackItem size="fill">
+						<HStack gap={2} vAlign="center">
+							<Heading level={2}>Invoice</Heading>
+							<StatusDot variant="success" label="Paid" />
+							<Text type="supporting" color="secondary">
+								Paid
+							</Text>
+						</HStack>
+					</StackItem>
+					<HStack gap={2}>
+						<Button label="Refund" variant="ghost" />
+						<Button label="Send Invoice" variant="secondary" />
+					</HStack>
+				</HStack>
 
-        <MetadataList>
-          <MetadataListItem label="Subtotal">
-            <HStack>
-              <StackItem size="fill">
-                <Text type="body" hasTabularNumbers>
-                  {PRODUCTS.length} items
-                </Text>
-              </StackItem>
-              <Text type="body" hasTabularNumbers>
-                {formatMoney(SUBTOTAL)}
-              </Text>
-            </HStack>
-          </MetadataListItem>
-          <MetadataListItem label="Discount">
-            <HStack>
-              <StackItem size="fill">
-                <Text type="body">New customer code: NEW15</Text>
-              </StackItem>
-              <Text type="body" hasTabularNumbers>
-                – {formatMoney(DISCOUNT)}
-              </Text>
-            </HStack>
-          </MetadataListItem>
-          <MetadataListItem label="Shipping">
-            <HStack>
-              <StackItem size="fill">
-                <Text type="body" hasTabularNumbers>
-                  Free shipping (0.0lbs) USPS
-                </Text>
-              </StackItem>
-              <Text type="body" hasTabularNumbers>
-                {formatMoney(SHIPPING)}
-              </Text>
-            </HStack>
-          </MetadataListItem>
-          <MetadataListItem label="Tax">
-            <HStack>
-              <StackItem size="fill">
-                <Text type="body" hasTabularNumbers>
-                  Sales tax (8.25%)
-                </Text>
-              </StackItem>
-              <Text type="body" hasTabularNumbers>
-                {formatMoney(TAX)}
-              </Text>
-            </HStack>
-          </MetadataListItem>
-          <MetadataListItem label="Total">
-            <HStack>
-              <StackItem size="fill" />
-              <Text type="body" weight="semibold" hasTabularNumbers>
-                {formatMoney(TOTAL)}
-              </Text>
-            </HStack>
-          </MetadataListItem>
-        </MetadataList>
+				<MetadataList>
+					<MetadataListItem label="Subtotal">
+						<HStack>
+							<StackItem size="fill">
+								<Text type="body" hasTabularNumbers>
+									{PRODUCTS.length} items
+								</Text>
+							</StackItem>
+							<Text type="body" hasTabularNumbers>
+								{formatMoney(SUBTOTAL)}
+							</Text>
+						</HStack>
+					</MetadataListItem>
+					<MetadataListItem label="Discount">
+						<HStack>
+							<StackItem size="fill">
+								<Text type="body">New customer code: NEW15</Text>
+							</StackItem>
+							<Text type="body" hasTabularNumbers>
+								– {formatMoney(DISCOUNT)}
+							</Text>
+						</HStack>
+					</MetadataListItem>
+					<MetadataListItem label="Shipping">
+						<HStack>
+							<StackItem size="fill">
+								<Text type="body" hasTabularNumbers>
+									Free shipping (0.0lbs) USPS
+								</Text>
+							</StackItem>
+							<Text type="body" hasTabularNumbers>
+								{formatMoney(SHIPPING)}
+							</Text>
+						</HStack>
+					</MetadataListItem>
+					<MetadataListItem label="Tax">
+						<HStack>
+							<StackItem size="fill">
+								<Text type="body" hasTabularNumbers>
+									Sales tax (8.25%)
+								</Text>
+							</StackItem>
+							<Text type="body" hasTabularNumbers>
+								{formatMoney(TAX)}
+							</Text>
+						</HStack>
+					</MetadataListItem>
+					<MetadataListItem label="Total">
+						<HStack>
+							<StackItem size="fill" />
+							<Text type="body" weight="semibold" hasTabularNumbers>
+								{formatMoney(TOTAL)}
+							</Text>
+						</HStack>
+					</MetadataListItem>
+				</MetadataList>
 
-        <Divider />
+				<Divider />
 
-        <MetadataList>
-          <MetadataListItem label="Paid by customer">
-            <HStack>
-              <StackItem size="fill">
-                <Text type="body" hasTabularNumbers>
-                  Visa …7482
-                </Text>
-              </StackItem>
-              <Text type="body" hasTabularNumbers>
-                {formatMoney(TOTAL)}
-              </Text>
-            </HStack>
-          </MetadataListItem>
-        </MetadataList>
-      </VStack>
-    </Section>
-  );
+				<MetadataList>
+					<MetadataListItem label="Paid by customer">
+						<HStack>
+							<StackItem size="fill">
+								<Text type="body" hasTabularNumbers>
+									Visa …7482
+								</Text>
+							</StackItem>
+							<Text type="body" hasTabularNumbers>
+								{formatMoney(TOTAL)}
+							</Text>
+						</HStack>
+					</MetadataListItem>
+				</MetadataList>
+			</VStack>
+		</Section>
+	);
 }
 
 // ─── Timeline ───────────────────────────────────────────────────────────────
 function TimelineSection() {
-  return (
-    <Section>
-      <VStack gap={4}>
-        {/* gap={2}, matching the byte-identical header rows at :340 and
+	return (
+		<Section>
+			<VStack gap={4}>
+				{/* gap={2}, matching the byte-identical header rows at :340 and
             :408. Core's Stack has no default gap (Stack.tsx:211, pass-through
             at :255/:285), so this rendered 0px -- the heading and the Filters
             button touched -- while both siblings render 8px. */}
-        <HStack gap={2} vAlign="center">
-          <StackItem size="fill">
-            <Heading level={2}>Timeline</Heading>
-          </StackItem>
-          <Button
-            label="Filters"
-            variant="ghost"
-            icon={<Icon icon={Filter} />}
-            isIconOnly
-          />
-        </HStack>
+				<HStack gap={2} vAlign="center">
+					<StackItem size="fill">
+						<Heading level={2}>Timeline</Heading>
+					</StackItem>
+					<Button label="Filters" variant="ghost" icon={<Icon icon={Filter} />} isIconOnly />
+				</HStack>
 
-        <List density="spacious" style={itemsList}>
-          {ACTIVITY.map(item => (
-            <ListItem
-              key={`${item.user}-${item.time}`}
-              label={item.user}
-              description={
-                <VStack gap={2}>
-                  <Text type="body">{item.text}</Text>
-                  {item.changes && (
-                    <VStack gap={1}>
-                      {item.changes.map(change => (
-                        <HStack key={change} gap={2} vAlign="center">
-                          <Icon icon={SquarePen} size="sm" color="secondary" />
-                          <Text type="supporting" color="secondary">
-                            {change}
-                          </Text>
-                        </HStack>
-                      ))}
-                    </VStack>
-                  )}
-                  <HStack gap={3} vAlign="center">
-                    <HStack gap={1} vAlign="center">
-                      <Icon icon={ThumbsUp} size="xsm" color="secondary" />
-                      <Icon icon={Heart} size="xsm" color="secondary" />
-                      <Text
-                        type="supporting"
-                        color="secondary"
-                        hasTabularNumbers>
-                        {item.reactions}
-                      </Text>
-                    </HStack>
-                    <Text type="supporting" color="secondary">
-                      Like
-                    </Text>
-                    <Bullet />
-                    <Text type="supporting" color="secondary">
-                      Reply
-                    </Text>
-                    <Bullet />
-                    <Text
-                      type="supporting"
-                      color="secondary"
-                      hasTabularNumbers>
-                      {item.time}
-                    </Text>
-                  </HStack>
-                </VStack>
-              }
-              startContent={<Avatar name={item.user} size="md" />}
-            />
-          ))}
-        </List>
-      </VStack>
-    </Section>
-  );
+				<List density="spacious" style={itemsList}>
+					{ACTIVITY.map((item) => (
+						<ListItem
+							key={`${item.user}-${item.time}`}
+							label={item.user}
+							description={
+								<VStack gap={2}>
+									<Text type="body">{item.text}</Text>
+									{item.changes && (
+										<VStack gap={1}>
+											{item.changes.map((change) => (
+												<HStack key={change} gap={2} vAlign="center">
+													<Icon icon={SquarePen} size="sm" color="secondary" />
+													<Text type="supporting" color="secondary">
+														{change}
+													</Text>
+												</HStack>
+											))}
+										</VStack>
+									)}
+									<HStack gap={3} vAlign="center">
+										<HStack gap={1} vAlign="center">
+											<Icon icon={ThumbsUp} size="xsm" color="secondary" />
+											<Icon icon={Heart} size="xsm" color="secondary" />
+											<Text type="supporting" color="secondary" hasTabularNumbers>
+												{item.reactions}
+											</Text>
+										</HStack>
+										<Text type="supporting" color="secondary">
+											Like
+										</Text>
+										<Bullet />
+										<Text type="supporting" color="secondary">
+											Reply
+										</Text>
+										<Bullet />
+										<Text type="supporting" color="secondary" hasTabularNumbers>
+											{item.time}
+										</Text>
+									</HStack>
+								</VStack>
+							}
+							startContent={<Avatar name={item.user} size="md" />}
+						/>
+					))}
+				</List>
+			</VStack>
+		</Section>
+	);
 }
 
 // ─── Right Panel ────────────────────────────────────────────────────────────
 // Renders as a fixed-width side panel on desktop, and as a plain stacked section
 // on mobile (so it flows below the content instead of squishing beside it).
 function PanelContent() {
-  return (
-    <VStack gap={4}>
-      <Collapsible trigger={<Heading level={3}>Notes</Heading>}>
-        {/* "Show more" closes the sentence inside the Text below, so it is
+	return (
+		<VStack gap={4}>
+			<Collapsible trigger={<Heading level={3}>Notes</Heading>}>
+				{/* "Show more" closes the sentence inside the Text below, so it is
             prose and asks for `hasUnderline` — colour alone is not a
             sufficient cue inline (1.4.1 / F73). `type="inherit"` adopts the
             paragraph's size and leading. The two links in the header are
             navigation, so they pass neither. */}
-        <Text type="body">
-          Customer is a repeat buyer, 3rd order this quarter. Prefers
-          moonlight and sage glazes. Requested gift wrapping for the mug set.
-          Ships to a residential address in CA.{' '}
-          <Link href="#/templates/detail-page" hasUnderline type="inherit">
-            Show more
-          </Link>
-        </Text>
-      </Collapsible>
-      <Collapsible trigger={<Heading level={3}>Customer</Heading>}>
-        <MetadataList>
-          <MetadataListItem label="Name">Vlad Dracul</MetadataListItem>
-          <MetadataListItem label="Address">
-            321 Smith Road, CA 38238
-          </MetadataListItem>
-          <MetadataListItem label="Phone">234-555-0134</MetadataListItem>
-          <MetadataListItem label="Email">vlad@castle-dracula.transylvania</MetadataListItem>
-          <MetadataListItem label="Billing Address">
-            Same as shipping address
-          </MetadataListItem>
-        </MetadataList>
-      </Collapsible>
-      <Collapsible trigger={<Heading level={3}>Fraud analysis</Heading>}>
-        <VStack gap={1}>
-          <ProgressBar
-            label="Risk level"
-            value={15}
-            variant="success"
-            isLabelHidden
-          />
-          <Text type="body">Recommendation: Fulfill order</Text>
-          <Text type="body">
-            There is a low chance that you will receive a chargeback on this
-            order.
-          </Text>
-        </VStack>
-      </Collapsible>
-    </VStack>
-  );
+				<Text type="body">
+					Customer is a repeat buyer, 3rd order this quarter. Prefers moonlight and sage glazes.
+					Requested gift wrapping for the mug set. Ships to a residential address in CA.{" "}
+					<Link href="#/templates/detail-page" hasUnderline type="inherit">
+						Show more
+					</Link>
+				</Text>
+			</Collapsible>
+			<Collapsible trigger={<Heading level={3}>Customer</Heading>}>
+				<MetadataList>
+					<MetadataListItem label="Name">Vlad Dracul</MetadataListItem>
+					<MetadataListItem label="Address">321 Smith Road, CA 38238</MetadataListItem>
+					<MetadataListItem label="Phone">234-555-0134</MetadataListItem>
+					<MetadataListItem label="Email">vlad@castle-dracula.transylvania</MetadataListItem>
+					<MetadataListItem label="Billing Address">Same as shipping address</MetadataListItem>
+				</MetadataList>
+			</Collapsible>
+			<Collapsible trigger={<Heading level={3}>Fraud analysis</Heading>}>
+				<VStack gap={1}>
+					<ProgressBar label="Risk level" value={15} variant="success" isLabelHidden />
+					<Text type="body">Recommendation: Fulfill order</Text>
+					<Text type="body">
+						There is a low chance that you will receive a chargeback on this order.
+					</Text>
+				</VStack>
+			</Collapsible>
+		</VStack>
+	);
 }
 
 // Desktop: fixed-width side panel in the layout's `end` slot.
 function RightPanel() {
-  return (
-    <LayoutPanel width={320} padding={4} role="complementary">
-      <PanelContent />
-    </LayoutPanel>
-  );
+	return (
+		<LayoutPanel width={320} padding={4} role="complementary">
+			<PanelContent />
+		</LayoutPanel>
+	);
 }
 
 // ─── Main Page ──────────────────────────────────────────────────────────────
 export default function DetailPage() {
-  const [activeTab, setActiveTab] = useState('details');
-  const isNarrow = useMediaQuery('(max-width: 1024px)');
-  // Desktop: a fixed-width `end`-slot side panel that can be hidden.
-  const [showSidePanel, setShowSidePanel] = useState(true);
-  // Mobile: the panel opens as a full-screen dialog (the side slot would squish
-  // the main content), driven by the same toolbar button.
-  const [isPanelDialogOpen, setPanelDialogOpen] = useState(false);
+	const [activeTab, setActiveTab] = useState("details");
+	const isNarrow = useMediaQuery("(max-width: 1024px)");
+	// Desktop: a fixed-width `end`-slot side panel that can be hidden.
+	const [showSidePanel, setShowSidePanel] = useState(true);
+	// Mobile: the panel opens as a full-screen dialog (the side slot would squish
+	// the main content), driven by the same toolbar button.
+	const [isPanelDialogOpen, setPanelDialogOpen] = useState(false);
 
-  const isPanelShown = isNarrow ? isPanelDialogOpen : showSidePanel;
-  const togglePanel = () =>
-    isNarrow
-      ? setPanelDialogOpen(prev => !prev)
-      : setShowSidePanel(prev => !prev);
+	const isPanelShown = isNarrow ? isPanelDialogOpen : showSidePanel;
+	const togglePanel = () =>
+		isNarrow ? setPanelDialogOpen((prev) => !prev) : setShowSidePanel((prev) => !prev);
 
-  return (
-    <>
-      <Layout
-        height="fill"
-        contentWidth={1000}
-        defaultHasDividers
-        header={
-          <PageHeader
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            isPanelOpen={isPanelShown}
-            onTogglePanel={togglePanel}
-            isNarrow={isNarrow}
-          />
-        }
-        content={
-          <LayoutContent role="main">
-            <VStack gap={4}>
-              <ItemsCard />
-              <InvoiceCard />
-              <TimelineSection />
-            </VStack>
-          </LayoutContent>
-        }
-        end={!isNarrow && showSidePanel ? <RightPanel /> : undefined}
-      />
-      {/* Mobile: the side panel content opens as a full-screen dialog. (A
+	return (
+		<>
+			<Layout
+				height="fill"
+				contentWidth={1000}
+				defaultHasDividers
+				header={
+					<PageHeader
+						activeTab={activeTab}
+						onTabChange={setActiveTab}
+						isPanelOpen={isPanelShown}
+						onTogglePanel={togglePanel}
+						isNarrow={isNarrow}
+					/>
+				}
+				content={
+					<LayoutContent role="main">
+						<VStack gap={4}>
+							<ItemsCard />
+							<InvoiceCard />
+							<TimelineSection />
+						</VStack>
+					</LayoutContent>
+				}
+				end={!isNarrow && showSidePanel ? <RightPanel /> : undefined}
+			/>
+			{/* Mobile: the side panel content opens as a full-screen dialog. (A
           side drawer/sheet would be more idiomatic, but Astryx has no Drawer
           component yet — #2575 — so we use the fullscreen Dialog variant.) */}
-      <Dialog
-        variant="fullscreen"
-        isOpen={isNarrow && isPanelDialogOpen}
-        onOpenChange={setPanelDialogOpen}>
-        <Layout
-          height="auto"
-          header={
-            <DialogHeader
-              title="Order details"
-              onOpenChange={setPanelDialogOpen}
-            />
-          }
-          content={
-            <LayoutContent padding={4}>
-              <PanelContent />
-            </LayoutContent>
-          }
-        />
-      </Dialog>
-    </>
-  );
+			<Dialog
+				variant="fullscreen"
+				isOpen={isNarrow && isPanelDialogOpen}
+				onOpenChange={setPanelDialogOpen}
+			>
+				<Layout
+					height="auto"
+					header={<DialogHeader title="Order details" onOpenChange={setPanelDialogOpen} />}
+					content={
+						<LayoutContent padding={4}>
+							<PanelContent />
+						</LayoutContent>
+					}
+				/>
+			</Dialog>
+		</>
+	);
 }

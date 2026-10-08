@@ -19,388 +19,359 @@
  *   viewports scroll the table horizontally instead of widening the page.
  */
 
-import type {CSSProperties} from 'react';
+import { Avatar } from "@astryxdesign/core/Avatar";
+import { Button } from "@astryxdesign/core/Button";
+import { Card } from "@astryxdesign/core/Card";
+import { Icon } from "@astryxdesign/core/Icon";
+import { IconButton } from "@astryxdesign/core/IconButton";
 import {
-  VStack,
-  HStack,
-  StackItem,
-  Layout,
-  LayoutContent,
-  LayoutHeader,
-} from '@astryxdesign/core/Layout';
-import {Text, Heading} from '@astryxdesign/core/Text';
-import {Button} from '@astryxdesign/core/Button';
-import {IconButton} from '@astryxdesign/core/IconButton';
-import {Icon} from '@astryxdesign/core/Icon';
-import {Avatar} from '@astryxdesign/core/Avatar';
-import {Token} from '@astryxdesign/core/Token';
-import {Card} from '@astryxdesign/core/Card';
-import {Link} from '@astryxdesign/core/Link';
-import {Table, proportional, pixel} from '@astryxdesign/core/Table';
-import type {TableColumn} from '@astryxdesign/core/Table';
-import {Filter, Download, RotateCw} from 'lucide-react';
-import {CHART_HUES} from 'astryx-dracula/shared/chart-hues';
-import {ChartLegend, type ChartLegendEntry} from 'astryx-dracula/shared/chart-legend';
-import {CHART_PANEL_STYLE} from 'astryx-dracula/shared/chart-panel-style';
-import {ChartLabel} from 'astryx-dracula/shared/chart-labels';
+	HStack,
+	Layout,
+	LayoutContent,
+	LayoutHeader,
+	StackItem,
+	VStack,
+} from "@astryxdesign/core/Layout";
+import { Link } from "@astryxdesign/core/Link";
+import type { TableColumn } from "@astryxdesign/core/Table";
+import { pixel, proportional, Table } from "@astryxdesign/core/Table";
+import { Heading, Text } from "@astryxdesign/core/Text";
+import { Token } from "@astryxdesign/core/Token";
+import { CHART_HUES } from "astryx-dracula/shared/chart-hues";
+import { ChartLabel } from "astryx-dracula/shared/chart-labels";
+import { ChartLegend, type ChartLegendEntry } from "astryx-dracula/shared/chart-legend";
+import { CHART_PANEL_STYLE } from "astryx-dracula/shared/chart-panel-style";
+import { Download, Filter, RotateCw } from "lucide-react";
+import type { CSSProperties } from "react";
 
 // ============= ICONS (verified lucide-react exports) =============
 // Filter ← FunnelIcon, Download ← ArrowDownTrayIcon, RotateCw ← ArrowPathIcon.
 
 // ============= DATA =============
 type ProductName =
-  | 'Ads Manager'
-  | 'Business Suite'
-  | 'Commerce Manager'
-  | 'Pages'
-  | 'Messenger API'
-  | 'Graph API'
-  | 'WhatsApp Business'
-  | 'Instagram API';
+	| "Ads Manager"
+	| "Business Suite"
+	| "Commerce Manager"
+	| "Pages"
+	| "Messenger API"
+	| "Graph API"
+	| "WhatsApp Business"
+	| "Instagram API";
 
 interface IncidentRow extends Record<string, unknown> {
-  id: string;
-  product: ProductName;
-  title: string;
-  status: 'ongoing' | 'identified' | 'monitoring' | 'resolved';
-  oncall: string;
-  startTime: string;
-  duration: string;
-  date: string;
-  dayOfWeek: number;
-  hour: number;
+	id: string;
+	product: ProductName;
+	title: string;
+	status: "ongoing" | "identified" | "monitoring" | "resolved";
+	oncall: string;
+	startTime: string;
+	duration: string;
+	date: string;
+	dayOfWeek: number;
+	hour: number;
 }
 
 const incidents: IncidentRow[] = [
-  // Active — ongoing
-  {
-    id: 'INC-4008',
-    product: 'Business Suite',
-    title:
-      'Notification delivery delays affecting mobile push and email channels, queue saturation under investigation',
-    oncall: 'Carlos Mendez',
-    status: 'ongoing',
-    startTime: '09:15',
-    duration: 'ongoing',
-    date: '2025-01-15',
-    dayOfWeek: 3,
-    hour: 9,
-  },
-  // Tue (2) 3pm — the only major outage cluster (3 incidents)
-  {
-    id: 'INC-4001',
-    product: 'Ads Manager',
-    title:
-      'Campaign creation timing out for ~12% of advertisers in EMEA region, root caused to elevated DB write latency',
-    oncall: 'Sarah Chen',
-    status: 'resolved',
-    startTime: '15:10',
-    duration: '2h 15m',
-    date: '2025-01-14',
-    dayOfWeek: 2,
-    hour: 15,
-  },
-  {
-    id: 'INC-4002',
-    product: 'Graph API',
-    title:
-      'Elevated 5xx error rates on /me and /me/accounts endpoints affecting third-party integrations globally',
-    oncall: 'David Kim',
-    status: 'resolved',
-    startTime: '15:30',
-    duration: '3h 20m',
-    date: '2025-01-14',
-    dayOfWeek: 2,
-    hour: 15,
-  },
-  {
-    id: 'INC-4003',
-    product: 'Instagram API',
-    title:
-      'Media upload failures for image and video content via /media endpoint affecting ~8% of publishers',
-    oncall: 'Priya Sharma',
-    status: 'resolved',
-    startTime: '15:05',
-    duration: '1h 50m',
-    date: '2025-01-14',
-    dayOfWeek: 2,
-    hour: 15,
-  },
-  // Tue (2) 4pm — spillover (2 incidents)
-  {
-    id: 'INC-4004',
-    product: 'Ads Manager',
-    title:
-      'Audience insights tab returning empty results due to cache invalidation cascade from earlier outage',
-    oncall: 'Marcus Rivera',
-    status: 'resolved',
-    startTime: '16:00',
-    duration: '45m',
-    date: '2025-01-14',
-    dayOfWeek: 2,
-    hour: 16,
-  },
-  {
-    id: 'INC-4005',
-    product: 'WhatsApp Business',
-    title:
-      'Outbound message delivery delays of 2-5 minutes for high-volume senders due to queue backpressure',
-    oncall: 'Elena Volkov',
-    status: 'resolved',
-    startTime: '16:20',
-    duration: '1h 15m',
-    date: '2025-01-14',
-    dayOfWeek: 2,
-    hour: 16,
-  },
-  // Thu (4) 10am — single incident
-  {
-    id: 'INC-4006',
-    product: 'Commerce Manager',
-    title:
-      'Product catalog sync failures from Shopify and BigCommerce integrations after schema migration deployed',
-    oncall: 'Noah Williams',
-    status: 'resolved',
-    startTime: '10:15',
-    duration: '2h 40m',
-    date: '2025-01-16',
-    dayOfWeek: 4,
-    hour: 10,
-  },
-  // Fri (5) 4pm — single incident
-  {
-    id: 'INC-4007',
-    product: 'Messenger API',
-    title:
-      'Webhook delivery failures for subscribed page events, retries succeeded but signaled false alerts',
-    oncall: 'Mei Lin',
-    status: 'resolved',
-    startTime: '16:30',
-    duration: '45m',
-    date: '2025-01-17',
-    dayOfWeek: 5,
-    hour: 16,
-  },
-  // Active incident
-  // Scattered minor blips — light pink cells
-  {
-    id: 'INC-4009',
-    product: 'Pages',
-    title:
-      'Image upload timeouts for posts larger than 4MB, auto-recovered after CDN region failover',
-    oncall: 'Fatima Al-Rashid',
-    status: 'resolved',
-    startTime: '11:00',
-    duration: '20m',
-    date: '2025-01-12',
-    dayOfWeek: 0,
-    hour: 11,
-  },
-  {
-    id: 'INC-4010',
-    product: 'Graph API',
-    title:
-      'Intermittent 503 errors on a single load balancer in us-east-1, auto-healed by health check rotation',
-    oncall: 'Lucas Andersson',
-    status: 'resolved',
-    startTime: '14:30',
-    duration: '15m',
-    date: '2025-01-13',
-    dayOfWeek: 1,
-    hour: 14,
-  },
-  {
-    id: 'INC-4011',
-    product: 'WhatsApp Business',
-    title:
-      'Template message rejections due to stale category cache for newly approved templates',
-    oncall: 'Sofia Garcia',
-    status: 'resolved',
-    startTime: '13:00',
-    duration: '30m',
-    date: '2025-01-16',
-    dayOfWeek: 4,
-    hour: 13,
-  },
-  {
-    id: 'INC-4012',
-    product: 'Commerce Manager',
-    title:
-      'Inventory count mismatch between checkout and catalog services for ~200 SKUs in test region',
-    oncall: 'Raj Kapoor',
-    status: 'resolved',
-    startTime: '12:00',
-    duration: '1h 00m',
-    date: '2025-01-17',
-    dayOfWeek: 5,
-    hour: 12,
-  },
-  {
-    id: 'INC-4013',
-    product: 'Instagram API',
-    title:
-      'Story insights data delayed by 30-60 minutes for accounts with >100K followers',
-    oncall: 'Emma Thompson',
-    status: 'resolved',
-    startTime: '10:00',
-    duration: '45m',
-    date: '2025-01-18',
-    dayOfWeek: 6,
-    hour: 10,
-  },
-  {
-    id: 'INC-4014',
-    product: 'Business Suite',
-    title:
-      'Slow inbox loading times (>3s p95) for accounts with large message histories, index rebuild in progress',
-    oncall: 'Andre Santos',
-    status: 'resolved',
-    startTime: '15:00',
-    duration: '25m',
-    date: '2025-01-15',
-    dayOfWeek: 3,
-    hour: 15,
-  },
+	// Active — ongoing
+	{
+		id: "INC-4008",
+		product: "Business Suite",
+		title:
+			"Notification delivery delays affecting mobile push and email channels, queue saturation under investigation",
+		oncall: "Carlos Mendez",
+		status: "ongoing",
+		startTime: "09:15",
+		duration: "ongoing",
+		date: "2025-01-15",
+		dayOfWeek: 3,
+		hour: 9,
+	},
+	// Tue (2) 3pm — the only major outage cluster (3 incidents)
+	{
+		id: "INC-4001",
+		product: "Ads Manager",
+		title:
+			"Campaign creation timing out for ~12% of advertisers in EMEA region, root caused to elevated DB write latency",
+		oncall: "Sarah Chen",
+		status: "resolved",
+		startTime: "15:10",
+		duration: "2h 15m",
+		date: "2025-01-14",
+		dayOfWeek: 2,
+		hour: 15,
+	},
+	{
+		id: "INC-4002",
+		product: "Graph API",
+		title:
+			"Elevated 5xx error rates on /me and /me/accounts endpoints affecting third-party integrations globally",
+		oncall: "David Kim",
+		status: "resolved",
+		startTime: "15:30",
+		duration: "3h 20m",
+		date: "2025-01-14",
+		dayOfWeek: 2,
+		hour: 15,
+	},
+	{
+		id: "INC-4003",
+		product: "Instagram API",
+		title:
+			"Media upload failures for image and video content via /media endpoint affecting ~8% of publishers",
+		oncall: "Priya Sharma",
+		status: "resolved",
+		startTime: "15:05",
+		duration: "1h 50m",
+		date: "2025-01-14",
+		dayOfWeek: 2,
+		hour: 15,
+	},
+	// Tue (2) 4pm — spillover (2 incidents)
+	{
+		id: "INC-4004",
+		product: "Ads Manager",
+		title:
+			"Audience insights tab returning empty results due to cache invalidation cascade from earlier outage",
+		oncall: "Marcus Rivera",
+		status: "resolved",
+		startTime: "16:00",
+		duration: "45m",
+		date: "2025-01-14",
+		dayOfWeek: 2,
+		hour: 16,
+	},
+	{
+		id: "INC-4005",
+		product: "WhatsApp Business",
+		title:
+			"Outbound message delivery delays of 2-5 minutes for high-volume senders due to queue backpressure",
+		oncall: "Elena Volkov",
+		status: "resolved",
+		startTime: "16:20",
+		duration: "1h 15m",
+		date: "2025-01-14",
+		dayOfWeek: 2,
+		hour: 16,
+	},
+	// Thu (4) 10am — single incident
+	{
+		id: "INC-4006",
+		product: "Commerce Manager",
+		title:
+			"Product catalog sync failures from Shopify and BigCommerce integrations after schema migration deployed",
+		oncall: "Noah Williams",
+		status: "resolved",
+		startTime: "10:15",
+		duration: "2h 40m",
+		date: "2025-01-16",
+		dayOfWeek: 4,
+		hour: 10,
+	},
+	// Fri (5) 4pm — single incident
+	{
+		id: "INC-4007",
+		product: "Messenger API",
+		title:
+			"Webhook delivery failures for subscribed page events, retries succeeded but signaled false alerts",
+		oncall: "Mei Lin",
+		status: "resolved",
+		startTime: "16:30",
+		duration: "45m",
+		date: "2025-01-17",
+		dayOfWeek: 5,
+		hour: 16,
+	},
+	// Active incident
+	// Scattered minor blips — light pink cells
+	{
+		id: "INC-4009",
+		product: "Pages",
+		title:
+			"Image upload timeouts for posts larger than 4MB, auto-recovered after CDN region failover",
+		oncall: "Fatima Al-Rashid",
+		status: "resolved",
+		startTime: "11:00",
+		duration: "20m",
+		date: "2025-01-12",
+		dayOfWeek: 0,
+		hour: 11,
+	},
+	{
+		id: "INC-4010",
+		product: "Graph API",
+		title:
+			"Intermittent 503 errors on a single load balancer in us-east-1, auto-healed by health check rotation",
+		oncall: "Lucas Andersson",
+		status: "resolved",
+		startTime: "14:30",
+		duration: "15m",
+		date: "2025-01-13",
+		dayOfWeek: 1,
+		hour: 14,
+	},
+	{
+		id: "INC-4011",
+		product: "WhatsApp Business",
+		title: "Template message rejections due to stale category cache for newly approved templates",
+		oncall: "Sofia Garcia",
+		status: "resolved",
+		startTime: "13:00",
+		duration: "30m",
+		date: "2025-01-16",
+		dayOfWeek: 4,
+		hour: 13,
+	},
+	{
+		id: "INC-4012",
+		product: "Commerce Manager",
+		title:
+			"Inventory count mismatch between checkout and catalog services for ~200 SKUs in test region",
+		oncall: "Raj Kapoor",
+		status: "resolved",
+		startTime: "12:00",
+		duration: "1h 00m",
+		date: "2025-01-17",
+		dayOfWeek: 5,
+		hour: 12,
+	},
+	{
+		id: "INC-4013",
+		product: "Instagram API",
+		title: "Story insights data delayed by 30-60 minutes for accounts with >100K followers",
+		oncall: "Emma Thompson",
+		status: "resolved",
+		startTime: "10:00",
+		duration: "45m",
+		date: "2025-01-18",
+		dayOfWeek: 6,
+		hour: 10,
+	},
+	{
+		id: "INC-4014",
+		product: "Business Suite",
+		title:
+			"Slow inbox loading times (>3s p95) for accounts with large message histories, index rebuild in progress",
+		oncall: "Andre Santos",
+		status: "resolved",
+		startTime: "15:00",
+		duration: "25m",
+		date: "2025-01-15",
+		dayOfWeek: 3,
+		hour: 15,
+	},
 ];
 
-const DAYS = [
-  'Jan 12',
-  'Jan 13',
-  'Jan 14',
-  'Jan 15',
-  'Jan 16',
-  'Jan 17',
-  'Jan 18',
-];
-const HOURS = [
-  '9am',
-  '10am',
-  '11am',
-  '12pm',
-  '1pm',
-  '2pm',
-  '3pm',
-  '4pm',
-  '5pm',
-];
+const DAYS = ["Jan 12", "Jan 13", "Jan 14", "Jan 15", "Jan 16", "Jan 17", "Jan 18"];
+const HOURS = ["9am", "10am", "11am", "12pm", "1pm", "2pm", "3pm", "4pm", "5pm"];
 
 function buildHeatmapData(data: IncidentRow[]) {
-  return HOURS.flatMap((hour, hi) =>
-    DAYS.map((day, di) => {
-      const hourValue = 9 + hi;
-      const count = data.filter(
-        o => o.dayOfWeek === di && o.hour === hourValue,
-      ).length;
-      return {day, hour, incidents: count};
-    }),
-  );
+	return HOURS.flatMap((hour, hi) =>
+		DAYS.map((day, di) => {
+			const hourValue = 9 + hi;
+			const count = data.filter((o) => o.dayOfWeek === di && o.hour === hourValue).length;
+			return { day, hour, incidents: count };
+		}),
+	);
 }
 
-const STATUS_TOKEN_COLOR: Record<
-  IncidentRow['status'],
-  'red' | 'yellow' | 'cyan' | 'green'
-> = {
-  ongoing: 'red',
-  identified: 'yellow',
-  monitoring: 'cyan',
-  resolved: 'green',
+const STATUS_TOKEN_COLOR: Record<IncidentRow["status"], "red" | "yellow" | "cyan" | "green"> = {
+	ongoing: "red",
+	identified: "yellow",
+	monitoring: "cyan",
+	resolved: "green",
 };
 
-const STATUS_LABEL: Record<IncidentRow['status'], string> = {
-  ongoing: 'Ongoing',
-  identified: 'Identified',
-  monitoring: 'Monitoring',
-  resolved: 'Resolved',
+const STATUS_LABEL: Record<IncidentRow["status"], string> = {
+	ongoing: "Ongoing",
+	identified: "Identified",
+	monitoring: "Monitoring",
+	resolved: "Resolved",
 };
 
 const columns: TableColumn<IncidentRow>[] = [
-  {
-    key: 'id',
-    header: 'Incident',
-    width: pixel(96),
-    renderCell: (item: IncidentRow) => (
-      <Link href="#/templates/table-page-heatmap-status" isStandalone>
-        {item.id}
-      </Link>
-    ),
-  },
-  {
-    key: 'product',
-    header: 'Product',
-    width: proportional(2, {minWidth: 120}),
-    renderCell: (item: IncidentRow) => (
-      <Text type="body" maxLines={1}>
-        {item.product}
-      </Text>
-    ),
-  },
-  {
-    key: 'title',
-    header: 'Description',
-    width: proportional(5, {minWidth: 160}),
-    renderCell: (item: IncidentRow) => (
-      <Text type="body" maxLines={2}>
-        {item.title}
-      </Text>
-    ),
-  },
-  {
-    key: 'startTime',
-    header: 'Started',
-    width: pixel(88),
-    renderCell: (item: IncidentRow) => (
-      <Text type="body" hasTabularNumbers maxLines={1}>
-        {item.startTime}
-      </Text>
-    ),
-  },
-  {
-    key: 'duration',
-    header: 'Duration',
-    width: pixel(96),
-    renderCell: (item: IncidentRow) => (
-      <Text type="body" hasTabularNumbers maxLines={1}>
-        {item.duration}
-      </Text>
-    ),
-  },
-  {
-    key: 'oncall',
-    header: 'On-call',
-    width: proportional(2, {minWidth: 120}),
-    renderCell: (item: IncidentRow) => (
-      <HStack gap={2} vAlign="center">
-        <Avatar name={item.oncall} size="sm" />
-        <StackItem size="fill">
-          <Text type="body" maxLines={1}>
-            {item.oncall}
-          </Text>
-        </StackItem>
-      </HStack>
-    ),
-  },
-  {
-    key: 'status',
-    header: 'Status',
-    width: pixel(120),
-    renderCell: (item: IncidentRow) => (
-      <Token
-        size="sm"
-        color={STATUS_TOKEN_COLOR[item.status]}
-        label={STATUS_LABEL[item.status]}
-      />
-    ),
-  },
-  {
-    key: 'date',
-    header: 'Date',
-    width: pixel(112),
-    renderCell: (item: IncidentRow) => (
-      <Text type="body" hasTabularNumbers maxLines={1}>
-        {item.date}
-      </Text>
-    ),
-  },
+	{
+		key: "id",
+		header: "Incident",
+		width: pixel(96),
+		renderCell: (item: IncidentRow) => (
+			<Link href="#/templates/table-page-heatmap-status" isStandalone>
+				{item.id}
+			</Link>
+		),
+	},
+	{
+		key: "product",
+		header: "Product",
+		width: proportional(2, { minWidth: 120 }),
+		renderCell: (item: IncidentRow) => (
+			<Text type="body" maxLines={1}>
+				{item.product}
+			</Text>
+		),
+	},
+	{
+		key: "title",
+		header: "Description",
+		width: proportional(5, { minWidth: 160 }),
+		renderCell: (item: IncidentRow) => (
+			<Text type="body" maxLines={2}>
+				{item.title}
+			</Text>
+		),
+	},
+	{
+		key: "startTime",
+		header: "Started",
+		width: pixel(88),
+		renderCell: (item: IncidentRow) => (
+			<Text type="body" hasTabularNumbers maxLines={1}>
+				{item.startTime}
+			</Text>
+		),
+	},
+	{
+		key: "duration",
+		header: "Duration",
+		width: pixel(96),
+		renderCell: (item: IncidentRow) => (
+			<Text type="body" hasTabularNumbers maxLines={1}>
+				{item.duration}
+			</Text>
+		),
+	},
+	{
+		key: "oncall",
+		header: "On-call",
+		width: proportional(2, { minWidth: 120 }),
+		renderCell: (item: IncidentRow) => (
+			<HStack gap={2} vAlign="center">
+				<Avatar name={item.oncall} size="sm" />
+				<StackItem size="fill">
+					<Text type="body" maxLines={1}>
+						{item.oncall}
+					</Text>
+				</StackItem>
+			</HStack>
+		),
+	},
+	{
+		key: "status",
+		header: "Status",
+		width: pixel(120),
+		renderCell: (item: IncidentRow) => (
+			<Token size="sm" color={STATUS_TOKEN_COLOR[item.status]} label={STATUS_LABEL[item.status]} />
+		),
+	},
+	{
+		key: "date",
+		header: "Date",
+		width: pixel(112),
+		renderCell: (item: IncidentRow) => (
+			<Text type="body" hasTabularNumbers maxLines={1}>
+				{item.date}
+			</Text>
+		),
+	},
 ];
 
 // ============= HEATMAP (hand SVG, Dracula ramp) =============
@@ -411,107 +382,107 @@ const columns: TableColumn<IncidentRow>[] = [
 // literal here is what let a --dracula-* primitive reach a chart mark: the
 // dictionary itself held primitives, so "use the module" was not available.
 function heatFill(count: number): string {
-  if (count >= 3) {
-    return CHART_HUES.red;
-  }
-  if (count === 2) {
-    return CHART_HUES.orange;
-  }
-  if (count === 1) {
-    return CHART_HUES.green;
-  }
-  // Zero is a magnitude, not a severity, so it wears the surface tier rather
-  // than a data hue -- which is why the legend type needs a background arm.
-  return 'var(--color-background-card)';
+	if (count >= 3) {
+		return CHART_HUES.red;
+	}
+	if (count === 2) {
+		return CHART_HUES.orange;
+	}
+	if (count === 1) {
+		return CHART_HUES.green;
+	}
+	// Zero is a magnitude, not a severity, so it wears the surface tier rather
+	// than a data hue -- which is why the legend type needs a background arm.
+	return "var(--color-background-card)";
 }
 
 // The zero swatch and its cell MUST move together: the legend is how a reader
 // learns what a colour means, so a legend that disagrees with the grid teaches
 // them the wrong mapping.
 const HEAT_LEGEND: readonly ChartLegendEntry[] = [
-  {label: '0', color: 'var(--color-background-card)'},
-  {label: '1', color: CHART_HUES.green},
-  {label: '2', color: CHART_HUES.orange},
-  {label: '3+', color: CHART_HUES.red},
+	{ label: "0", color: "var(--color-background-card)" },
+	{ label: "1", color: CHART_HUES.green },
+	{ label: "2", color: CHART_HUES.orange },
+	{ label: "3+", color: CHART_HUES.red },
 ];
 
 function OutageHeatmap() {
-  const heatmapData = buildHeatmapData(incidents);
-  const cellW = 56;
-  const cellH = 24;
-  const gap = 4;
-  const labelW = 44;
-  const labelH = 22;
-  const W = labelW + DAYS.length * (cellW + gap);
-  const H = labelH + HOURS.length * (cellH + gap);
-  const countFor = (day: string, hour: string) =>
-    heatmapData.find(d => d.day === day && d.hour === hour)?.incidents ?? 0;
-  return (
-    <VStack gap={3}>
-      <Card padding={4} style={CHART_PANEL_STYLE}>
-        <svg
-          viewBox={`0 0 ${W} ${H}`}
-          width="100%"
-          role="img"
-          aria-label="Incidents by day and hour, January 12 to 18">
-          {DAYS.map((day, di) => (
-            <ChartLabel
-              key={day}
-              x={labelW + di * (cellW + gap) + cellW / 2}
-              y={14}>
-              {day}
-            </ChartLabel>
-          ))}
-          {HOURS.map((hour, hi) => (
-            <g key={hour}>
-              <ChartLabel
-                x={labelW - 6}
-                y={labelH + hi * (cellH + gap) + cellH / 2 + 3}
-                textAnchor="end">
-                {hour}
-              </ChartLabel>
-              {DAYS.map((day, di) => {
-                const count = countFor(day, hour);
-                return (
-                  <g key={day}>
-                    <rect
-                      x={labelW + di * (cellW + gap)}
-                      y={labelH + hi * (cellH + gap)}
-                      width={cellW}
-                      height={cellH}
-                      rx={4}
-                      fill={heatFill(count)}
-                    />
-                    {/* Every cell prints its count, empty ones included, so
+	const heatmapData = buildHeatmapData(incidents);
+	const cellW = 56;
+	const cellH = 24;
+	const gap = 4;
+	const labelW = 44;
+	const labelH = 22;
+	const W = labelW + DAYS.length * (cellW + gap);
+	const H = labelH + HOURS.length * (cellH + gap);
+	const countFor = (day: string, hour: string) =>
+		heatmapData.find((d) => d.day === day && d.hour === hour)?.incidents ?? 0;
+	return (
+		<VStack gap={3}>
+			<Card padding={4} style={CHART_PANEL_STYLE}>
+				<svg
+					viewBox={`0 0 ${W} ${H}`}
+					width="100%"
+					role="img"
+					aria-label="Incidents by day and hour, January 12 to 18"
+				>
+					{DAYS.map((day, di) => (
+						<ChartLabel key={day} x={labelW + di * (cellW + gap) + cellW / 2} y={14}>
+							{day}
+						</ChartLabel>
+					))}
+					{HOURS.map((hour, hi) => (
+						<g key={hour}>
+							<ChartLabel
+								x={labelW - 6}
+								y={labelH + hi * (cellH + gap) + cellH / 2 + 3}
+								textAnchor="end"
+							>
+								{hour}
+							</ChartLabel>
+							{DAYS.map((day, di) => {
+								const count = countFor(day, hour);
+								return (
+									<g key={day}>
+										<rect
+											x={labelW + di * (cellW + gap)}
+											y={labelH + hi * (cellH + gap)}
+											width={cellW}
+											height={cellH}
+											rx={4}
+											fill={heatFill(count)}
+										/>
+										{/* Every cell prints its count, empty ones included, so
                         the ramp reinforces the number instead of carrying the
                         reading on its own. */}
-                    <ChartLabel
-                      x={labelW + di * (cellW + gap) + cellW / 2}
-                      y={labelH + hi * (cellH + gap) + cellH / 2 + 3}
-                      // On-fill ink follows the cell it sits on, so it takes
-                      // the --color-on-* arm for that status rather than one
-                      // fixed token. --color-on-dark is the wrong target here:
-                      // it is #F8F8F2, near-white, which would fail on the
-                      // saturated green/orange/red fills.
-                      fill={
-                        count >= 3
-                          ? 'var(--color-on-error)'
-                          : count === 2
-                            ? 'var(--color-on-warning)'
-                            : count === 1
-                              ? 'var(--color-on-success)'
-                              : undefined
-                      }>
-                      {count}
-                    </ChartLabel>
-                  </g>
-                );
-              })}
-            </g>
-          ))}
-        </svg>
-      </Card>
-      {/* Legend rows go through shared/chart-legend.tsx. The ramp itself stays
+										<ChartLabel
+											x={labelW + di * (cellW + gap) + cellW / 2}
+											y={labelH + hi * (cellH + gap) + cellH / 2 + 3}
+											// On-fill ink follows the cell it sits on, so it takes
+											// the --color-on-* arm for that status rather than one
+											// fixed token. --color-on-dark is the wrong target here:
+											// it is #F8F8F2, near-white, which would fail on the
+											// saturated green/orange/red fills.
+											fill={
+												count >= 3
+													? "var(--color-on-error)"
+													: count === 2
+														? "var(--color-on-warning)"
+														: count === 1
+															? "var(--color-on-success)"
+															: undefined
+											}
+										>
+											{count}
+										</ChartLabel>
+									</g>
+								);
+							})}
+						</g>
+					))}
+				</svg>
+			</Card>
+			{/* Legend rows go through shared/chart-legend.tsx. The ramp itself stays
           local: it encodes SEVERITY (0/1/2/3+ against green/orange/red), which
           is a status vocabulary, not a magnitude. A sequential magnitude ramp
           would invert this one — on a dark page a high count reads lighter,
@@ -519,18 +490,18 @@ function OutageHeatmap() {
           1..5 steps remain in tokens.css for a consumer that genuinely needs
           one; nothing in this kit does, which is why the module that wrapped
           them is gone. */}
-      <ChartLegend
-        entries={HEAT_LEGEND}
-        gap={2}
-        swatchSize={12}
-        caption={
-          <Text type="supporting" color="secondary">
-            Incidents by day and hour · Jan 12–18
-          </Text>
-        }
-      />
-    </VStack>
-  );
+			<ChartLegend
+				entries={HEAT_LEGEND}
+				gap={2}
+				swatchSize={12}
+				caption={
+					<Text type="supporting" color="secondary">
+						Incidents by day and hour · Jan 12–18
+					</Text>
+				}
+			/>
+		</VStack>
+	);
 }
 
 // ============= PAGE =============
@@ -541,56 +512,54 @@ function OutageHeatmap() {
 // the scroll. LayoutContent is overflow:auto, so the definite height lands as a
 // content-pane scroller rather than a clip. Same shape as dashboard.tsx and
 // editor.tsx:302.
-const pageStyle: CSSProperties = {height: '100dvh'};
+const pageStyle: CSSProperties = { height: "100dvh" };
 
 export default function HeatmapTable() {
-  return (
-    <Layout
-      style={pageStyle}
-      height="fill"
-      header={
-        <LayoutHeader hasDivider padding={6}>
-          <HStack gap={2} vAlign="center">
-            <StackItem size="fill">
-              <Heading level={1} type="display-2">Status</Heading>
-            </StackItem>
-            <IconButton
-              label="Filter"
-              icon={<Icon icon={Filter} size="sm" />}
-              variant="ghost"
-              tooltip="Filter"
-            />
-            <IconButton
-              label="Export"
-              icon={<Icon icon={Download} size="sm" />}
-              variant="ghost"
-              tooltip="Export"
-            />
-            <Button
-              label="Refresh"
-              variant="secondary"
-              icon={<Icon icon={RotateCw} size="sm" />}
-            />
-          </HStack>
-        </LayoutHeader>
-      }
-      content={
-        <LayoutContent padding={3}>
-          <VStack gap={4}>
-            <OutageHeatmap />
+	return (
+		<Layout
+			style={pageStyle}
+			height="fill"
+			header={
+				<LayoutHeader hasDivider padding={6}>
+					<HStack gap={2} vAlign="center">
+						<StackItem size="fill">
+							<Heading level={1} type="display-2">
+								Status
+							</Heading>
+						</StackItem>
+						<IconButton
+							label="Filter"
+							icon={<Icon icon={Filter} size="sm" />}
+							variant="ghost"
+							tooltip="Filter"
+						/>
+						<IconButton
+							label="Export"
+							icon={<Icon icon={Download} size="sm" />}
+							variant="ghost"
+							tooltip="Export"
+						/>
+						<Button label="Refresh" variant="secondary" icon={<Icon icon={RotateCw} size="sm" />} />
+					</HStack>
+				</LayoutHeader>
+			}
+			content={
+				<LayoutContent padding={3}>
+					<VStack gap={4}>
+						<OutageHeatmap />
 
-            <Table<IncidentRow>
-              data={incidents}
-              columns={columns}
-              idKey="id"
-              density="balanced"
-              dividers="rows"
-              textOverflow="truncate"
-              hasHover
-            />
-          </VStack>
-        </LayoutContent>
-      }
-    />
-  );
+						<Table<IncidentRow>
+							data={incidents}
+							columns={columns}
+							idKey="id"
+							density="balanced"
+							dividers="rows"
+							textOverflow="truncate"
+							hasHover
+						/>
+					</VStack>
+				</LayoutContent>
+			}
+		/>
+	);
 }

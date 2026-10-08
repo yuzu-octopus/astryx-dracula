@@ -2,71 +2,68 @@
 // astryx-theme.ts at runtime. The prebuilt 4-import block (reset + astryx +
 // tokens + theme.css files, see USAGE.md) is the zero-runtime alternative —
 // same hexes, no runtime cost. Demo uses this file + provider wrappers.
-import '@astryxdesign/core/reset.css';
-import '@astryxdesign/core/astryx.css';
-import '../tokens.css';
-import { StrictMode, Suspense, lazy, useEffect, useState } from 'react';
-import { createRoot } from 'react-dom/client';
-import App from './App';
-import { BareTemplate, TemplateDetail, TemplatesIndex } from './Templates';
-import { TEMPLATE_IDS } from './templateRegistry';
+import "@astryxdesign/core/reset.css";
+import "@astryxdesign/core/astryx.css";
+import "../tokens.css";
+import { lazy, StrictMode, Suspense, useEffect, useState } from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App";
+import { SiteShell } from "./Chrome";
+import { BareTemplate, TemplateDetail, TemplatesIndex } from "./Templates";
+import { TEMPLATE_IDS } from "./templateRegistry";
 
-import { SiteShell } from './Chrome';
-
-const Bento = lazy(() =>
-  import('./Bento').then((m) => ({ default: m.Bento })),
-);
+const Bento = lazy(() => import("./Bento").then((m) => ({ default: m.Bento })));
 
 function useHash(): string {
-  const [hash, setHash] = useState(window.location.hash);
-  useEffect(() => {
-    const fn = () => setHash(window.location.hash);
-    window.addEventListener('hashchange', fn);
-    return () => window.removeEventListener('hashchange', fn);
-  }, []);
-  return hash;
+	const [hash, setHash] = useState(window.location.hash);
+	useEffect(() => {
+		const fn = () => setHash(window.location.hash);
+		window.addEventListener("hashchange", fn);
+		return () => window.removeEventListener("hashchange", fn);
+	}, []);
+	return hash;
 }
 
 function Router() {
-  const params = new URLSearchParams(window.location.search);
-  // `?bare=<id>` renders a template with no viewer chrome. The templates index
-  // loads each page through this so the template gets a frame of its own.
-  // Unknown and empty values render the index instead: a blank screen has no
-  // way back to the showcase.
-  const bare = params.get('bare');
-  const hash = useHash();
-  if (bare != null) {
-    return (
-      <Suspense fallback={null}>
-        {TEMPLATE_IDS.includes(bare) ? <BareTemplate id={bare} /> : <TemplatesIndex />}
-      </Suspense>
-    );
-  }
-  // The bento is a showcase page, so it gets the site chrome like every other
-  // one -- the nav is how a visitor finds the rest of the kit.
-  if (hash === '#/bento') {
-    return (
-      <Suspense fallback={null}>
-        <SiteShell ctaHref="#/templates" isWide>
-          <Bento />
-        </SiteShell>
-      </Suspense>
-    );
-  }
-  if (hash === '#/templates') return <TemplatesIndex />;
-  const match = hash.match(/^#\/templates\/([\w-]+)$/);
-  if (match) {
-    return (
-      <Suspense fallback={null}>
-        <TemplateDetail id={match[1]} />
-      </Suspense>
-    );
-  }
-  return <App />;
+	const params = new URLSearchParams(window.location.search);
+	// `?bare=<id>` renders a template with no viewer chrome. The templates index
+	// loads each page through this so the template gets a frame of its own.
+	// Unknown and empty values render the index instead: a blank screen has no
+	// way back to the showcase.
+	const bare = params.get("bare");
+	const hash = useHash();
+	if (bare != null) {
+		return (
+			<Suspense fallback={null}>
+				{TEMPLATE_IDS.includes(bare) ? <BareTemplate id={bare} /> : <TemplatesIndex />}
+			</Suspense>
+		);
+	}
+	// The bento is a showcase page, so it gets the site chrome like every other
+	// one -- the nav is how a visitor finds the rest of the kit.
+	if (hash === "#/bento") {
+		return (
+			<Suspense fallback={null}>
+				<SiteShell ctaHref="#/templates" isWide>
+					<Bento />
+				</SiteShell>
+			</Suspense>
+		);
+	}
+	if (hash === "#/templates") return <TemplatesIndex />;
+	const match = hash.match(/^#\/templates\/([\w-]+)$/);
+	if (match) {
+		return (
+			<Suspense fallback={null}>
+				<TemplateDetail id={match[1]} />
+			</Suspense>
+		);
+	}
+	return <App />;
 }
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <Router />
-  </StrictMode>,
+createRoot(document.getElementById("root")!).render(
+	<StrictMode>
+		<Router />
+	</StrictMode>,
 );
