@@ -166,3 +166,23 @@ Before tagging a release:
 3. Rebuild and gate: `bun run theme:build`, then `bun run theme:check`, then `bun run audit`, then `bunx react-doctor@latest` (must stay 100/100).
 4. Counts in the docs are cited with the command that produces them, so there is nothing to refresh by hand. If you find a bare numeral, replace it with its command.
 5. `npm publish` runs the same four gates itself via `prepublishOnly`, so a tree that fails cannot reach the registry. There is no publish workflow in CI — publishing is deliberately a human step.
+
+### The toolchain
+
+One tool per job, so nothing formats the same bytes twice:
+
+- **`bun`** installs, runs scripts, typechecks (`bun check`) and formats (`bun fmt`). The format style
+  lives in `bunfig.toml` — tabs, 100 columns, semicolons, double quotes.
+- **Biome** still runs, but as the **linter** only (`bun run lint`); its formatter is off in
+  `biome.json`. The lint rules are the part worth keeping: unused imports, non-null assertions,
+  `!important`, import organisation.
+- **Markdown is not formatted by either tool.** `bun fmt` restructures markdown — emphasis marks,
+  list spacing, blockquote reflow — which is churn prose never had, so the `fmt` scripts name the
+  code extensions explicitly.
+- **The generated outputs are never formatted.** `theme.css`, `astryx-dracula.js`, the `.d.ts`
+  files and `icons.mjs` are build products, compared byte-for-byte against a fresh build by
+  `theme:check` and `icons:check`. A formatter that touches them breaks the freshness gate, so
+  they are listed in `.gitignore` (they stay tracked, and npm's `files` array still ships them).
+- **`bun build` needs `NODE_ENV=production`.** Bun 1.4.4 defaults the bundler to the
+  *development* JSX runtime, so an unbundled build emitted `jsxDEV` and would have shipped
+  React's dev build inside the package. `icons:build` sets it.

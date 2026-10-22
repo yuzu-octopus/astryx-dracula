@@ -10,6 +10,7 @@
 	"devDependencies": {
 		"@astryxdesign/cli": "0.7.2",
 		"@astryxdesign/core": "0.7.2",
+		"@biomejs/biome": "2.6.2",
 		"@types/bun": "^1.4.3",
 		"@types/node": "^26.6.5",
 		"@types/react": "^19.3.0",
@@ -101,15 +102,18 @@
 	"scripts": {
 		"audit": "bun run fonts:sync && bun scripts/check.ts",
 		"fonts:sync": "mkdir -p public/fonts && cp fonts/*.woff2 public/fonts/",
-		"build": "tsc --noEmit && vite build",
+		"build": "bun check && vite build",
 		"dev": "vite",
 		"preview": "vite preview",
 		"theme:build": "bun run icons:build && bunx astryx theme build astryx-theme.ts -o theme.css --icons-specifier ./icons.mjs",
-		"icons:build": "bun build icons.tsx --outfile icons.mjs --format esm --external react --external lucide-react",
+		"icons:build": "NODE_ENV=production bun build icons.tsx --outfile icons.mjs --format esm --external react --external lucide-react",
 		"theme:check": "bun run icons:check && bunx astryx theme build astryx-theme.ts -o theme.css --icons-specifier ./icons.mjs --check --json | bun -e 'const r = JSON.parse(await Bun.stdin.text()); if (r.type !== \"theme.build.check\") { console.error(\"theme:check: unexpected CLI response \" + JSON.stringify(r).slice(0, 200)); process.exit(1); } const stale = r.data.stale; for (const s of stale) console.error(\"stale: \" + s.path + \" (\" + s.reason + \")\"); if (stale.length) process.exit(1); const entry = await import(\"./astryx-dracula.js\"); if (!entry.astryxDraculaTheme || !entry.draculaIconRegistry) { console.error(\"astryx-dracula.js is missing its theme or icon registry export\"); process.exit(1); } console.log(\"theme outputs up to date; astryx-dracula.js (hand-maintained) loads and exports\");' && bun run entry:check",
-		"icons:check": "bun build icons.tsx --outfile .tmp-icons.mjs --format esm --external react --external lucide-react; s=$?; cmp -s .tmp-icons.mjs icons.mjs; c=$?; rm -f .tmp-icons.mjs; [ $s -eq 0 ] && [ $c -eq 0 ] || { echo 'stale: icons.mjs (rerun bun run icons:build)'; exit 1; }",
+		"icons:check": "NODE_ENV=production bun build icons.tsx --outfile .tmp-icons.mjs --format esm --external react --external lucide-react; s=$?; cmp -s .tmp-icons.mjs icons.mjs; c=$?; rm -f .tmp-icons.mjs; [ $s -eq 0 ] && [ $c -eq 0 ] || { echo 'stale: icons.mjs (rerun bun run icons:build)'; exit 1; }",
 		"entry:check": "node -e \"const{pathToFileURL}=require('url');const{resolve}=require('path');import(pathToFileURL(resolve('astryx-dracula.js')).href).then(m=>{if(!m.astryxDraculaTheme||!m.draculaIconRegistry){console.error('astryx-dracula.js is missing its theme or icon registry export');process.exit(1)}console.log('astryx-dracula.js loads under plain Node ESM')}).catch(e=>{console.error('astryx-dracula.js is not importable by Node ESM: '+e.message);process.exit(1)})\"",
-		"prepublishOnly": "bun run theme:check && bun run icons:check && bun run entry:check && bun run audit && tsc --noEmit && bunx react-doctor@latest --score"
+		"prepublishOnly": "bun run theme:check && bun run icons:check && bun run entry:check && bun run audit && bun check && bun run fmt:check && bun run lint && bunx react-doctor@latest --score",
+		"fmt": "bun fmt '**/*.{ts,tsx,mjs,js,jsx,json,css}'",
+		"fmt:check": "bun fmt --check '**/*.{ts,tsx,mjs,js,jsx,json,css}'",
+		"lint": "biome lint"
 	},
 	"sideEffects": [
 		"**/*.css"
@@ -119,5 +123,5 @@
 		"@astryxdesign/cli"
 	],
 	"type": "module",
-	"version": "0.6.0"
+	"version": "0.6.1"
 }

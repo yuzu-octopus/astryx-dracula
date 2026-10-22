@@ -52,5 +52,16 @@ local/
 # Generated - fonts:sync rebuilds from fonts/
 public/fonts/
 
+# Generated build outputs. These stay TRACKED (they ship in the npm tarball via
+# package.json "files", which wins over .gitignore) and the freshness gates
+# compare them byte-for-byte against a fresh build — so a formatter must not
+# touch them. Gitignoring is how `bun fmt` is told to skip a tracked file.
+theme.css
+theme.css.d.ts
+astryx-dracula.js
+astryx-dracula.d.ts
+astryx-dracula.variants.d.ts
+icons.mjs
+
 # npm verification leftovers; this repo locks with bun
 package-lock.json

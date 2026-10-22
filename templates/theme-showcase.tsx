@@ -72,15 +72,7 @@ const PRODUCT_COLUMNS = { minWidth: 200, max: 3 } as const;
 
 /** Categorical badge variants usable for showcase product/inventory tags. */
 export type ShowcaseBadgeVariant =
-	| "blue"
-	| "cyan"
-	| "green"
-	| "orange"
-	| "pink"
-	| "purple"
-	| "red"
-	| "teal"
-	| "yellow";
+	"blue" | "cyan" | "green" | "orange" | "pink" | "purple" | "red" | "teal" | "yellow";
 
 export interface ProductSpec {
 	name: string;

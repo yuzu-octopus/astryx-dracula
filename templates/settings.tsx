@@ -67,13 +67,7 @@ const settingsSearchSource: SearchSource<SearchableItem> = {
 // the fields in the right column. Text and check fields share one row shape;
 // the renderer switches on `kind`.
 type SettingsTextKey =
-	| "username"
-	| "firstName"
-	| "lastName"
-	| "email"
-	| "currentPw"
-	| "newPw"
-	| "confirmPw";
+	"username" | "firstName" | "lastName" | "email" | "currentPw" | "newPw" | "confirmPw";
 type SettingsCheckKey = "dataExport" | "adminMembers" | "twoFactor";
 type SettingsField =
 	| {

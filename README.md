@@ -66,6 +66,9 @@ demo/             showcase source, deployed to GitHub Pages
 | `bun run theme:build`| Rebuild `theme.css` from the source        |
 | `bun run theme:check`| Fail if committed theme outputs are stale  |
 | `bun run build`      | Typecheck plus showcase build              |
+| `bun run fmt`        | Format the source (`bun fmt`; style in `bunfig.toml`) |
+| `bun run fmt:check`  | Fail if the source is not formatted        |
+| `bun run lint`       | Biome, lint only — the formatter is `bun fmt` |
 | `bunx react-doctor@latest` | Component health scan (currently 100/100) |
 
 ## Attribution & License

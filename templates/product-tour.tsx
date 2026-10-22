@@ -2,7 +2,7 @@
 // XLE (canonical structure of the tree below; the CLI had no XLE validator
 // after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
 // human drift check — update it with the file, never alone):
-//   A[cp=0 h=auto @sideNav=(SN[collapsible header=SideNavHeading] > (SNS"Getting started" > (SNI"Introduction"! + SNI"Install")) + (SNS"The brand" > (SNI"Palette" + SNI"Type and shape")) + (SNS"In practice" > (SNI"Components" + SNI"Templates")) + (SNS"Reference" > (SNI"Tokens" + SNI"Migrating"))))] > L[h=auto] > (LC[p=8 !scroll] > V[g=8] > (V[g=2] > (H[g=2 a=center] > MNT + Tx"Documentation"[t=supporting]) + Hd"Introduction"[level=1 t=display-2] + Tx"astryx-dracula v0.6.0"[t=supporting] + SE{Selector}"On this page") + Tx"astryx-dracula is a pure Dracula brand theme"[t=large] + AR[ratio=16/9] + (V[g=8] > (V[g=3] > Hd"What it is"[level=2] + Tx"Four decisions shape everything else"[t=body] + (UL > LI*4)))*2) + D + (H[g=3 j=between a=center] > SI[fill] + B.secondary"Install")) + (LP[!scroll] > Outline)
+//   A[cp=0 h=auto @sideNav=(SN[collapsible header=SideNavHeading] > (SNS"Getting started" > (SNI"Introduction"! + SNI"Install")) + (SNS"The brand" > (SNI"Palette" + SNI"Type and shape")) + (SNS"In practice" > (SNI"Components" + SNI"Templates")) + (SNS"Reference" > (SNI"Tokens" + SNI"Migrating"))))] > L[h=auto] > (LC[p=8 !scroll] > V[g=8] > (V[g=2] > (H[g=2 a=center] > MNT + Tx"Documentation"[t=supporting]) + Hd"Introduction"[level=1 t=display-2] + Tx"astryx-dracula v0.6.1"[t=supporting] + SE{Selector}"On this page") + Tx"astryx-dracula is a pure Dracula brand theme"[t=large] + AR[ratio=16/9] + (V[g=8] > (V[g=3] > Hd"What it is"[level=2] + Tx"Four decisions shape everything else"[t=body] + (UL > LI*4)))*2) + D + (H[g=3 j=between a=center] > SI[fill] + B.secondary"Install")) + (LP[!scroll] > Outline)
 
 /**
  * Product Tour — a chaptered walkthrough of this theme.
@@ -855,7 +855,7 @@ export default function ProductTour() {
 			railHref={SELF_HASH}
 			railIcon={<Icon icon={Sparkles} size="sm" />}
 			eyebrow="Documentation"
-			badge={() => "astryx-dracula v0.6.0"}
+			badge={() => "astryx-dracula v0.6.1"}
 			art={(chapterId) => <ChapterArt chapterId={chapterId} />}
 		/>
 	);

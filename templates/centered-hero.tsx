@@ -2,7 +2,7 @@
 // XLE (canonical structure of the tree below; the CLI had no XLE validator
 // after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
 // human drift check — update it with the file, never alone):
-//   L[h=auto] > LC[p=6] > V[g=10] > ((V[g=6 a=center] > (V[g=3 a=center] > Hd"Small joys for creatures of the night"[level=1 t=display-2] + Tx"Sometimes all it takes is one small ritual to turn the whole night around."[t=body] + Tx"astryx-dracula v0.6.0"[t=supporting]) + (H[j=center g=3] > B.primary"Embrace the night" + B.secondary"Read the lore")) + (S.transparent[p=0] > AR[ratio=16/9] > Scene{SceneCastle}))
+//   L[h=auto] > LC[p=6] > V[g=10] > ((V[g=6 a=center] > (V[g=3 a=center] > Hd"Small joys for creatures of the night"[level=1 t=display-2] + Tx"Sometimes all it takes is one small ritual to turn the whole night around."[t=body] + Tx"astryx-dracula v0.6.1"[t=supporting]) + (H[j=center g=3] > B.primary"Embrace the night" + B.secondary"Read the lore")) + (S.transparent[p=0] > AR[ratio=16/9] > Scene{SceneCastle}))
 
 import { AspectRatio } from "@astryxdesign/core/AspectRatio";
 import { Button } from "@astryxdesign/core/Button";
@@ -41,7 +41,7 @@ export default function CenteredHero() {
 									Sometimes all it takes is one small ritual to turn the whole night around.
 								</Text>
 								<Text type="supporting" color="secondary" justify="center" hasTabularNumbers>
-									astryx-dracula v0.6.0
+									astryx-dracula v0.6.1
 								</Text>
 							</VStack>
 							<HStack gap={3} wrap="wrap" justify="center">
