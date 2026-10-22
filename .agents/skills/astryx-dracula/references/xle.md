@@ -50,9 +50,13 @@ names a component the template does not import.
 `TR` TableRow · `TC` TableCell · `THC` TableHeaderCell · `UL` List ·
 `LI` ListItem · `TrL` TreeList · `ML` MetadataList · `MLI` MetadataListItem ·
 `Tbar` Toolbar · `OFL` OverflowList · `Po` Popover · `PS` PowerSearch ·
-`MM` MoreMenu · `SG` SegmentedGroup · `SGI` SegmentedGroupItem ·
-`SE` SegmentedControl / Selector · `Tg` ToggleButton · `TgG` ToggleButtonGroup ·
-`Coll` Collapsible · `ColG` CollapsibleGroup
+`MM` MoreMenu · `SG` SegmentedControl · `SGI` SegmentedControlItem ·
+`SE` Selector · `Tg` ToggleButton · `TgG` ToggleButtonGroup ·
+`Coll` Collapsible · `ColG` CollapsibleGroup · `Dlg` Dialog · `DH` DialogHeader ·
+`Drawer` Drawer · `DrawerHeader` DrawerHeader · `Sk` Skeleton ·
+`TNI` TopNavItem · `TNI{TopNavMegaMenu}` TopNavMegaMenu ·
+`CmdP` CommandPalette · `DD` DropdownMenu · `EmptyState` EmptyState ·
+`TS` Timestamp · `RH` ResizeHandle
 
 **Text and marks** — `Hd` Heading · `Tx` Text · `Lk` Link · `Ic` Icon ·
 `IB` IconButton · `Tk` Token · `Av` Avatar · `SD` StatusDot · `AR` AspectRatio ·
