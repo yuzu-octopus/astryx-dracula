@@ -2,7 +2,7 @@
 // XLE (canonical structure of the tree below; the CLI had no XLE validator
 // after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
 // human drift check — update it with the file, never alone):
-//   L[h=auto] > LC[p=6] > V[g=10] > (V[g=6 a=center] > (V[g=3 a=center] > Hd"Little haunts, everywhere you roam"[level=1 t=display-2] + Tx"Sometimes all it takes"[t=body]) + (H[j=center g=3] > B.primary"Enter the gallery" + B.secondary"Read the lore")) + (G[c={min:200} g=4] > AR*3)
+//   L[h=auto] > LC[p=6] > V[g=10] > (V[g=6 a=center] > (V[g=3 a=center] > Hd"Little haunts, everywhere you roam"[level=1 t=display-2] + Tx"Sometimes all it takes"[t=body]) + (H[j=center g=3] > B.primary"Enter the gallery" + B.secondary"Read the lore")) + (G[c={min:200} g=4] > AR[ratio=4/5] > Scene{SceneCastle}*3)
 
 import { AspectRatio } from "@astryxdesign/core/AspectRatio";
 import { Button } from "@astryxdesign/core/Button";

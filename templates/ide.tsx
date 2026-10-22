@@ -2,7 +2,7 @@
 // XLE (canonical structure of the tree below; the CLI had no XLE validator
 // after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
 // human drift check — update it with the file, never alone):
-//   L > (LP[p=4] > V[g=2] > TI"Search files" + TreeList) + (LC[p=0] > (Hd"Code editor"[level=1] + H > (SI[fill] > Cd) + (H > (TL > Tab"Terminal"! + Tab"Problems" + Tab"Output" + Tab"Debug") + Cd))) + (LP[p=4] > V[g=3] > (SG > SGI"Properties"! + SGI"History") + (V[g=3] > (V[g=1] > Hd"NightCounter.tsx"[level=3] + Tx"src/components/NightCounter.tsx"[t=supporting]) + ML + (V[g=2] > B.secondary"Format Document" + B.secondary"Go to Definition" + B.secondary"Find References")))
+//   L[h=fill] > LC[p=0] > (VH"Code editor" + L[h=fill] > (LP[w=256 p=4] > V[g=2] > TI"Search the night" + TrL) + RH + (LC[p=0] > L[h=fill] > (LC[p=0] > V > (SI[fill] > Cd) + RH + (V[h=300] > (TL[size=sm] > Tab"Terminal"! + Tab"Problems" + Tab"Output" + Tab"Debug") + (SI[fill] > Cd))) + (RH + (LP[w=320 p=4] > V[g=3] > (SG > SGI"Properties"! + SGI"History") + (V[g=3] > (V[g=1] > Hd"NightCounter.tsx"[level=3] + Tx"src/components/NightCounter.tsx"[t=supporting]) + ML + (V[g=2] > B.secondary"Format Document" + B.secondary"Go to Definition" + B.secondary"Find References")) + (V[g=1] > UL > LI*3)))))
 
 import { Button } from "@astryxdesign/core/Button";
 import { Center } from "@astryxdesign/core/Center";

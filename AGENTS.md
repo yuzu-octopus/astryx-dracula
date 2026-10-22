@@ -95,6 +95,13 @@ Templates are the reference implementation. Read the closest `templates/<id>.tsx
 header comment, which is the structural map of the tree it renders — before writing a new pattern.
 Core's `.d.ts` describes the API; it does not describe how this brand uses it.
 
+The XLE header is **gated**, and the notation is **written down**. CLI 0.7.0 removed
+`astryx layout check`, so the headers became prose nobody could check and an audit found drift in
+all 45 of them. Two things came out of it: `.agents/skills/astryx-dracula/references/xle.md` now
+carries the node vocabulary (the one that had been implicit for 45 templates), and
+`scripts/check.ts` fails when a header names a component the template does not import. Read the
+vocabulary before writing a header, and update the header with the file — never the header alone.
+
 `templates/<id>.template.mjs` is **metadata, not structure**: it carries the page's `type`, `name`,
 `description`, `category` and the `keywords` the CLI matches `astryx search` and `astryx build`
 against. It does not list the page's blocks and it holds no XLE — the XLE lives in the `.tsx`

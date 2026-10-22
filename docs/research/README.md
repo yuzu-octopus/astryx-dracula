@@ -133,7 +133,13 @@ AA floor, 44 where touch matters). Truth:
 **xle-drift** — probed 2026-10-22, after the core+CLI 0.7.2 upgrade. Two
 independent read-only audits swept all 45 templates' XLE headers against their
 own source, because CLI 0.7.0 removed `astryx layout check` and nothing
-replaced it — the headers became unforced prose. 26 corrections landed (each
-verified against the template's own source, since three of the audit's quotes
-were wrong); the rest is inventoried in `xle-drift.md`, split into "needs a
-notation token that does not exist yet" and "structure that was flattened".
+replaced it — the headers became unforced prose, and every one of them had
+drifted. The cause was that the notation had never been written down: 69 node
+names, a mixed convention, and one outright collision (`TL` meant TabList in
+five templates and TreeList in a sixth). So the vocabulary is now in
+`references/xle.md`, all 45 headers were rewritten against it, and
+`scripts/check.ts` gained a gate that fails when a header names a component
+the template does not import. A third pass audited the result with no knowledge
+of the work that produced it, because the gate is blind to one class — a
+component that IS imported but attributed to the wrong place in the header.
+Record and traps in `xle-drift.md`.

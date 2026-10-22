@@ -2,7 +2,7 @@
 // XLE (canonical structure of the tree below; the CLI had no XLE validator
 // after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
 // human drift check — update it with the file, never alone):
-//   Ctr > S.transparent[p=10] > V[g=10] > (G[c={min:280,max:2} g=10] > (V[g=6] > (V[g=3] > Hd"Let's conjure together"[level=1 t=display-1] + Tx"Tell us what you're brewing"[t=body]) + AR) + (C[p=4] > V[g=4] > Hd"Your details"[level=2] + TI"Full name"[req] + (G[c={min:180} g=3] > TI"Email"[req] + TI"Company") + (G[c={min:180} g=3] > TI"Job title" + TI"Phone") + (V[g=2] > Tx"What are you reaching out about?"[t=label] + (H[g=2] > Tk"Reason"*7)) + SE"Budget" + TA"Project details" + B.primary"Send it into the night")) + (V[g=6] > D + (G[c={min:200} g=6] > (V[g=1 a=center] > Tx"General"[t=supporting] + Lk"hello@castle.dracula")*3))
+//   Ctr > S.transparent[mw=1100 w=100% p=10] > V[g=10] > (G[c={min:280,max:2} g=10 a=center] > (V[g=6] > (V[g=3] > Hd"Let's conjure together"[level=1 t=display-1] + Tx"Tell us what you're brewing"[t=body]) + (AR[ratio=4/3] > Scene{SceneCastle})) + (C[p=4] > V[g=4] > Hd"Your details"[level=2] + TI"Full name"[req] + (G[c={min:180} g=3] > TI"Email"[req] + TI"Company name") + (G[c={min:180} g=3] > TI"Job title" + TI"Phone number") + (V[g=2] > Tx"What are you reaching out about?"[t=label] + (H[g=2] > Tk"Reason"*7)) + SE"Budget range" + TA"Project details" + Bn.success"Sent into the night" + (V[a=stretch] > B.primary"Send it into the night"))) + (V[g=6] > D + (G[c={min:200} g=6] > (V[g=1 a=center] > Tx"General"[t=supporting] + Lk"hello@castle.dracula")*3))
 
 import { AspectRatio } from "@astryxdesign/core/AspectRatio";
 import { Banner } from "@astryxdesign/core/Banner";

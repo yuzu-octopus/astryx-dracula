@@ -287,9 +287,12 @@ for three literal string rules — `variant="section"`, `weight="bold"`, and
 `<Layout>` without an explicit height — plus the zero-`!important` sweep over
 CSS sources and TSX (skipping the one line in `tokens.css` that states the rule
 in prose), plus a **two-directional gate that `package.json` `exports` agrees
-with `shared/`**.
+with `shared/`**, plus a gate that every `--color-data-*` fallback in source
+equals the theme's own pin, plus a gate that `tokens.css` and `theme.css` agree
+on the `--color-syntax-*` family, plus a gate that **no template's XLE header
+names a component the template does not import**.
 
-That last one is worth knowing why it exists. The map is hand-maintained, so it
+The exports gate is worth knowing why it exists. The map is hand-maintained, so it
 drifts silently in both directions, and each direction has a different blast
 radius. A **deleted** module leaves an entry pointing at a file that no longer
 exists *and still ships*, because `files` globs `shared/` independently of
@@ -297,6 +300,25 @@ exists *and still ships*, because `files` globs `shared/` independently of
 deletion and stayed published. A **new** module with no entry fails only in a
 *consumer's* `tsc`, never in ours, so the breakage lands on someone else and
 costs a bug report. The second direction is the expensive one.
+
+The XLE gate is the newest one, and it exists because CLI 0.7.0 removed
+`astryx layout check`: the XLE headers became prose nobody could check, and an
+audit of all 45 templates found drift in every one of them. The gate is
+one-directional on purpose — a template may import a component it does not put
+in the header, but a header may not name a component the template does not
+import. It follows the shared modules a template imports (so a template that
+delegates to `shared/chaptered-doc.tsx` is checked against the tree THAT
+module renders) and it counts locally declared components as well as imported
+ones.
+
+**What it does NOT catch**, because no import check can: a component that IS
+imported and used elsewhere in the file, but attributed to the wrong place in
+the header. `<VisuallyHidden as="h1">` written as `Hd"…"[level=1]` passes the
+gate whenever the file also renders a real `Heading` somewhere else. That class
+is caught by reading, not by a gate — which is why the vocabulary in
+`references/xle.md` is the authority on which token means which component, and
+why the notation's payload rule ("the RENDERED string, not a label") matters:
+the gate cannot see a payload that is a placeholder rather than what renders.
 
 Compare keys **extensionless on both sides**: `exports` keys are specifiers
 (`./shared/scene-hues`), so comparing them to filenames reports every module as

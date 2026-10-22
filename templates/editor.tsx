@@ -2,7 +2,7 @@
 // XLE (canonical structure of the tree below; the CLI had no XLE validator
 // after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
 // human drift check — update it with the file, never alone):
-//   L > (LP[w=320] > V[g=4] > (S[p=4] > V[g=4] > Hd"Page Editor"[level=1 t=display-2] + Tbar) + (V[g=4] > (TL > Tab"Blocks"! + Tab"Properties") + D + (S[p=4] > V[g=2] > Hd"Add Block"[level=3] + UL + Hd"Layers"[level=3] + UL))) + (LC > V[g=4] > SC*3)
+//   L[h=fill] > (LP[w=320 p=0 divider] > V[g=4] > (S.transparent[p=4] > V[g=4] > (TI"Page title" + Hd"Page Editor"[level=1 t=display-2]) + Tbar) + (V[g=4] > (V[g=0] > (TL > Tab"Blocks"! + Tab"Properties") + D) + (S.transparent[p=4] > (V[g=2] > (V[g=1] > Hd"Add Block"[level=3] + UL) + (V[g=1] > Hd"Layers"[level=3] + UL)) + (V[g=4] > TI"Heading" + TA"Description")))) + (LC[p=8] > V[g=4] > SC*3) ;; Dlg[variant=fullscreen p=0] > L[h=fill] > (LH[divider] > (H[g=3 j=between a=center] > Hd"Customize"[level=3] + IB"Close")) + (LC[p=0] > (V[g=4] > (V[g=0] > (TL > Tab"Blocks"! + Tab"Properties") + D) + (S.transparent[p=4] > (V[g=2] > (V[g=1] > Hd"Add Block"[level=3] + UL) + (V[g=1] > Hd"Layers"[level=3] + UL)) + (V[g=4] > TI"Heading" + TA"Description")))))
 
 import { Button } from "@astryxdesign/core/Button";
 import { Center } from "@astryxdesign/core/Center";

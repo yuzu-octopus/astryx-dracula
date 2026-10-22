@@ -2,7 +2,7 @@
 // XLE (canonical structure of the tree below; the CLI had no XLE validator
 // after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
 // human drift check — update it with the file, never alone):
-//   L > (Tbar[size=sm] > (H > IB"Go back" + IB"Go forward" + Tx"Folder"[t=label]) + (SG"View mode" > SGI*4) + (H > IB"Group" + IB"Share" + IB"Tags" + IB"More" + IB"Search")) + (LC[p=0 !scroll] > (Hd"File Explorer"[level=1] + H[h=fill] > (S.transparent[p=2 w=240 dv=[end]] > UL[density=compact !hasDividers] > (LI > Ic + Tx"Item"[t=body])*3)*3 + (S.transparent[p=6] > V[g=4 a=center] > Av[size=96] + (V[g=1 a=center] > Tx"Name"[t=body] + Tx"Kind"[t=supporting]) + (ML"Information" > MLI*3))))
+//   L[h=fill] > (Tbar[size=sm dv=[bottom]] > (IB"Go back" + IB"Go forward" + Tx"Folder"[t=label]) + (SG"View mode" > SGI*4) + (IB"Group" + IB"Share" + IB"Tags" + IB"More" + IB"Search")) + (LC[p=0 !scroll] > (VH"File Explorer" + H[h=100%] > (S.transparent[p=2 w=240 dv=[end]] > UL[density=compact !hasDividers] > (LI > Ic + Tx"Item"[t=body])*3)*3 + (S.transparent[p=4 w=320] > V[g=4 a=center] > Av[size=96] + (V[g=1 a=center] > Tx"Name"[t=body] + Tx"Kind"[t=supporting]) + (ML"Information" > MLI*3))))
 
 import { Avatar } from "@astryxdesign/core/Avatar";
 import { EmptyState } from "@astryxdesign/core/EmptyState";

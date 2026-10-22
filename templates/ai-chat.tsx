@@ -2,7 +2,7 @@
 // XLE (canonical structure of the tree below; the CLI had no XLE validator
 // after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
 // human drift check — update it with the file, never alone):
-//   L > LC[p=0] > H > (SI[fill] > ChL > ChML > (ChM > ChB)*4 + ChC"Ask the night anything...") + (C.transparent > Tbar + S.transparent > MD) ;; Dlg#artifact[variant=fullscreen] > L > (DH"JWT Token Refresh" + (LC[p=0] > S.transparent > MD))
+//   L > LC[p=0] > H > (V > ChL > (VH"Night thread"[as=h1] + ChML > (ChSM"Today" + (ChM > ChBu)*8 + ChSM"Changes sealed in the crypt") + ChC"Ask the night anything...")) + (RH + C.transparent > Tbar + S.transparent > (V[g=2] > Hd"JWT Token Refresh: Design & Rollout"[level=2 t=display-2] + MD)) ;; Dlg#artifact[variant=fullscreen] > L > (DH"JWT Token Refresh" + (LC[p=0] > S.transparent > (V[g=2] > Hd"JWT Token Refresh: Design & Rollout"[level=2 t=display-2] + MD)))
 
 import { Avatar } from "@astryxdesign/core/Avatar";
 import { Button } from "@astryxdesign/core/Button";

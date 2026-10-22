@@ -52,9 +52,9 @@ theme.css         prebuilt output of bun run theme:build
 tokens.css        plain-CSS :root mirror for any stack
 icons.tsx         Lucide icon registry (runtime `lucide-react` dependency)
 fonts/            JetBrains Mono woff2 files
-templates/        around 45 themed pages plus integration specs
+templates/        around 45 themed pages, each with an XLE structure header
 shared/           reusable modules templates compose (23 files)
-scripts/check.ts  palette, contrast, and packaging gates
+scripts/check.ts  palette, contrast, packaging, and XLE-header gates
 demo/             showcase source, deployed to GitHub Pages
 ```
 
@@ -62,7 +62,7 @@ demo/             showcase source, deployed to GitHub Pages
 
 | Command              | Purpose                                    |
 | -------------------- | ------------------------------------------ |
-| `bun run audit`      | Palette plus contrast gates, fails on drift |
+| `bun run audit`      | Palette, contrast, packaging and XLE gates   |
 | `bun run theme:build`| Rebuild `theme.css` from the source        |
 | `bun run theme:check`| Fail if committed theme outputs are stale  |
 | `bun run build`      | Typecheck plus showcase build              |

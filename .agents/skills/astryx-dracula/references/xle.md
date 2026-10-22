@@ -46,7 +46,7 @@ names a component the template does not import.
 
 **Surfaces** — `C` Card · `CC` ClickableCard · `SC` SelectableCard ·
 `S` Section · `D` Divider · `B` Button · `Bd` Badge · `Bn` Banner ·
-`TL` TabList · `TB` Toolbar · `Tmb` ToolbarMenuItem · `T` Table ·
+`TL` TabList · `Tab` Tab · `TabMenu` TabMenu · `TB` Toolbar · `Tmb` ToolbarMenuItem · `T` Table ·
 `TR` TableRow · `TC` TableCell · `THC` TableHeaderCell · `UL` List ·
 `LI` ListItem · `TrL` TreeList · `ML` MetadataList · `MLI` MetadataListItem ·
 `Tbar` Toolbar · `OFL` OverflowList · `Po` Popover · `PS` PowerSearch ·
@@ -60,7 +60,7 @@ names a component the template does not import.
 
 **Text and marks** — `Hd` Heading · `Tx` Text · `Lk` Link · `Ic` Icon ·
 `IB` IconButton · `Tk` Token · `Av` Avatar · `SD` StatusDot · `AR` AspectRatio ·
-`Cd` CodeBlock · `TI` TextInput · `TA` TextArea · `NI` NumberInput ·
+`Cd` CodeBlock · `MD` Markdown · `TI` TextInput · `TA` TextArea · `NI` NumberInput ·
 `CB` CheckboxInput · `RL` RadioList · `RLI` RadioListItem · `TY` Typeahead ·
 `Fd` Field · `VH` VisuallyHidden · `MNT` MobileNavToggle · `Bu` Bullet
 separator · `RC` RevenueChart · `Spl` Sparkline · `Sw` chart legend swatch · `Scene` SceneTile / SceneCastle ·
