@@ -106,7 +106,7 @@ if (built === null) {
 const lightDarkTuples = (src: string): { at: number; parts: string[] }[] => {
 	const out: { at: number; parts: string[] }[] = [];
 	for (const m of src.matchAll(/light-dark\(/g)) {
-		let i = m.index! + m[0].length;
+		let i = m.index + m[0].length;
 		let depth = 1;
 		const parts: string[] = [];
 		let cur = "";
@@ -133,7 +133,7 @@ const lightDarkTuples = (src: string): { at: number; parts: string[] }[] => {
 			}
 			cur += c;
 		}
-		out.push({ at: m.index!, parts: parts.map((p) => p.trim()) });
+		out.push({ at: m.index, parts: parts.map((p) => p.trim()) });
 	}
 	return out;
 };
@@ -468,11 +468,19 @@ const pairs: ContrastRow[] = [
 			continue;
 		}
 		const alpha = alphaOf(bgHex);
-		if (alpha < 1 && !card) {
-			fail(`FAIL ${row.name}: ${row.bg} is a wash and --color-background-card will not resolve`);
-			continue;
+		// A translucent background has to be composited over the card surface
+		// to be measured, and the card token is resolved once, here. The guard
+		// is nested rather than combined so `card` is narrowed to a string
+		// in the branch that uses it — a combined condition leaves it
+		// `string | undefined` and the only way through is an assertion.
+		let bg = solid(bgHex);
+		if (alpha < 1) {
+			if (!card) {
+				fail(`FAIL ${row.name}: ${row.bg} is a wash and --color-background-card will not resolve`);
+				continue;
+			}
+			bg = mix(solid(bgHex), alpha, solid(card));
 		}
-		const bg = alpha < 1 ? mix(solid(bgHex), alpha, solid(card!)) : solid(bgHex);
 		const r = ratio(solid(fgHex), bg);
 		if (r < row.floor)
 			fail(`FAIL ${row.name} ${r.toFixed(2)} (floor ${row.floor}, ${row.fg} on ${row.bg})`);
@@ -647,7 +655,7 @@ for (const f of lintFiles.sort()) {
 	const line = (i: number) => src.slice(0, i).split("\n").length;
 	for (const m of src.matchAll(/variant=\{?["']section["']\}?/g)) {
 		fail(
-			`${f}:${line(m.index!)} variant="section" paints the shell surface tier instead of body — use the default AppShell variant`,
+			`${f}:${line(m.index)} variant="section" paints the shell surface tier instead of body — use the default AppShell variant`,
 		);
 	}
 	// weight="bold" AND weight="medium": only 400 and 600 faces ship, so both
@@ -655,7 +663,7 @@ for (const f of lintFiles.sort()) {
 	// hypothetical — the token existing is precisely why the call must not.
 	for (const m of src.matchAll(/weight=\{?["'](bold|medium)["']\}?/g)) {
 		fail(
-			`${f}:${line(m.index!)} weight="${m[1]}" — only 400 + 600 faces ship; the label role already owns semibold`,
+			`${f}:${line(m.index)} weight="${m[1]}" — only 400 + 600 faces ship; the label role already owns semibold`,
 		);
 	}
 	// A prop regex cannot see a style object, which is how ide.tsx:81
@@ -663,7 +671,7 @@ for (const f of lintFiles.sort()) {
 	// unshipped weight requests. Watch the literal form too.
 	for (const m of src.matchAll(/fontWeight:\s*['"]?(500|700)['"]?/g)) {
 		fail(
-			`${f}:${line(m.index!)} fontWeight: ${m[1]} — only 400 + 600 faces ship; use the Text role instead`,
+			`${f}:${line(m.index)} fontWeight: ${m[1]} — only 400 + 600 faces ship; use the Text role instead`,
 		);
 	}
 	// --color-text-subdue is chrome only: 1.80:1 on the page and 1.49:1 on the
@@ -674,12 +682,12 @@ for (const f of lintFiles.sort()) {
 	// non-text shape) are allowed; a bare `color:` is not.
 	for (const m of src.matchAll(/(?:^|[;{\s])color:\s*['"]?var\(--color-text-subdue\)/g)) {
 		fail(
-			`${f}:${line(m.index!)} --color-text-subdue used as a foreground (chrome only: borders, separators, backgrounds)`,
+			`${f}:${line(m.index)} --color-text-subdue used as a foreground (chrome only: borders, separators, backgrounds)`,
 		);
 	}
 	for (const m of src.matchAll(/(?:color|stroke|fill)=['"]?\{?['"]?var\(--color-text-subdue\)/g)) {
 		fail(
-			`${f}:${line(m.index!)} --color-text-subdue used as a foreground via a style prop (chrome only)`,
+			`${f}:${line(m.index)} --color-text-subdue used as a foreground via a style prop (chrome only)`,
 		);
 	}
 	// The inverse alias: a well-intentioned "simplify the muted step" edit that
@@ -690,7 +698,7 @@ for (const f of lintFiles.sort()) {
 		/--color-text-base-muted['"]?\s*:\s*[^;]*var\(--color-text-subdue\)/g,
 	)) {
 		fail(
-			`${f}:${line(m.index!)} --color-text-base-muted must not alias to --color-text-subdue — subdue is chrome only and unreadable as text`,
+			`${f}:${line(m.index)} --color-text-base-muted must not alias to --color-text-subdue — subdue is chrome only and unreadable as text`,
 		);
 	}
 	for (const m of src.matchAll(/<Layout(?=[\s>])/g)) {
@@ -698,7 +706,7 @@ for (const f of lintFiles.sort()) {
 		const tag = end === -1 ? "" : src.slice(m.index, end + 1);
 		if (!/height\s*=/.test(tag))
 			fail(
-				`${f}:${line(m.index!)} <Layout> missing explicit height (auto for hero/document pages, fill for app panes)`,
+				`${f}:${line(m.index)} <Layout> missing explicit height (auto for hero/document pages, fill for app panes)`,
 			);
 	}
 }
@@ -1091,7 +1099,7 @@ for (const f of lintFiles.sort()) {
 		);
 	}
 	for (const m of src.matchAll(/<Link(?=[\s>])/g)) {
-		const end = findTagEnd(src, m.index! + "<Link".length);
+		const end = findTagEnd(src, m.index + "<Link".length);
 		if (end === -1) continue;
 		const at = `${f}:${src.slice(0, m.index).split("\n").length}`;
 		// Literal text only. A label behind {…} is unknown to a source walk, and

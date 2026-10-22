@@ -1467,7 +1467,7 @@ export default function TechReport() {
 			railHref={SELF_HASH}
 			railIcon={<Icon icon={ScrollText} size="sm" />}
 			eyebrow="DeepSeek-V4.1-Flash technical report"
-			badge={(chapter, index, total) =>
+			badge={(_chapter, index, total) =>
 				`Chapter ${index + 1} of ${total} · DeepSeek-AI · research@deepseek.com`
 			}
 			art={(chapterId) => <ChapterArt chapterId={chapterId} />}

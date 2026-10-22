@@ -11,7 +11,6 @@ import { Button } from "@astryxdesign/core/Button";
 import { CodeBlock } from "@astryxdesign/core/CodeBlock";
 import { Divider } from "@astryxdesign/core/Divider";
 import { useMediaQuery } from "@astryxdesign/core/hooks";
-import type { IconType } from "@astryxdesign/core/Icon";
 import { Icon } from "@astryxdesign/core/Icon";
 import {
 	HStack,
@@ -39,7 +38,7 @@ import {
 	sectionId,
 } from "astryx-dracula/shared/chaptered-doc-config";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { type CSSProperties, type ReactNode, useState } from "react";
+import { type ReactNode, useState } from "react";
 
 function ChapterRail({
 	groups,

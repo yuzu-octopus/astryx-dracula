@@ -304,9 +304,7 @@ export function Bento() {
 														borderRadius: "var(--border-radius)",
 														border: "var(--border-width) solid var(--color-separator)",
 													}}
-												>
-													<></>
-												</Card>
+												></Card>
 												<Text type="supporting" color="secondary">
 													{s.name}
 												</Text>

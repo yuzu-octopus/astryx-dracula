@@ -164,34 +164,30 @@ export default function ShellNav() {
 				topNav={
 					<TopNav
 						label="Dracula Studio menu bar"
-						startContent={
-							<>
-								{MENUS.map((menu) => (
-									<DropdownMenu
-										key={menu.label}
-										button={{ label: menu.label, variant: "ghost", size: "sm" }}
-										hasChevron={false}
-										menuWidth={MENU_WIDTH}
-									>
-										{/* Keyed by the group's first label, not its position:
+						startContent={MENUS.map((menu) => (
+							<DropdownMenu
+								key={menu.label}
+								button={{ label: menu.label, variant: "ghost", size: "sm" }}
+								hasChevron={false}
+								menuWidth={MENU_WIDTH}
+							>
+								{/* Keyed by the group's first label, not its position:
                         an index key remounts every group when the menu
                         data shifts. `gi` only decides the divider. */}
-										{menu.groups.map((group, gi) => (
-											<Fragment key={group[0][0]}>
-												{gi > 0 && <Divider />}
-												{group.map(([label, shortcut]) => (
-													<DropdownMenuItem
-														key={label}
-														label={label}
-														endContent={shortcut ? <Kbd keys={shortcut} /> : undefined}
-													/>
-												))}
-											</Fragment>
+								{menu.groups.map((group, gi) => (
+									<Fragment key={group[0][0]}>
+										{gi > 0 && <Divider />}
+										{group.map(([label, shortcut]) => (
+											<DropdownMenuItem
+												key={label}
+												label={label}
+												endContent={shortcut ? <Kbd keys={shortcut} /> : undefined}
+											/>
 										))}
-									</DropdownMenu>
+									</Fragment>
 								))}
-							</>
-						}
+							</DropdownMenu>
+						))}
 						endContent={
 							// A real palette trigger, not a lookalike field: the previous
 							// TextInput swallowed keystrokes while a wrapper div opened the

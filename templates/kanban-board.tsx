@@ -597,7 +597,7 @@ export default function KanbanBoard() {
 	const renderColumnCards = (colId: ColumnId): ReactNode => {
 		const colItems = itemsByColumn[colId];
 		const visible = drag ? colItems.filter((it) => it.id !== drag.id) : colItems;
-		const ghostTarget = drag && drag.target && drag.target.column === colId ? drag : null;
+		const ghostTarget = drag?.target && drag.target.column === colId ? drag : null;
 
 		if (visible.length === 0 && !ghostTarget) {
 			return null;
@@ -613,7 +613,7 @@ export default function KanbanBoard() {
 			/>
 		));
 
-		if (ghostTarget && ghostTarget.target) {
+		if (ghostTarget?.target) {
 			const index = Math.min(ghostTarget.target.index, nodes.length);
 			nodes.splice(
 				index,

@@ -91,7 +91,7 @@ const COMPONENT_DOCS: Record<
 	},
 };
 
-const ACTIVE_DOCS = COMPONENT_DOCS["button"];
+const ACTIVE_DOCS = COMPONENT_DOCS.button;
 
 // One preview node per example in ACTIVE_DOCS.examples, index-aligned. The
 // old EXAMPLE_PREVIEWS record carried only this key, so the record wrapper

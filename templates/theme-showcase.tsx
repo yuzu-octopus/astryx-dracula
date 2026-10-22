@@ -530,7 +530,7 @@ const ACTIVITY: ActivityRow[] = [
 
 function formatAmount(amount: number): string {
 	const sign = amount < 0 ? "−" : "+";
-	return sign + "$" + Math.abs(amount).toLocaleString();
+	return `${sign}$${Math.abs(amount).toLocaleString()}`;
 }
 
 function LatestActivityCard({ isMobile }: { isMobile: boolean }) {
@@ -728,7 +728,7 @@ const LOW_STOCK_THRESHOLD = 25;
 function SelectCell({ row }: { row: InventoryRow }) {
 	return (
 		<CheckboxInput
-			label={"Select " + row.name}
+			label={`Select ${row.name}`}
 			isLabelHidden
 			value={row.selected}
 			onChange={() => {}}
@@ -954,7 +954,7 @@ function InventoryCard({ inventory }: { inventory: InventoryRow[] }) {
 						// the count crosses the threshold, and a screen reader must
 						// hear it.
 						role="status"
-						title={lowStockCount + " items are running low"}
+						title={`${lowStockCount} items are running low`}
 					/>
 				</VStack>
 			)}

@@ -77,12 +77,24 @@ const specs = import.meta.glob<{ default: TemplateSpec }>("../templates/*.templa
 });
 const pages = import.meta.glob<{ default: ComponentType }>("../templates/*.tsx");
 
-export const TEMPLATES: TemplateEntry[] = ORDER.map((id) => ({
-	id,
-	name: specs[`../templates/${id}.template.mjs`]!.default.name,
-	description: specs[`../templates/${id}.template.mjs`]!.default.description,
-	load: pages[`../templates/${id}.tsx`]!,
-}));
+export const TEMPLATES: TemplateEntry[] = ORDER.map((id) => {
+	// Every id in ORDER needs a spec and a page, and a missing one is a
+	// developer error, not a state to render around. Looked up and checked
+	// rather than asserted or optional-chained: optional chaining would turn
+	// "the template is missing" into a blank entry in the showcase, which is
+	// exactly the quiet failure this repo is trying to avoid.
+	const spec = specs[`../templates/${id}.template.mjs`];
+	if (!spec)
+		throw new Error(`templates/${id}.template.mjs is missing — every id in ORDER needs a spec`);
+	const page = pages[`../templates/${id}.tsx`];
+	if (!page) throw new Error(`templates/${id}.tsx is missing — every id in ORDER needs a page`);
+	return {
+		id,
+		name: spec.default.name,
+		description: spec.default.description,
+		load: page,
+	};
+});
 
 // Ids the bare frame accepts. The router checks `?bare=` against this list so
 // an unknown or empty value lands on the index instead of a blank page.

@@ -62,7 +62,13 @@ function Router() {
 	return <App />;
 }
 
-createRoot(document.getElementById("root")!).render(
+// The mount point is in index.html. Looked up and checked rather than
+// asserted: a missing element would otherwise fail as a TypeError from
+// deep inside React, and this says what actually went wrong.
+const rootElement = document.getElementById("root");
+if (!rootElement) throw new Error("Demo mount point #root is missing from index.html");
+
+createRoot(rootElement).render(
 	<StrictMode>
 		<Router />
 	</StrictMode>,

@@ -38,6 +38,12 @@ import {
 	X,
 	XCircle,
 } from "lucide-react";
+// The Astryx theme loader evaluates this file to read the icon registry, and
+// it evaluates JSX with the CLASSIC runtime, so React has to be in scope
+// here even though the app's own bundler uses the automatic one. Without it,
+// `astryx theme build` fails with "React is not defined" — so this import is
+// load-bearing and must not be removed as "unused".
+// biome-ignore lint/correctness/noUnusedImports: the theme loader needs React in scope for the classic JSX runtime
 import React from "react";
 
 const iconProps = {

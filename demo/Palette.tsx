@@ -94,9 +94,7 @@ export function Palette() {
 									borderRadius: "var(--border-radius)",
 									border: "var(--border-width) solid var(--color-separator)",
 								}}
-							>
-								<></>
-							</Card>
+							></Card>
 							<VStack gap={0.5}>
 								<HStack justify="between" vAlign="center">
 									<Text weight="semibold">{s.name}</Text>

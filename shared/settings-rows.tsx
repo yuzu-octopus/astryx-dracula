@@ -8,29 +8,7 @@ import { Divider } from "@astryxdesign/core/Divider";
 import { HStack, VStack } from "@astryxdesign/core/Layout";
 import { Link } from "@astryxdesign/core/Link";
 import { Text } from "@astryxdesign/core/Text";
-import {
-	actionNoWrap,
-	DEVICE_ROWS,
-	type DeviceRow,
-	INFO_TILES,
-	type InfoRow,
-	type InfoTileData,
-	iconBox,
-	LOGIN_ROWS,
-	type SettingsNavItem,
-	SOCIAL_ROWS,
-} from "astryx-dracula/shared/settings-data";
-import {
-	Bell,
-	Briefcase,
-	CreditCard,
-	FileText,
-	Globe,
-	Lock,
-	Share2,
-	ShieldCheck,
-	SquarePen,
-} from "lucide-react";
+import { actionNoWrap, type InfoRow } from "astryx-dracula/shared/settings-data";
 import type { CSSProperties, ReactNode } from "react";
 
 // ─── Row components ──────────────────────────────────────────────────────────

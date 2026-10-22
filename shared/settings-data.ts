@@ -12,18 +12,12 @@ import {
 	Briefcase,
 	CreditCard,
 	FileText,
-	Fingerprint,
 	Globe,
-	KeyRound,
-	Laptop,
 	Lock,
 	Share2,
 	ShieldCheck,
-	Smartphone,
 	SquarePen,
-	Tablet,
 	User,
-	UserCog,
 } from "lucide-react";
 import type { CSSProperties } from "react";
 
