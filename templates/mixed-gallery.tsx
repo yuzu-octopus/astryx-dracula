@@ -2,7 +2,7 @@
 // XLE (canonical structure of the tree below; the CLI had no XLE validator
 // after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
 // human drift check — update it with the file, never alone):
-//   L > LC[p=6] > V[g=8] > ((V[g=2 a=center] > Hd"Every corner of the castle, caught after dark."[level=1] + Tx"Relics, sketches, and moonlit views from the coven archives, collected over one long Transylvanian night."[t=body]) + (V[g=3] > (V[g=2] > AR[ratio=3/1] + Tx"The castle at moonrise"[t=body]) + (G[c={min:280} g=4] > (V[g=2] > AR[ratio=3/2] + Tx"Coven gathering"[t=body]) + (V[g=2] > AR[ratio=3/2] + Tx"Belfry view"[t=body]) + (V[g=2] > AR[ratio=3/2] + Tx"Crypt archives"[t=body]) + (V[g=2] > AR[ratio=3/2] + Tx"Midnight garden"[t=body]))))
+//   L[h=fill] > LC[p=6] > V[g=8] > ((V[g=2 a=center] > Hd"Every corner of the castle, caught after dark."[level=1] + Tx"Relics, sketches, and moonlit views from the coven archives, collected over one long Transylvanian night."[t=body]) + (V[g=3] > (V[g=2] > (AR[ratio=3/1] > Scene{SceneTile}) + Tx"The castle at moonrise"[t=body]) + (G[c={min:280} g=4] > (V[g=2] > (AR[ratio=3/2] > Scene{SceneTile}) + Tx"Coven gathering"[t=body]) + (V[g=2] > (AR[ratio=3/2] > Scene{SceneTile}) + Tx"Belfry view"[t=body]) + (V[g=2] > (AR[ratio=3/2] > Scene{SceneTile}) + Tx"Crypt archives"[t=body]) + (V[g=2] > (AR[ratio=3/2] > Scene{SceneTile}) + Tx"Midnight garden"[t=body]))))
 
 import { AspectRatio } from "@astryxdesign/core/AspectRatio";
 import { Grid } from "@astryxdesign/core/Grid";

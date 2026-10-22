@@ -52,7 +52,7 @@ names a component the template does not import.
 `Tbar` Toolbar · `OFL` OverflowList · `Po` Popover · `PS` PowerSearch ·
 `MM` MoreMenu · `SG` SegmentedControl · `SGI` SegmentedControlItem ·
 `SE` Selector · `Tg` ToggleButton · `TgG` ToggleButtonGroup ·
-`Coll` Collapsible · `ColG` CollapsibleGroup · `Dlg` Dialog · `DH` DialogHeader ·
+`Col` Collapsible · `ColG` CollapsibleGroup · `Dlg` Dialog · `DH` DialogHeader ·
 `Drawer` Drawer · `DrawerHeader` DrawerHeader · `Sk` Skeleton ·
 `TNI` TopNavItem · `TNI{TopNavMegaMenu}` TopNavMegaMenu ·
 `CmdP` CommandPalette · `DD` DropdownMenu · `EmptyState` EmptyState ·
@@ -63,7 +63,7 @@ names a component the template does not import.
 `Cd` CodeBlock · `TI` TextInput · `TA` TextArea · `NI` NumberInput ·
 `CB` CheckboxInput · `RL` RadioList · `RLI` RadioListItem · `TY` Typeahead ·
 `Fd` Field · `VH` VisuallyHidden · `MNT` MobileNavToggle · `Bu` Bullet
-separator · `RC` RevenueChart · `Sw` chart legend swatch · `Scene` SceneTile / SceneCastle ·
+separator · `RC` RevenueChart · `Spl` Sparkline · `Sw` chart legend swatch · `Scene` SceneTile / SceneCastle ·
 `SB` the local SeverityBadge · `Outline` the shared chapter outline
 
 **Chat** — `ChC` ChatComposer · `ChL` ChatLayout · `ChM` ChatMessage ·

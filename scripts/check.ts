@@ -748,6 +748,16 @@ for (const f of lintFiles.sort()) {
 		TrL: ["TreeList"],
 		MLI: ["MetadataListItem"],
 		MM: ["MoreMenu"],
+		Drawer: ["Drawer"],
+		Dlg: ["Dialog"],
+		DH: ["DialogHeader"],
+		EmptyState: ["EmptyState"],
+		TS: ["Timestamp"],
+		RH: ["ResizeHandle"],
+		Sk: ["Skeleton"],
+		CmdP: ["CommandPalette"],
+		DD: ["DropdownMenu"],
+		TNI: ["TopNavItem"],
 		// The house tokens for a SegmentedControl and its items. Core has no
 		// SegmentedGroup component, so the names predate the component and
 		// are kept rather than churned.
@@ -782,7 +792,6 @@ for (const f of lintFiles.sort()) {
 		ChC: ["ChatComposer"],
 		ChL: ["ChatLayout"],
 		ChM: ["ChatMessage"],
-		ChB: ["ChatMessageBubble"],
 		ChBu: ["ChatMessageBubble"],
 		ChMeta: ["ChatMessageMetadata"],
 		ChTC: ["ChatToolCalls"],
@@ -793,7 +802,8 @@ for (const f of lintFiles.sort()) {
 		SB: ["SeverityBadge"],
 		Scene: ["SceneTile", "SceneCastle", "SceneFrame"],
 		Outline: ["Outline", "ChapteredDoc"],
-		Sw: ["ChartLegend", "ProductSwatch", "RevenueChart"],
+		Sw: ["ChartLegend", "ProductSwatch"],
+		Spl: ["Sparkline"],
 		RC: ["RevenueChart"],
 		// Layout primitives
 		B: ["Button"],
@@ -852,6 +862,12 @@ for (const f of lintFiles.sort()) {
 			}
 		};
 		collectImports(src);
+		// A component the template DEFINES is one it renders. detail-page.tsx
+		// has its own Bullet; the header naming it is not drift, so the gate
+		// counts locally declared symbols as well as imported ones.
+		for (const m of src.matchAll(/(?:function|const)\s+([A-Z][A-Za-z0-9]*)\s*[=(<]/g)) {
+			imported.add(m[1]);
+		}
 		// The shared modules are imported two ways in this repo: relatively
 		// (`../shared/x`) from the demo, and through the package's own export
 		// map (`astryx-dracula/shared/x`) from the templates. Both point at the
