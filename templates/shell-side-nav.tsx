@@ -1,5 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
 //   A[cp=0 @sideNav=(SN > SNI"New chat" + SNI"Search" + SNI"Library" + D + (SNI"Personal" > SNI"Full-moon rite planning")*3)] > L > (LC[p=6] > V[g=5] > (H > C.muted[p=0])*4) + (LF > TI"Message Night Owl")
 // Note: skeleton placeholders carry no Hd by design (skill skeleton-shell
 // exemption) — routed pages supply the h1.
@@ -93,22 +95,25 @@ export default function ShellSideNav() {
 								icon={workspace.icon}
 								collapsible={{ defaultIsCollapsed: false }}
 							>
-								<VStack gap={0.5}>
-									{workspace.chats.map((chat) => (
-										// The hover-only MoreMenu was four dead actions unreachable
-										// by keyboard and touch, so it goes: the status dot stays
-										// always visible (its label doubles as the tooltip), and
-										// selecting a conversation switches selection.
-										<SideNavItem
-											key={chat.label}
-											label={chat.label}
-											href={SELF_HASH}
-											isSelected={chat.label === selectedChat}
-											onClick={() => setSelectedChat(chat.label)}
-											endContent={<StatusDot variant={chat.status} label={chat.statusLabel} />}
-										/>
-									))}
-								</VStack>
+								{/* The nested rows are direct children, not wrapped in a
+                    VStack: core 0.7.2 made nested SideNavItems span the
+                    full width of the nav list with the indent inside the row,
+                    and any non-SideNavItem content in between (a VStack is
+                    exactly that) takes the children out of that flow. */}
+								{workspace.chats.map((chat) => (
+									// The hover-only MoreMenu was four dead actions unreachable
+									// by keyboard and touch, so it goes: the status dot stays
+									// always visible (its label doubles as the tooltip), and
+									// selecting a conversation switches selection.
+									<SideNavItem
+										key={chat.label}
+										label={chat.label}
+										href={SELF_HASH}
+										isSelected={chat.label === selectedChat}
+										onClick={() => setSelectedChat(chat.label)}
+										endContent={<StatusDot variant={chat.status} label={chat.statusLabel} />}
+									/>
+								))}
 							</SideNavItem>
 						))}
 					</SideNavSection>

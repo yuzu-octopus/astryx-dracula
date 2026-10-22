@@ -1,5 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
 //   L > (LP[p=4] > V[g=2] > TI"Search files" + TreeList) + (LC[p=0] > (Hd"Code editor"[level=1] + V > (SI[fill] > Cd) + (V > (TL > Tab"Terminal"! + Tab"Problems" + Tab"Output" + Tab"Debug") + Cd))) + (LP[p=4] > V[g=3] > (SG > SGI"Properties"! + SGI"History") + (V[g=3] > (V[g=1] > Hd"NightCounter.tsx"[level=3] + Tx"src/components/NightCounter.tsx"[t=supporting]) + ML + (V[g=2] > B.secondary"Format Document" + B.secondary"Go to Definition" + B.secondary"Find References")))
 
 import { Button } from "@astryxdesign/core/Button";
@@ -34,11 +36,14 @@ const styles: Record<string, CSSProperties> = {
 	},
 	tabListPadding: {
 		paddingTop: "var(--spacing-2)",
-		// 4px inline = offset 2 + ring thickness 2, so the focus ring lands INSIDE
-		// this box's clip instead of on its edge being cut in half. Deliberately
-		// NOT applied to `terminalPanel`: that would inset the CodeBlock itself,
+		// The focus ring is a fixed 2px outline (core's defineTheme.ts), and the
+		// ring lands INSIDE this box's clip rather than on its edge being cut in
+		// half. The 2px of that is a PIXEL relationship, so it is written as
+		// pixels: --spacing-1 is rem since core 0.7.0, and at a 20px root it
+		// is 5px, which would clip the ring by a pixel. Deliberately NOT
+		// applied to `terminalPanel`: that would inset the CodeBlock itself,
 		// moving the code rather than giving the ring somewhere to live.
-		paddingInline: "var(--spacing-1)",
+		paddingInline: "calc(var(--spacing-1) + 2px)",
 	},
 	metadataCompact: {
 		gap: "var(--spacing-1) var(--spacing-3)",

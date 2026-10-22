@@ -73,8 +73,11 @@ export default function App() {
 						{applied && (
 							<Banner
 								status="success"
+								// Core 0.7.0 stopped deriving the live-region role from
+								// `status`, so this banner states its own.
+								role="status"
 								title="Theme applied"
-								description="All 155 Astryx components resolving Dracula tokens with zero runtime overhead."
+								description={`All ${import.meta.env.ASTRYX_COMPONENT_COUNT} Astryx components resolving Dracula tokens with zero runtime overhead.`}
 							/>
 						)}
 

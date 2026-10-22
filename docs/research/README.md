@@ -118,7 +118,7 @@ notes, and the unlayered-escape-hatch + balanced-parser-trap method notes.
 Truth: `SKILL.md` (GridSpan, the `display-2`-declared-but-unapplied note),
 `tokens.css` unlayered header, inline deltas in F1–F6. F0 dropped without a
 re-probe note: it was pinned to core 0.3.0 (101 dirs / 155 exports) and the
-repo now runs core 0.6.3 (`package.json`) — the version-pinned numbers are
+repo now runs core 0.7.2 (`package.json`) — the version-pinned numbers are
 stale, and every live conclusion (G1-corrected `data-state` via runtime-built
 names, G9-void span, G10 unlayered) already survives in F3/F5 and the skill.
 
@@ -129,3 +129,11 @@ content 15, tile-row 96, Card 4/3, radius 5, type-base 14; touch two-tier (24px
 AA floor, 44 where touch matters). Truth:
 `.agents/skills/astryx-dracula/references/spacing.md`, `BRAND.md:89` (Dims),
 `tokens.css:79-89`. Angle files F1–F3 deleted; `REPORT.md` kept as the record.
+
+**xle-drift** — probed 2026-10-22, after the core+CLI 0.7.2 upgrade. Two
+independent read-only audits swept all 45 templates' XLE headers against their
+own source, because CLI 0.7.0 removed `astryx layout check` and nothing
+replaced it — the headers became unforced prose. 26 corrections landed (each
+verified against the template's own source, since three of the audit's quotes
+were wrong); the rest is inventoried in `xle-drift.md`, split into "needs a
+notation token that does not exist yet" and "structure that was flattened".

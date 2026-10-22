@@ -10,7 +10,7 @@ Live showcase: https://yuzu-octopus.github.io/astryx-dracula/
 
 ## Features
 
-- Dracula tokens pinned in `astryx-theme.ts` (`grep -c "pin(" astryx-theme.ts` pins) (191 public props in the prebuilt `theme.css`, plus 3 private `--_*-radius` aliases; `tokens.css` is a full plain-CSS mirror, `grep -c "^  --" tokens.css` vars), dark-only. No gate asserts these counts — `bun run theme:check` asserts freshness, `bun run audit` asserts palette purity and contrast.
+- Dracula tokens pinned in `astryx-theme.ts` (`grep -c "pin(" astryx-theme.ts` pins) (the public props the prebuilt `theme.css` ships, `grep -c "^    --" theme.css`, plus 3 private `--_*-radius` aliases; `tokens.css` mirrors the theme's colour, spacing, radius, type and motion tokens as plain `:root` custom properties, unlayered so it beats core's layers, `grep -c "^\s*--" tokens.css` vars), dark-only. No gate asserts these counts — `bun run theme:check` asserts freshness, `bun run audit` asserts palette purity and contrast.
 - Syntax theme plus chart series and sequential ramps
 - Prebuilt CSS plus runtime theme injection, or runtime injection alone for prototyping
 - WCAG contrast gates enforced in CI via `bun run audit`

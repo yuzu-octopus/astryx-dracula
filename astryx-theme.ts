@@ -61,6 +61,18 @@ const draculaSyntax = defineSyntaxTheme({
 		property: DRA.fg,
 		punctuation: DRA.fg,
 		background: DRA.bg,
+		// The diff layer (core 0.7.1). Left unset, core defaults these to a
+		// 25% mix of the theme's --color-success-muted / --color-error-muted
+		// tokens, and those are 10% alpha washes here — so the default row
+		// tint measures 1.06:1 against the code background and the diff
+		// renders as "a slightly different grey". Authored on the Dracula
+		// ramp instead: a 15% green / 15% red row tint, the spec green and
+		// red as the row markers, and Selection for the header row.
+		added: "#50FA7B26",
+		removed: "#FF555526",
+		"diff-header": "#44475A",
+		"added-marker": DRA.green,
+		"removed-marker": DRA.red,
 	},
 });
 
@@ -167,11 +179,17 @@ const tokens: Record<string, TokenValue> = {
 	"--color-overlay-pressed": pin("#00000033"),
 	"--color-border": pin(DRA.comment),
 	// Repinned from DRA.comment (#6272A4). Core tone-bumps this token to >=3:1
-	// for form-control boundaries (expandColorScale.ts:22-24), but pin() returns a
+	// for form-control boundaries (expandColorScale.ts:31-32), but pin() returns a
 	// literal, so that guarantee is inert by construction on this theme.
 	// #9AA1BC is the shipped AA lift: it clears 3:1 on all four surface tiers
-	// (5.56/4.60/3.77/3.57) where the old value cleared none (3.03/2.51/2.05/1.94),
-	// and it is what a DropdownMenuRadioItem boundary needs on a popover.
+	// (5.56/4.60/3.77/3.57) where the old value cleared none (3.03/2.51/2.05/1.94).
+	// Its live 0.7.2 consumers are form controls and content chrome: Field /
+	// FileInput / NumberInput / InputGroupText / Kbd borders, Divider
+	// variant="strong", Blockquote's rule, HoverCard's and Tooltip's dashed
+	// underlines, the checkbox/radio Indicator, Calendar's today ring,
+	// TreeList's branch lines, ResizeHandle and Selector's focus restore.
+	// (DropdownMenuRadioItem read this token in 0.6.3 and no longer does; it
+	// reads --color-text-primary and --color-overlay-hover.)
 	// Known shortfall: the inverted surface (#F8F8F2) at 2.40, which has no live
 	// consumer — only Toast.tsx paints it and its one control is a Button, which
 	// reads --color-border, not -emphasized. Recorded at the site, not certified.
@@ -452,7 +470,7 @@ export const astryxDraculaTheme: DefinedTheme = defineTheme({
 				borderColor: "var(--color-error)",
 			},
 		},
-		statusdot: {
+		"status-dot": {
 			// Cyan info dot: the status vocabulary's info hue. New variant values
 			// are picked up by `astryx theme build`, which generates both the CSS
 			// and the StatusDotVariantMap augmentation (see
@@ -463,7 +481,7 @@ export const astryxDraculaTheme: DefinedTheme = defineTheme({
 				backgroundColor: DRA.cyan,
 			},
 		},
-		"progressbar-fill": {
+		"progress-bar-fill": {
 			"variant:accent": {
 				backgroundColor: DRA.purple,
 			},
@@ -487,12 +505,33 @@ export const astryxDraculaTheme: DefinedTheme = defineTheme({
 			},
 		},
 		"text-input": INPUT_STATUS,
-		textarea: INPUT_STATUS,
+		"text-area": INPUT_STATUS,
 		"number-input": INPUT_STATUS,
 		"date-input": INPUT_STATUS,
 		"time-input": INPUT_STATUS,
-		selector: INPUT_STATUS,
-		"multi-selector": INPUT_STATUS,
+		// The `secondary` trigger variant (core 0.7.1) is borderless with a
+		// --color-neutral fill, which already IS this theme's secondary Button.
+		// One thing does not match: core sets the trigger to
+		// --font-weight-medium, a weight this kit does not ship (only 400 and
+		// 600 exist), while the Button is --font-weight-normal. Pin it to the
+		// Button's weight so a secondary Selector reads as its sibling rather
+		// than as a different control set.
+		//
+		// No template uses this variant today: upstream's own rule is that a
+		// secondary Selector belongs beside a secondary Button, and none of ours
+		// is. The rule is here so the theme owns the parity the moment one is.
+		selector: {
+			...INPUT_STATUS,
+			"variant:secondary": {
+				fontWeight: "var(--font-weight-normal)",
+			},
+		},
+		"multi-selector": {
+			...INPUT_STATUS,
+			"variant:secondary": {
+				fontWeight: "var(--font-weight-normal)",
+			},
+		},
 		typeahead: INPUT_STATUS,
 		tokenizer: INPUT_STATUS,
 		switch: {
@@ -548,7 +587,17 @@ export const astryxDraculaTheme: DefinedTheme = defineTheme({
 		// floating. Promoted to the floater tier. Known: --color-text-secondary
 		// drops 4.60:1 -> 3.77:1 inside a HoverCard. Latent, not live — no template
 		// renders <HoverCard>; the three "HoverCard" hits are catalog metadata.
-		hovercard: {
+		"hover-card": {
+			base: {
+				backgroundColor: "var(--color-background-popover)",
+			},
+		},
+		// Drawer (core 0.7.2) paints the surface tier, #343746, which is the
+		// same chrome tier the HoverCard had to be promoted out of: on the
+		// #282A36 page that measures 1.21:1 and a panel slid over the page
+		// reads as a hole rather than a surface. The popover tier (#424450,
+		// 1.47:1) is the floating-surface tier, which is what a Drawer is.
+		drawer: {
 			base: {
 				backgroundColor: "var(--color-background-popover)",
 			},
@@ -569,5 +618,18 @@ export const astryxDraculaTheme: DefinedTheme = defineTheme({
 	// still reads tappable there.
 	onDark: {
 		tokens: { "--color-accent": pin(DRA.purple) },
+	},
+	// Mirror of the onDark passthrough, for the same reason. This kit is
+	// dark-only, so core's default LIGHT-surface passthrough would collapse
+	// text, icon and accent to --color-on-light (#000000) — black on the
+	// #282A36 page, about 1.2:1. Nothing in this repo renders a light media
+	// surface today, so this is a trap for the first consumer who adds one,
+	// not a live bug. The light surface keeps the dark values.
+	onLight: {
+		tokens: {
+			"--color-text-primary": pin(DRA.fg),
+			"--color-icon-primary": pin(DRA.fg),
+			"--color-accent": pin(DRA.purple),
+		},
 	},
 });

@@ -387,10 +387,14 @@ const pairs: ContrastRow[] = [
 	},
 	{ name: "separator/bg", fg: "--color-separator", bg: "--color-background-body", floor: 1.3 },
 	// border-em: 3.0, not 1.5. The floor is the WCAG 1.4.11 tier core's own
-	// expandColorScale.ts:22-24 promises for form-control boundaries, which
-	// pin() makes inert. Popover is a REAL adjacent tier, not a hypothetical one:
-	// DropdownMenuRadioItem.tsx:84 reads this token and DropdownMenu paints
-	// --color-background-popover. Muted is included for the same reason.
+	// expandColorScale.ts:31-32 promises for form-control boundaries, which
+	// pin() makes inert. The token's live 0.7.2 consumers are form controls and
+	// content chrome — Field / FileInput / NumberInput / InputGroupText / Kbd
+	// borders, Divider variant="strong", Blockquote's rule, HoverCard's and
+	// Tooltip's dashed underlines, the checkbox/radio Indicator, Calendar's
+	// today ring, TreeList's branch lines, ResizeHandle and Selector's focus
+	// restore. (DropdownMenuRadioItem read this token in 0.6.3 and no longer
+	// does.) Popover and Muted are REAL adjacent tiers, not hypothetical ones.
 	{
 		name: "border-em/card",
 		fg: "--color-border-emphasized",
@@ -1069,13 +1073,130 @@ for (const f of lintFiles.sort()) {
 	}
 }
 
+// A data-token fallback must equal the theme's own pin for that token.
+//
+// Core 0.7.0 moved the canonical `--color-data-*` defaults out of the generated
+// theme CSS and into core's own dataVars group, so a bare
+// `var(--color-data-*)` in source is no longer guaranteed to resolve: the
+// theme's pin is the only thing painting it. Every such var() in this repo
+// therefore carries an explicit fallback equal to that pin, so a theme that
+// drops the token still paints the right colour instead of nothing.
+//
+// That makes the fallback a SECOND copy of a value the theme already owns, and
+// a second copy is a value that can drift. This gate reads the pins out of
+// astryx-theme.ts and compares them with every fallback in the tree, so the
+// copy cannot disagree with the original. The upstream codemod
+// `validate-data-token-ownership` requires a fallback for the same reason:
+// it only flags the fallback-LESS form.
+{
+	// Token -> pinned value, read from the theme source (never built output).
+	const pins = new Map<string, string>();
+	for (const m of themeSrc.matchAll(
+		/"(--color-data-[a-z0-9-]+)":\s*pin\(\s*(?:"([^"]+)"|([A-Za-z0-9_.]+))\s*\)/g,
+	)) {
+		const name = m[1];
+		const literal = m[2];
+		const named = m[3];
+		if (literal) pins.set(name, literal.toUpperCase());
+		else if (named) {
+			// DRA.* and other named constants: resolve from the theme's own map.
+			// The constant is written `DRA.comment`, but the map declares
+			// `comment: "#6272A4"`, so match on the last segment.
+			const key = named.split(".").pop() ?? named;
+			const v = themeSrc.match(new RegExp(`\\b${key}:\\s*"([^"]+)"`));
+			if (v) pins.set(name, v[1].toUpperCase());
+		}
+	}
+	if (!pins.size) fail("no --color-data-* pins found in astryx-theme.ts");
+	// Normalise hsl() fallback values to the same shape the theme pins, so a
+	// spacing difference does not read as a mismatch.
+	const norm = (v: string) => v.replace(/\s+/g, " ").toUpperCase();
+	let checked = 0;
+	for (const entry of [...new Bun.Glob("{templates,shared,demo}/*.{ts,tsx}").scanSync(".")]) {
+		const src = await Bun.file(entry).text();
+		for (const m of src.matchAll(
+			/var\(\s*(--color-data-[a-z0-9-]+)\s*,\s*((?:hsl\([^()]*\))|(?:#[0-9A-Fa-f]{3,8}))\s*\)/g,
+		)) {
+			const name = m[1];
+			const fallback = m[2].trim();
+			const pinned = pins.get(name);
+			if (!pinned) {
+				fail(
+					`${entry} uses ${name} but astryx-theme.ts pins no such token — a data colour that the theme does not own paints nothing`,
+				);
+				continue;
+			}
+			checked++;
+			if (norm(fallback) !== norm(pinned)) {
+				const line = src.slice(0, m.index).split("\n").length;
+				fail(
+					`${entry}:${line} ${name} fallback is ${fallback} but the theme pins ${pinned} — the fallback is a copy of the pin, and a copy that disagrees with the original paints the wrong colour the moment the token is missing`,
+				);
+			}
+		}
+	}
+	console.log(`PASS data-token fallbacks ${checked} match the theme pins`);
+}
+
+// tokens.css and theme.css must agree on the syntax family.
+//
+// The two files hold the same values twice — theme.css is generated from
+// astryx-theme.ts, tokens.css is hand-maintained as its plain-CSS mirror — and
+// nothing compared them. The five diff slots drifted: core's defaults are a
+// 25% mix of the theme's 10%-alpha success/error washes, which measure 1.06:1
+// against the code background, so a diff row rendered as "a slightly different
+// grey". The mirror still carried the same dead value, so nothing caught it.
+//
+// Both files declare the syntax family with flat values, so they can be
+// compared directly. The gate reads the generated theme.css — the build output
+// IS the theme's declaration — and fails when the hand-maintained mirror
+// disagrees.
+{
+	const built = await Bun.file("theme.css").text();
+	const mirror = await Bun.file("tokens.css").text();
+	const readFamily = (src: string) => {
+		const map = new Map<string, string>();
+		for (const m of src.matchAll(/--color-syntax-[a-z-]+:\s*([^;]+);/g)) {
+			const name = m[0].slice(0, m[0].indexOf(":"));
+			map.set(name, m[1].trim().replace(/\s+/g, " ").toLowerCase());
+		}
+		return map;
+	};
+	const builtFamily = readFamily(built);
+	const mirrorFamily = readFamily(mirror);
+	if (!builtFamily.size) fail("theme.css declares no --color-syntax-* tokens to mirror");
+	let compared = 0;
+	let mismatched = 0;
+	for (const [name, value] of builtFamily) {
+		const mirrored = mirrorFamily.get(name);
+		if (mirrored === undefined) {
+			fail(
+				`tokens.css is missing ${name} — the plain-CSS path gets core's default, and core ships no CSS default for the syntax family, so a CodeBlock renders unhighlighted`,
+			);
+			mismatched++;
+			continue;
+		}
+		compared++;
+		if (mirrored !== value) {
+			mismatched++;
+			fail(
+				`${name} is ${value} in theme.css but ${mirrored} in tokens.css — the two files hold the same value twice, and a mirror that disagrees paints a different colour than the theme`,
+			);
+		}
+	}
+	// Only claim PASS when nothing failed: a PASS printed next to a failure
+	// reads as a passing gate in a log that a human skims.
+	if (mismatched === 0)
+		console.log(`PASS syntax tokens ${compared} match between theme.css and tokens.css`);
+}
+
 // A declared token is not an applied token.
 //
 // Until core+CLI 0.6.3, --text-display-2-size was defined in the theme and
 // applied by NOTHING: core 0.3.0's Heading emitted no data-type, and the 0.3.0
-// CLI emitted no .astryx-heading[data-type] rule. 24 templates asked for
-// type="display-2" and every one of them rendered at core's 24px level-1
-// default instead of the 35px they declared. It looked correct, it was
+// CLI emitted no .astryx-heading[data-type] rule. 20 templates asked for
+// type="display-2" (`rg -l 'type="display-2"' templates | wc -l`) and every one of them rendered at core's
+// 24px level-1 default instead of the 35px they declared. It looked correct, it was
 // correct in light mode, three consumers did not notice, and only a pixel
 // diff between two builds found it.
 //

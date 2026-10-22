@@ -1,5 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
 // AR*9 is the live count: SCENE_TILE_ALTS has 9 entries and a bare .map renders
 // all 9, with no slice.
 //   L > LC[p=6] > G[c={min:280} g8 a=center] > (V[g6] > (V[g3] > Tx"AFTER DARK"[t=supporting] + Hd"Make every night"[level=1] + Tx"The smallest rituals"[t=body]) + B.primary"Explore the night" + (V[g4] > D + (H[g6] > (V > Tx"12k+"[t=display-3] + Tx"Night shots"[t=supporting])*3))) + (G[c3 g3] > AR*9)

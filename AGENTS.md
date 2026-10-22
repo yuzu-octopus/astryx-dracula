@@ -3,34 +3,33 @@
 Project-specific guidance for AI coding agents.
 
 <!-- ASTRYX:START -->
-Astryx v0.3.0 · 155 components
+Astryx v0.7.2 · 173 components
 CLI: run every command as `bunx astryx <cmd>` (shown below as `astryx ...`).
 
-SETUP (once, in your app entry e.g. main.tsx) — without these, components render unstyled:
+SETUP (once, in app entry e.g. main.tsx) — without these, components render unstyled:
   import "@astryxdesign/core/reset.css";
   import "@astryxdesign/core/astryx.css";
 
-WORKFLOW — discover, don't guess. Before writing UI:
-1. `astryx build "<idea>"` — START HERE: returns a kit (closest [page] + [block]s + [component]s). No args = full playbook.
-2. `astryx template <name> [--skeleton]` — scaffold the [page]/[block]s it named, or study their layout. Templates are reference code.
-3. `astryx component <Name>` — props + examples for every component you use.
+WORKFLOW — start every page from a template, never from scratch:
+1. `astryx build "<idea>"` — names the template to scaffold from and the parts it lacks.
+2. `astryx template <name> <path>` — scaffold it; keep its frame, gap and padding; replace the content.
+3. `astryx template <Block>` for parts it lacks; `astryx component <Name>` to read props before using one.
+Changing an existing page? Keep it: skip step 2 and add blocks/components inside its sections.
 
 RULES:
-- No <div> — components do all layout/spacing. Full page → AppShell; sidebar nav → SideNav.
-- Frame first: pick the shell (AppShell / Layout+LayoutPanel) and budget regions in px BEFORE writing content (`astryx docs layout`).
-- Dense data = rows (Table, List/Item) edge-to-edge — never Card-wrapped list items. Card = dashboard widgets, galleries, settings groups only.
-- Status → StatusDot/Token; Badge only for counts and enumerated states, never decoration.
-- Custom styling: component props first; else style/className with tokens — var(--color-*|--spacing-*|--radius-*). No raw hex/px. (No StyleX/Tailwind compiler here — don't use xstyle/utility classes.)
-- Tokens for every value (`astryx docs tokens`). Brand/accent via `astryx theme` — never override --color-* in :root.
-- SELF-CHECK before you finish: re-read the file and replace any raw <div>/<span> layout, imported .css/@apply, or hardcoded value (#hex, 16px) with the component or a token (var(--color-*|--spacing-*|…)). If unsure a component/prop exists, run `astryx component <Name>` / `astryx search "<thing>"`; don't hand-roll CSS.
+- No <div> — components handle all layout and spacing.
+- Read `astryx docs layout` before changing a template's frame.
+- Dense data = rows (Table, List/Item), not Card-wrapped lists. Badge = counts only.
+- Style with component props first, then tokens (var(--color-*|--spacing-*|--radius-*)). No raw hex/px. No StyleX/Tailwind compiler here — don't use xstyle/utility classes directly. Some templates use StyleX and need a compiler plugin; see `astryx docs styling-overview`.
+- Palettes and custom colors go through the theme, never :root overrides. Run `astryx theme add <slug>` to import; `theme eject <slug>` only forks source. See `astryx docs theme`.
+- SELF-CHECK: re-read the file; replace any raw <div>/<span>, imported .css/@apply, or hardcoded #hex/px with the component or a token.
 
-MORE CLI:
-  search "<query>"   find any component / hook / doc / template / block
-  component --list   155 components by category
-  template --list    page + block recipes
-  docs <topic>       browser-support, cli-integrations, color, elevation, getting-started, icons, illustrations, internationalization, layout, migration, motion, principles, shape, spacing, styling, styling-libraries, theme, tokens, typography, working-with-ai
-  swizzle <Name>     eject component source for deep customization
-  upgrade --apply    run after any @astryxdesign/core bump
+`astryx help` lists every command. Key ones beyond the workflow:
+  search "<query>"   find any component / hook / doc / template
+  discover <words>   integrations you could add
+  docs <topic>       getting-started, principles, tokens, theme … (`astryx docs` lists all)
+  docs cli           commands, API reference, integration authoring
+  upgrade --from <old version> --apply   run after a dependency bump
 <!-- ASTRYX:END -->
 
 ## Astryx Dracula brand (this repo)
@@ -39,7 +38,7 @@ Dark-only Dracula, no light mode exists or is planned. Never invent a color, tok
 Kit import order in the app entry: `@astryxdesign/core/reset.css`, then `@astryxdesign/core/astryx.css`,
 then `astryx-dracula/tokens.css`, then `astryx-dracula/theme.css` inside `<Theme theme={astryxDraculaTheme} mode="dark">`.
 Read `.agents/skills/astryx-dracula/SKILL.md` before styling anything (agent index: [AGENTS.snippet.md](AGENTS.snippet.md)).
-Scaffold pages with `bunx astryx template <id> --package astryx-dracula` — templates carry XLE headers.
+Scaffold pages with `bunx @astryxdesign/cli template <id> --package astryx-dracula ./path/to/page.tsx` — the path argument is required, without it the CLI prints the source and writes nothing. Templates carry XLE headers.
 
 Three rules that are cheap to get wrong and expensive to debug, all settled with evidence in SKILL.md:
 
@@ -52,7 +51,8 @@ Three rules that are cheap to get wrong and expensive to debug, all settled with
 - **A `.tsx` exports components only; data lives in a sibling `.ts`.** A file exporting both breaks
   React Fast Refresh. `bun run audit` gates `package.json` `exports` against `shared/` in both
   directions, so a new shared module needs an entry and a deleted one loses it.
-- **A declared token is not an applied token.** 24 templates asked for `type="display-2"` (35px) and
+- **A declared token is not an applied token.** 20 templates asked for `type="display-2"` (35px,
+  `rg -l 'type="display-2"' templates | wc -l`) and
   every one rendered 24px for the package's entire life: no `.astryx-heading[data-type]` rule existed
   to apply the size, so core's level-1 default leaked through. It looked right, no build failed, and
   only a pixel diff between two builds found it. `bun run audit` now fails if a `display-N` this repo
@@ -91,17 +91,29 @@ each one is recorded here.
   spread: `InfoRow` declared only `label`/`value`/`action`, so the extra key was rejected at the
   literal. Fix the interface and a data-side signal reaches every renderer with zero template edits.
 
-Templates are the reference implementation. Read the closest `templates/<id>.template.mjs` — it
-names the page and blocks it is built from — before writing a new pattern. Core's `.d.ts` describes
-the API; it does not describe how this brand uses it.
+Templates are the reference implementation. Read the closest `templates/<id>.tsx` — and its XLE
+header comment, which is the structural map of the tree it renders — before writing a new pattern.
+Core's `.d.ts` describes the API; it does not describe how this brand uses it.
 
-On "155 components" in the generated block above: that is the number of **exported
-component names** the CLI enumerates, not the number of component directories. The
-package ships **101** component directories — `find
+`templates/<id>.template.mjs` is **metadata, not structure**: it carries the page's `type`, `name`,
+`description`, `category` and the `keywords` the CLI matches `astryx search` and `astryx build`
+against. It does not list the page's blocks and it holds no XLE — the XLE lives in the `.tsx`
+header, and only there.
+
+On the "173 components" line in the generated block above: that is the number of
+**exported component names** the CLI enumerates, not the number of component
+directories. The package ships **107** component directories — `find
 node_modules/@astryxdesign/core/src -maxdepth 1 -type d | tail -n +2 | wc -l` returns
-106, minus 5 infrastructure directories (`__tests__`, `hooks`, `i18n`, `theme`,
+112, minus 5 infrastructure directories (`__tests__`, `hooks`, `i18n`, `theme`,
 `utils`) that are not components. The gap is compound parts the CLI lists
 individually (`AvatarGroup`, `AvatarStatusDot`, `ChatMessageBubble`,
 `CommandPaletteItem`, `DialogHeader`, `ToggleButtonGroup`, …), so the generated line is
 correct in its own terms and is not edited — but do not read it as a component count.
 Say which of the two you mean, and name the command.
+
+The demo's own copy of this number is **derived, not written**: `vite.config.ts` counts
+the component directories of the installed core package and hands the result to
+`demo/App.tsx` through `import.meta.env.ASTRYX_COMPONENT_COUNT`. It said "All 155
+Astryx components" through the 0.6.3 era and was true for core 0.6.3; a number about a
+dependency drifts the moment the dependency moves, and this one is now counted at build
+time instead.

@@ -1,5 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
 //   L > (LH[divider] > H[g=2 a=center] > (SI[fill] > Hd"Familiars"[level=1]) + IB"Filter"[variant=ghost] + IB"Download"[variant=ghost] + B.primary"Add") + (LC[p=3] > V[g=4] > PS + (T[hover] > (TR > THC*3) + (TR > TC*3)*3))
 
 /**

@@ -1,5 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
 //   L > (LH[divider] > V[g=3] > ((H[g=4 a=start] > (SI > V[g=0] > (Lk"All orders" + (V[g=0] > Hd"#1001"[level=1] + (H[g=1 a=center] > Tx"5 ordered items"[t=supporting] + Av"Vlad Dracul" + SD"Unfulfilled" + Tx"02/23/2026"[t=supporting] + Lk"See all")))) + (H[g=2] > B"Restock" + B"Edit")) + (H[g=3 a=center] > (SI > TL > Tab"Details"! + Tab"Invoices" + Tab"Timeline" + TabMenu"More") + B.ghost))) + (LC > V[g=4] > ((S > V[g=4] > ((H[g=2 a=center] > Hd"Items"[level=2] + SD"Unfulfilled") + UL)) + (S > V[g=4] > ((H[g=2 a=center] > Hd"Invoice"[level=2] + SD"Paid") + ML)) + (S > V[g=4] > ((H[g=2 a=center] > Hd"Timeline"[level=2] + B.ghost) + UL)))) + (LP[w=320 p=4] > V[g=4] > Col"Notes" + Col"Customer" + Col"Fraud analysis")
 
 import { Avatar } from "@astryxdesign/core/Avatar";
@@ -50,16 +52,14 @@ import { useState } from "react";
 
 // Bleed the tab bar to the header's content edges so the active-tab underline
 // meets the header divider. No edge-dock prop on TabList (#2622).
+//
+// These are written as spacing-token arithmetic, not raw pixels: core's
+// --spacing-* scale is `rem` since 0.7.0, so a literal -12px stops matching
+// the padding it cancels at any root font size other than 16px.
 const tabsRow: CSSProperties = {
-	marginInline: -12,
-	marginBottom: -16,
-	marginTop: 12,
-};
-// Pull the list items' inner padding back so their content optically aligns
-// with the section heading above (ListItem insets content by ~8px). No
-// edge/inset prop on List (#2626).
-const itemsList: CSSProperties = {
-	marginInline: -8,
+	marginInline: "calc(var(--spacing-3) * -1)",
+	marginBottom: "calc(var(--spacing-4) * -1)",
+	marginTop: "var(--spacing-3)",
 };
 
 // ─── Product data ───────────────────────────────────────────────────────────
@@ -334,7 +334,7 @@ function ItemsCard() {
 					</HStack>
 				</HStack>
 
-				<List density="spacious" style={itemsList}>
+				<List density="spacious" edge="outset">
 					{PRODUCTS.map((product, i) => (
 						<ListItem
 							key={product.name}
@@ -482,7 +482,7 @@ function TimelineSection() {
 					<Button label="Filters" variant="ghost" icon={<Icon icon={Filter} />} isIconOnly />
 				</HStack>
 
-				<List density="spacious" style={itemsList}>
+				<List density="spacious" edge="outset">
 					{ACTIVITY.map((item) => (
 						<ListItem
 							key={`${item.user}-${item.time}`}
@@ -624,9 +624,9 @@ export default function DetailPage() {
 				}
 				end={!isNarrow && showSidePanel ? <RightPanel /> : undefined}
 			/>
-			{/* Mobile: the side panel content opens as a full-screen dialog. (A
-          side drawer/sheet would be more idiomatic, but Astryx has no Drawer
-          component yet — #2575 — so we use the fullscreen Dialog variant.) */}
+			{/* Mobile: the side-panel content uses the full viewport so order details
+          are not squeezed beside narrow page chrome. Drawer remains available
+          for side-overlay flows that intentionally preserve page context. */}
 			<Dialog
 				variant="fullscreen"
 				isOpen={isNarrow && isPanelDialogOpen}

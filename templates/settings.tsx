@@ -1,5 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
 //   L > (LH[divider] > H[a=center wrap] > (SI[fill] > Hd"Settings"[level=1 t=display-2]) + TY"Search") + (LP[w=260 p=2] > UL > LI*6) + (LC[p=6] > V[g=4] > (V[a=center] > TabList) + ((G[c={min:280} g=8] > (V[g=1] > Hd"Basic information"[level=2] + Tx"View and update your details"[t=body]) + (V[g=4] > TI"Username" + TI"Email address" + (H > B.primary"Save"))) + D)*3)
 
 /**
@@ -283,7 +285,7 @@ export default function SettingsTemplate() {
 			start={
 				isNarrow ? undefined : (
 					<LayoutPanel hasDivider={false} width={260} padding={2}>
-						<List density="balanced">
+						<List density="balanced" edge="flush">
 							{NAV_ITEMS.map((item) => (
 								<ListItem
 									key={item}

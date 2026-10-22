@@ -1,5 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
 //   L > (LH[divider] > V[g=4] > (H[j=between a=center] > Hd"Night-shift issues"[level=1] + B.primary"Raise issue"[opens=#raise-issue]) + (H[g=2 a=center] > PS + Po > B.secondary"View options")) + (LC[p=0] > (Tx"Scroll the table sideways to see every column"[t=supporting] + D) + T[hover] > (TR > THC*7) + (TR > TC*7)*4) + (LP > V[g=4] > (H > Tx[t=supporting] + IB"Close panel") + (V[g=1] > Hd[level=2] + Tx[t=body]) + ML + (D + (V[g=2] > Tx"Labels"[t=label] + (H[g=2] > Tk*2)))) ;; Dlg#raise-issue > (DH"Raise issue" + (LC[p=4] > V[g=4] > TI*4) + (LF > H[j=end g=2] > B.secondary"Cancel" + B.primary"Raise issue"))
 
 /**
@@ -1049,7 +1051,7 @@ export default function TableGrouped() {
 					content={
 						<LayoutContent padding={4}>
 							<VStack gap={4}>
-								<TextInput label="Title" placeholder="Issue title" value="" />
+								<TextInput label="Title" placeholder="Issue title" value="" onChange={() => {}} />
 								<Selector
 									label="Status"
 									value="todo"

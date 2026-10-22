@@ -1,6 +1,8 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LC > V[g=8] > (V[g=2] > Hd"Getting started with Astryx Dracula"[level=1] + Tx"Last updated March 30, 2026"[t=supporting]) + (C > V[g=3] > (H[j=between] > (H[g=2] > Ic + Tx"AI Assistance"[t=body]) + B"Copy prompt") + Tx"Prompt description"[t=body]) + (V[g=4] > Hd"Prerequisites"[level=2] + UL) + D + (V[g=4] > Hd"Install the package"[level=2] + Tx"Description"[t=body] + (V[g=2] > Tx"Step"[t=body] + Cd)*3) + D + (V[g=4] > Hd"Configure theming"[level=2] + Tx"Description"[t=body] + Cd + Tx"Note"[t=body]) + D + (V[g=4] > Hd"Next steps"[level=2] + UL)) + (LP > Outline)
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
+//   L > (LC[p=8] > V[g=8] > (V[g=2] > Hd"Getting started with Astryx Dracula"[level=1] + Tx"Last updated March 30, 2026"[t=supporting]) + (C > V[g=3] > (H[j=between] > (H[g=2] > Ic + Tx"AI Assistance"[t=body]) + B"Copy prompt") + Tx"Prompt description"[t=body]) + (V[g=4] > Hd"Prerequisites"[level=2] + UL) + D + (V[g=4] > Hd"Install the package"[level=2] + Tx"Description"[t=body] + (V[g=2] > Tx"Step"[t=body] + Cd)*3) + D + (V[g=4] > Hd"Configure theming"[level=2] + Tx"Description"[t=body] + Cd + Tx"Note"[t=body]) + D + (V[g=4] > Hd"Next steps"[level=2] + UL)) + (LP > Outline)
 
 import { Button } from "@astryxdesign/core/Button";
 import { Card } from "@astryxdesign/core/Card";

@@ -1,10 +1,12 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
 // Counts: 31 total, Core 18 / Layout 4 / Navigation 4 / Form 5. Derived at
 // render from COMPONENT_CATEGORIES, so these numerals must move together with
 // the array -- the gate in scripts/check.ts reads the rendered count, not this
 // comment.
-//   L > LC > V[g=10] > (C[p=10] > (H[g=8 a=center] > (V[g=4] > Hd"The coven grimoire"[level=1 t=display-1] + Tx.lg"Every incantation in the Astryx spellbook"[t=large] + (H > B.primary"Enter the grimoire")))) + (V[g=4] > (H[j=between a=center] > Hd"Core"[level=2] + Tx"18 spells"[t=body]) + (H[j=between a=center] > Hd"Layout"[level=2] + Tx"4 spells"[t=body]) + (H[j=between a=center] > Hd"Navigation"[level=2] + Tx"4 spells"[t=body]) + (H[j=between a=center] > Hd"Form"[level=2] + Tx"5 spells"[t=body]) + (G[c={min:260} g=4] > (CC[p=4] > V[g=3] > C[p=0] + (V[g=1] > Tx"Avatar"[t=body] + Tx"Avatars represent"[t=body]))*4))
+//   L > LC[p=8] > V[g=10] > (C[p=10] > (H[g=8 a=center] > (V[g=4] > Hd"The coven grimoire"[level=1 t=display-1] + Tx.lg"Every incantation in the Astryx spellbook"[t=large] + (H > B.primary"Enter the grimoire")))) + (V[g=4] > (H[j=between a=center] > Hd"Core"[level=2] + Tx"18 spells"[t=body]) + (H[j=between a=center] > Hd"Layout"[level=2] + Tx"4 spells"[t=body]) + (H[j=between a=center] > Hd"Navigation"[level=2] + Tx"4 spells"[t=body]) + (H[j=between a=center] > Hd"Form"[level=2] + Tx"5 spells"[t=body]) + (G[c={min:260} g=4] > (CC[p=4] > V[g=3] > C[p=0] + (V[g=1] > Tx"Avatar"[t=body] + Tx"Avatars represent"[t=body]))*4))
 
 /**
  * Documentation catalog — every component shelf in the grimoire.  Frame-first layout (see `bunx astryx docs layout`): (Frame/responsive/container: see XLE header above.)

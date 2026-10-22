@@ -167,7 +167,9 @@ export function Gallery() {
 						/>
 						<DataBar
 							label="Network bandwidth headroom"
-							segments={[{ id: "used", value: 38, color: "var(--color-data-categorical-green)" }]}
+							segments={[
+								{ id: "used", value: 38, color: "var(--color-data-categorical-green, #50FA7B)" },
+							]}
 							hasValueLabel
 							formatValue={(used) => `${used}% used`}
 						/>

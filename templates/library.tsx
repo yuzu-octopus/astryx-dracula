@@ -1,6 +1,8 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LH[divider] > (V[g=1] > Hd"Library"[level=1] + Tx"30 components across 5 categories"[t=body])) + (LC[p=6] > V[g=8] > (V[g=4] > TI"Search the stacks…" + (H[a=center g=3] > (SI[fill] > TgG"Filter" > OFL > Tg"All"! + Tg"Layout" + Tg"Forms" + Tg"Navigation" + Tg"Feedback" + Tg"Data") + DM"Sort")) + D + (V[g=8] > (H[j=between a=center] > Hd"Layout"[level=2] + Tx"6 items"[t=body]) + (G[c={min:280} g=4] > (C[p=0] > AR + (S.transparent[p=4] > V[g=1] > Hd"Card"[level=3] + Tx"Description"[t=supporting]))*4)))
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
+//   L > (LH[divider] > (V[g=1] > Hd"Library"[level=1] + Tx"30 components across 5 categories"[t=body])) + (LC[p=6] > V[g=8] > (V[g=4] > TI"Search the stacks…" + (H[a=center g=3] > (SI[fill] > TgG"Filter" > OFL > Tg"All"! + Tg"Layout" + Tg"Forms" + Tg"Navigation" + Tg"Feedback" + Tg"Data") + DM"Sort")) + D + (V[g=8] > (H[j=between a=center] > Hd"Layout"[level=2] + Tx"6 items"[t=body]) + (G[c={min:280} g=4] > (C[p=0] > AR + (S.transparent[p=4] > V[g=1] > Hd"Card"[level=3] + Tx"Description"[t=body]))*4)))
 
 /**
  * Library — a browsable grid of design-system entries grouped by category.  Frame: page header (title) | content column (search, filter row, s (Frame/responsive/container: see XLE header above.)

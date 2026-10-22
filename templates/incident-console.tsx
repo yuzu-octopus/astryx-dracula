@@ -1,5 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
 // NOTE on `t=display-2`: the h1 asked for display-2 from the start, but
 // core 0.3.0's Heading emitted no `data-type`, and the 0.3.0 CLI emitted no
 // `.astryx-heading[data-type]` rule, so --text-display-2-size never reached a
@@ -8,7 +10,7 @@
 // pixel-diffing the pre-upgrade build against this one at 1440 and 390: the
 // only regression was this header detaching at 390, fixed by stacking the
 // title group under `isNarrow`.
-//   L > (LH > H[g3 a=center] > (H[g2 a=center] > Hd"Night watch"[level=1 t=display-2] + Tx"3 investigating"[t=supporting]) + SegmentedControl"Filter by status" + B"Declare incident") + (LC[p0] > V[g0] > (H > PowerSearch"Search the night watch…") + (List > (ListItem)*7)) + (LayoutPanel[w380 p0] > V[g4] > (V[g2] > (H[g2 a=center] > StatusDot + Tx"INC-2417"[t=supporting] + Token"Investigating") + Hd"Checkout API elevated 5xx rate"[level=2]) + (H[g2] > B.primary"Mark mitigated" + B.secondary"Escalate") + Divider + MetadataList + Divider + (V[g2] > Hd"Timeline"[level=3] + List))
+//   L > (LH > H[g3 a=center] > (H[g2 a=center] > Hd"Night watch"[level=1 t=display-2] + Tx"3 investigating"[t=supporting]) + SegmentedControl"Filter by status" + B"Declare incident") + (LC[p0] > V[g0] > (H > PowerSearch"Search the night watch…") + (List > (ListItem)*7)) + (LayoutPanel[w380 p0] > V[g4] > (V[g2] > (H[g2 a=center] > StatusDot + Tx"INC-2417"[t=supporting] + Token"Investigating") + Hd"Checkout API elevated 5xx rate"[level=2]) + (H[g2] > B.primary"Mark mitigated" + B.secondary"Escalate") + Divider + MetadataList + Divider + (V[g2] > Hd"Timeline"[level=3] + List)) + Drawer"Incident details" > (DrawerHeader"Incident details" + (V[g4] > (V[g2] > (H[g2 a=center] > StatusDot + Tx"INC-2417"[t=supporting] + Token"Investigating") + Hd"Checkout API elevated 5xx rate"[level=2]) + (H[g2] > B.primary"Mark mitigated" + B.secondary"Escalate") + Divider + MetadataList + Divider + (V[g2] > Hd"Timeline"[level=3] + List)))
 
 /**
  * Incident Console — an on-call incident response tool for the night watch.  Frame-first layout (see `bunx astryx docs layout`), distilled fro (Frame/responsive/container: see XLE header above.)
@@ -16,6 +18,7 @@
 
 import { Button } from "@astryxdesign/core/Button";
 import { Divider } from "@astryxdesign/core/Divider";
+import { Drawer, DrawerHeader } from "@astryxdesign/core/Drawer";
 import { EmptyState } from "@astryxdesign/core/EmptyState";
 import { useMediaQuery } from "@astryxdesign/core/hooks";
 import { Icon } from "@astryxdesign/core/Icon";
@@ -373,6 +376,10 @@ function IncidentRows({
 								key={incident.id}
 								label={incident.title}
 								description={`${incident.id} · ${incident.service} · ${incident.impact}`}
+								// Incident titles wrap to two lines. The severity badge
+								// and the status token belong on the TITLE's first
+								// line, not floating at the middle of the block.
+								align="first-line"
 								startContent={
 									<SeverityBadge
 										severity={incident.severity}
@@ -476,6 +483,10 @@ export default function IncidentConsole() {
 	const [statusFilter, setStatusFilter] = useState("all");
 	const [filters, setFilters] = useState<PowerSearchFilter[]>([]);
 	const [selectedId, setSelectedId] = useState<string | null>(INCIDENTS[0].id);
+	// Mobile inspector drawer. The inspector is a separate surface at <= 1024px
+	// (it is the `end` slot of the layout there), so it is a Drawer: a panel
+	// that slides in over the row list instead of a column that compresses it.
+	const [isInspectorOpen, setInspectorOpen] = useState(false);
 	const { config, applyFilters } = usePowerSearchConfig(fieldDefs, "Incidents");
 
 	// Responsive contract: the inspector is hidden at <= 1024px so the row
@@ -533,89 +544,120 @@ export default function IncidentConsole() {
 	);
 
 	return (
-		<Layout
-			height="fill"
-			header={
-				<LayoutHeader hasDivider padding={6}>
-					{isNarrow ? (
-						<VStack gap={2}>
-							{titleGroup}
-							<HStack
-								gap={2}
-								vAlign="center"
-								style={styles.controlsRow}
-								tabIndex={0}
-								role="region"
-								aria-label="Incident filter actions"
-							>
+		<>
+			<Layout
+				height="fill"
+				header={
+					<LayoutHeader hasDivider padding={6}>
+						{isNarrow ? (
+							<VStack gap={2}>
+								{titleGroup}
+								<HStack
+									gap={2}
+									vAlign="center"
+									style={styles.controlsRow}
+									tabIndex={0}
+									role="region"
+									aria-label="Incident filter actions"
+								>
+									{statusFilterControl}
+									{declareButton}
+								</HStack>
+							</VStack>
+						) : (
+							<HStack gap={3} vAlign="center">
+								<StackItem size="fill">{titleGroup}</StackItem>
 								{statusFilterControl}
 								{declareButton}
 							</HStack>
-						</VStack>
-					) : (
-						<HStack gap={3} vAlign="center">
-							<StackItem size="fill">{titleGroup}</StackItem>
-							{statusFilterControl}
-							{declareButton}
-						</HStack>
-					)}
-				</LayoutHeader>
-			}
-			content={
-				<LayoutContent padding={0} isScrollable={false}>
-					<VStack gap={0} style={styles.contentFill}>
-						<HStack style={styles.searchRow}>
-							<StackItem size="fill">
-								<PowerSearch
-									config={config}
-									filters={filters}
-									onChange={(newFilters) => setFilters([...newFilters])}
-									placeholder="Search the night watch…"
-									resultCount={visible.length}
+						)}
+					</LayoutHeader>
+				}
+				content={
+					<LayoutContent padding={0} isScrollable={false}>
+						<VStack gap={0} style={styles.contentFill}>
+							<HStack style={styles.searchRow}>
+								<StackItem size="fill">
+									<PowerSearch
+										config={config}
+										filters={filters}
+										onChange={(newFilters) => setFilters([...newFilters])}
+										placeholder="Search the night watch…"
+										resultCount={visible.length}
+									/>
+								</StackItem>
+							</HStack>
+							<StackItem
+								size="fill"
+								style={styles.rows}
+								tabIndex={0}
+								role="region"
+								aria-label="Incident rows"
+							>
+								<IncidentRows
+									incidents={visible}
+									selectedId={selected?.id ?? null}
+									onSelect={(id) => {
+										setSelectedId(id);
+										// On a narrow viewport the inspector is the Drawer, so
+										// picking a row is what opens it.
+										if (isNarrow) setInspectorOpen(true);
+									}}
 								/>
 							</StackItem>
-						</HStack>
-						<StackItem
-							size="fill"
-							style={styles.rows}
-							tabIndex={0}
-							role="region"
-							aria-label="Incident rows"
-						>
-							<IncidentRows
-								incidents={visible}
-								selectedId={selected?.id ?? null}
-								onSelect={setSelectedId}
+						</VStack>
+					</LayoutContent>
+				}
+				end={
+					isNarrow ? undefined : (
+						<>
+							<ResizeHandle
+								direction="horizontal"
+								hasDivider
+								isAlwaysVisible={false}
+								resizable={inspectorPanel.props}
+								label="Resize inspector"
 							/>
-						</StackItem>
-					</VStack>
-				</LayoutContent>
-			}
-			end={
-				isNarrow ? undefined : (
-					<>
-						<ResizeHandle
-							direction="horizontal"
-							hasDivider
-							isAlwaysVisible={false}
-							resizable={inspectorPanel.props}
-							label="Resize inspector"
-						/>
-						<LayoutPanel width={inspectorPanel.size} padding={0} label="Incident details">
-							{selected ? (
-								<IncidentInspector incident={selected} />
-							) : (
-								<EmptyState
-									title="No incident under the lens"
-									description="Select an incident from the rows to inspect its timeline."
-									icon={<Icon icon={BellRing} size="lg" color="secondary" />}
-									isCompact
-								/>
-							)}
-						</LayoutPanel>
-					</>
-				)
-			}
-		/>
+							<LayoutPanel width={inspectorPanel.size} padding={0} label="Incident details">
+								{selected ? (
+									<IncidentInspector incident={selected} />
+								) : (
+									<EmptyState
+										title="No incident under the lens"
+										description="Select an incident from the rows to inspect its timeline."
+										icon={<Icon icon={BellRing} size="lg" color="secondary" />}
+										isCompact
+									/>
+								)}
+							</LayoutPanel>
+						</>
+					)
+				}
+			/>
+			{/* Narrow viewport: the inspector is a Drawer, not a column. It is
+        non-modal (hasScrim={false}) so the row list stays visible behind it —
+        the point of a peek-at-the-detail surface. The close button comes from
+        DrawerHeader, which only renders it when it is given onOpenChange. */}
+			<Drawer
+				side="end"
+				label="Incident details"
+				isOpen={isNarrow && isInspectorOpen}
+				onOpenChange={setInspectorOpen}
+				hasScrim={false}
+				width={inspectorPanel.size}
+			>
+				<DrawerHeader title="Incident details" onOpenChange={setInspectorOpen} />
+				{selected ? (
+					<IncidentInspector incident={selected} />
+				) : (
+					<EmptyState
+						title="No incident under the lens"
+						description="Select an incident from the rows to inspect its timeline."
+						icon={<Icon icon={BellRing} size="lg" color="secondary" />}
+						isCompact
+					/>
+				)}
+			</Drawer>
+		</>
 	);
 }

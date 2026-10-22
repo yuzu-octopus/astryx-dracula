@@ -1,5 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
 //   L > LC > V[g=8 a=center] > (V[g=1] > (H[g=2 a=center] > Ic + Tx"Hi, Vlad"[t=body]) + Hd"Where should we start?"[level=1 type=display-2]) + ChC"Ask anything" + (V[g=6] > (TgG"Category" > H[g=1 wrap] > Tg"Writing"*4) + Hd"Suggested prompts"[level=2] + (G[c={min:280} g=3] > (CC[p=4] > V[g=0.5] > Hd"Draft"[level=3] + Tx"Compose"[t=body])*4))
 
 import {
@@ -215,15 +217,23 @@ function makeTrigger<TAux>({
 	items,
 	getDescription,
 	toToken,
+	hasMultiWordQuery,
+	emptySearchText,
 }: {
 	character: string;
 	items: SearchableItem<TAux>[];
 	getDescription: (aux: TAux | undefined) => string | undefined;
 	toToken: (item: SearchableItem<TAux>) => string | ChatComposerToken;
+	/** Continue the query past spaces, for names that contain them. */
+	hasMultiWordQuery?: boolean;
+	/** Shown when the query matched nothing. */
+	emptySearchText?: string;
 }): ChatComposerTrigger {
 	return {
 		character,
 		searchSource: createStaticSource(items),
+		...(hasMultiWordQuery ? { hasMultiWordQuery } : {}),
+		...(emptySearchText ? { emptySearchText } : {}),
 		renderItem: (item) => (
 			<TypeaheadItem
 				item={item}
@@ -238,6 +248,13 @@ const mentionTrigger = makeTrigger({
 	character: "@",
 	items: MENTION_ITEMS,
 	getDescription: (aux) => aux?.role,
+	// The mention labels are full names ("Vesper Lin", "Alex Nocturne"), so
+	// the query has to survive the space: without this the menu closes at the
+	// first space and "@Vesper L" narrows to "Vesper" and then matches
+	// nothing. Core hides the menu on an unmatched multi-word query unless
+	// the trigger sets emptySearchText, so both go together.
+	hasMultiWordQuery: true,
+	emptySearchText: "No one by that name tonight.",
 	toToken: (item) => ({
 		value: `@${item.id}`,
 		label: item.label,
@@ -257,6 +274,11 @@ const commandTrigger = makeTrigger({
 });
 
 const composerTriggers = [mentionTrigger, commandTrigger];
+// The upstream `rename emptySearchResultsText to emptySearchText` codemod
+// leaves a TODO on any ChatComposerInput whose `triggers` value it cannot
+// attribute to a literal object — these are built by `makeTrigger`, so it
+// cannot see inside them. The old key appears nowhere in this file, so that
+// TODO would name a rename this template does not need.
 
 /** Composer attachment. The name is user-facing; the id is the React key, since
  * two dropped files can share a name. */

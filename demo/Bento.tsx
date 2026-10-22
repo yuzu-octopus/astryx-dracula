@@ -44,8 +44,12 @@ const SPEC = [
 ];
 
 const METERS: { label: string; value: number; color: DataBarSegment["color"] }[] = [
-	{ label: "Build minutes quota", value: 62, color: "var(--color-data-categorical-green)" },
-	{ label: "Error budget", value: 91, color: "var(--color-data-yellow-2)" },
+	{
+		label: "Build minutes quota",
+		value: 62,
+		color: "var(--color-data-categorical-green, #50FA7B)",
+	},
+	{ label: "Error budget", value: 91, color: "var(--color-data-yellow-2, hsl(64.91 91.67% 74%))" },
 ];
 
 // Every number this page prints is read off the data it renders, and latency is

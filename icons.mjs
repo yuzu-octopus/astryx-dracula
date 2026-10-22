@@ -25,6 +25,7 @@ import {
   MoreHorizontal,
   Search,
   Square,
+  Upload,
   Wrench,
   X,
   XCircle
@@ -84,6 +85,9 @@ var draculaIconRegistry = {
     ...iconProps
   }),
   search: /* @__PURE__ */ jsx(Search, {
+    ...iconProps
+  }),
+  upload: /* @__PURE__ */ jsx(Upload, {
     ...iconProps
   }),
   arrowUp: /* @__PURE__ */ jsx(ArrowUp, {

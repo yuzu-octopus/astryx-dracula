@@ -26,7 +26,7 @@ Use the links below to style a site with this theme or migrate a codebase to it.
 ## Theme source
 
 - [Theme definition](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/astryx-theme.ts): defineTheme source with all token overrides.
-- [Plain CSS tokens](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/tokens.css): full `:root` mirror (289 vars) and font declarations.
+- [Plain CSS tokens](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/tokens.css): the theme's colour, spacing, radius, type and motion tokens as plain `:root` custom properties, unlayered (`grep -c "^\s*--" tokens.css` vars) and font declarations.
 - [Icon registry](https://raw.githubusercontent.com/yuzu-octopus/astryx-dracula/main/icons.tsx): Lucide icon registry (runtime `lucide-react` dependency).
 
 ## Optional

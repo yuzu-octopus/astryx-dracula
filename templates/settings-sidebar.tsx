@@ -1,5 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
 //   L > (LP[p=0] > V[g=4] > Tx"Account settings"[t=label] + (UL > LI*8) + D + LI"Professional hosting tools") + (LC[p=6] > V[g=0] > (Tbar > B.ghost + Hd"Personal info"[level=1]) + Hd"Personal info"[level=1] + (V[g=0] > (H[j=between a=start] > (V[g=1] > Tx"Legal name"[weight=semibold] + Tx"Vlad Dracul"[t=supporting]) + B.secondary"Edit")*7) + (C.muted > V[g=4] > (H[g=3 a=start] > Ic + (V[g=1] > Tx"Why is info hidden?"[weight=semibold] + Tx[t=supporting]))*3))
 
 /**
@@ -131,7 +133,7 @@ export default function SettingsSidebar() {
 			<Text type="label" style={sideNavHeading}>
 				Account settings
 			</Text>
-			<List density="spacious">
+			<List density="spacious" edge="flush">
 				{NAV_ITEMS.map((item) => (
 					<ListItem
 						key={item.label}
@@ -146,7 +148,7 @@ export default function SettingsSidebar() {
 				))}
 			</List>
 			<Divider />
-			<List density="spacious">
+			<List density="spacious" edge="flush">
 				<ListItem label="Professional hosting tools" startContent={<Icon icon={Wrench} />} />
 			</List>
 		</VStack>

@@ -1,5 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
 //   A[cp=0 @sideNav=(SN > (SNS"Overview" > (SNI"Abstract"! + SNI"Model at a glance")) + (SNS"Architecture" > (SNI"Causal Encoder-Decoder" + SNI"Compressed Sparse Attention 2" + SNI"Single-Pass mHC" + SNI"Engram, DSpark, FP4")) + (SNS"Infrastructure" > (SNI"Training infrastructure" + SNI"Inference system" + SNI"SWA Bounded Replay")) + (SNS"Training and evaluation" > (SNI"Pre-training" + SNI"Post-training" + SNI"Conclusion")))] > L[h=auto] > (LC[p=8 !scroll] > V[g=8] > (V[g=2] > (H[g=2 a=center] > MNT + Tx[t=supporting]) + Hd"Abstract"[level=1 t=display-2] + Tx"Chapter 1 of 12"[t=supporting]) + Tx"Intro"[t=large] + AR + (V[g=8] > (V[g=3] > Hd"The bottleneck"[level=2] + Tx"Body"[t=body] + UL + Cd)*3) + D + (H[j=between] > B.secondary"Previous" + B.secondary"Next") + (Tx[t=supporting] > Lk"Checkpoints")) + (LP[!scroll] > Outline)
 
 import { Icon } from "@astryxdesign/core/Icon";
@@ -892,9 +894,9 @@ function IndexerScene({ alt }: { alt: string }) {
 						width="276"
 						height="13"
 						rx="2"
-						fill="var(--color-data-categorical-cyan)"
+						fill={"var(--color-data-categorical-cyan, #8BE9FD)"}
 						fillOpacity={0.12}
-						stroke="var(--color-data-categorical-cyan)"
+						stroke={"var(--color-data-categorical-cyan, #8BE9FD)"}
 						strokeOpacity={0.45}
 					/>
 				) : null,
@@ -911,7 +913,7 @@ function IndexerScene({ alt }: { alt: string }) {
 						rx="1"
 						fill={
 							row.picks.includes(cell)
-								? "var(--color-data-categorical-green)"
+								? "var(--color-data-categorical-green, #50FA7B)"
 								: "var(--dracula-comment)"
 						}
 					/>
@@ -935,7 +937,7 @@ function IndexerScene({ alt }: { alt: string }) {
 					width="8"
 					height="8"
 					rx="1"
-					fill="var(--color-data-categorical-cyan)"
+					fill={"var(--color-data-categorical-cyan, #8BE9FD)"}
 				/>
 				<text x="54" y="204">
 					block kept by its top score
@@ -946,7 +948,7 @@ function IndexerScene({ alt }: { alt: string }) {
 					width="8"
 					height="8"
 					rx="1"
-					fill="var(--color-data-categorical-green)"
+					fill={"var(--color-data-categorical-green, #50FA7B)"}
 				/>
 				<text x="244" y="204">
 					position in Top-512

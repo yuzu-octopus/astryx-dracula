@@ -23,7 +23,7 @@
 
 import { HStack, StackItem, VStack } from "@astryxdesign/core/Stack";
 import { Text } from "@astryxdesign/core/Text";
-import type { ChartHue } from "astryx-dracula/shared/chart-hues";
+import type { ChartHue, DataColor } from "astryx-dracula/shared/chart-hues";
 import type { ReactNode } from "react";
 
 export interface ChartLegendEntry {
@@ -35,7 +35,7 @@ export interface ChartLegendEntry {
 	 *  The surface arm is not optional: a legend whose first row is a recessive
 	 *  surface is normal (the heatmap's zero cell), so a data-only type would
 	 *  reject the value the heatmap is supposed to paint. */
-	color: ChartHue | `var(--color-data-${string})` | `var(--color-background-${string})`;
+	color: ChartHue | DataColor | `var(--color-background-${string})`;
 }
 
 // Kept as a string-keyed fall-through on purpose, and DO NOT narrow it: call

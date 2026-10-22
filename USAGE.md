@@ -62,7 +62,7 @@ import '../tokens.css';
 ```
 
 Then use `var(--color-primary)`, `var(--dracula-purple)`, `var(--space-gap)`.
-`tokens.css` sets real `:root` values with `color-scheme: dark`, so first paint is correct with no runtime. It is a full plain-CSS mirror of the theme (`grep -c "^  --" tokens.css` `:root` vars, unlayered by design so it beats core layers with zero `!important`); edit the theme, not this file, then re-mirror.
+`tokens.css` sets real `:root` values with `color-scheme: dark`, so first paint is correct with no runtime. It mirrors the theme's colour, spacing, radius, type and motion tokens as plain `:root` custom properties (`grep -c "^\s*--" tokens.css` vars, unlayered by design so it beats core layers with zero `!important`); edit the theme, not this file, then re-mirror.
 
 ## Migrating an existing site
 
@@ -78,7 +78,7 @@ as an Astryx integration pack (`astryx.integration.mjs`). List this package in y
 `astryx.config`, then scaffold any of them:
 
 ```bash
-bunx astryx template dashboard --package astryx-dracula
+bunx @astryxdesign/cli template dashboard --package astryx-dracula ./src/pages/dashboard.tsx
 ```
 
 View them all live at `/astryx-dracula/#/templates` on the showcase (agent index: [AGENTS.snippet.md](AGENTS.snippet.md)). Pack rules: templates
@@ -97,36 +97,22 @@ falls back to `monospace`. `bun run audit` fails when the files are missing here
 
 No special config needed. This kit follows the glimpse path: prebuilt
 `@astryxdesign/core` CSS plus `<Theme>` injection. A stock Vite React
-config works. The only recommended extra is the CSS layer-order snippet so
-theme overrides beat component base styles (our repo `vite.config.ts` also
-sets a demo-only `base` path; do not copy that). Tailwind projects keep their
-own setup and add the snippet as a plain `<style>` tag in `index.html` — the
-layer names are the contract, not the Vite plugin:
+config works.
 
-```ts
-// vite.config.ts
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+**The CSS layer order is now declared by the packages themselves.** As of
+core 0.7.x, `reset.css`, `astryx.css` and this kit's `theme.css` each open
+with `@layer reset, astryx-base, astryx-theme;`, so theme overrides beat
+component base styles no matter which order you import them in. The
+layer-order snippet this kit used to recommend is therefore redundant: a
+repeated `@layer` statement is a no-op once the order is established, and
+whichever file lands first establishes the same order. Keep it only if you
+load a DIFFERENT layer name set, and never rename the three layers — the
+names are the contract.
 
-export default defineConfig({
-  plugins: [
-    {
-      name: 'astryx-css-layer-order',
-      transformIndexHtml() {
-        return [
-          {
-            tag: 'style',
-            children:
-              '@layer reset, astryx-base, astryx-theme;',
-            injectTo: 'head-prepend',
-          },
-        ];
-      },
-    },
-    react(),
-  ],
-});
-```
+This kit's own `tokens.css` is deliberately **unlayered**, so it beats every
+core layer with no `!important`. That is why the demo still injects the
+layer-order statement: it costs nothing and documents the contract in the
+one file a reader opens first.
 
 Advanced: custom `astryx theme build` pipelines need the full StyleX
 source-compile setup. See the `/facebook/astryx` `apps/example-vite`
@@ -139,26 +125,20 @@ README. Not required for this kit.
 - Wrong colors after a theme edit: rebuild with `bun run theme:build`; `bun run theme:check` confirms staleness (it ignores `astryx-dracula.js` by design — that file is a build artifact, not a freshness signal).
 - Old `:root` `--color-*` overrides winning: delete them.
 
-## Known upstream defects in `@astryxdesign/core@0.6.3`
+## Upstream defects in `@astryxdesign/core` — resolved
 
-This kit carries local patches for three defects in core, committed under `patches/` and wired through
-`patchedDependencies`. **Read this before assuming the patches reach you: they do not.** Bun and npm
-honour `patchedDependencies` only from the *root* project of an install. The patches apply when you
-clone or work in this repository; they do **not** propagate to a downstream app that installs
-`astryx-dracula` from npm, because core resolves through your own dependency tree. If you hit one of
-these in your own app, the fix is yours to carry.
+This kit used to carry local patches for three core defects, under `patches/` and wired through
+`patchedDependencies`. **All three were fixed upstream in `@astryxdesign/core@0.7.2`**, so the
+patch directory and the `patchedDependencies` entry are gone. Nothing to carry downstream any more.
 
-| Defect | Symptom | Workaround |
-|---|---|---|
-| `ChatToolCalls` discards its `label` prop | The `label` prop is typed and documented ("Auto-generated from count if omitted") but the expanded group header always renders `"{count} tool calls"`. The prop is destructured away, so it cannot reach the DOM either. | Render your own header above the component, or wrap it. The internal header markup is not exported. |
-| `ToggleButton` drops `className` | A `className` passed to `ToggleButton` never reaches the DOM, even though `BaseProps` documents that it is kept. A sweep of all of core's `dist` found this to be the only component doing it, so it reads as an oversight rather than policy. | Style via `style` or `xstyle`, both of which do forward. Or use `Button` with `aria-pressed`, which honours `className`. |
-| `ChatToolCalls` `defaultIsExpanded` JSDoc is wrong | The type comment claims "true for ≤3 calls, false for >3". The implementation is an unconditional `?? false`. The behaviour is the JSDoc that is wrong, so no action is needed. | None. Documented so nobody codes against the comment. |
+| Defect (core 0.6.3) | Status in 0.7.2 |
+|---|---|
+| `ChatToolCalls` discarded its `label` prop — the prop was destructured to `_customLabel` and never read, so the expanded group header always rendered `"{count} tool calls"`. | Fixed. The prop is destructured to `customLabel` and the header renders `customLabel ?? t('@astryx.chatToolCalls.groupLabel', …)`. |
+| `ToggleButton` dropped `className` — destructured to `_className` and discarded, so it never reached the DOM. | Fixed. `className` is now merged into the inner `Button` via `mergeProps(themeProps(…), className)`. |
+| `ChatToolCalls` `defaultIsExpanded` JSDoc claimed "true for ≤3 calls, false for >3" while the implementation was an unconditional `?? false`. | Fixed. The doc comment now reads `@default false`, which matches the code. |
 
-If you want the patches, copy `patches/@astryxdesign%2Fcore@0.6.3.patch` from the repository into
-your own root `package.json` under `patchedDependencies`. They are version-locked to `0.6.3`, so
-upgrading core makes them stop applying rather than silently mis-apply — which is the intended
-signal to delete them. Each hunk carries a comment naming the defect, so they are easy to drop once
-upstream ships a fix.
+Because these were the only defects we ever patched, this repository now installs a stock
+`@astryxdesign/core` with no `patchedDependencies` at all.
 
 ## Rules
 

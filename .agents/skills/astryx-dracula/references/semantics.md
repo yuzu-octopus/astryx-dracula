@@ -69,12 +69,12 @@ read as a form (`shared/settings-rows.tsx:54-56`); and a row action passes
 ## 2. The underline follows the context, not the element
 
 Core's `Link` is undecorated by default and underlines on hover only:
-`node_modules/@astryxdesign/core/src/Link/Link.tsx:61-66` sets
+`node_modules/@astryxdesign/core/src/Link/Link.tsx:63-69` sets
 `textDecoration` to `none` at rest and `underline` under `:hover` inside
-`@media (hover: hover)`. The `hasUnderline` prop (`:91-93`, defaulted `false`
-at `:300`) is the only way to get a persistent underline, and this theme adds
-none of its own — `astryx-theme.ts:394-399` sets colour and hover colour and
-stops there, shipping as `.astryx-link` in `theme.css:471-477`.
+`@media (hover: hover)`. The `hasUnderline` prop (`:89-91`, defaulted `false`
+at `:298`) is the only way to get a persistent underline, and this theme adds
+none of its own — `astryx-theme.ts:418` sets colour and hover colour and
+stops there, shipping as `.astryx-link` in `theme.css:502-508`.
 
 **Links in running prose pass `hasUnderline`.** A link inside a sentence — a
 sentence in a description, help text, a privacy line, terms of service — has
@@ -173,8 +173,9 @@ neighbours.
 is widely assumed. Core applies the gap style only when the value is non-null
 (`node_modules/@astryxdesign/core/src/Stack/stack.stylex.ts:235`,
 `gap != null && gapStyles[gap]`), and `gapStyles[0]` is a real entry
-(`:113-116`) resolving `--spacing-0` to `0px`
-(`node_modules/@astryxdesign/core/src/theme/tokens.stylex.ts:153`). So `0`
+(`:113-116`) resolving `--spacing-0` to `0rem`
+(`node_modules/@astryxdesign/core/src/theme/tokens.stylex.ts:158`; core's spacing
+defaults are `rem` since 0.7.0 — the same value at a 16px root). So `0`
 flips the switch on, it does not read as absent. In templates:
 `templates/settings-dialog.tsx:259` (a column whose sections carry their own
 gaps), `templates/incident-console.tsx:336` and `:338`,

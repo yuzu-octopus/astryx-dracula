@@ -1,5 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
 //   L > (LP[w=68] > V > Av + (V > IB*4) + IB) + (LP[w=260] > V > (H > Hd"Messages"[level=1] + IB) + TI"Jump to…" + (V > Tx"Channels"[t=label] + (List > (ListItem)*4)) + (V > Tx"Direct messages"[t=label] + (List > (ListItem)*3))) + (LC[p=0] > V > (H > Hd"design-systems"[level=2] + SD + IB) + (ChL > ChML > (ChM > ChB)*6 + ChC)) + (LP[w=340] > V > (H > Tx"Thread"[weight=semibold] + IB) + (ChL > ChML > (ChM > ChB)*3 + ChC))
 
 /**
@@ -497,6 +499,7 @@ export default function MessagingShell() {
 			>
 				<List
 					density="compact"
+					edge="flush"
 					hasDividers={false}
 					header={
 						<Text type="label" size="sm" color="secondary">
@@ -522,6 +525,7 @@ export default function MessagingShell() {
             container, so no wrapper element is needed. */}
 				<List
 					density="compact"
+					edge="flush"
 					hasDividers={false}
 					style={sectionGapStyle}
 					header={

@@ -113,13 +113,17 @@ export function Dashboard() {
                   ProgressBar. See shared/data-bar.tsx for why. */}
 							<DataBar
 								label="Build minutes quota"
-								segments={[{ id: "used", value: 62, color: "var(--color-data-categorical-green)" }]}
+								segments={[
+									{ id: "used", value: 62, color: "var(--color-data-categorical-green, #50FA7B)" },
+								]}
 								hasValueLabel
 								formatValue={(used) => `${used}% used`}
 							/>
 							<DataBar
 								label="Network egress bandwidth"
-								segments={[{ id: "used", value: 38, color: "var(--color-data-categorical-green)" }]}
+								segments={[
+									{ id: "used", value: 38, color: "var(--color-data-categorical-green, #50FA7B)" },
+								]}
 								hasValueLabel
 								formatValue={(used) => `${used}% used`}
 							/>
@@ -129,13 +133,21 @@ export function Dashboard() {
 								// the ramp's step 2, #F0F980, 2.5 L from the spec yellow
 								// #F1FA8C; the DataBar contract admits a --color-data-<family>-N
 								// step as well as a categorical.
-								segments={[{ id: "used", value: 91, color: "var(--color-data-yellow-2)" }]}
+								segments={[
+									{
+										id: "used",
+										value: 91,
+										color: "var(--color-data-yellow-2, hsl(64.91 91.67% 74%))",
+									},
+								]}
 								hasValueLabel
 								formatValue={(used) => `${used}% used`}
 							/>
 							<DataBar
 								label="Memory pool allocation"
-								segments={[{ id: "used", value: 45, color: "var(--color-data-categorical-green)" }]}
+								segments={[
+									{ id: "used", value: 45, color: "var(--color-data-categorical-green, #50FA7B)" },
+								]}
 								hasValueLabel
 								formatValue={(used) => `${used}% used`}
 							/>

@@ -1,5 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
 //   L > LC[p=6] > V[g=8] > (G[c={min:280} g=4 a=start] > Hd"Small comforts for the midnight hours."[level=1 t=display-2] + (V[g=3 a=start] > Tx"Provisions from the castle workshops"[t=body] + B.primary"Browse the collection")) + (V[g=8] > (V[g=2] > Hd"The collection"[level=2] + Tx"Each piece is made in small batches"[t=body]) + (G[c={min:280} g=8] > (V[g=3] > (C[p=0] > AR[ratio=1]) + (V[g=1] > Hd"Nightfall Stoneware Mug"[level=3] + Tx"A hand-thrown mug that sits easy"[t=body color=secondary] + Tx.lg"$75.00"))*6))
 
 import { AspectRatio } from "@astryxdesign/core/AspectRatio";

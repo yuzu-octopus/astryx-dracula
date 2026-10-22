@@ -1,6 +1,8 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
-//   S > L > (LH[divider] > Tbar > (Hd"Sprint Board"[level=1] + Bd.neutral"8") + (H[g=2] > SE + D.strong + IB"Sort" + IB"Filter" + IB"Search" + B.primary"Add task")) + (LC[p=0] > G[c={min:280,max:4} g=4] > (C.muted[p=0] > L > (LH[divider] > H[j=between a=center] > (H[g=2 a=center] > SD + Hd"To-do"[level=2] + IB) + Tx) + (LC[p=3] > V[g=2] > (C[p=3] > V[g=2] > (H[j=between] > (H[g=2] > Tk + Bd) + MM) + (V[g=1] > Hd[level=3] + Tx) + Tx)*2))*4)
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
+//   S > L > (LH[divider] > Tbar > (Hd"Sprint Board"[level=1 t=display-2] + Bd.neutral"8") + (H[g=2] > SE + D.strong + IB"Sort" + IB"Filter" + IB"Search" + B.primary"Add task")) + (LC[p=0] > G[c={min:280,max:4} g=4] > (C.muted[p=0] > L > (LH[divider] > H[j=between a=center] > (H[g=2 a=center] > SD + Hd"To-do"[level=2] + IB) + Tx) + (LC[p=3] > V[g=2] > (C[p=3] > V[g=2] > (H[j=between] > (H[g=2] > Tk + Bd) + MM) + (V[g=1] > Hd[level=3] + Tx) + Tx)*2))*4)
 
 import { Badge } from "@astryxdesign/core/Badge";
 import { Button } from "@astryxdesign/core/Button";

@@ -8,13 +8,16 @@
  * paragraph #B0B3C4 and base-muted #8288A6 are same-hue lifts, #4C5067
  * (subdue) is chrome only and never text, and theme.css adds #FFD5CC as the
  * pale inverted error surface. Do not revert any of them to spec hexes.
- * Two categorical data hues are deliberately ABSENT from the list below, do not
- * re-add them: `brown` (was byte-identical to orange, and a categorical series
- * set is a palette where distinctness IS the contract) and `purple` (purple
- * means tappable, never data). The purple ban is a MODULE rule —
- * `shared/chart-hues.ts` is purple-free by construction — so the SEQUENTIAL
- * `--color-data-purple-1..5` ramp below SURVIVES and is sanctioned; only the
- * categorical half is revoked. Rationale lives in astryx-theme.ts.
+ * Two categorical data hues are excluded from the CHART palette: `brown` (was
+ * byte-identical to orange, and a categorical series set is a palette where
+ * distinctness IS the contract) and `purple` (purple means tappable, never
+ * data). That exclusion is a MODULE rule — `shared/chart-hues.ts` is
+ * purple-free by construction — so the SEQUENTIAL `--color-data-purple-1..5`
+ * ramp below SURVIVES and is sanctioned. The two TOKENS are still defined
+ * below, on-brand, because core 0.7.x moved the canonical data-colour defaults
+ * out of CSS entirely: a theme that wants a name to exist must author it, and
+ * this one authors it on-palette so nothing off-brand can ship. Rationale
+ * lives in astryx-theme.ts.
  * `--color-data-teal-1..5` derives off `--color-data-categorical-teal` (#A4FFFF,
  * an ANSI bright, not a spec token) rather than spec Cyan #8BE9FD; provenance
  * fix only, nothing renders the ramp today (HeatScale is shamrock).
@@ -276,6 +279,8 @@ body {
 	--color-data-categorical-red: #ff5555;
 	--color-data-categorical-teal: #a4ffff;
 	--color-data-categorical-indigo: #d6acff;
+	--color-data-categorical-purple: #bd93f9;
+	--color-data-categorical-brown: #ffb86c;
 	--color-data-neutral: #8c939b;
 	--color-data-purple-5: hsl(264.71 89.47% 28%);
 	--color-data-purple-4: hsl(264.71 89.47% 44%);
@@ -343,6 +348,32 @@ body {
 	--color-tag-cyan: #8be9fd;
 	--color-tag-yellow: #f1fa8c;
 	--color-tag-green: #50fa7b;
+	/* Syntax theme, mirrored from astryx-theme.ts's draculaSyntax map. Core
+	 * 0.7.x emits NO --color-syntax-* defaults in CSS — the canonical values
+	 * live in JS only — and core's highlighter uses them with no fallback, so
+	 * a plain-CSS consumer that imports this file without theme.css would
+	 * render an UNHIGHLIGHTED CodeBlock. These 19 slots close that gap; the
+	 * five diff slots are the 0.7.1 diff layer and derive from Dracula's
+	 * green/red rather than being Dracula spec tokens. */
+	--color-syntax-keyword: #ff79c6;
+	--color-syntax-string: #f1fa8c;
+	--color-syntax-comment: #6272a4;
+	--color-syntax-number: #ffb86c;
+	--color-syntax-function: #50fa7b;
+	--color-syntax-type: #8be9fd;
+	--color-syntax-variable: #f8f8f2;
+	--color-syntax-operator: #ff79c6;
+	--color-syntax-constant: #bd93f9;
+	--color-syntax-tag: #ff79c6;
+	--color-syntax-attribute: #50fa7b;
+	--color-syntax-property: #f8f8f2;
+	--color-syntax-punctuation: #f8f8f2;
+	--color-syntax-background: #282a36;
+	--color-syntax-added: #50fa7b26;
+	--color-syntax-removed: #ff555526;
+	--color-syntax-diff-header: #44475a;
+	--color-syntax-added-marker: #50fa7b;
+	--color-syntax-removed-marker: #ff5555;
 	--color-tag-purple: #bd93f9;
 	/* Renamed in 0.3.0 from `tag-blue`, which held this same #BD93F9. Dracula
    * has no blue; Purple is what the rest of the kit already uses for a fourth
@@ -416,41 +447,6 @@ body {
 		border: 2px solid transparent;
 		background-clip: content-box;
 	}
-}
-
-/* A resizable SideNav reports exactly 1px of horizontal overflow: the resize
- * handle renders 1px wider than its own box, and the side-nav panel scrolls
- * both axes, so a permanent horizontal scrollbar paints under the rail even
- * though nothing overflows visually. Clip the offending pixel on the handle
- * itself rather than on the panel: a collapsed rail renders its child popovers
- * as descendants of that panel, and they only escape the clip because their
- * root happens to be position:fixed. Clipping the panel would break them the
- * day an ancestor gains a transform. The handle contains nothing but its pill,
- * which sits inside its box, so clipping it costs nothing. Needed until the
- * resize handle stops reporting the extra pixel. Re-verified against
- * @astryxdesign/core 0.3.0: without the clip the hit area's half-pixel inline
- * shift leaves content at 300.5px in a 300px rail, and the LayoutPanel
- * (overflow:auto on both axes) reports scrollWidth 301 > 300 — the permanent
- * bar is back. Keep. */
-.astryx-app-shell-sidenav .astryx-resize-handle {
-	overflow: hidden;
-}
-
-/* Astryx leaves the resize handle's drag surface translated -50% along the
- * block axis without ever positioning it at top:50%, so it spans only the TOP
- * HALF of the rail: the pointer reads col-resize and dragging works above the
- * midpoint, and nothing at all happens below it, even though the pill is drawn
- * straddling that boundary. The pill sibling carries a correct top:50%, which
- * is exactly what the drag surface is missing. Re-verified against
- * @astryxdesign/core 0.3.0: hitAreaHorizontal is still top:0/bottom:0 while
- * hitAreaOffsetX translates Y by -50%, so without this the drag surface spans
- * [-50%,+50%] of the rail and the bottom half is dead (elementFromPoint hits
- * the handle, which has no pointer handler). Upstream workaround; drop it if
- * the component starts positioning its own hit area. */
-.astryx-app-shell-sidenav .astryx-resize-handle > :not(.astryx-resize-handle-pill) {
-	top: 50%;
-	bottom: auto;
-	height: 100%;
 }
 
 /* Everything below this line is UNLAYERED on purpose, and that is load-bearing,

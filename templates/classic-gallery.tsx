@@ -1,6 +1,8 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC[p=0] > Ctr > V[g=8] > ((Ctr > S.transparent > V[g=4 a=center] > (V[g=2 a=center] > Hd"Hung after dark"[level=1] + Tx"A coven-curated wall"[t=body]) + (TL > Tab"All"! + Tab"Lifestyle" + Tab"Scenery" + Tab"Home") + Tx"10 pieces on the wall"[t=body]) + (G[c={min:260} g=4] > (C[p=0] > AR[ratio=3/2])*10))
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
+//   L[h=fill] > LC[p=0] > Ctr > V[g=8] > ((Ctr > S.transparent > V[g=4 a=center] > (V[g=2 a=center] > Hd"Hung after dark"[level=1] + Tx"A coven-curated wall"[t=body]) + (TL > Tab"All"! + Tab"Lifestyle" + Tab"Scenery" + Tab"Home") + Tx"10 pieces on the wall"[t=body]) + (G[c={min:260} g=4] > (C[p=0] > AR[ratio=3/2])*10))
 
 import { AspectRatio } from "@astryxdesign/core/AspectRatio";
 import { Card } from "@astryxdesign/core/Card";

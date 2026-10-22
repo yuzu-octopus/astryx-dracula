@@ -1,6 +1,8 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > LC[p=0] > H > (SI[fill] > ChL > ChML > (ChM > ChB)*4 + ChC"Ask a follow up...") + (C.transparent > Tbar + S.section > MD) ;; Dlg#artifact[variant=fullscreen] > L > (DH"JWT Token Refresh" + (LC[p=0] > S.section > MD))
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
+//   L > LC[p=0] > H > (SI[fill] > ChL > ChML > (ChM > ChB)*4 + ChC"Ask the night anything...") + (C.transparent > Tbar + S.transparent > MD) ;; Dlg#artifact[variant=fullscreen] > L > (DH"JWT Token Refresh" + (LC[p=0] > S.transparent > MD))
 
 import { Avatar } from "@astryxdesign/core/Avatar";
 import { Button } from "@astryxdesign/core/Button";

@@ -48,25 +48,26 @@ import { astryxDraculaTheme } from 'astryx-dracula';
 </Theme>;
 ```
 
-Stock Vite config plus the layer-order snippet in USAGE.md. Verify every prop with `bunx astryx component <Name>` before use — never guess. Button `label` is REQUIRED, Heading `level` is REQUIRED, Grid `columns` is optional.
+Stock Vite config; no layer-order statement needed — core 0.7.x and this kit's `theme.css` each declare `@layer reset, astryx-base, astryx-theme;` themselves. Verify every prop with `bunx @astryxdesign/cli component <Name>` before use — never guess. Button `label` is REQUIRED, Heading `level` is REQUIRED, Grid `columns` is optional.
 
 ## Layout expressions
 
-New page from scratch: write XLE, expand, then brand-pass. `bunx astryx layout check "<expr>"` validates; `bunx astryx layout expand "<expr>" ./path.tsx` emits TSX. Full grammar lives in the tool (`bunx astryx layout grammar`), details in `references/xle.md`. All 45 templates lead with their canonical XLE in a header comment (`// XLE (...)`); read that header first to inspect or adapt the layout at ~1/5th token cost instead of reading hundreds of lines of TSX. Expansion emits stock Astryx, so the brand pass in `references/xle.md` still applies after. Never hand-write full TSX first; never use XLE for small edits.
+New page from scratch: scaffold from a template, then brand-pass. The CLI no longer ships an XLE validator or expander — `astryx layout` was removed in CLI 0.7.0 — so the XLE is a READ-ONLY structural summary carried in each template's `// XLE (...)` header, and `references/xle.md` is the only grammar reference. All 45 templates lead with that header; read it first to inspect or adapt the layout at ~1/5th token cost instead of reading hundreds of lines of TSX. The header is a reading aid and a human drift check, not a machine-checked artifact: update it with the file, never alone. Scaffold with `bunx @astryxdesign/cli template <id> <path>` and read `astryx docs layout` for guidance. Never hand-write a full page before reading the closest `templates/<id>.template.mjs`; never use XLE for small edits.
 
 ## Templates
 
 Forty-five themed pages ship in `templates/`,
-each leading with its canonical, validated XLE expression
+each leading with its canonical structural XLE expression
 in a header comment (`// XLE (...)`).
 Also published as an Astryx integration pack (`astryx.integration.mjs`).
 Consumers with the package in `astryx.config` scaffold
-with `bunx astryx template <id> --package astryx-dracula`.
+with `bunx @astryxdesign/cli template <id> --package astryx-dracula ./path/to/page.tsx`
+(the path argument is required; without it the CLI prints the template's source and writes nothing).
 Live at `/astryx-dracula/#/templates` on the showcase,
 where `demo/Templates.tsx` renders each page bare inside a viewer iframe
 and keeps the `Templates / <name>` bar plus its `<Theme>` provider outside it.
 That bar, the provider, and the frame are viewer chrome, not page content:
-never copy them into a `templates/` file. Pack rules: templates import `@astryxdesign/core`, `lucide-react`, and the kit's own shared modules (`astryx-dracula/shared/*`: auth-copy, auth-chrome-config, chaptered-doc, chaptered-doc-config, chart-hues, chart-labels, chart-panel-style, gallery-image, login-demo, metric-delta, revenue-chart, scene-castle, scene-hues, scene-tile, settings-data, settings-rows, sparkline, sso-icons), no chart libraries; no default `React` import in 43 templates (JSX transform — 11 omit `react` entirely, the rest use named hook/type imports) — only `settings-dialog` and `table-grouped` carry a default `React` import for the `React.*` namespace (`React.ReactNode`, `React.useEffect`, `React.Fragment`); every template carries its `<id>.template.mjs` spec. IDs: dashboard, table-grouped, table-page, kanban-board, settings-sidebar, settings, payment-form, login-card, file-explorer, ai-chat-landing, library, centered-hero, ai-chat, classic-gallery, contact-form, dashboard-portfolio, detail-page, documentation, documentation-design, documentation-technical, editor, form-two-column, gallery-hero, ide, login, mixed-gallery, product-detail, product-gallery, product-tour, settings-dialog, shell-nav, shell-side-nav, shell-…
+never copy them into a `templates/` file. Pack rules: templates import `@astryxdesign/core`, `lucide-react`, and the kit's own shared modules (`astryx-dracula/shared/*`: auth-copy, auth-chrome-config, chaptered-doc, chaptered-doc-config, chart-hues, chart-labels, chart-panel-style, gallery-image, login-demo, metric-delta, revenue-chart, scene-castle, scene-hues, scene-tile, settings-data, settings-rows, sparkline, sso-icons), no chart libraries; no default `React` import in 44 templates (JSX transform — 9 omit `react` entirely, the rest use named hook/type imports) — only `table-grouped` carries a default `React` import for the `React.*` namespace (`React.ReactNode`, `React.useEffect`, `React.Fragment`); every template carries its `<id>.template.mjs` spec. IDs: dashboard, table-grouped, table-page, kanban-board, settings-sidebar, settings, payment-form, login-card, file-explorer, ai-chat-landing, library, centered-hero, ai-chat, classic-gallery, contact-form, dashboard-portfolio, detail-page, documentation, documentation-design, documentation-technical, editor, form-two-column, gallery-hero, ide, login, mixed-gallery, product-detail, product-gallery, product-tour, settings-dialog, shell-nav, shell-side-nav, shell-…
 
 ## Brand principles
 
@@ -92,6 +93,61 @@ The theme scale is base 14, ratio 1.2: body and code 14, supporting 12, headings
 - Nothing meaningful below 12px, ever. A 9–11px floor is a core scale artifact, not a license.
 
 Type carries hierarchy, so weight stays quiet: headings normal, `semibold` for emphasis and KPI values, never bold display type. Tabular numerals on every quantity (`hasTabularNumbers`). When in doubt go one role larger, never smaller — the reason is **thin weights, not x-height**: Apple's rule is "if you use a custom font with a thin weight, aim for larger than the recommended sizes", and we ship JetBrains Mono at `weightClass 400` (Regular). An earlier version of this line claimed JBM "has a small x-height"; measured from our shipped woff2 with fontTools, `sxHeight/upem` = **0.5500** against Inter 0.5459 and Roboto 0.5283 — the **highest** of the three, cap-height 0.7300 also highest. The instruction stands; the premise was false and is removed.
+
+## What core 0.7.x added, and what this kit does with it
+
+Core 0.6.4 → 0.7.2 brought capabilities that change how a page is built. What
+survived into this kit's templates, and the rule each one settled:
+
+- **`List edge`** (`'padded' | 'flush' | 'outset' | 'bleed'`) — where a row's
+  text, dividers and hover fill sit. **`flush`** drops the row side padding so
+  text lands on the heading's line; **`outset`** lets the row reach into the
+  padding of the container it sits in (a Card, Section, Dialog, a padded
+  Layout region). This is the sanctioned way to cancel a row inset, and it
+  replaces the negative-margin hacks this kit used to carry (`detail-page.tsx`
+  had `marginInline: -8` with the comment "No edge/inset prop on List (#2626)";
+  #2626 is what `edge` closed). **`outset`/`bleed` only work under a host that
+  publishes container padding** — `flush` works anywhere. A List inside a
+  padded `LayoutPanel` or a `paddingBlock`/`paddingInline` VStack wants
+  `flush`; a List inside a Card or Section wants `outset`.
+- **`Item align="first-line"`** (0.7.2) — puts the start and end slots on the
+  label's FIRST line instead of the middle of a wrapped row. Use it exactly
+  where the label can wrap: an incident title with a severity badge, a
+  product name with a price. `center` remains the default and a one-line row
+  looks the same either way.
+- **`Drawer` / `DrawerHeader`** (0.7.2, promoted from Lab) — a full-height side
+  panel. Modal with a scrim (`hasScrim`, the default) or a non-modal overlay
+  (`hasScrim={false}`) that leaves the page behind interactive. `DrawerHeader`
+  renders a close button only when it is given `onOpenChange`, and the drawer's
+  `label` is required (it has no heading to derive a name from). **Use it for
+  a panel that would otherwise be dropped on a narrow viewport** — the
+  incident console's inspector is the exemplar. A panel that must own the
+  whole viewport stays a `Dialog variant="fullscreen"`, which is what
+  `detail-page.tsx` does.
+- **The diff syntax layer** (0.7.1) — five `--color-syntax-*` slots
+  (`added`, `removed`, `diff-header`, `added-marker`, `removed-marker`) that
+  `CodeBlock isDiff` paints. Core's DEFAULTS for these are a 25% mix of the
+  theme's `--color-success-muted` / `--color-error-muted` tokens, and this
+  kit's muted tokens are 10% alpha washes — so the default row tint measures
+  1.06:1 against the code background and a diff renders as "a slightly
+  different grey". This kit authors them on the Dracula ramp instead
+  (`astryx-theme.ts`, `draculaSyntax`), and `scripts/check.ts` fails if
+  `tokens.css` and `theme.css` disagree about them.
+- **`Selector variant="secondary"`** (0.7.1) — a borderless, neutral-filled
+  trigger that reads as the sibling of a secondary `Button` rather than as a
+  form field. Upstream's rule is mechanical: `input` reads as a form field,
+  `secondary` matches an adjacent secondary `Button`, `ghost` matches an
+  adjacent ghost `Button`. **No template uses it today**, because no Selector
+  in this kit sits next to a secondary Button. The theme owns the parity
+  anyway (the trigger's weight is pinned to `--font-weight-normal`, because
+  core's default is `--font-weight-medium` and this kit ships only 400 and
+  600), so the moment a site qualifies it already matches.
+
+And what this kit deliberately does NOT adopt, so nobody re-litigates it:
+`Timer` (live elapsed time would make the deterministic, clock-free fixtures
+tick), `Item` swipe actions (a verb reachable only by swipe is unreachable by
+keyboard and mouse), `Pagination variant="compact"` (no Pagination here), and
+`useTableRowExpansion panelVariant` (no row expansion here).
 
 ## Control semantics (binding when authoring or reviewing a template)
 
@@ -129,8 +185,8 @@ cannot drift between templates.
 **A declared token is not an applied token.** Until core+CLI 0.6.3,
 `--text-display-2-size` was defined in this theme and applied by nothing:
 core 0.3.0's `Heading` emitted no `data-type`, and the 0.3.0 CLI emitted no
-`.astryx-heading[data-type]` rule. **24 templates asked for `type="display-2"`
-and every one rendered at core's 24px level-1 default instead of the 35px they
+`.astryx-heading[data-type]` rule. **20 templates asked for `type="display-2"`** (`rg -l 'type="display-2"' templates | wc -l`)
+**and every one rendered at core's 24px level-1 default instead of the 35px they
 declared.** It looked right, it was right in light mode, no build failed, no
 review caught it, and three consumers did not notice — only a pixel diff
 between two builds found it. Every other gate checks that a value is *correct*;
@@ -213,7 +269,7 @@ The page `h1` takes **one value per surface class**, and the classifier is a pro
 - **The heading IS the page's own title or document's own title** → `--text-display-2-size` (35px). Covers a marketing hero and a utility page's `LayoutHeader` alike: `side-gallery.tsx:80`, `classic-gallery.tsx:91`, `mixed-gallery.tsx:64`, `settings.tsx:101`.
 - **A routed record or section inside a page that also carries other controls** → stays at `--text-heading-1-size` (24px). Covers `detail-page.tsx:220` and the ten section titles in `settings-sidebar.tsx`.
 
-**A string that fits is not the question.** `detail-page.tsx:220` is `#1001` — five characters, about 105px wide at 35px — and it is still correct at 24px, because the surface classifies it, not the length. Phrasing this rule as "a heading short enough to fit at the smaller size" reintroduces exactly the bug it fixes. Before this was bound the same job rendered at 24px, 35px and 42px across the template set; of 52 h1 sites, **29 change, 12 were already correct, 11 stay at 24px** — reproduce with `rg -c 'Heading level=\{1\}' templates/*.tsx demo/*.tsx` and read each site's container, never just the count. **Do not write "majority" or "most templates"**: 24px is the plurality at 38/52, and 35px is the majority only among sites that explicitly typed their h1.
+**A string that fits is not the question.** `detail-page.tsx:220` is `#1001` — five characters, about 105px wide at 35px — and it is still correct at 24px, because the surface classifies it, not the length. Phrasing this rule as "a heading short enough to fit at the smaller size" reintroduces exactly the bug it fixes. Before this was bound the same job rendered at 24px, 35px and 42px across the template set; of the h1 sites in the template set (`rg -c 'Heading level=\{1\}' templates/*.tsx demo/*.tsx`), read each site's container before deciding its tier — never the count. **Do not write "majority" or "most templates"**: the old 24px plurality split (29 change / 12 correct / 11 stay, 38 of 52) was measured against a tree that no longer exists, and 35px is the majority only among sites that explicitly typed their h1.
 
 **Keep the two dense-panel exceptions apart, because only one is a defect.** `detail-page.tsx`'s ladder is complete (1 h1 / 3 h2 / 3 h3) and correctly sized. `settings-sidebar.tsx`'s has a **gap** (10 h1 / 0 h2 / 13 h3) and is mis-built — that is the one to fix. Folding them together as "the two dense-panel exceptions" would invite a future agent to "fix" the correct one.
 
@@ -221,12 +277,12 @@ The page `h1` takes **one value per surface class**, and the classifier is a pro
 
 ## What `check.ts` actually gates — and what it does not
 
-`bun run audit` runs 38 gate checks (`grep -c "fail(" scripts/check.ts`). That
+`bun run audit` runs 51 gate checks (`grep -c "fail(" scripts/check.ts`) — a count that moves whenever a gate is added, so re-run the command rather than trusting the number. That
 count is every `fail(` call site, not a tally of distinct gates, so treat it as
 an upper bound. Be precise about their reach either way, because a reader who
 over-trusts a gate file ships a defect it never claimed to catch.
 
-**It does gate:** palette purity, 28 contrast pairs (`sed -n '/^const pairs/,/^];/p' scripts/check.ts | grep -c "^  \['"`), a lint over template source
+**It does gate:** palette purity, 28 contrast pairs (`sed -n '/^const pairs/,/^];/p' scripts/check.ts | grep -c 'floor:'`), a lint over template source
 for three literal string rules — `variant="section"`, `weight="bold"`, and
 `<Layout>` without an explicit height — plus the zero-`!important` sweep over
 CSS sources and TSX (skipping the one line in `tokens.css` that states the rule
@@ -257,7 +313,7 @@ label starts with one of the verbs in `ACTION_VERBS`, where `hasUnderline`
 downgrades a hard fail to a REVIEW rather than silencing it and
 `ACTION_LINK_ALLOW` (keyed `file:line`) is the one human-ruling escape hatch;
 and a per-file `Divider` count failing above `DIVIDER_DENSITY_MAX = 6`, a
-number read off the tree rather than off taste: 43 across it, max 4 in any one
+number read off the tree rather than off taste: 37 across it (`rg -c '<Divider' templates shared | awk -F: '{s+=$2} END {print s}'`), max 4 in any one
 file. Find them with `rg -n 'ACTION_VERBS|ACTION_LINK_ALLOW|DIVIDER_DENSITY_MAX' scripts/check.ts`.
 
 **It does NOT gate, and you must check these yourself:**
@@ -284,7 +340,7 @@ The `!important` sweep has one exemption by design: `tokens.css` contains that l
 
 **Core does emit `data-*` state hooks — a source grep cannot see it, and that is the trap.** `themeProps()` reflects *every* visual prop onto the element as a kebab-cased `data-*` attribute with **no allowlist** (`core/src/utils/themeProps.ts`, `themeDataAttributes` → `toDataAttributeName`), so `state: 'expanded'` becomes `data-state="expanded"`. Two greps both mislead here and both were reported as fact before being checked: `grep -rn "data-state" node_modules/@astryxdesign/core/src` returns only a *comment* in `DateInput.tsx:677` saying the attribute is not there, and `grep -o "data-state" core/dist/astryx.umd.js` returns nothing because the name is **built at runtime** and minified away. Verify with `bunx astryx component DateInput --detail`.
 
-The real gap is **adoption, not capability**: of 270 `themeProps(` call sites, 7 pass a `state` key. So the honest sentence is *core ships the mechanism and uses `state` at 7 of 270 sites* — not *core emits zero state attributes*, which was wrong and is retired. Two related facts, both measured: `aria-selected` **is** emitted on selected table rows (`useTableSelection.tsx:130`), so "no state attributes anywhere" was false on its face; and `data-custom` (x10) appears only in `.test.tsx` fixtures, never as a shipped prop. **Check the API, not the string** — this is limb 1 of the evidence doctrine, and it is why `data-custom` being test-only is a distinction worth carrying.
+The real gap is **adoption, not capability**: exactly 2 `themeProps(` call sites pass a `state` key — `core/src/DateInput/NativeDateField.tsx` and `core/src/DateTimeInput/NativeDateSegment.tsx`, both `{state: 'collapsed'}`. So the honest sentence is *core ships the mechanism and uses `state` at 2 sites* — not *core emits zero state attributes*, which was wrong and is retired. Two related facts, both measured: `aria-selected` **is** emitted on selected table rows (`useTableSelection.tsx:130`), so "no state attributes anywhere" was false on its face; and `data-custom` (x10) appears only in `.test.tsx` fixtures, never as a shipped prop. **Check the API, not the string** — this is limb 1 of the evidence doctrine, and it is why `data-custom` being test-only is a distinction worth carrying.
 
 When you need a kit rule to survive review, type it: `shared/chart-hues.ts` exports a `ChartHue` union and `shared/scene-hues.ts` enforces its own "purple never touches these scenes" remit with a `SCENE_HUES` union **typed at every hop**, so a hand-rolled array fails the build instead of a reviewer. That is why purple, a value CoreInvertedPairAudit and the joint bucket both flagged, now surfaces as a compiler error rather than a finding.
 
@@ -311,8 +367,9 @@ Long-form reading copy is capped at `max-width: 75ch`, which is **630px at 14px 
 
 `astryx-theme.ts` is the source of record and the counts are cited rather than
 written, because they drift: `grep -c "pin(" astryx-theme.ts` for the pins,
-`grep -o "^  --[a-z-]*:" theme.css | sort -u | wc -l` for the public props in the
-prebuilt output, `grep -c "^  --" tokens.css` for the plain-CSS mirror.
+`grep -c "^    --" theme.css` for the public props in the prebuilt output (the
+generated file is 4-space indented inside a `:scope` block),
+`grep -c "^\s*--" tokens.css` for the plain-CSS mirror (that file is tab-indented).
 `tokens.css` is unlayered by design so it beats core layers with zero
 `!important`. No gate asserts the counts;
 `bun run theme:check` asserts freshness, `bun run audit`
@@ -332,12 +389,16 @@ Icon `--color-icon-primary` / `--color-icon-secondary` /
 `--color-icon-disabled` / `--color-icon-accent`.
 Border `--color-border` (Comment `#6272A4`) / `--color-border-emphasized`
 (**`#9AA1BC`, repinned from Comment**). Core tone-bumps `-emphasized` to ≥3:1
-for form-control boundaries (`expandColorScale.ts:22-24`), but `pin()` returns a
+for form-control boundaries (`expandColorScale.ts:31-32`), but `pin()` returns a
 literal, so that guarantee is inert by construction on this theme — the old
 Comment value cleared **no** surface tier at 3:1 (3.03/2.51/2.05/1.94) and the
-new one clears all four (5.56/4.60/3.77/3.57). `DropdownMenuRadioItem.tsx:84`
-reads this token and `DropdownMenu` paints `--color-background-popover`, so the
-popover tier is a real consumer, not a hypothetical. Known shortfall: the
+new one clears all four (5.56/4.60/3.77/3.57). Its live 0.7.2 consumers are form
+controls and content chrome — `Field`/`FileInput`/`NumberInput`/`InputGroupText`/
+`Kbd` borders, `Divider variant="strong"`, `Blockquote`'s rule, `HoverCard`'s and
+`Tooltip`'s dashed underlines, the checkbox/radio `Indicator`, `Calendar`'s today
+ring, `TreeList`'s branch lines, `ResizeHandle` and `Selector`'s focus restore.
+(`DropdownMenuRadioItem` read it in 0.6.3 and no longer does.) The popover tier
+is a real consumer for the popover surface itself. Known shortfall: the
 inverted surface (`#F8F8F2`) at 2.40, which has **no live consumer** — only
 `Toast.tsx` paints it and its one control is a `Button`, which reads
 `--color-border`, not `-emphasized`. Recorded at the site, not certified.
@@ -404,9 +465,10 @@ palette does not supply; consumed by the error Toast). Skeleton/track
 `--color-skeleton` / `--color-track`.
 Charts: `--color-data-categorical-<blue|orange|green|pink|cyan|red|teal|indigo>`
 (blue goes comment; teal ANSI bright cyan `#A4FFFF`, indigo ANSI bright blue
-`#D6ACFF`, brown reuses orange), `--color-data-neutral` (`#8C939B` — **inherited
-from core, not chosen here**: core declares it as `light-dark(#8494A3, #8C939B)`
-in `core/src/theme/domainTokens/dataTokens.ts`, and it is off-palette, sitting
+`#D6ACFF`, brown reuses orange), `--color-data-neutral` (`#8C939B` — **pinned by
+this theme**, and off-palette: since core 0.7.0 the canonical data-colour
+defaults live in core's `dataVars` group and a concrete theme emits only what it
+authors, so this value is ours to own rather than core's; it sits
 neither on a Dracula hex nor on our own gray ramp, whose L60 computes to
 `#8A8EA8`. An earlier version of this line called it "Stone gray reads fine on
 dark — deliberate"; whether "Stone" is a real Astryx brand name is an **open
@@ -483,7 +545,7 @@ comment at the site of the choice.
 - **Truncation must reveal.** When copy is truncated, the full value has to be reachable — SC 1.4.10 (Reflow) and **1.4.12 (Text Spacing)** both require it, and this is a conformance obligation, not a nicety. Core implements it: `Text` truncation plus `useTruncation` plus `Tooltip` plus `EmptyState`. A `maxLines` with no reveal path is a defect.
 - **Motion: the criterion that bites is 2.2.2 Pause, Stop, Hide (Level A), not SC 2.3.3.** 2.3.3 Animation from Interactions is **Level AAA**; several docs state it as AA. An auto-animating indicator — a pulsing in-progress `StatusDot` — is governed by 2.2.2, which is the one that requires it to be pausable.
 - **WCAG 1.4.1 Use of Color has no exceptions in WCAG 2.2.** The familiar three-part exception wording (incidental, decorative, logo) appears nowhere on the criterion or its Understanding page. An earlier version of this file implied exceptions and it was wrong. Consequence for this brand: colour is never the only channel — a `StatusDot` is paired with a visible word, because a label that reaches a screen reader but paints nothing leaves a sighted user with the hue alone.
-- **EmptyState heading default.** Core renders the empty-state title as `h3`; Mantine and shadcn default to a `div`. If a page needs the empty state at a different tier, wrap it — do not assume the default is configurable.
+- **EmptyState heading level.** Core renders the empty-state title as `h3` by default, and since core 0.7.2 the level is a prop — pass `headingLevel={2}` (or 1-6) instead of wrapping the component to change the tier. Mantine and shadcn still default to a `div`.
 
 ## Troubleshooting
 

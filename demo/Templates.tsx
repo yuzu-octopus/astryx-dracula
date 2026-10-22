@@ -25,7 +25,7 @@ export function TemplatesIndex() {
 					</Heading>
 					<Text type="body" color="secondary">
 						{TEMPLATES.length} Astryx pages, themed and retokened. Open one live, or scaffold it
-						with bunx astryx template.
+						with bunx @astryxdesign/cli template.
 					</Text>
 				</VStack>
 				<Grid columns={{ minWidth: 280, max: 3 }} gap={4}>

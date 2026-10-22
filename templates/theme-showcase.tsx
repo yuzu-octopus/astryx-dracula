@@ -1,5 +1,7 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
 //   TN"Nocturne" + (S[p6] > V[g10] > (Ctr > V[g4 a=center] > Hd"Little haunts"[level=1 type=display-2] + Tx"We believe"[t=body]) + (G[c={min:200,max:3} g4] > (C[p0] > AR + V[g2 a=center] > Bd + Hd"Product"[level=2] + Tx"Description"[t=body] + (H[g2] > NI + B"Add to cart"))*3)) + (V[g8] > (C[p0] > Hd"Night Owl AI"[level=2]) + (G[c={min:200} g4] > (GS[c=3] > C > T) + (GS[c=1] > C > Hd"Revenue"[level=2])))
 
 /**
@@ -291,7 +293,7 @@ function StorePreview({ products, isMobile }: { products: ProductSpec[]; isMobil
 													// 40px was too tight on themes with larger padding /
 													// bigger type scale (e.g. Matcha, Y2K), clipping the
 													// value.
-													style={{ minWidth: 64, flexShrink: 0 }}
+													controlStyle={{ minWidth: 64, flexShrink: 0 }}
 												/>
 												<Button
 													label="Add to cart"
@@ -587,7 +589,11 @@ function LatestActivityCard({ isMobile }: { isMobile: boolean }) {
 						overflow: "hidden",
 						maskImage: "linear-gradient(to bottom, black calc(100% - 48px), transparent)",
 						WebkitMaskImage: "linear-gradient(to bottom, black calc(100% - 48px), transparent)",
-						marginInline: "calc(var(--spacing-2) * -1)",
+						// Cancel the Item inline inset with the inset ITSELF: core
+						// publishes it as --_item-inset-inline (0.6.7), and it
+						// tracks density and theme overrides. A literal spacing
+						// step silently stops matching when either moves.
+						marginInline: "calc(-1 * var(--_item-inset-inline))",
 					}}
 				>
 					{/* The sign travels in the string (formatAmount prefixes U+2212), so
@@ -887,7 +893,7 @@ function InventoryCard({ inventory }: { inventory: InventoryRow[] }) {
 						value=""
 						onChange={() => {}}
 						startIcon={<Search size={16} />}
-						style={{ flex: 1, minWidth: 0, maxWidth: 240 }}
+						controlStyle={{ flex: 1, minWidth: 0, maxWidth: 240 }}
 					/>
 					<OverflowList
 						gap={2}
@@ -949,7 +955,15 @@ function InventoryCard({ inventory }: { inventory: InventoryRow[] }) {
 
 			{lowStockCount > 0 && (
 				<VStack gap={0} paddingInline={6} paddingBlockEnd={4}>
-					<Banner status="warning" title={lowStockCount + " items are running low"} />
+					<Banner
+						status="warning"
+						// Core 0.7.0 stopped deriving the live-region role from
+						// `status`, so this banner states its own. It appears when
+						// the count crosses the threshold, and a screen reader must
+						// hear it.
+						role="status"
+						title={lowStockCount + " items are running low"}
+					/>
 				</VStack>
 			)}
 

@@ -1,6 +1,8 @@
 // Copyright (c) Meta Platforms, Inc. and affiliates.
-// XLE (canonical structure, validated with `bunx astryx layout check`):
-//   L > (LC > V[g=8] > (V[g=2] > Hd"Button"[level=1] + Tx"March 30, 2026"[t=supporting]) + (C.muted[p=0] > Ctr[h=360]) + (V[g=4] > Hd"Usage"[level=2] + Tx"Usage"[t=body] + Hd"Best practices"[level=3] + T) + D + (V[g=4] > Hd"Examples"[level=2] + Tx"Explore"[t=body]) + (V[g=8] > (C[p=0] > (S[p=3] > Tx"Semantics"[t=body]) + Ctr[h=280] + (S.muted[p=3] > V[g=3] > (TL > Tab"Description"! + Tab"Code") + Tx"We have four"[t=body])) + (C[p=0] > (S[p=3] > Tx"Default button with badge"[t=body]) + Ctr[h=280] + (S.muted[p=3] > V[g=3] > (TL > Tab"Description"! + Tab"Code") + Tx"Buttons can include"[t=body])))) + (LP > Outline)
+// XLE (canonical structure of the tree below; the CLI had no XLE validator
+// after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
+// human drift check — update it with the file, never alone):
+//   L > (LC[p=8] > V[g=8] > (V[g=2] > Hd"Button"[level=1 t=display-2] + Tx"March 30, 2026"[t=supporting]) + (C.muted[p=0] > Ctr[h=360]) + (V[g=4] > Hd"Usage"[level=2] + Tx"Usage"[t=body] + Hd"Best practices"[level=3] + T) + D + (V[g=4] > Hd"Examples"[level=2] + Tx"Explore"[t=body]) + (V[g=8] > (C[p=0] > (S[p=3] > Tx"Semantics"[t=body]) + Ctr[h=280] + (S.muted[p=3] > V[g=3] > (TL > Tab"Description"! + Tab"Code") + Tx"We have four"[t=body])) + (C[p=0] > (S[p=3] > Tx"Default button with badge"[t=body]) + Ctr[h=280] + (S.muted[p=3] > V[g=3] > (TL > Tab"Description"! + Tab"Code") + Tx"Buttons can include"[t=body])))) + (LP > Outline)
 
 /**
  * Documentation detail — one component, its usage, its guidance and its live examples. (Frame/responsive/container: see XLE header above.)

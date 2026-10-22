@@ -70,7 +70,7 @@ export function TrafficChart({
 							width={barWidth}
 							height={h}
 							rx={4}
-							fill="var(--color-data-categorical-cyan)"
+							fill={"var(--color-data-categorical-cyan, #8BE9FD)"}
 						/>
 						{showValues && (
 							<text
