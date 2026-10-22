@@ -2,7 +2,7 @@
 // XLE (canonical structure of the tree below; the CLI had no XLE validator
 // after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
 // human drift check — update it with the file, never alone):
-//   A[cp=0 @sideNav=(SN > SNI"New chat" + SNI"Search" + SNI"Library" + D + (SNI"Personal" > SNI"Full-moon rite planning")*3)] > L > (LC[p=6] > V[g=5] > (H > C.muted[p=0])*4) + (LF > TI"Message Night Owl")
+//   A[cp=0 @sideNav=(SN[collapsible header=SideNavHeading] > (SNS > SNI"New chat" + SNI"Search" + SNI"Library") + D + (SNS > SNI"Personal" > (SNI"Full-moon rite planning"! + SNI"Potion recipes for the week" + SNI"Grimoire recommendations")) + (SNS > SNI"Settings" + SNI"Sarah Chen"))] > L[h=fill] > (LC[p=6] > V[g=5] > (H > C.muted[p=0])*4) + (LF > TI"Message Night Owl…")
 // Note: skeleton placeholders carry no Hd by design (skill skeleton-shell
 // exemption) — routed pages supply the h1.
 

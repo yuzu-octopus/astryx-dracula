@@ -703,6 +703,185 @@ for (const f of lintFiles.sort()) {
 	}
 }
 
+// The XLE header must name components the template actually imports.
+//
+// WHY THIS EXISTS. Every template carries a one-line XLE header: a structural
+// map of the tree it renders, in a house notation. CLI 0.7.0 removed `astryx
+// layout check` (breaking change #7137), and nothing replaced it — the
+// headers became prose nobody could check. A 2026-10-22 audit of all 45
+// templates found drift in every one of them: a header naming a component the
+// file does not render, a wrong count, a missing second root.
+//
+// A header that names a component the template does not import is the
+// cheapest drift to catch and the most misleading to leave: it tells a reader
+// the page contains a structure it does not have. So the check is one
+//-directional. A template may import a component it does not put in the
+// header (a component used for behaviour rather than structure), but a header
+// may not name a component the template does not import.
+//
+// The token -> component map below is the vocabulary in
+// `.agents/skills/astryx-dracula/references/xle.md`. A token that is not in
+// the map is not gated — the map is the list of tokens this repo uses, and a
+// token outside it is a vocabulary question, not a drift question.
+{
+	// Token -> the component symbol(s) it names. Several tokens name a family
+	// (SE is both SegmentedControl and Selector; Scene covers the three art
+	// primitives), so a token passes when the template imports ANY of them.
+	const XLE_TOKEN_COMPONENTS: Record<string, string[]> = {
+		// Shell and layout
+		A: ["AppShell"],
+		LC: ["LayoutContent"],
+		LF: ["LayoutFooter"],
+		LH: ["LayoutHeader"],
+		LP: ["LayoutPanel"],
+		GS: ["GridSpan"],
+		SI: ["StackItem"],
+		// Surfaces
+		CC: ["ClickableCard"],
+		SC: ["SelectableCard"],
+		Bn: ["Banner"],
+		TL: ["TabList"],
+		TR: ["TableRow", "Table"],
+		TC: ["TableCell", "Table"],
+		THC: ["TableHeaderCell", "Table"],
+		LI: ["ListItem"],
+		TrL: ["TreeList"],
+		MLI: ["MetadataListItem"],
+		MM: ["MoreMenu"],
+		// The house tokens for a SegmentedControl and its items. Core has no
+		// SegmentedGroup component, so the names predate the component and
+		// are kept rather than churned.
+		SG: ["SegmentedControl"],
+		SGI: ["SegmentedControlItem"],
+		SE: ["SegmentedControl", "Selector"],
+		Tg: ["ToggleButton"],
+		TgG: ["ToggleButtonGroup"],
+		Col: ["Collapsible"],
+		ColG: ["CollapsibleGroup"],
+		OFL: ["OverflowList"],
+		Po: ["Popover"],
+		PS: ["PowerSearch"],
+		MNT: ["MobileNavToggle"],
+		// Text and marks
+		Av: ["Avatar"],
+		IB: ["IconButton"],
+		AR: ["AspectRatio"],
+		Cd: ["CodeBlock"],
+		TI: ["TextInput"],
+		TA: ["TextArea"],
+		NI: ["NumberInput"],
+		CB: ["CheckboxInput"],
+		RL: ["RadioList"],
+		RLI: ["RadioListItem"],
+		TY: ["Typeahead"],
+		Fd: ["Field"],
+		VH: ["VisuallyHidden"],
+		SD: ["StatusDot"],
+		Tk: ["Token"],
+		// Chat
+		ChC: ["ChatComposer"],
+		ChL: ["ChatLayout"],
+		ChM: ["ChatMessage"],
+		ChB: ["ChatMessageBubble"],
+		ChBu: ["ChatMessageBubble"],
+		ChMeta: ["ChatMessageMetadata"],
+		ChTC: ["ChatToolCalls"],
+		ChML: ["ChatMessageList"],
+		ChSM: ["ChatSystemMessage"],
+		// Local and shared symbols a template may render
+		Bu: ["Bullet"],
+		SB: ["SeverityBadge"],
+		Scene: ["SceneTile", "SceneCastle", "SceneFrame"],
+		Outline: ["Outline", "ChapteredDoc"],
+		Sw: ["ChartLegend", "ProductSwatch", "RevenueChart"],
+		RC: ["RevenueChart"],
+		// Layout primitives
+		B: ["Button"],
+		Bd: ["Badge"],
+		C: ["Card"],
+		Ctr: ["Center"],
+		D: ["Divider"],
+		G: ["Grid"],
+		// The house notation calls a horizontal Stack "H" and a vertical one
+		// "V". A template may import either the directional alias
+		// (HStack/VStack) or the plain Stack with a direction prop.
+		H: ["HStack", "Stack"],
+		V: ["VStack", "Stack"],
+		Hd: ["Heading"],
+		Ic: ["Icon"],
+		L: ["Layout"],
+		Lk: ["Link"],
+		ML: ["MetadataList"],
+		NI2: [],
+		SN: ["SideNav"],
+		SNI: ["SideNavItem"],
+		SNS: ["SideNavSection"],
+		S: ["Section"],
+		T: ["Table"],
+		Tbar: ["Toolbar"],
+		Tmb: ["ToolbarMenuItem"],
+		TN: ["TopNav"],
+		Tx: ["Text"],
+		UL: ["List"],
+	};
+	for (const f of lintFiles.sort()) {
+		if (!f.startsWith("templates/")) continue;
+		const src = await Bun.file(f).text();
+		const header = src.split("\n").find((l) => l.startsWith("//   "));
+		if (!header) {
+			fail(`${f} has no XLE header — every template carries one (//   …)`);
+			continue;
+		}
+		// Every symbol the template imports, from any module — PLUS the symbols
+		// the shared modules it imports pull in. A template that delegates to
+		// `shared/chaptered-doc.tsx` describes the tree that shared module
+		// renders, so the AppShell and the SideNav in its header are imported
+		// there, not here. Without following the shared imports the gate would
+		// flag every delegated template for a tree it does not own.
+		const imported = new Set<string>();
+		const collectImports = (source: string) => {
+			for (const m of source.matchAll(/import\s+(?:type\s+)?\{([^}]*)\}\s+from\s+"([^"]+)"/g)) {
+				for (const part of m[1].split(",")) {
+					const name = part
+						.trim()
+						.replace(/^type\s+/, "")
+						.split(/\s+as\s+/)[0]
+						.trim();
+					if (name) imported.add(name);
+				}
+			}
+		};
+		collectImports(src);
+		// The shared modules are imported two ways in this repo: relatively
+		// (`../shared/x`) from the demo, and through the package's own export
+		// map (`astryx-dracula/shared/x`) from the templates. Both point at the
+		// same file under `shared/`.
+		for (const m of src.matchAll(/from\s+"(?:\.\.\/shared\/|astryx-dracula\/shared\/)([^"]+)"/g)) {
+			const stem = `shared/${m[1].split("/").pop()}`;
+			for (const ext of [".tsx", ".ts"]) {
+				if (await Bun.file(stem + ext).exists()) {
+					collectImports(await Bun.file(stem + ext).text());
+					break;
+				}
+			}
+		}
+		// Node names in the header. Quoted payloads are stripped first: the
+		// words inside them are text, not nodes.
+		const stripped = header.replace(/"[^"]*"/g, '""');
+		const used = new Set<string>();
+		for (const m of stripped.matchAll(/\b([A-Z][A-Za-z]{0,14})(?=[.[*)\s>]|$)/g)) used.add(m[1]);
+		for (const token of used) {
+			const components = XLE_TOKEN_COMPONENTS[token];
+			if (!components || components.length === 0) continue;
+			if (!components.some((c) => imported.has(c))) {
+				fail(
+					`${f}: XLE names "${token}" (${components.join(" | ")}) but the template imports none of them — the header describes a structure the file does not render`,
+				);
+			}
+		}
+	}
+}
+
 // Zero !important, anywhere we author. Unlayered already outranks every core
 // layer on cascade order, so !important is never the answer here — it is only
 // ever a way to stop noticing which layer you are actually in.

@@ -2,7 +2,7 @@
 // XLE (canonical structure of the tree below; the CLI had no XLE validator
 // after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
 // human drift check — update it with the file, never alone):
-//   L > (LH[divider] > H[a=center wrap] > (SI[fill] > Hd"Settings"[level=1 t=display-2]) + TY"Search") + (LP[w=260 p=2] > UL > LI*6) + (LC[p=6] > V[g=4] > (V[a=center] > TabList) + ((G[c={min:280} g=8] > (V[g=1] > Hd"Basic information"[level=2] + Tx"View and update your details"[t=body]) + (V[g=4] > TI"Username" + TI"Email address" + (H > B.primary"Save"))) + D)*3)
+//   L[h=fill] > (LH[divider p=6] > H[a=center wrap] > (SI[fill] > Hd"Settings"[level=1 t=display-2]) + TY"Search coven settings…") + (LP[w=260 p=2] > UL[density=balanced edge=flush] > LI*6) + (LC[p=6] > V[g=4] > (V[a=center] > (TL > Tab"Profile"! + Tab"Account" + Tab"Members" + TabMenu"More")) + (G[c={min:280} g=8] > (V[g=1] > Hd"Basic information"[level=2] + Tx"View and update your crypt details"[t=body]) + (V[g=4] > TI"Username" + TI"First name" + TI"Last name" + TI"Email address" + (H > B.primary"Save"))) + D + (G[c={min:280} g=8] > (V[g=1] > Hd"Change password"[level=2] + Tx"Update your password"[t=body]) + (V[g=4] > TI"Verify current password" + TI"New password" + TI"Confirm password" + (H > B.primary"Save"))) + D + (G[c={min:280} g=8] > (V[g=1] > Hd"Advanced settings"[level=2] + Tx"Configure detailed coven preferences"[t=body]) + (V[g=4] > CB"Data Export Access" + CB"Allow Admin to Add Members" + CB"Enable Two-Factor Authentication" + (H > B.primary"Save"))))
 
 /**
  * Settings — one scrolling page of account sections.

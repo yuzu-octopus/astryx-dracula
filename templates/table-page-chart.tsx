@@ -2,7 +2,7 @@
 // XLE (canonical structure of the tree below; the CLI had no XLE validator
 // after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
 // human drift check — update it with the file, never alone):
-//   L > (LH[divider] > H[a=center g=2] > (SI[size=fill] > Hd"Matcha Bar"[level=1]) + IB"Filter"[variant=ghost] + IB"Export"[variant=ghost] + B.primary"New order") + (LC[p=3] > V[g=4] > C[p=4] + (T[hover] > (TR > THC"Order" + THC"Product" + THC"Amount" + THC"Customer" + THC"Email" + THC"Status" + THC"Date") + (TR > TC"ORD-1001" + TC"Ceremonial Matcha Latte" + TC"$6" + TC"Sarah Chen" + TC"sarah.chen@acme.co" + (TC > Tk.green"Completed") + TC"2025-01-15")*6))
+//   L[h=fill] > (LH[divider p=6] > H[a=center g=2] > (SI[size=fill] > Hd"Matcha Bar"[level=1 t=display-2]) + IB"Filter"[variant=ghost] + IB"Export"[variant=ghost] + B.primary"New order") + (LC[p=3] > V[g=4] > (V[g=3] > RC + Tx"Daily revenue · Jan 1–15"[t=supporting] + (H[g=2 a=center] > Ic + Tx"Revenue"[t=supporting])) + (T[hover density=balanced dv=rows] > (TR > THC"Order" + THC"Product" + THC"Amount" + THC"Customer" + THC"Email" + THC"Status" + THC"Date") + (TR > TC"ORD-1001" + TC"Ceremonial Matcha Latte" + TC"$6" + TC"Sarah Chen" + TC"sarah.chen@acme.co" + (TC > Tk.green"Completed") + TC"2025-01-15")*30))
 
 /**
  * Matcha Bar — order desk: a daily revenue line over the full order log.  Frame: page header (title + icon actions) | content column (chart, t (Frame/responsive/container: see XLE header above.)

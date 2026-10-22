@@ -2,7 +2,7 @@
 // XLE (canonical structure of the tree below; the CLI had no XLE validator
 // after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
 // human drift check — update it with the file, never alone):
-//   L > (LH[divider] > H[g=2 a=center] > (SI[fill] > Hd"Familiars"[level=1]) + IB"Filter"[variant=ghost] + IB"Download"[variant=ghost] + B.primary"Add") + (LC[p=3] > V[g=4] > PS + (T[hover] > (TR > THC*3) + (TR > TC*3)*3))
+//   L[h=fill] > (LH[divider p=6] > H[g=2 a=center] > (SI[fill] > Hd"Familiars"[level=1 t=display-2]) + IB"Filter"[variant=ghost] + IB"Download"[variant=ghost] + B.primary"Add") + (LC[p=3] > V[g=4] > PS"Search familiars…" + (T[hover density=balanced dv=rows] > (TR > THC"Name" + THC"Biography" + THC"Age") + (TR > TC*3)*38))
 
 /**
  * Familiars — the full roster of the crypt's companions, with a PowerSearch field filter bar above one dense table. (Frame/responsive/container: see XLE header above.)

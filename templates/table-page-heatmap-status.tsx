@@ -2,7 +2,7 @@
 // XLE (canonical structure of the tree below; the CLI had no XLE validator
 // after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
 // human drift check — update it with the file, never alone):
-//   L > (LH[divider] > H[g2 a=center] > Hd"Status"[level=1] + IB"Filter"[variant=ghost] + IB"Export"[variant=ghost] + B.secondary"Refresh") + (LC[p3] > V[g4] > (V[g3] > C[p4] + Tx"Incidents by day and hour"[t=supporting] + (H[g4] > (H[g2] > Tx[t=supporting])*4)) + (T[hover] > (TR > THC"Incident" + THC"Product" + THC"Description" + THC"Started" + THC"Duration" + THC"On-call" + THC"Status" + THC"Date") + (TR > TC"INC-4008" + TC"Business Suite" + TC"Notification delivery delays" + TC"09:15" + TC"ongoing" + TC"Carlos Mendez" + (TC > Tk.red"Ongoing") + TC"2025-01-15")*5))
+//   L[h=fill] > (LH[divider p=6] > H[g=2 a=center] > (SI[size=fill] > Hd"Status"[level=1 t=display-2]) + IB"Filter"[variant=ghost] + IB"Export"[variant=ghost] + B.secondary"Refresh") + (LC[p=3] > V[g=4] > (V[g=3] > C[p=4] + (V[g=1] > (H[g=2 a=center] > (H[g=1 a=center] > Sw + Tx"0"[t=supporting])*4) + Tx"Incidents by day and hour · Jan 12–18"[t=supporting])) + (T[hover density=balanced dv=rows] > (TR > THC"Incident" + THC"Product" + THC"Description" + THC"Started" + THC"Duration" + THC"On-call" + THC"Status" + THC"Date") + (TR > TC"INC-4008" + TC"Business Suite" + TC"Notification delivery delays" + TC"09:15" + TC"ongoing" + TC"Carlos Mendez" + (TC > Tk.red"Ongoing") + TC"2025-01-15")*14))
 
 /**
  * Status — the incident heatmap for the week plus the log behind it.

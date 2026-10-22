@@ -2,7 +2,7 @@
 // XLE (canonical structure of the tree below; the CLI had no XLE validator
 // after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
 // human drift check — update it with the file, never alone):
-//   A[cp=0 @topNav=(TN) @sideNav=(SN > TL)] > L > (LH[divider] > H[g=2 wrap] > C.muted[p=0]*3) + (LC[p=6] > V[g=2] > (H[g=3 a=center] > C.muted[p=0] + C.muted[p=0])*3 + C.muted[p=0] + (H[g=3 a=center] > C.muted[p=0] + C.muted[p=0])*4 + C.muted[p=0] + (H[g=3 a=center] > C.muted[p=0] + C.muted[p=0])*5)
+//   A[cp=0 @topNav=(TN > (B.ghost"File" + B.ghost"Edit" + B.ghost"View" + B.ghost"Window" + B.ghost"Help") + B.secondary"Search files and commands") @sideNav=(SN > TrL[density=compact])] > L[h=fill] > (LH[divider p=6] > H[g=2 wrap] > Sk[w=132 h=36]*2) + (LC[p=6] > V[g=2] > (H[g=3 a=center] > Sk + Sk)*2 + Sk + (H[g=3 a=center] > Sk + Sk) + Sk{Skeleton})
 // Note: skeleton placeholders carry no Hd by design (skill skeleton-shell
 // exemption) — routed pages supply the h1.
 

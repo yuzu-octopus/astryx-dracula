@@ -32,6 +32,52 @@ bunx @astryxdesign/cli docs layout             # layout guidance
 - `[...]` — attrs: fused (`p6 g4 c4`), `key=value` (`t=email c{min:340}`), flags (`req striped hover`), align (`j=` main axis, `a=` cross), slots (`@topNav=TN`), `fill` wraps in StackItem
 - `>` nests, `+` siblings. Structure auto-routes: `Layout > LH + LC + LF + LP` into slots; `T >` rows partition into header/body.
 
+## Node vocabulary
+
+These are the ONLY node names. A header that names a component with a
+different token is wrong, and `scripts/check.ts` fails the build when a header
+names a component the template does not import.
+
+**Shell and layout** — `A` AppShell · `L` Layout · `LC` LayoutContent ·
+`LH` LayoutHeader · `LF` LayoutFooter · `LP` LayoutPanel · `Ctr` Center ·
+`H` horizontal Stack (HStack) · `V` vertical Stack (VStack) · `G` Grid ·
+`GS` GridSpan · `SI` StackItem · `A2`/`A3` AppShell grid span (see note) ·
+`LH` LayoutHeader
+
+**Surfaces** — `C` Card · `CC` ClickableCard · `SC` SelectableCard ·
+`S` Section · `D` Divider · `B` Button · `Bd` Badge · `Bn` Banner ·
+`TL` TabList · `TB` Toolbar · `Tmb` ToolbarMenuItem · `T` Table ·
+`TR` TableRow · `TC` TableCell · `THC` TableHeaderCell · `UL` List ·
+`LI` ListItem · `TrL` TreeList · `ML` MetadataList · `MLI` MetadataListItem ·
+`Tbar` Toolbar · `OFL` OverflowList · `Po` Popover · `PS` PowerSearch ·
+`MM` MoreMenu · `SG` SegmentedGroup · `SGI` SegmentedGroupItem ·
+`SE` SegmentedControl / Selector · `Tg` ToggleButton · `TgG` ToggleButtonGroup ·
+`Coll` Collapsible · `ColG` CollapsibleGroup
+
+**Text and marks** — `Hd` Heading · `Tx` Text · `Lk` Link · `Ic` Icon ·
+`IB` IconButton · `Tk` Token · `Av` Avatar · `SD` StatusDot · `AR` AspectRatio ·
+`Cd` CodeBlock · `TI` TextInput · `TA` TextArea · `NI` NumberInput ·
+`CB` CheckboxInput · `RL` RadioList · `RLI` RadioListItem · `TY` Typeahead ·
+`Fd` Field · `VH` VisuallyHidden · `MNT` MobileNavToggle · `Bu` Bullet
+separator · `RC` RevenueChart · `Sw` chart legend swatch · `Scene` SceneTile / SceneCastle ·
+`SB` the local SeverityBadge · `Outline` the shared chapter outline
+
+**Chat** — `ChC` ChatComposer · `ChL` ChatLayout · `ChM` ChatMessage ·
+`ChBu` ChatMessageBubble · `ChMeta` ChatMessageMetadata · `ChTC` ChatToolCalls · `ChML` ChatMessageList · `ChSM` ChatSystemMessage
+
+Notes on the two that used to collide:
+
+- **`TL` is TabList, not TreeList.** TreeList is `TrL`. The two were both
+  `TL` in the tree before 2026-10-22, which meant one header could not be
+  read without knowing which component its template used.
+- **`SE` is both SegmentedControl and Selector**, because the two are the
+  same shape in a header and the surrounding attrs (`[label=…]`) tell them
+  apart. Where that is ambiguous, name the component in a hint: `SE{Selector}`.
+
+**Text payloads are the rendered string, not a label.** A header that says
+`TI"Email"` must match a field whose rendered label is "Email" — not its
+`label` attribute when the two differ, and not a placeholder.
+
 ## Example (analytics dashboard, 204 tok in)
 
 ```text

@@ -2,7 +2,7 @@
 // XLE (canonical structure of the tree below; the CLI had no XLE validator
 // after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
 // human drift check — update it with the file, never alone):
-//   A[cp=6 @topNav=(TN > TNI"Shop" + TNI"Brands" + TNI"Sale" + TNI"Service")] > Ctr[axis=horizontal] > S[mw=1100 w=100% p=0] > V[g=10] > C.muted[p=0 w=100% h=360] + (V[g=4] > C.muted[p=0 w=200 h=24] + (G[c={min:160} g=4] > (V[g=2] > C.muted[p=0 w=100% h=120] + C.muted[p=0 w=60% h=14])*6))*3
+//   A.surface[cp=6 @topNav=(TN > (Hd{TopNavHeading}"Nocturne") + (TNI{TopNavMegaMenu}"Shop" > (TNI{TopNavMegaMenuItem}*4 + C{TopNavMegaMenuFeaturedCard}"The Midnight Edit") + TNI{TopNavMegaMenu}"Brands" > (TNI{TopNavMegaMenuItem}*4 + C{TopNavMegaMenuFeaturedCard}"Meet Studio Mara") + TNI"Sale" + TNI"Service") + (IB"Search products" + B.ghost"Sign in" + B.primary"Checkout"))] > Ctr[axis=horizontal] > S.transparent[mw=1100 w=100% p=0] > V[g=10] > C.muted[p=0 w=100% h=360] + (V[g=4] > C.muted[p=0 w=200 h=24] + (G[c={min:160} g=4] > (V[g=2] > C.muted[p=0 w=100% h=120] + C.muted[p=0 w=60% h=14])*4))*3
 // Note: skeleton placeholders carry no Hd by design (skill skeleton-shell
 // exemption) — routed pages supply the h1.
 

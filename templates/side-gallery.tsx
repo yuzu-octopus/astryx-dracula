@@ -4,7 +4,7 @@
 // human drift check — update it with the file, never alone):
 // AR*9 is the live count: SCENE_TILE_ALTS has 9 entries and a bare .map renders
 // all 9, with no slice.
-//   L > LC[p=6] > G[c={min:280} g8 a=center] > (V[g6] > (V[g3] > Tx"AFTER DARK"[t=supporting] + Hd"Make every night"[level=1] + Tx"The smallest rituals"[t=body]) + B.primary"Explore the night" + (V[g4] > D + (H[g6] > (V > Tx"12k+"[t=display-3] + Tx"Night shots"[t=supporting])*3))) + (G[c3 g3] > AR*9)
+//   L[h=fill mw=1400] > LC[p=6] > G[c={min:280} g=8 a=center] > (V[g=6 a=center] > (V[g=3] > Tx"AFTER DARK"[t=supporting] + Hd"Make every night"[level=1] + Tx"The smallest rituals"[t=body]) + B.primary"Explore the night" + (V[g=4] > D + (H[g=6] > (V[g=0] > Tx"12k+"[t=display-3] + Tx"Night shots"[t=supporting])*3))) + (G[c=3 g=3] > AR[ratio=1]*9)
 
 import { AspectRatio } from "@astryxdesign/core/AspectRatio";
 import { Button } from "@astryxdesign/core/Button";

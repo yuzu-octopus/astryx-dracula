@@ -2,7 +2,7 @@
 // XLE (canonical structure of the tree below; the CLI had no XLE validator
 // after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
 // human drift check — update it with the file, never alone):
-//   L > (LH[divider] > H[a=center j=between] > Hd"Artifacts"[level=1] + B.primary"Add artifact") + (LC > T[hover] > (TR > THC"Name" + THC"Status" + THC"Updated" + THC"Actions") + (TR > TC"Blood Vial" + (TC > SD.success + Tx"Active") + TC"2025-01-15" + (TC > B.secondary"Edit"))*3)
+//   L[h=auto] > (LH[divider] > H[a=center j=between] > Hd"Artifacts"[level=1] + B.primary"Add artifact") + (LC > T[hover w=auto] > (TR > THC"Name" + THC"Status" + THC"Updated" + THC"Actions") + (TR > TC"Blood Vial" + (TC > H[g=1 a=center] > SD.success + Tx"Active") + TC"2025-01-15" + (TC > B.secondary"Edit"))*3)
 
 import { Button } from "@astryxdesign/core/Button";
 import { HStack, Layout, LayoutContent, LayoutHeader } from "@astryxdesign/core/Layout";

@@ -2,7 +2,7 @@
 // XLE (canonical structure of the tree below; the CLI had no XLE validator
 // after `astryx layout` was removed in 0.7.0, so this is a reading aid and a
 // human drift check — update it with the file, never alone):
-//   L > (LH[divider] > H[g2 a=center] > Hd"Midnight Kicks"[level=1] + IB"Filter"[variant=ghost] + IB"Export"[variant=ghost] + B.primary"New order") + (LC[p3] > V[g4] > (V[g3] > C[p=4] + Tx"Daily revenue"[t=supporting] + (H[g2 a=center] > Ic + Tx"Revenue"[t=supporting])) + (T[hover] > (TR > THC"Order" + THC"Product" + THC"Amount" + THC"Customer" + THC"Email" + THC"Status" + THC"Date") + (TR > TC"ORD-1001" + TC"Air Max 90" + TC"$130" + TC"Sarah Chen" + TC"sarah.chen@acme.co" + (TC > Tk.green"Completed") + TC"2025-01-12")*5))
+//   L[h=fill] > (LH[divider p=6] > H[g=2 a=center] > (SI[size=fill] > Hd"Midnight Kicks"[level=1 t=display-2]) + IB"Filter"[variant=ghost] + IB"Export"[variant=ghost] + B.primary"New order") + (LC[p=3] > V[g=4] > (V[g=3] > RC + Tx"Daily revenue · Jan 1–15"[t=supporting] + (H[g=2 a=center] > Ic + Tx"Revenue"[t=supporting])) + (T[hover density=balanced dv=rows] > (TR > THC"Order" + THC"Product" + THC"Amount" + THC"Customer" + THC"Email" + THC"Status" + THC"Date") + (TR > TC"ORD-1001" + TC"Air Max 90" + TC"$130" + TC"Sarah Chen" + TC"sarah.chen@acme.co" + (TC > Tk.green"Completed") + TC"2025-01-12")*59))
 
 /**
  * Midnight Kicks — sneaker order desk: a daily revenue line over the order log.  Frame: page header (title + icon actions) | content column (c (Frame/responsive/container: see XLE header above.)
